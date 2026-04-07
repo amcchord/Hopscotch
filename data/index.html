@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopscotch Controller</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Hopscotch</h1>
+        <div id="connection-status" class="status-dot disconnected"></div>
+    </header>
+
+    <main>
+        <!-- Telemetry Section -->
+        <section class="panel" id="telemetry-panel">
+            <h2>Telemetry</h2>
+            <div class="telemetry-row">
+                <div class="info-box">
+                    <span class="label">Link</span>
+                    <span id="link-status" class="value">--</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">RSSI</span>
+                    <span id="rssi" class="value">--</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">LQ</span>
+                    <span id="lq" class="value">--</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">Drive</span>
+                    <span id="drive-armed" class="value">DISARMED</span>
+                </div>
+                <div class="info-box">
+                    <span class="label">Arms</span>
+                    <span id="arm-armed" class="value">DISARMED</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Motor Status -->
+        <section class="panel" id="motor-panel">
+            <h2>Motors</h2>
+            <div class="motor-diagram">
+                <div class="motor-row">
+                    <div class="motor-box" id="motor-fl" title="Front Left">
+                        <span class="motor-label">FL</span>
+                        <span class="motor-id"></span>
+                    </div>
+                    <div class="robot-body">
+                        <div class="arrow-up"></div>
+                    </div>
+                    <div class="motor-box" id="motor-fr" title="Front Right">
+                        <span class="motor-label">FR</span>
+                        <span class="motor-id"></span>
+                    </div>
+                </div>
+                <div class="motor-row">
+                    <div class="motor-box" id="motor-bl" title="Back Left">
+                        <span class="motor-label">BL</span>
+                        <span class="motor-id"></span>
+                    </div>
+                    <div class="robot-body-lower"></div>
+                    <div class="motor-box" id="motor-br" title="Back Right">
+                        <span class="motor-label">BR</span>
+                        <span class="motor-id"></span>
+                    </div>
+                </div>
+                <div class="motor-row arm-row">
+                    <div class="motor-box arm" id="motor-la" title="Left Arm">
+                        <span class="motor-label">LA</span>
+                        <span class="motor-id"></span>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="motor-box arm" id="motor-ra" title="Right Arm">
+                        <span class="motor-label">RA</span>
+                        <span class="motor-id"></span>
+                    </div>
+                </div>
+            </div>
+            <table class="motor-table" id="motor-details">
+                <thead>
+                    <tr><th>ID</th><th>Pos</th><th>Vel</th><th>Trq</th><th>Tmp</th><th>Err</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <!-- RC Channels -->
+        <section class="panel" id="channel-panel">
+            <h2>RC Channels</h2>
+            <div id="channel-bars"></div>
+        </section>
+
+        <!-- Emergency Controls -->
+        <section class="panel" id="control-panel">
+            <h2>Controls</h2>
+            <button class="btn btn-danger" id="btn-disarm">DISARM ALL</button>
+        </section>
+
+        <!-- Settings -->
+        <section class="panel" id="settings-panel">
+            <h2>Settings</h2>
+            <div class="settings-form" id="settings-form">
+                <fieldset>
+                    <legend>WiFi</legend>
+                    <label>SSID <input type="text" id="set-wifi-ssid"></label>
+                    <label>Password <input type="password" id="set-wifi-pass"></label>
+                </fieldset>
+                <fieldset>
+                    <legend>Channel Assignments (0-15)</legend>
+                    <label>Steering <input type="number" id="set-ch-steering" min="0" max="15"></label>
+                    <label>Throttle <input type="number" id="set-ch-throttle" min="0" max="15"></label>
+                    <label>Arm/Disarm Drive <input type="number" id="set-ch-arm-drive" min="0" max="15"></label>
+                    <label>Arm/Disarm Arms <input type="number" id="set-ch-arm-arms" min="0" max="15"></label>
+                    <label>Left Arm <input type="number" id="set-ch-arm-left" min="0" max="15"></label>
+                    <label>Right Arm <input type="number" id="set-ch-arm-right" min="0" max="15"></label>
+                </fieldset>
+                <fieldset>
+                    <legend>Control</legend>
+                    <label>Deadband <input type="number" id="set-deadband" min="0" max="500"></label>
+                    <label>Max Drive Speed (rad/s) <input type="number" id="set-max-speed" step="0.5" min="0" max="33"></label>
+                    <label>Position Horizon (s) <input type="number" id="set-horizon" step="0.1" min="0.5" max="5"></label>
+                    <label>Max Arm Speed (rad/s) <input type="number" id="set-arm-speed" step="0.5" min="0" max="50"></label>
+                </fieldset>
+                <fieldset>
+                    <legend>Motor CAN IDs</legend>
+                    <label>Front Right <input type="number" id="set-mid-fr" min="1" max="127"></label>
+                    <label>Back Right <input type="number" id="set-mid-br" min="1" max="127"></label>
+                    <label>Back Left <input type="number" id="set-mid-bl" min="1" max="127"></label>
+                    <label>Front Left <input type="number" id="set-mid-fl" min="1" max="127"></label>
+                    <label>Arm Left <input type="number" id="set-mid-la" min="1" max="127"></label>
+                    <label>Arm Right <input type="number" id="set-mid-ra" min="1" max="127"></label>
+                </fieldset>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+                    <button class="btn btn-secondary" id="btn-reset-settings">Reset Defaults</button>
+                </div>
+            </div>
+            <fieldset>
+                <legend>Change Motor CAN ID on Bus</legend>
+                <label>Current ID <input type="number" id="canid-old" min="1" max="127"></label>
+                <label>New ID <input type="number" id="canid-new" min="1" max="127"></label>
+                <button class="btn btn-warning" id="btn-change-canid">Change CAN ID</button>
+                <p class="note">Motor must be power-cycled after changing ID.</p>
+            </fieldset>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
