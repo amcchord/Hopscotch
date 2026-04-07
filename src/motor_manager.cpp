@@ -177,6 +177,17 @@ void MotorManager::checkTimeouts(uint32_t timeout_ms) {
     }
 }
 
+void MotorManager::scanNextMotor() {
+    if (!_can) return;
+
+    // Round-robin: send motion control ping (all zeros) to each motor.
+    // This provokes a type-0x02 feedback response without commanding movement.
+    MotorState& m = _motors[_scan_index];
+    _can->sendMotionPing(m.can_id);
+
+    _scan_index = (_scan_index + 1) % NUM_MOTORS;
+}
+
 bool MotorManager::changeMotorCanIdOnBus(uint8_t old_id, uint8_t new_id) {
     if (!_can) return false;
     return _can->changeMotorCanId(old_id, CAN_HOST_ID, new_id);

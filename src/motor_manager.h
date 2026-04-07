@@ -63,6 +63,9 @@ public:
     // Mark motors offline if no feedback within timeout
     void checkTimeouts(uint32_t timeout_ms = 500);
 
+    // Ping one motor by reading its position parameter (round-robins through motors)
+    void scanNextMotor();
+
     // Change a motor's CAN ID on the bus
     bool changeMotorCanIdOnBus(uint8_t old_id, uint8_t new_id);
 
@@ -79,4 +82,5 @@ private:
 
     int findMotorByCanId(uint8_t can_id);
     bool enableAndConfigureMotor(int idx, RobstrideRunMode mode);
+    int _scan_index = 0;
 };

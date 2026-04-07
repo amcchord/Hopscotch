@@ -63,6 +63,12 @@ public:
     // Build the 29-bit extended CAN ID
     static uint32_t makeCanId(RobstrideCommType type, uint16_t data16, uint8_t target_id, uint8_t host_id);
 
+    // Broadcast device discovery (ObtainID type 0, target=0)
+    bool broadcastScan(uint8_t host_id);
+
+    // Send motion control ping with all zeros to provoke feedback
+    bool sendMotionPing(uint8_t motor_id);
+
     // High-level commands
     bool enableMotor(uint8_t motor_id, uint8_t host_id);
     bool stopMotor(uint8_t motor_id, uint8_t host_id, bool clear_fault = false);
@@ -87,6 +93,9 @@ public:
     bool sendSpeedCommand(uint8_t motor_id, uint8_t host_id,
                           float target_speed_rad_s, float current_limit_a);
 
+    // Read a single parameter from a motor (provokes a response)
+    bool readParam(uint8_t motor_id, uint8_t host_id, uint16_t param_addr);
+
     // Change a motor's CAN ID (requires power cycle)
     bool changeMotorCanId(uint8_t current_id, uint8_t host_id, uint8_t new_id);
 
@@ -95,6 +104,26 @@ public:
 
     // Receive and parse feedback (non-blocking, returns false if no message)
     bool receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms = 1);
+
+    // Print TWAI bus status and error counters for diagnostics
+    void printBusStatus();
+
+    uint32_t tx_ok_count = 0;
+    uint32_t tx_fail_count = 0;
+    uint32_t rx_count = 0;
+
+    // Debug: store last N raw received frames for later inspection
+    static constexpr int RX_LOG_SIZE = 16;
+    struct RxLogEntry {
+        uint32_t id;
+        uint8_t  dlc;
+        uint8_t  data[8];
+        bool     extd;
+        bool     used;
+    };
+    RxLogEntry rx_log[RX_LOG_SIZE] = {};
+    int rx_log_idx = 0;
+    void printRxLog();
 
 private:
     bool sendFrame(uint32_t ext_id, const uint8_t* data, uint8_t len);

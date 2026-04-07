@@ -134,11 +134,13 @@ void setup() {
     M5.begin(cfg);
 
     Serial.begin(115200);
-    delay(300);
+    delay(1000);
+    Serial.println();
     Serial.println();
     Serial.println("========================================");
     Serial.println("  Hopscotch Robot Controller");
     Serial.println("========================================");
+    Serial.flush();
 
     // 1. Settings (needs LittleFS)
     settingsMgr.begin();
@@ -196,7 +198,8 @@ void loop() {
         // 1. Read CRSF data
         crsfRx.update();
 
-        // 2. Process CAN feedback
+        // 2. Scan for motors (one per tick, round-robin) and process feedback
+        motorMgr.scanNextMotor();
         motorMgr.processFeedback();
         motorMgr.checkTimeouts(500);
 
@@ -271,10 +274,32 @@ void loop() {
 
         // 8. Periodic debug output (every 2 seconds)
         if (controlTickCount % 100 == 0) {
-            Serial.printf("[Loop] t=%lu link=%d drv=%d arm=%d thr=%.2f str=%.2f\n",
-                          now, crsfRx.isLinkUp(),
+            Serial.printf("[Loop] t=%lu link=%d rssi=%d lq=%d drv=%d arm=%d thr=%.2f str=%.2f wifi=%d\n",
+                          now, crsfRx.isLinkUp(), crsfRx.getRssi(), crsfRx.getLinkQuality(),
                           motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
-                          throttle, steering);
+                          throttle, steering, wifiConnected);
+
+            // Print raw channel values
+            Serial.print("[CRSF] CH: ");
+            for (int i = 0; i < 16; i++) {
+                Serial.printf("%d", crsfRx.getChannel(i));
+                if (i < 15) Serial.print(",");
+            }
+            Serial.println();
+
+            // Print motor online status
+            Serial.print("[Motors] Online: ");
+            for (int i = 0; i < motorMgr.motorCount(); i++) {
+                const MotorState& m = motorMgr.getMotor(i);
+                Serial.printf("ID%d=%s ", m.can_id, m.online ? "Y" : "N");
+            }
+            Serial.println();
+
+            // CAN bus diagnostics
+            canBus.printBusStatus();
+            if (canBus.rx_count > 0) {
+                canBus.printRxLog();
+            }
         }
     }
 

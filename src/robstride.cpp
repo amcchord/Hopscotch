@@ -2,20 +2,27 @@
 #include <Arduino.h>
 #include <cstring>
 
-// The Robstride 29-bit extended CAN ID is packed as:
+// Robstride 29-bit extended CAN ID layout (confirmed from working JumpRopeM5/JumpropeESP32):
 //   bits [28:24] = communication type  (5 bits)
-//   bits [23:16] = extra data field    (8 bits, usage depends on command)
-//   bits [15:8]  = target motor CAN ID (8 bits)
-//   bits [7:0]   = host/master ID      (8 bits)
+//   bits [8:23]  = data field          (16 bits, typically master_id << 8 for non-motion)
+//   bits [0:7]   = motor CAN ID        (8 bits)
+//
+// For non-motion commands: (commType << 24) | (masterId << 8) | motorId
+// For motion control (0x01): (0x01 << 24) | (torque_u16 << 8) | motorId
 
 uint32_t Robstride::makeCanId(RobstrideCommType type, uint16_t data16,
                                uint8_t target_id, uint8_t host_id) {
-    uint32_t id = 0;
-    id |= (static_cast<uint32_t>(type) & 0x1F) << 24;
-    id |= (static_cast<uint32_t>(data16) & 0xFF) << 16;
-    id |= (static_cast<uint32_t>(target_id) & 0xFF) << 8;
-    id |= (static_cast<uint32_t>(host_id) & 0xFF);
-    return id;
+    if (type == RobstrideCommType::Control) {
+        // Motion control: data16 = torque_u16 goes in bits 8-23, motor in bits 0-7
+        return (static_cast<uint32_t>(type) << 24) |
+               (static_cast<uint32_t>(data16) << 8) |
+               static_cast<uint32_t>(target_id);
+    }
+
+    // All other commands: master_id in bits 8-15, motor_id in bits 0-7
+    return (static_cast<uint32_t>(type) << 24) |
+           (static_cast<uint32_t>(host_id) << 8) |
+           static_cast<uint32_t>(target_id);
 }
 
 bool Robstride::begin(int tx_pin, int rx_pin) {
@@ -67,12 +74,30 @@ bool Robstride::sendFrame(uint32_t ext_id, const uint8_t* data, uint8_t len) {
         memcpy(msg.data, data, len);
     }
 
-    esp_err_t err = twai_transmit(&msg, pdMS_TO_TICKS(5));
+    esp_err_t err = twai_transmit(&msg, pdMS_TO_TICKS(10));
     if (err != ESP_OK) {
-        Serial.printf("[CAN] TX fail id=0x%08lX err=0x%x\n", (unsigned long)ext_id, err);
+        tx_fail_count++;
         return false;
     }
+    tx_ok_count++;
     return true;
+}
+
+bool Robstride::broadcastScan(uint8_t host_id) {
+    // ObtainID command: broadcast (motor_id=0) to discover all motors
+    uint32_t can_id = makeCanId(RobstrideCommType::ObtainID, 0, 0, host_id);
+    uint8_t data[8] = {0};
+    return sendFrame(can_id, data, 8);
+}
+
+bool Robstride::sendMotionPing(uint8_t motor_id) {
+    // Send motion control frame with all zeros -- provokes a feedback response
+    // without actually commanding any movement
+    uint32_t can_id = (static_cast<uint32_t>(RobstrideCommType::Control) << 24) |
+                      (static_cast<uint32_t>(0x0000) << 8) |
+                      static_cast<uint32_t>(motor_id);
+    uint8_t data[8] = {0};
+    return sendFrame(can_id, data, 8);
 }
 
 bool Robstride::enableMotor(uint8_t motor_id, uint8_t host_id) {
@@ -175,6 +200,15 @@ bool Robstride::sendSpeedCommand(uint8_t motor_id, uint8_t host_id,
     return writeFloatParam(motor_id, host_id, RobstrideParam::TARGET_SPEED, target_speed_rad_s);
 }
 
+bool Robstride::readParam(uint8_t motor_id, uint8_t host_id, uint16_t param_addr) {
+    uint8_t data[8] = {0};
+    data[0] = param_addr & 0xFF;
+    data[1] = (param_addr >> 8) & 0xFF;
+
+    uint32_t can_id = makeCanId(RobstrideCommType::ParamRead, 0, motor_id, host_id);
+    return sendFrame(can_id, data, 8);
+}
+
 bool Robstride::changeMotorCanId(uint8_t current_id, uint8_t host_id, uint8_t new_id) {
     uint32_t can_id = makeCanId(RobstrideCommType::SetID, new_id, current_id, host_id);
     uint8_t data[8] = {0};
@@ -194,36 +228,54 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
     esp_err_t err = twai_receive(&msg, pdMS_TO_TICKS(timeout_ms));
     if (err != ESP_OK) return false;
 
-    if (!msg.extd) return false;
+    rx_count++;
+
+    // Log raw frame for later inspection
+    if (rx_log_idx < RX_LOG_SIZE) {
+        RxLogEntry& e = rx_log[rx_log_idx];
+        e.id = msg.identifier;
+        e.dlc = msg.data_length_code;
+        e.extd = msg.extd;
+        e.used = true;
+        memcpy(e.data, msg.data, 8);
+        rx_log_idx++;
+    }
+
+    if (!msg.extd) {
+        return false;
+    }
 
     uint32_t id = msg.identifier;
     uint8_t comm_type = (id >> 24) & 0x1F;
-    uint8_t motor_id = (id >> 8) & 0xFF;
 
+    // In the Robstride protocol, response frames have motor_id at bits 8-15
+    // (confirmed from working JumpRopeM5: feedback motor ID parsed from bits 8-15)
+    uint8_t motor_id = (id >> 8) & 0xFF;
     fb.motor_id = motor_id;
 
     if (comm_type == static_cast<uint8_t>(RobstrideCommType::Feedback)) {
-        // Feedback frame: 8 bytes packed similarly to MIT command
-        // Decode position (16-bit), velocity (12-bit), torque (12-bit), temp (8-bit), errors, mode
+        // Feedback frame: 4x uint16 big-endian (position, velocity, torque, temperature)
+        // Each scaled over full 16-bit range with motor-specific limits
+        // Error/mode from CAN ID bits 16-23
         auto uint_to_float = [](uint16_t val, float x_min, float x_max, int bits) -> float {
             float span = x_max - x_min;
             return x_min + static_cast<float>(val) / ((1 << bits) - 1) * span;
         };
 
-        uint16_t p_raw = (static_cast<uint16_t>(msg.data[0]) << 8) | msg.data[1];
-        uint16_t v_raw = (static_cast<uint16_t>(msg.data[2]) << 4) | (msg.data[3] >> 4);
-        uint16_t t_raw = (static_cast<uint16_t>(msg.data[3] & 0x0F) << 8) | msg.data[4];
-        uint16_t temp_raw = (static_cast<uint16_t>(msg.data[5]) << 4) | (msg.data[6] >> 4);
+        uint16_t pos_u16  = (static_cast<uint16_t>(msg.data[0]) << 8) | msg.data[1];
+        uint16_t vel_u16  = (static_cast<uint16_t>(msg.data[2]) << 8) | msg.data[3];
+        uint16_t torq_u16 = (static_cast<uint16_t>(msg.data[4]) << 8) | msg.data[5];
+        uint16_t temp_u16 = (static_cast<uint16_t>(msg.data[6]) << 8) | msg.data[7];
 
-        fb.position = uint_to_float(p_raw, -12.5f, 12.5f, 16);
-        fb.velocity = uint_to_float(v_raw, -44.0f, 44.0f, 12);
-        fb.torque = uint_to_float(t_raw, -17.0f, 17.0f, 12);
-        fb.temperature = uint_to_float(temp_raw, 0.0f, 120.0f, 12);
+        // Use RS05 limits as default (both RS00 and RS05 share +-4*pi pos, +-33 vel, +-17 torque)
+        fb.position = uint_to_float(pos_u16, -12.566f, 12.566f, 16);
+        fb.velocity = uint_to_float(vel_u16, -33.0f, 33.0f, 16);
+        fb.torque   = uint_to_float(torq_u16, -17.0f, 17.0f, 16);
+        fb.temperature = static_cast<float>(temp_u16) * 0.1f;
 
-        // Mode and errors from ID data field
-        uint8_t data_field = (id >> 16) & 0xFF;
-        fb.mode = (data_field >> 5) & 0x03;
-        fb.errors = data_field & 0x1F;
+        // Mode (bits 22-23) and error code (bits 16-21) from CAN ID
+        fb.mode = (id >> 22) & 0x03;
+        fb.errors = (id >> 16) & 0x3F;
         fb.has_fault = (fb.errors != 0);
 
         return true;
@@ -235,5 +287,76 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
         return true;
     }
 
+    // Log any received frame for debugging
+    Serial.printf("[CAN RX] type=%d motor=%d dlc=%d data=", comm_type, motor_id, msg.data_length_code);
+    for (int i = 0; i < msg.data_length_code; i++) Serial.printf("%02X ", msg.data[i]);
+    Serial.println();
+
+    // Any other response from a motor means it's alive (param read response, enable ack, etc.)
+    if (comm_type == static_cast<uint8_t>(RobstrideCommType::ParamRead) ||
+        comm_type == static_cast<uint8_t>(RobstrideCommType::ParamWrite) ||
+        comm_type == static_cast<uint8_t>(RobstrideCommType::Enable) ||
+        comm_type == static_cast<uint8_t>(RobstrideCommType::Stop) ||
+        comm_type == static_cast<uint8_t>(RobstrideCommType::ObtainID)) {
+
+        // For param read responses, try to extract float value from data[4..7]
+        if (comm_type == static_cast<uint8_t>(RobstrideCommType::ParamRead)) {
+            uint16_t param_addr = msg.data[0] | (msg.data[1] << 8);
+            if (param_addr == RobstrideParam::MOTOR_POSITION) {
+                float val;
+                memcpy(&val, &msg.data[4], sizeof(float));
+                fb.position = val;
+            }
+        }
+
+        fb.has_fault = false;
+        fb.errors = 0;
+        return true;
+    }
+
     return false;
+}
+
+void Robstride::printRxLog() {
+    Serial.printf("[CAN] RX log (%d frames captured):\n", rx_log_idx);
+    for (int i = 0; i < rx_log_idx; i++) {
+        RxLogEntry& e = rx_log[i];
+        if (!e.used) break;
+        Serial.printf("  #%d: ext=%d id=0x%08lX dlc=%d data=",
+                      i, e.extd, (unsigned long)e.id, e.dlc);
+        for (int j = 0; j < e.dlc; j++) {
+            Serial.printf("%02X ", e.data[j]);
+        }
+        // Decode the ID fields
+        if (e.extd) {
+            uint8_t type_field = (e.id >> 24) & 0x1F;
+            uint8_t data_field = (e.id >> 16) & 0xFF;
+            uint8_t id_high    = (e.id >> 8) & 0xFF;
+            uint8_t id_low     = e.id & 0xFF;
+            Serial.printf(" [type=%d d16=0x%02X hi=0x%02X(%d) lo=0x%02X(%d)]",
+                          type_field, data_field, id_high, id_high, id_low, id_low);
+        }
+        Serial.println();
+    }
+}
+
+void Robstride::printBusStatus() {
+    if (!_initialized) {
+        Serial.println("[CAN] Not initialized");
+        return;
+    }
+
+    twai_status_info_t status;
+    if (twai_get_status_info(&status) == ESP_OK) {
+        Serial.printf("[CAN] state=%d tx_err=%lu rx_err=%lu hw_tx_fail=%lu rx_miss=%lu arb_lost=%lu bus_err=%lu\n",
+                      status.state,
+                      status.tx_error_counter,
+                      status.rx_error_counter,
+                      status.tx_failed_count,
+                      status.rx_missed_count,
+                      status.arb_lost_count,
+                      status.bus_error_count);
+        Serial.printf("[CAN] our_tx_ok=%lu our_tx_fail=%lu our_rx=%lu\n",
+                      tx_ok_count, tx_fail_count, rx_count);
+    }
 }
