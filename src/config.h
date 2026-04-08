@@ -60,8 +60,8 @@ static constexpr uint32_t WEBSOCKET_PERIOD_MS    = 100;  // ~10 Hz
 // ---------------------------------------------------------------------------
 // Drive defaults
 // ---------------------------------------------------------------------------
-static constexpr float DEFAULT_MAX_DRIVE_SPEED_RAD_S = 10.0f;
-static constexpr float DEFAULT_POSITION_HORIZON_SEC  = 2.0f;
+static constexpr float DEFAULT_MAX_DRIVE_SPEED_RAD_S = 33.0f;  // RS05 max: 33 rad/s (~315 RPM)
+static constexpr float DEFAULT_POSITION_HORIZON_SEC  = 3.0f;
 static constexpr uint16_t DEFAULT_DEADBAND           = 50;   // raw CRSF units
 
 // ---------------------------------------------------------------------------

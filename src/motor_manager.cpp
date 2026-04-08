@@ -1,16 +1,38 @@
 #include "motor_manager.h"
 #include <Arduino.h>
 
+static MotorState makeMotor(uint8_t can_id, MotorRole role, bool reversed) {
+    MotorState m = {};
+    m.can_id = can_id;
+    m.role = role;
+    m.reversed = reversed;
+    m.online = false;
+    m.enabled = false;
+    m.has_fault = false;
+    m.position = 0;
+    m.raw_position = 0;
+    m.prev_raw_position = 0;
+    m.unwrap_offset = 0;
+    m._abs_pos_offset = 0;
+    m.has_first_feedback = false;
+    m.velocity = 0;
+    m.torque = 0;
+    m.temperature = 0;
+    m.errors = 0;
+    m.last_feedback_ms = 0;
+    m.run_mode = RobstrideRunMode::CSP;
+    return m;
+}
+
 void MotorManager::begin(Robstride* can_bus) {
     _can = can_bus;
 
-    // Initialize motor states with defaults
-    _motors[0] = { DEFAULT_MOTOR_ID_FRONT_RIGHT, MotorRole::FrontRight, false, false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
-    _motors[1] = { DEFAULT_MOTOR_ID_BACK_RIGHT,  MotorRole::BackRight,  false, false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
-    _motors[2] = { DEFAULT_MOTOR_ID_BACK_LEFT,   MotorRole::BackLeft,   true,  false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
-    _motors[3] = { DEFAULT_MOTOR_ID_FRONT_LEFT,  MotorRole::FrontLeft,  true,  false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
-    _motors[4] = { DEFAULT_MOTOR_ID_ARM_LEFT,    MotorRole::ArmLeft,    false, false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
-    _motors[5] = { DEFAULT_MOTOR_ID_ARM_RIGHT,   MotorRole::ArmRight,   false, false, false, false, 0,0,0,0,0,0, RobstrideRunMode::Position };
+    _motors[0] = makeMotor(DEFAULT_MOTOR_ID_FRONT_RIGHT, MotorRole::FrontRight, false);
+    _motors[1] = makeMotor(DEFAULT_MOTOR_ID_BACK_RIGHT,  MotorRole::BackRight,  false);
+    _motors[2] = makeMotor(DEFAULT_MOTOR_ID_BACK_LEFT,   MotorRole::BackLeft,   true);
+    _motors[3] = makeMotor(DEFAULT_MOTOR_ID_FRONT_LEFT,  MotorRole::FrontLeft,  true);
+    _motors[4] = makeMotor(DEFAULT_MOTOR_ID_ARM_LEFT,    MotorRole::ArmLeft,    false);
+    _motors[5] = makeMotor(DEFAULT_MOTOR_ID_ARM_RIGHT,   MotorRole::ArmRight,   false);
 
     _drive_armed = false;
     _arm_armed = false;
@@ -45,20 +67,48 @@ bool MotorManager::enableAndConfigureMotor(int idx, RobstrideRunMode mode) {
 
     MotorState& m = _motors[idx];
 
-    // Stop first to clear state
-    _can->stopMotor(m.can_id, CAN_HOST_ID, true);
-    delay(10);
+    // Per RS00 User Manual, the sequence for CSP mode is:
+    //   1. Stop (type 4, clear fault)
+    //   2. Set zero position (type 6) -- works in CSP and MIT modes, blocked in PP
+    //   3. Set run_mode (type 18 param write)
+    //   4. Enable (type 3)
+    //   5. Write limit_spd and loc_ref
 
-    // Set run mode to Position
+    _can->stopMotor(m.can_id, CAN_HOST_ID, true);
+    delay(100);
+
+    // Zero the position -- per manual section 4.2.6, this is supported in
+    // CSP and Motion Control modes (blocked in PP). Since we're about to
+    // set CSP mode, and the motor defaults to MIT after stop, zeroing works.
+    _can->setZeroPosition(m.can_id, CAN_HOST_ID);
+    delay(50);
+
     _can->setRunMode(m.can_id, CAN_HOST_ID, mode);
     delay(10);
 
-    // Enable
     bool ok = _can->enableMotor(m.can_id, CAN_HOST_ID);
+    delay(10);
+
     if (ok) {
+        if (mode == RobstrideRunMode::CSP) {
+            // CSP mode: set speed limit then hold at position 0
+            _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                                  RobstrideParam::SPEED_LIMIT, SPEC_RS05.max_speed);
+            delay(5);
+            _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                                  RobstrideParam::TARGET_POSITION, 0.0f);
+            delay(5);
+        }
+
         m.enabled = true;
         m.run_mode = mode;
-        Serial.printf("[Motors] Enabled motor ID=%d in mode %d\n", m.can_id, static_cast<int>(mode));
+        m.position = 0.0f;
+        m.raw_position = 0.0f;
+        m.prev_raw_position = 0.0f;
+        m.unwrap_offset = 0.0f;
+        m._abs_pos_offset = 0.0f;
+        m.has_first_feedback = false;
+        Serial.printf("[Motors] Enabled motor ID=%d in CSP mode (zeroed)\n", m.can_id);
     }
     return ok;
 }
@@ -68,13 +118,13 @@ bool MotorManager::armDriveMotors() {
 
     bool all_ok = true;
     for (int i = 0; i < NUM_DRIVE_MOTORS; i++) {
-        if (!enableAndConfigureMotor(i, RobstrideRunMode::Position)) {
+        if (!enableAndConfigureMotor(i, RobstrideRunMode::CSP)) {
             all_ok = false;
         }
         delay(20);
     }
     _drive_armed = all_ok;
-    Serial.printf("[Motors] Drive motors armed: %s\n", all_ok ? "OK" : "PARTIAL");
+    Serial.printf("[Motors] Drive motors armed (CSP): %s\n", all_ok ? "OK" : "PARTIAL");
     return all_ok;
 }
 
@@ -96,7 +146,7 @@ bool MotorManager::armArmMotors() {
 
     bool all_ok = true;
     for (int i = NUM_DRIVE_MOTORS; i < NUM_MOTORS; i++) {
-        if (!enableAndConfigureMotor(i, RobstrideRunMode::Position)) {
+        if (!enableAndConfigureMotor(i, RobstrideRunMode::CSP)) {
             all_ok = false;
         }
         delay(20);
@@ -136,6 +186,15 @@ bool MotorManager::sendDrivePosition(MotorRole role, float position_rad, float s
     return _can->sendPositionCommand(m.can_id, CAN_HOST_ID, pos, spd);
 }
 
+bool MotorManager::sendDriveSpeedLimit(MotorRole role, float speed_limit_rad_s) {
+    int idx = static_cast<int>(role);
+    if (idx >= NUM_DRIVE_MOTORS || !_can || !_drive_armed) return false;
+
+    float spd = fabsf(speed_limit_rad_s);
+    return _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
+                                 RobstrideParam::SPEED_LIMIT, spd);
+}
+
 bool MotorManager::sendArmPosition(MotorRole role, float position_rad, float speed_limit_rad_s) {
     int idx = static_cast<int>(role);
     if (idx < NUM_DRIVE_MOTORS || idx >= NUM_MOTORS || !_can || !_arm_armed) return false;
@@ -157,7 +216,32 @@ void MotorManager::processFeedback() {
 
         MotorState& m = _motors[idx];
         float sign = m.reversed ? -1.0f : 1.0f;
-        m.position = fb.position * sign;
+
+        // Unwrap position: the feedback encodes position in [-4pi, +4pi]
+        // and wraps when the motor rotates beyond that range. We detect
+        // wraps by looking for jumps larger than half the range and
+        // accumulate an offset to produce a continuous position.
+        float raw = fb.position;
+        m.raw_position = raw;
+
+        if (!m.has_first_feedback) {
+            m.prev_raw_position = raw;
+            // Compute initial unwrap offset so that:
+            //   raw + unwrap_offset = abs_pos_offset (the motor's true position)
+            // This aligns our coordinate system with the motor's internal counter.
+            m.unwrap_offset = m._abs_pos_offset - raw;
+            m.has_first_feedback = true;
+        } else {
+            float delta = raw - m.prev_raw_position;
+            if (delta > POSITION_FEEDBACK_HALF) {
+                m.unwrap_offset -= POSITION_FEEDBACK_RANGE;
+            } else if (delta < -POSITION_FEEDBACK_HALF) {
+                m.unwrap_offset += POSITION_FEEDBACK_RANGE;
+            }
+            m.prev_raw_position = raw;
+        }
+
+        m.position = (raw + m.unwrap_offset) * sign;
         m.velocity = fb.velocity * sign;
         m.torque = fb.torque * sign;
         m.temperature = fb.temperature;

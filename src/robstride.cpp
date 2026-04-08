@@ -116,38 +116,38 @@ bool Robstride::stopMotor(uint8_t motor_id, uint8_t host_id, bool clear_fault) {
 bool Robstride::sendMITControl(uint8_t motor_id, uint8_t host_id,
                                 float position, float velocity,
                                 float kp, float kd, float torque) {
-    // MIT mode packs target position, velocity, kp, kd, torque into 8 bytes
-    // using scaled integer encoding within known ranges:
-    //   position: [-12.5, 12.5] rad  -> uint16  (16 bits)
-    //   velocity: [-44, 44] rad/s    -> uint12  (12 bits)
-    //   kp:       [0, 500]           -> uint12  (12 bits)
-    //   kd:       [0, 5]             -> uint12  (12 bits)
-    //   torque:   [-17, 17] Nm       -> uint12  (12 bits)
+    // Private protocol Type 1 (operation control mode) per RS00 User Manual:
+    //   CAN ID bits 23:8 = torque uint16 [0~65535] → [-14, +14] Nm
+    //   Data Byte0~1: position uint16 [0~65535] → [-4pi, +4pi] rad
+    //   Data Byte2~3: velocity uint16 [0~65535] → [-33, +33] rad/s
+    //   Data Byte4~5: Kp       uint16 [0~65535] → [0, 500]
+    //   Data Byte6~7: Kd       uint16 [0~65535] → [0, 5]
+    // All fields are 16-bit, high byte first.
 
-    auto float_to_uint = [](float x, float x_min, float x_max, int bits) -> uint16_t {
+    auto float_to_uint16 = [](float x, float x_min, float x_max) -> uint16_t {
         float span = x_max - x_min;
         if (x < x_min) x = x_min;
         if (x > x_max) x = x_max;
-        return static_cast<uint16_t>((x - x_min) / span * ((1 << bits) - 1));
+        return static_cast<uint16_t>((x - x_min) / span * 65535.0f);
     };
 
-    uint16_t p = float_to_uint(position, -12.5f, 12.5f, 16);
-    uint16_t v = float_to_uint(velocity, -44.0f, 44.0f, 12);
-    uint16_t kp_i = float_to_uint(kp, 0.0f, 500.0f, 12);
-    uint16_t kd_i = float_to_uint(kd, 0.0f, 5.0f, 12);
-    uint16_t t = float_to_uint(torque, -17.0f, 17.0f, 12);
+    uint16_t t = float_to_uint16(torque, -14.0f, 14.0f);
+    uint16_t p = float_to_uint16(position, -12.566f, 12.566f);
+    uint16_t v = float_to_uint16(velocity, -33.0f, 33.0f);
+    uint16_t kp_i = float_to_uint16(kp, 0.0f, 500.0f);
+    uint16_t kd_i = float_to_uint16(kd, 0.0f, 5.0f);
 
     uint8_t data[8];
     data[0] = (p >> 8) & 0xFF;
     data[1] = p & 0xFF;
-    data[2] = (v >> 4) & 0xFF;
-    data[3] = ((v & 0x0F) << 4) | ((kp_i >> 8) & 0x0F);
-    data[4] = kp_i & 0xFF;
-    data[5] = (kd_i >> 4) & 0xFF;
-    data[6] = ((kd_i & 0x0F) << 4) | ((t >> 8) & 0x0F);
-    data[7] = t & 0xFF;
+    data[2] = (v >> 8) & 0xFF;
+    data[3] = v & 0xFF;
+    data[4] = (kp_i >> 8) & 0xFF;
+    data[5] = kp_i & 0xFF;
+    data[6] = (kd_i >> 8) & 0xFF;
+    data[7] = kd_i & 0xFF;
 
-    uint32_t can_id = makeCanId(RobstrideCommType::Control, 0, motor_id, host_id);
+    uint32_t can_id = makeCanId(RobstrideCommType::Control, t, motor_id, host_id);
     return sendFrame(can_id, data, 8);
 }
 
@@ -209,6 +209,38 @@ bool Robstride::readParam(uint8_t motor_id, uint8_t host_id, uint16_t param_addr
     return sendFrame(can_id, data, 8);
 }
 
+bool Robstride::readParamSync(uint8_t motor_id, uint8_t host_id,
+                               uint16_t param_addr, float& out_value,
+                               uint32_t timeout_ms) {
+    if (!readParam(motor_id, host_id, param_addr)) return false;
+
+    uint32_t start = millis();
+    while (millis() - start < timeout_ms) {
+        twai_message_t msg;
+        esp_err_t err = twai_receive(&msg, pdMS_TO_TICKS(5));
+        if (err != ESP_OK) continue;
+
+        rx_count++;
+        if (!msg.extd) continue;
+
+        uint8_t comm_type = (msg.identifier >> 24) & 0x1F;
+        uint8_t resp_motor = (msg.identifier >> 8) & 0xFF;
+
+        if (comm_type == static_cast<uint8_t>(RobstrideCommType::ParamRead) &&
+            resp_motor == motor_id) {
+            uint16_t resp_param = msg.data[0] | (msg.data[1] << 8);
+            if (resp_param == param_addr) {
+                memcpy(&out_value, &msg.data[4], sizeof(float));
+                return true;
+            }
+        }
+
+        // If it's a feedback frame or other response, let it pass
+        // (we lose it, but this is a debug tool)
+    }
+    return false;
+}
+
 bool Robstride::changeMotorCanId(uint8_t current_id, uint8_t host_id, uint8_t new_id) {
     uint32_t can_id = makeCanId(RobstrideCommType::SetID, new_id, current_id, host_id);
     uint8_t data[8] = {0};
@@ -267,10 +299,13 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
         uint16_t torq_u16 = (static_cast<uint16_t>(msg.data[4]) << 8) | msg.data[5];
         uint16_t temp_u16 = (static_cast<uint16_t>(msg.data[6]) << 8) | msg.data[7];
 
-        // Use RS05 limits as default (both RS00 and RS05 share +-4*pi pos, +-33 vel, +-17 torque)
+        // Per RS00 User Manual section 4.1.2 (Type 2 feedback):
+        //   Position: [0~65535] → [-4pi, +4pi] rad
+        //   Velocity: [0~65535] → [-33, +33] rad/s
+        //   Torque:   [0~65535] → [-14, +14] Nm
         fb.position = uint_to_float(pos_u16, -12.566f, 12.566f, 16);
         fb.velocity = uint_to_float(vel_u16, -33.0f, 33.0f, 16);
-        fb.torque   = uint_to_float(torq_u16, -17.0f, 17.0f, 16);
+        fb.torque   = uint_to_float(torq_u16, -14.0f, 14.0f, 16);
         fb.temperature = static_cast<float>(temp_u16) * 0.1f;
 
         // Mode (bits 22-23) and error code (bits 16-21) from CAN ID

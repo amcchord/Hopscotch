@@ -8,6 +8,11 @@ static constexpr int NUM_DRIVE_MOTORS = 4;
 static constexpr int NUM_ARM_MOTORS   = 2;
 static constexpr int NUM_MOTORS       = NUM_DRIVE_MOTORS + NUM_ARM_MOTORS;
 
+// Robstride feedback position is encoded in [-4pi, +4pi] and wraps.
+// Full range for unwrapping.
+static constexpr float POSITION_FEEDBACK_RANGE = 4.0f * 3.14159265f * 2.0f;  // ~25.133 rad
+static constexpr float POSITION_FEEDBACK_HALF  = POSITION_FEEDBACK_RANGE / 2.0f;
+
 enum class MotorRole : uint8_t {
     FrontRight = 0,
     BackRight  = 1,
@@ -24,7 +29,12 @@ struct MotorState {
     bool     online;
     bool     enabled;
     bool     has_fault;
-    float    position;       // rad
+    float    position;       // rad (unwrapped, continuous)
+    float    raw_position;   // rad (raw from feedback, [-4pi, +4pi])
+    float    prev_raw_position; // previous raw position for unwrap detection
+    float    unwrap_offset;  // cumulative unwrap offset
+    float    _abs_pos_offset; // motor's absolute position at arm time
+    bool     has_first_feedback; // true after first feedback received
     float    velocity;       // rad/s
     float    torque;         // Nm
     float    temperature;    // C
@@ -53,6 +63,9 @@ public:
 
     // Send position command to a drive motor (handles reversal)
     bool sendDrivePosition(MotorRole role, float position_rad, float speed_limit_rad_s);
+
+    // Send only the speed limit to a drive motor (for braking, no target position write)
+    bool sendDriveSpeedLimit(MotorRole role, float speed_limit_rad_s);
 
     // Send position command to an arm motor
     bool sendArmPosition(MotorRole role, float position_rad, float speed_limit_rad_s);
