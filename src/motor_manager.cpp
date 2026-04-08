@@ -75,23 +75,22 @@ bool MotorManager::enableAndConfigureMotor(int idx, RobstrideRunMode mode) {
     //   5. Write limit_spd and loc_ref
 
     _can->stopMotor(m.can_id, CAN_HOST_ID, true);
-    delay(100);
-
-    // Zero the position -- per manual section 4.2.6, this is supported in
-    // CSP and Motion Control modes (blocked in PP). Since we're about to
-    // set CSP mode, and the motor defaults to MIT after stop, zeroing works.
-    _can->setZeroPosition(m.can_id, CAN_HOST_ID);
-    delay(50);
+    delay(200);
 
     _can->setRunMode(m.can_id, CAN_HOST_ID, mode);
     delay(10);
 
     bool ok = _can->enableMotor(m.can_id, CAN_HOST_ID);
-    delay(10);
+    delay(50);
 
     if (ok) {
+        // Zero position AFTER enabling in CSP mode. Per manual section 4.2.6:
+        // "New (CSP/Motion Control): Target updates to 0 instantly -> motor
+        // remains stationary." Zero is blocked in PP but supported in CSP.
+        _can->setZeroPosition(m.can_id, CAN_HOST_ID);
+        delay(50);
+
         if (mode == RobstrideRunMode::CSP) {
-            // CSP mode: set speed limit then hold at position 0
             _can->writeFloatParam(m.can_id, CAN_HOST_ID,
                                   RobstrideParam::SPEED_LIMIT, SPEC_RS05.max_speed);
             delay(5);

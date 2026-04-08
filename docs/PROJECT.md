@@ -65,31 +65,54 @@ The host/master ID used by this project is **0xFD**.
 - Bits [8:15]: Motor's own CAN ID
 - Bits [0:7]: Destination host ID (0xFD)
 
-**Data payload:** 4x uint16, big-endian:
+**Data payload:** 4x uint16, big-endian (per RS00 User Manual section 4.1.2):
 | Bytes | Field | Scaling |
 |-------|-------|---------|
 | 0–1 | Position | uint16 over [−4π, +4π] rad |
-| 2–3 | Velocity | uint16 over [−50, +50] rad/s (universal, not per-model) |
-| 4–5 | Torque | uint16 over [−17, +17] Nm |
+| 2–3 | Velocity | uint16 over [−33, +33] rad/s |
+| 4–5 | Torque | uint16 over [−14, +14] Nm |
 | 6–7 | Temperature | uint16 × 0.1 = °C |
 
 ### Motor Polling / Keep-Alive
 
 Sending a **motion control frame (type 0x01) with all-zero data and zero torque** acts as a status ping. The motor responds with a type 0x02 feedback frame without moving. This is the recommended way to poll motor status without enabling the motor.
 
-### Position Control via Parameter Writes
+### Position Modes
 
-Position mode is set using parameter writes (type 0x12), not a dedicated CAN ID:
-1. Write `RUN_MODE` (0x7005) = 1 (position mode)
-2. Write `SPEED_LIMIT` (0x7017) = desired max speed (float, rad/s)
-3. Write `TARGET_POSITION` (0x7016) = target position (float, rad)
+The motor has **two** position modes (per RS00 User Manual):
+
+- **Mode 1 (PP - Profile Position)**: Motor generates internal trapezoidal trajectory. Speed via `vel_max` (0x7024), acceleration via `acc_set` (0x7025). **Does NOT support changing speed during operation.** Zero calibration is blocked.
+- **Mode 5 (CSP - Cyclic Synchronous Position)**: Real-time position updates from host. Speed limit via `limit_spd` (0x7017), position via `loc_ref` (0x7016). **This is what Hopscotch uses for drive motors.** Zero calibration is supported.
+
+### CSP Position Control Sequence
+
+1. Stop motor (type 0x04, clear fault)
+2. Set `RUN_MODE` (0x7005) = 5 (CSP mode)
+3. Enable motor (type 0x03)
+4. Set zero position (type 0x06) — supported in CSP mode
+5. Write `SPEED_LIMIT` (0x7017) = desired max speed (float, rad/s)
+6. Write `TARGET_POSITION` (0x7016) = target position (float, rad)
+
+### Key Parameter Addresses
+
+| Address | Name | Description | R/W |
+|---------|------|-------------|-----|
+| 0x7005 | run_mode | 0=MIT, 1=PP, 2=Speed, 3=Current, 5=CSP | W/R |
+| 0x7016 | loc_ref | Position target (rad) | W/R |
+| 0x7017 | limit_spd | CSP mode speed limit (0–33 rad/s) | W/R |
+| 0x7018 | limit_cur | Current limit (0–16A) | W/R |
+| 0x700A | spd_ref | Speed mode target (−33 to 33 rad/s) | W/R |
+| 0x701E | loc_kp | Position Kp (default 40) | W/R |
+| 0x701F | spd_kp | Speed Kp (default 6) | W/R |
+| 0x7019 | mechPos | Load mechanical angle (rad) | R |
+| 0x701B | mechVel | Load speed (rad/s) | R |
 
 ### Motor Specs
 
-| Model | Max Torque | Max Speed | KP Range | KD Range |
-|-------|-----------|-----------|----------|----------|
-| RS00 | 17 Nm | 50 rad/s | 500 | 5.0 |
-| RS05 | 17 Nm | 33 rad/s | 500 | 5.0 |
+| Model | Max Torque | Max Speed | No-Load Speed | Gear Ratio |
+|-------|-----------|-----------|---------------|------------|
+| RS00 | 14 Nm | 33 rad/s | 315 RPM | 10:1 |
+| RS05 | 14 Nm | 33 rad/s | 315 RPM | 10:1 |
 
 ## Driving Model
 

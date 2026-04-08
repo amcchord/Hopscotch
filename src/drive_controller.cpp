@@ -95,8 +95,9 @@ void DriveController::update(float throttle, float steering, float dt_sec) {
             _motors->sendDrivePosition(role, _target_pos[i], HOLD_SPEED_LIMIT);
 
         } else if (_state[i] == DriveMotorState::Braking) {
-            // --- BRAKING: keep sending fixed target with low speed limit ---
-            _motors->sendDrivePosition(role, _target_pos[i], HOLD_SPEED_LIMIT);
+            // --- BRAKING: keep sending fixed target with zero speed limit ---
+            // Speed limit 0 tells the motor to not move at all.
+            _motors->sendDrivePosition(role, _target_pos[i], 0.0f);
 
             if (abs_actual < STOP_THRESHOLD) {
                 _state[i] = DriveMotorState::Idle;
@@ -105,9 +106,11 @@ void DriveController::update(float throttle, float steering, float dt_sec) {
             }
 
         } else {
-            // --- IDLE: hold current position ---
-            _target_pos[i] = current_pos;
-            _motors->sendDrivePosition(role, _target_pos[i], HOLD_SPEED_LIMIT);
+            // --- IDLE: hold the captured position with zero speed limit ---
+            // Speed limit 0 locks the motor at the target position with no
+            // allowed movement. The target was captured when transitioning
+            // to Idle from Braking or on init.
+            _motors->sendDrivePosition(role, _target_pos[i], 0.0f);
         }
     }
 }
@@ -124,7 +127,7 @@ void DriveController::emergencyStop() {
         _actual_speed[i] = 0.0f;
         _brake_speed_limit[i] = 0.0f;
         _state[i] = DriveMotorState::Idle;
-        _motors->sendDrivePosition(role, current_pos, HOLD_SPEED_LIMIT);
+        _motors->sendDrivePosition(role, current_pos, 0.0f);
     }
     _initialized = false;
 }
