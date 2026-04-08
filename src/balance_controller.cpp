@@ -1,27 +1,12 @@
 #include "balance_controller.h"
 #include <Arduino.h>
+#include <LittleFS.h>
 #include <cmath>
+#include <esp_heap_caps.h>
 
 // ---------------------------------------------------------------------------
-// PID helpers
+// Helpers
 // ---------------------------------------------------------------------------
-
-float BalanceController::pidCompute(PidState& pid, float error, float dt) {
-    pid.integral += error * dt;
-    if (pid.integral >  pid.i_max) pid.integral =  pid.i_max;
-    if (pid.integral < -pid.i_max) pid.integral = -pid.i_max;
-
-    float derivative = 0.0f;
-    if (dt > 0.0f) {
-        derivative = (error - pid.prev_error) / dt;
-    }
-    pid.prev_error = error;
-
-    float output = pid.kp * error + pid.ki * pid.integral + pid.kd * derivative;
-    if (output > pid.out_max) output = pid.out_max;
-    if (output < pid.out_min) output = pid.out_min;
-    return output;
-}
 
 float BalanceController::moveToward(float current, float target, float rate, float dt) {
     float diff = target - current;
@@ -45,20 +30,29 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
     _state  = BalanceState::Idle;
     _targets_initialized = false;
     _logging = false;
+    _log_count = 0;
+    _log_saved = false;
 
-    _outer.kp    = BALANCE_OUTER_KP;
-    _outer.ki    = BALANCE_OUTER_KI;
-    _outer.kd    = BALANCE_OUTER_KD;
-    _outer.i_max = BALANCE_OUTER_I_MAX;
-    _outer.out_min = -180.0f;
-    _outer.out_max =  180.0f;
+    if (!_log_buf) {
+        _log_buf = (BalanceSample*)heap_caps_malloc(
+            BALANCE_LOG_MAX_SAMPLES * sizeof(BalanceSample), MALLOC_CAP_SPIRAM);
+        if (_log_buf) {
+            Serial.printf("[Balance] Log buffer allocated in PSRAM (%d bytes)\n",
+                          BALANCE_LOG_MAX_SAMPLES * (int)sizeof(BalanceSample));
+        } else {
+            Serial.println("[Balance] WARNING: PSRAM alloc failed, trying regular heap");
+            _log_buf = (BalanceSample*)malloc(BALANCE_LOG_MAX_SAMPLES * sizeof(BalanceSample));
+            if (_log_buf) {
+                Serial.printf("[Balance] Log buffer allocated in heap (%d bytes)\n",
+                              BALANCE_LOG_MAX_SAMPLES * (int)sizeof(BalanceSample));
+            } else {
+                Serial.println("[Balance] WARNING: could not allocate log buffer");
+            }
+        }
+    }
 
-    _inner.kp    = BALANCE_INNER_KP;
-    _inner.ki    = BALANCE_INNER_KI;
-    _inner.kd    = BALANCE_INNER_KD;
-    _inner.i_max = 50.0f;
-    _inner.out_min = -BALANCE_MAX_DRIVE_SPEED;
-    _inner.out_max =  BALANCE_MAX_DRIVE_SPEED;
+    _kp = BALANCE_KP;
+    _kd = BALANCE_KD;
 }
 
 // ---------------------------------------------------------------------------
@@ -74,9 +68,12 @@ void BalanceController::enterTippingUp() {
 
     _arm_left_target  = _motors->getMotor(MotorRole::ArmLeft).position;
     _arm_right_target = _motors->getMotor(MotorRole::ArmRight).position;
-    _arm_left_goal    = fwd_l + BALANCE_ARM_TIP_LEFT;
-    _arm_right_goal   = fwd_r + BALANCE_ARM_TIP_RIGHT;
+    _arm_tip_left_goal  = fwd_l + BALANCE_ARM_TIP_LEFT;
+    _arm_tip_right_goal = fwd_r + BALANCE_ARM_TIP_RIGHT;
+    _arm_left_goal    = _arm_tip_left_goal;
+    _arm_right_goal   = _arm_tip_right_goal;
     _arm_ramp_speed   = BALANCE_ARM_TIP_SPEED;
+    _arms_reached_tip = false;
 
     _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
 
@@ -89,10 +86,8 @@ void BalanceController::enterTippingUp() {
 void BalanceController::enterBalancing() {
     _state = BalanceState::Balancing;
 
-    _outer.integral   = 0.0f;
-    _outer.prev_error = 0.0f;
-    _inner.integral   = 0.0f;
-    _inner.prev_error = 0.0f;
+    _adaptive_setpoint = _setpoint_deg;
+    _cumulative_error  = 0.0f;
 
     _back_left_target  = _motors->getMotor(MotorRole::BackLeft).position;
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
@@ -101,30 +96,43 @@ void BalanceController::enterBalancing() {
     _front_left_hold  = _motors->getMotor(MotorRole::FrontLeft).position;
     _front_right_hold = _motors->getMotor(MotorRole::FrontRight).position;
 
-    float fwd_l = _arms->getForwardLeft();
-    float fwd_r = _arms->getForwardRight();
-    _arm_left_goal  = fwd_l;
-    _arm_right_goal = fwd_r;
+    _arms_reached_tip = true;
+    _arms_returning   = false;
+    _balance_start_ms = millis();
+
+    Serial.printf("[Balance] BALANCING (PD+adapt)  setpoint=%.1f  Kp=%.3f Kd=%.4f adapt=%.2f  back_pos: L=%.2f R=%.2f\n",
+                  _setpoint_deg, _kp, _kd, _adapt_rate, _back_left_target, _back_right_target);
+}
+
+void BalanceController::enterReturningArms() {
+    _state = BalanceState::ReturningArms;
+    _targets_initialized = false;
+
+    _arm_left_goal  = _arms->getForwardLeft();
+    _arm_right_goal = _arms->getForwardRight();
     _arm_ramp_speed = BALANCE_ARM_RETURN_SPEED;
 
-    Serial.printf("[Balance] BALANCING  setpoint=%.1f  back_pos: L=%.2f R=%.2f\n",
-                  _setpoint_deg, _back_left_target, _back_right_target);
+    stopLog();
+
+    Serial.println("[Balance] RETURNING ARMS to forward reference");
 }
 
 void BalanceController::disengage() {
     BalanceState prev = _state;
-    _state = BalanceState::Idle;
-    _targets_initialized = false;
 
-    if (_arms) {
-        _arms->clearOverride();
+    if (prev == BalanceState::Idle || prev == BalanceState::ReturningArms) {
+        _state = BalanceState::Idle;
+        _targets_initialized = false;
+        if (_arms) {
+            _arms->clearOverride();
+        }
+        stopLog();
+        return;
     }
 
-    stopLog();
-
-    if (prev != BalanceState::Idle) {
-        Serial.println("[Balance] DISENGAGED -> Idle");
-    }
+    enterReturningArms();
+    Serial.printf("[Balance] Disengaged from %s -> ReturningArms\n",
+                  prev == BalanceState::TippingUp ? "TIP_UP" : "BALANCE");
 }
 
 // ---------------------------------------------------------------------------
@@ -135,38 +143,61 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                                 bool ch7_active, bool ch11_edge, float dt) {
     if (!_motors || !_arms) return;
 
-    // Auto-stop log after duration
     if (_logging && (millis() - _log_start_ms >= BALANCE_LOG_DURATION_MS)) {
         stopLog();
     }
 
-    // Ch7 going LOW always disengages
     if (!ch7_active) {
         if (_state != BalanceState::Idle) {
-            disengage();
+            if (_state == BalanceState::ReturningArms) {
+                _state = BalanceState::Idle;
+                _targets_initialized = false;
+                if (_arms) _arms->clearOverride();
+                stopLog();
+            } else {
+                disengage();
+            }
         }
         return;
     }
 
-    float angle_error = _setpoint_deg - roll_deg;
-
     switch (_state) {
 
     case BalanceState::Idle:
-        // Ch7 is high and Ch11 edge triggers tip-up (only if arms are armed)
         if (ch11_edge && _motors->isArmArmed()) {
             enterTippingUp();
         }
         break;
 
     case BalanceState::TippingUp: {
-        // Ramp arms toward tip-up goal
-        _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  _arm_ramp_speed, dt);
-        _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, _arm_ramp_speed, dt);
-        _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
+        float dist_l = fabsf(_arm_left_goal - _arm_left_target);
+        float dist_r = fabsf(_arm_right_goal - _arm_right_target);
 
-        // Check if roll is close enough to engage PID
-        if (fabsf(angle_error) < BALANCE_ENGAGE_THRESHOLD_DEG) {
+        float scale_l = dist_l / 1.5f;
+        if (scale_l > 1.0f) scale_l = 1.0f;
+        if (scale_l < 0.05f) scale_l = 0.05f;
+
+        float scale_r = dist_r / 1.5f;
+        if (scale_r > 1.0f) scale_r = 1.0f;
+        if (scale_r < 0.05f) scale_r = 0.05f;
+
+        float speed_l = BALANCE_ARM_TIP_SPEED * scale_l;
+        float speed_r = BALANCE_ARM_TIP_SPEED * scale_r;
+
+        _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  speed_l, dt);
+        _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, speed_r, dt);
+
+        float motor_speed = (speed_l > speed_r) ? speed_l : speed_r;
+        _arms->setOverrideTargets(_arm_left_target, _arm_right_target, motor_speed);
+
+        float arm_err_l = fabsf(_arm_left_target - _arm_tip_left_goal);
+        float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
+        bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
+
+        float tip_error = fabsf(_setpoint_deg - roll_deg);
+        if (arms_done &&
+            tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
+            fabsf(roll_rate_dps) < BALANCE_ENGAGE_RATE_MAX_DPS) {
             enterBalancing();
         }
 
@@ -175,48 +206,85 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
     }
 
     case BalanceState::Balancing: {
-        // Safety bailout
-        if (fabsf(angle_error) > BALANCE_BAILOUT_THRESHOLD_DEG) {
-            Serial.printf("[Balance] BAILOUT  roll=%.1f err=%.1f\n", roll_deg, angle_error);
+        // Safety bailout (use base setpoint, not adaptive)
+        if (fabsf(_setpoint_deg - roll_deg) > BALANCE_BAILOUT_THRESHOLD_DEG) {
+            Serial.printf("[Balance] BAILOUT  roll=%.1f err=%.1f\n", roll_deg, _setpoint_deg - roll_deg);
             disengage();
             return;
         }
 
-        // Outer PID: angle error -> desired angular rate (deg/s)
-        float desired_rate = pidCompute(_outer, angle_error, dt);
+        // Adaptive setpoint: track cumulative error to find the true balance point.
+        // If the robot consistently sits below the setpoint, the setpoint drifts down
+        // to meet it. This separates "finding equilibrium" from "maintaining balance."
+        // Only adapt the setpoint when roll is reasonably close to balance.
+        // If the robot is far off (>15 deg), don't let the setpoint chase the fall.
+        float base_err = _setpoint_deg - roll_deg;
+        if (fabsf(base_err) < 15.0f) {
+            _cumulative_error += base_err * dt;
+            if (_cumulative_error >  50.0f) _cumulative_error =  50.0f;
+            if (_cumulative_error < -50.0f) _cumulative_error = -50.0f;
+        }
 
-        // Inner PID: rate error -> motor velocity (rad/s)
-        float rate_error = desired_rate - roll_rate_dps;
-        float motor_vel  = pidCompute(_inner, rate_error, dt);
+        _adaptive_setpoint = _setpoint_deg - _adapt_rate * _cumulative_error;
+        if (_adaptive_setpoint > _setpoint_deg + 5.0f) _adaptive_setpoint = _setpoint_deg + 5.0f;
+        if (_adaptive_setpoint < _setpoint_deg - 5.0f) _adaptive_setpoint = _setpoint_deg - 5.0f;
+
+        // Pure PD on the adaptive setpoint
+        float angle_err = _adaptive_setpoint - roll_deg;
+        float motor_vel = _kp * angle_err - _kd * roll_rate_dps;
+
+        // Clamp to max drive speed
+        if (motor_vel >  BALANCE_MAX_DRIVE_SPEED) motor_vel =  BALANCE_MAX_DRIVE_SPEED;
+        if (motor_vel < -BALANCE_MAX_DRIVE_SPEED) motor_vel = -BALANCE_MAX_DRIVE_SPEED;
 
         // Accumulate position targets for back wheels
         float pos_delta = motor_vel * dt;
         _back_left_target  += pos_delta;
         _back_right_target += pos_delta;
 
-        // Send commands to back wheels
         if (_motors->isDriveArmed()) {
             _motors->sendDrivePosition(MotorRole::BackLeft,  _back_left_target,  BALANCE_MAX_DRIVE_SPEED);
             _motors->sendDrivePosition(MotorRole::BackRight, _back_right_target, BALANCE_MAX_DRIVE_SPEED);
 
-            // Hold front wheels in place
             _motors->sendDrivePosition(MotorRole::FrontLeft,  _front_left_hold,  0.0f);
             _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
         }
 
-        // Ramp arms back toward forward reference
+        // Hold arms at tip for 1 second, then return -- don't lean on them
+        if (!_arms_returning && (millis() - _balance_start_ms >= 1000)) {
+            _arms_returning = true;
+            _arm_left_goal  = _arms->getForwardLeft();
+            _arm_right_goal = _arms->getForwardRight();
+            _arm_ramp_speed = BALANCE_ARM_RETURN_SPEED;
+            Serial.println("[Balance] Arms beginning return to forward");
+        }
+
+        if (_arms_returning) {
+            _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  _arm_ramp_speed, dt);
+            _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, _arm_ramp_speed, dt);
+        }
+        _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
+                                  _arms_returning ? _arm_ramp_speed : 0.0f);
+
+        _last_angle_err = angle_err;
+        _last_motor_vel = motor_vel;
+
+        logSample(roll_deg, roll_rate_dps);
+        break;
+    }
+
+    case BalanceState::ReturningArms: {
         _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  _arm_ramp_speed, dt);
         _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, _arm_ramp_speed, dt);
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
 
-        // Store for logging
-        _last_outer_err = angle_error;
-        _last_outer_out = desired_rate;
-        _last_inner_err = rate_error;
-        _last_inner_out = motor_vel;
-        _last_motor_vel = motor_vel;
-
-        logSample(roll_deg, roll_rate_dps);
+        float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
+        float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
+        if (arm_err_l < 0.05f && arm_err_r < 0.05f) {
+            _state = BalanceState::Idle;
+            _arms->clearOverride();
+            Serial.println("[Balance] Arms returned -> Idle");
+        }
         break;
     }
 
@@ -224,70 +292,98 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 }
 
 // ---------------------------------------------------------------------------
-// Telemetry logging
+// Telemetry logging -- buffered in PSRAM, flushed to LittleFS on stop
 // ---------------------------------------------------------------------------
 
 void BalanceController::startLog() {
     if (_logging) return;
+    if (!_log_buf) return;
 
-    _log_file = LittleFS.open(BALANCE_LOG_PATH, "w");
-    if (!_log_file) {
-        Serial.println("[Balance] WARNING: could not open log file");
-        return;
-    }
-
-    _log_file.println("t_ms,state,roll,roll_rate,setpoint,outer_err,outer_out,inner_err,inner_out,motor_vel,bl_pos,br_pos,bl_vel,br_vel,arm_l,arm_r");
+    _log_count = 0;
+    _log_saved = false;
     _log_start_ms = millis();
     _logging = true;
 
-    _last_outer_err = 0.0f;
-    _last_outer_out = 0.0f;
-    _last_inner_err = 0.0f;
-    _last_inner_out = 0.0f;
+    _last_angle_err = 0.0f;
     _last_motor_vel = 0.0f;
 
-    Serial.println("[Balance] Telemetry log started");
+    Serial.println("[Balance] Telemetry log started (PSRAM buffer)");
 }
 
 void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
-    if (!_logging || !_log_file) return;
+    if (!_logging || !_log_buf) return;
+    if (_log_count >= BALANCE_LOG_MAX_SAMPLES) return;
 
-    uint32_t t = millis() - _log_start_ms;
-
-    float bl_pos = _motors->getMotor(MotorRole::BackLeft).position;
-    float br_pos = _motors->getMotor(MotorRole::BackRight).position;
-    float bl_vel = _motors->getMotor(MotorRole::BackLeft).velocity;
-    float br_vel = _motors->getMotor(MotorRole::BackRight).velocity;
-    float arm_l  = _motors->getMotor(MotorRole::ArmLeft).position;
-    float arm_r  = _motors->getMotor(MotorRole::ArmRight).position;
-
-    _log_file.printf("%lu,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
-                     t,
-                     static_cast<int>(_state),
-                     roll_deg, roll_rate_dps,
-                     _setpoint_deg,
-                     _last_outer_err, _last_outer_out,
-                     _last_inner_err, _last_inner_out,
-                     _last_motor_vel,
-                     bl_pos, br_pos, bl_vel, br_vel,
-                     arm_l, arm_r);
+    BalanceSample& s = _log_buf[_log_count];
+    s.t_ms      = millis() - _log_start_ms;
+    s.state     = static_cast<uint8_t>(_state);
+    s.roll      = roll_deg;
+    s.roll_rate = roll_rate_dps;
+    s.setpoint  = (_state == BalanceState::Balancing) ? _adaptive_setpoint : _setpoint_deg;
+    s.angle_err = _last_angle_err;
+    s.motor_vel = _last_motor_vel;
+    s.integral  = _cumulative_error;
+    s.bl_pos    = _motors->getMotor(MotorRole::BackLeft).position;
+    s.br_pos    = _motors->getMotor(MotorRole::BackRight).position;
+    s.bl_vel    = _motors->getMotor(MotorRole::BackLeft).velocity;
+    s.br_vel    = _motors->getMotor(MotorRole::BackRight).velocity;
+    s.arm_l     = _motors->getMotor(MotorRole::ArmLeft).position;
+    s.arm_r     = _motors->getMotor(MotorRole::ArmRight).position;
+    _log_count++;
 }
 
 void BalanceController::stopLog() {
     if (!_logging) return;
-    _log_file.close();
     _logging = false;
-    Serial.printf("[Balance] Telemetry log stopped (%lu ms recorded)\n",
-                  millis() - _log_start_ms);
+
+    uint32_t duration = millis() - _log_start_ms;
+    Serial.printf("[Balance] Telemetry log stopped (%lu ms, %d samples)\n",
+                  duration, _log_count);
+
+    flushLogToFile();
+}
+
+void BalanceController::flushLogToFile() {
+    if (_log_count == 0 || !_log_buf) return;
+
+    Serial.printf("[Balance] Writing %d samples to %s...\n", _log_count, BALANCE_LOG_PATH);
+    uint32_t start = millis();
+
+    File f = LittleFS.open(BALANCE_LOG_PATH, "w");
+    if (!f) {
+        Serial.println("[Balance] WARNING: could not open log file for writing");
+        return;
+    }
+
+    f.println("t_ms,state,roll,roll_rate,setpoint,angle_err,motor_vel,integral,bl_pos,br_pos,bl_vel,br_vel,arm_l,arm_r");
+
+    for (int i = 0; i < _log_count; i++) {
+        const BalanceSample& s = _log_buf[i];
+        f.printf("%lu,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.3f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
+                 s.t_ms, s.state,
+                 s.roll, s.roll_rate, s.setpoint,
+                 s.angle_err, s.motor_vel, s.integral,
+                 s.bl_pos, s.br_pos, s.bl_vel, s.br_vel,
+                 s.arm_l, s.arm_r);
+    }
+
+    f.close();
+    _log_saved = true;
+
+    Serial.printf("[Balance] Log saved (%lu ms to write)\n", millis() - start);
 }
 
 void BalanceController::dumpLog() {
+    if (_log_count > 0 && !_log_saved) {
+        flushLogToFile();
+    }
+
     File f = LittleFS.open(BALANCE_LOG_PATH, "r");
     if (!f) {
         Serial.println("[Balance] No log file found");
         return;
     }
-    Serial.printf("[Balance] --- Log dump (%u bytes) ---\n", f.size());
+    Serial.printf("[Balance] --- Log dump (%u bytes, %d samples) ---\n", f.size(), _log_count);
     while (f.available()) {
         Serial.write(f.read());
     }
@@ -299,20 +395,26 @@ void BalanceController::clearLog() {
     if (_logging) {
         stopLog();
     }
+    _log_count = 0;
+    _log_saved = false;
     LittleFS.remove(BALANCE_LOG_PATH);
     Serial.println("[Balance] Log file deleted");
 }
 
 bool BalanceController::hasLog() const {
+    if (_log_count > 0) return true;
     return LittleFS.exists(BALANCE_LOG_PATH);
 }
 
 size_t BalanceController::logSize() const {
-    File f = LittleFS.open(BALANCE_LOG_PATH, "r");
-    if (!f) return 0;
-    size_t sz = f.size();
-    f.close();
-    return sz;
+    if (_log_saved) {
+        File f = LittleFS.open(BALANCE_LOG_PATH, "r");
+        if (!f) return 0;
+        size_t sz = f.size();
+        f.close();
+        return sz;
+    }
+    return _log_count * sizeof(BalanceSample);
 }
 
 // ---------------------------------------------------------------------------
@@ -321,9 +423,10 @@ size_t BalanceController::logSize() const {
 
 const char* BalanceController::getStateString() const {
     switch (_state) {
-        case BalanceState::Idle:      return "IDLE";
-        case BalanceState::TippingUp: return "TIP_UP";
-        case BalanceState::Balancing: return "BALANCE";
+        case BalanceState::Idle:          return "IDLE";
+        case BalanceState::TippingUp:     return "TIP_UP";
+        case BalanceState::Balancing:     return "BALANCE";
+        case BalanceState::ReturningArms: return "RET_ARMS";
     }
     return "?";
 }
@@ -332,14 +435,13 @@ void BalanceController::printStatus() {
     Serial.println("=== BALANCE STATUS ===");
     Serial.printf("  State: %s\n", getStateString());
     Serial.printf("  Setpoint: %.1f deg\n", _setpoint_deg);
-    Serial.printf("  Outer PID: Kp=%.3f Ki=%.3f Kd=%.3f  (I_max=%.1f)\n",
-                  _outer.kp, _outer.ki, _outer.kd, _outer.i_max);
-    Serial.printf("  Inner PID: Kp=%.3f Ki=%.3f Kd=%.3f\n",
-                  _inner.kp, _inner.ki, _inner.kd);
+    Serial.printf("  PD: Kp=%.4f  Kd=%.4f  adapt_rate=%.3f\n", _kp, _kd, _adapt_rate);
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
 
     if (_state == BalanceState::Balancing) {
-        Serial.printf("  Outer integral: %.2f\n", _outer.integral);
+        Serial.printf("  Adaptive setpoint: %.2f (base: %.1f, shift: %+.2f)\n",
+                      _adaptive_setpoint, _setpoint_deg, _adaptive_setpoint - _setpoint_deg);
+        Serial.printf("  Cumulative error: %.2f\n", _cumulative_error);
         Serial.printf("  Last motor vel: %.2f rad/s\n", _last_motor_vel);
     }
 

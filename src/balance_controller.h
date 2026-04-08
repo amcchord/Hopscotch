@@ -1,27 +1,32 @@
 #pragma once
 
 #include <cstdint>
-#include <LittleFS.h>
 #include "motor_manager.h"
 #include "arm_controller.h"
 #include "config.h"
 
 enum class BalanceState : uint8_t {
-    Idle      = 0,
-    TippingUp = 1,
-    Balancing = 2,
+    Idle           = 0,
+    TippingUp      = 1,
+    Balancing      = 2,
+    ReturningArms  = 3,
 };
 
-struct PidState {
-    float kp       = 0.0f;
-    float ki       = 0.0f;
-    float kd       = 0.0f;
-    float integral  = 0.0f;
-    float prev_error = 0.0f;
-    float i_max     = 100.0f;
-    float out_min   = -100.0f;
-    float out_max   =  100.0f;
+struct BalanceSample {
+    uint32_t t_ms;
+    uint8_t  state;
+    float    roll;
+    float    roll_rate;
+    float    setpoint;
+    float    angle_err;
+    float    motor_vel;
+    float    integral;
+    float    bl_pos, br_pos;
+    float    bl_vel, br_vel;
+    float    arm_l, arm_r;
 };
+
+static constexpr int BALANCE_LOG_MAX_SAMPLES = 1500;  // 30s at 50Hz
 
 class BalanceController {
 public:
@@ -32,25 +37,23 @@ public:
 
     BalanceState getState() const { return _state; }
     bool isActive() const { return _state != BalanceState::Idle; }
+    bool isControllingDrive() const {
+        return _state == BalanceState::TippingUp || _state == BalanceState::Balancing;
+    }
 
     const char* getStateString() const;
 
-    // PID gain setters for serial tuning
-    void setOuterKp(float v) { _outer.kp = v; }
-    void setOuterKi(float v) { _outer.ki = v; }
-    void setOuterKd(float v) { _outer.kd = v; }
-    void setInnerKp(float v) { _inner.kp = v; }
-    void setInnerKi(float v) { _inner.ki = v; }
-    void setInnerKd(float v) { _inner.kd = v; }
-    void setSetpoint(float v) { _setpoint_deg = v; }
+    // PD gain setters for serial tuning
+    void setKp(float v) { _kp = v; }
+    void setKd(float v) { _kd = v; }
+    void setAdaptRate(float v) { _adapt_rate = v; }
+    void setSetpoint(float v) { _setpoint_deg = v; _adaptive_setpoint = v; }
 
-    float getOuterKp() const { return _outer.kp; }
-    float getOuterKi() const { return _outer.ki; }
-    float getOuterKd() const { return _outer.kd; }
-    float getInnerKp() const { return _inner.kp; }
-    float getInnerKi() const { return _inner.ki; }
-    float getInnerKd() const { return _inner.kd; }
+    float getKp() const { return _kp; }
+    float getKd() const { return _kd; }
+    float getAdaptRate() const { return _adapt_rate; }
     float getSetpoint() const { return _setpoint_deg; }
+    float getAdaptiveSetpoint() const { return _adaptive_setpoint; }
 
     // Telemetry log
     void dumpLog();
@@ -67,9 +70,14 @@ private:
     BalanceState _state = BalanceState::Idle;
     float _setpoint_deg = BALANCE_SETPOINT_DEG;
 
-    // Cascaded PID controllers
-    PidState _outer;
-    PidState _inner;
+    // PD gains (tunable at runtime via serial)
+    float _kp = BALANCE_KP;
+    float _kd = BALANCE_KD;
+
+    // Adaptive setpoint: tracks the true balance point via cumulative error
+    float _adaptive_setpoint = BALANCE_SETPOINT_DEG;
+    float _cumulative_error  = 0.0f;
+    float _adapt_rate = 0.5f;  // deg of setpoint shift per degree*second of cumulative error
 
     // Back wheel position targets (accumulated)
     float _back_left_target  = 0.0f;
@@ -86,25 +94,30 @@ private:
     float _arm_left_goal    = 0.0f;
     float _arm_right_goal   = 0.0f;
     float _arm_ramp_speed   = 0.0f;
+    float _arm_tip_left_goal  = 0.0f;
+    float _arm_tip_right_goal = 0.0f;
+    bool  _arms_reached_tip   = false;
+    bool  _arms_returning     = false;
+    uint32_t _balance_start_ms = 0;
 
-    // Telemetry logging
-    File  _log_file;
-    bool  _logging = false;
-    uint32_t _log_start_ms = 0;
+    // Telemetry logging -- buffered in PSRAM, written to flash on stop
+    BalanceSample* _log_buf    = nullptr;
+    int            _log_count  = 0;
+    bool           _logging    = false;
+    uint32_t       _log_start_ms = 0;
+    bool           _log_saved  = false;
 
-    // Last PID outputs for logging
-    float _last_outer_err = 0.0f;
-    float _last_outer_out = 0.0f;
-    float _last_inner_err = 0.0f;
-    float _last_inner_out = 0.0f;
+    // Last values for logging
+    float _last_angle_err = 0.0f;
     float _last_motor_vel = 0.0f;
 
-    static float pidCompute(PidState& pid, float error, float dt);
     static float moveToward(float current, float target, float rate, float dt);
     void enterTippingUp();
     void enterBalancing();
+    void enterReturningArms();
     void disengage();
     void startLog();
     void logSample(float roll_deg, float roll_rate_dps);
     void stopLog();
+    void flushLogToFile();
 };

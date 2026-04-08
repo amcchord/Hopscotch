@@ -62,6 +62,7 @@ static constexpr uint32_t CAL_ENTRY_HOLD_MS = 3000;
 // Balance mode state tracking
 static bool  prevBalanceWasActive = false;
 static float prevRollDeg          = 0.0f;
+static float filteredRollRate     = 0.0f;
 
 // Periodic debug output toggle (press 'd' + Enter to toggle)
 static bool  debugOutputEnabled = true;
@@ -106,8 +107,7 @@ static void printSerialHelp() {
     Serial.println("--- Balance Mode ---");
     Serial.println("  bal status                  Print balance state, PID gains, log info");
     Serial.println("  bal setpoint <deg>          Set balance setpoint (default 90)");
-    Serial.println("  bal okp/oki/okd <val>       Set outer PID Kp/Ki/Kd");
-    Serial.println("  bal ikp/iki/ikd <val>       Set inner PID Kp/Ki/Kd");
+    Serial.println("  bal kp/kd/adapt <val>       Set PD gains / adaptive setpoint rate");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
     Serial.println("  help                        Show this help");
@@ -335,39 +335,24 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setSetpoint(val);
         Serial.printf("[Balance] Setpoint = %.1f deg\n", val);
 
-    } else if (strncmp(sub, "okp ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setOuterKp(val);
-        Serial.printf("[Balance] Outer Kp = %.4f\n", val);
+    } else if (strncmp(sub, "kp ", 3) == 0) {
+        float val = atof(sub + 3);
+        balanceCtrl.setKp(val);
+        Serial.printf("[Balance] Kp = %.4f\n", val);
 
-    } else if (strncmp(sub, "oki ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setOuterKi(val);
-        Serial.printf("[Balance] Outer Ki = %.4f\n", val);
+    } else if (strncmp(sub, "kd ", 3) == 0) {
+        float val = atof(sub + 3);
+        balanceCtrl.setKd(val);
+        Serial.printf("[Balance] Kd = %.4f\n", val);
 
-    } else if (strncmp(sub, "okd ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setOuterKd(val);
-        Serial.printf("[Balance] Outer Kd = %.4f\n", val);
-
-    } else if (strncmp(sub, "ikp ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setInnerKp(val);
-        Serial.printf("[Balance] Inner Kp = %.4f\n", val);
-
-    } else if (strncmp(sub, "iki ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setInnerKi(val);
-        Serial.printf("[Balance] Inner Ki = %.4f\n", val);
-
-    } else if (strncmp(sub, "ikd ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setInnerKd(val);
-        Serial.printf("[Balance] Inner Kd = %.4f\n", val);
+    } else if (strncmp(sub, "adapt ", 6) == 0) {
+        float val = atof(sub + 6);
+        balanceCtrl.setAdaptRate(val);
+        Serial.printf("[Balance] Adapt rate = %.4f\n", val);
 
     } else {
         Serial.println("[Balance] Usage: bal status | bal setpoint <deg>");
-        Serial.println("         bal okp/oki/okd <val> | bal ikp/iki/ikd <val>");
+        Serial.println("         bal kp/kd/adapt <val>");
         Serial.println("         bal log | bal log clear");
     }
 }
@@ -862,21 +847,24 @@ void loop() {
         bool ch7Active = isSwitchActive(ch7_raw);
 
         float rollDeg = ahrsFilter.getRoll();
-        float rollRateDps = (rollDeg - prevRollDeg) / dt;
+        float rawRollRate = (rollDeg - prevRollDeg) / dt;
         prevRollDeg = rollDeg;
+        filteredRollRate = 0.25f * rawRollRate + 0.75f * filteredRollRate;
+        float rollRateDps = filteredRollRate;
 
         // When Ch7 is active and balance is not yet running, Ch11 edge triggers tip-up.
         // When balance is active, suppress Ch11's normal jump behavior.
         bool balanceWantsEdge = ch7Active && !balanceCtrl.isActive() && calEdge;
         balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
 
-        bool balanceActive = balanceCtrl.isActive();
+        bool balanceDriving = balanceCtrl.isControllingDrive();
+        bool balanceActive  = balanceCtrl.isActive();
 
-        // If balance just disengaged, re-sync drive controller
-        if (prevBalanceWasActive && !balanceActive) {
+        // If balance just released drive control, re-sync drive controller
+        if (prevBalanceWasActive && !balanceDriving) {
             driveCtrl.emergencyStop();
         }
-        prevBalanceWasActive = balanceActive;
+        prevBalanceWasActive = balanceDriving;
 
         ArmInput armInput = {};
         armInput.cal_trigger = calEdge;
@@ -937,7 +925,7 @@ void loop() {
             if (motorMgr.isArmArmed()) {
                 armCtrl.holdPosition();
             }
-        } else if (balanceActive) {
+        } else if (balanceDriving) {
             // Balance controller owns back wheels and arms.
             // Hold front wheels at their current position via drive controller
             // only if drive is armed (back wheels handled inside balanceCtrl).

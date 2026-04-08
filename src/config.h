@@ -103,24 +103,19 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // Self-balance mode
 // ---------------------------------------------------------------------------
 static constexpr float    BALANCE_SETPOINT_DEG          = 90.0f;   // target roll angle on back wheels
-static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // how close roll must be to engage PID
+static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 10.0f;   // engage while approaching gently
+static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage (wait for slow approach)
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
 
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
-static constexpr float    BALANCE_ARM_TIP_SPEED         = 1.0f;    // rad/s ramp rate for tip-up
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s ramp rate for return to zero
+static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s -- return fast, force PID to take over
 
-static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 15.0f;   // rad/s speed limit for balance corrections
+static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
-static constexpr float    BALANCE_OUTER_KP              = 3.0f;
-static constexpr float    BALANCE_OUTER_KI              = 0.3f;
-static constexpr float    BALANCE_OUTER_KD              = 0.0f;
-static constexpr float    BALANCE_OUTER_I_MAX           = 30.0f;   // integral windup clamp (deg/s)
-
-static constexpr float    BALANCE_INNER_KP              = 0.3f;
-static constexpr float    BALANCE_INNER_KI              = 0.0f;
-static constexpr float    BALANCE_INNER_KD              = 0.0f;
+static constexpr float    BALANCE_KP                    = 1.0f;    // rad/s per degree of angle error (restoring force)
+static constexpr float    BALANCE_KD                    = 0.15f;   // rad/s per deg/s of roll rate (damping via heavily filtered rate)
 
 static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
