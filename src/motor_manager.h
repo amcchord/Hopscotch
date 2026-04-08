@@ -87,6 +87,12 @@ public:
     const MotorState& getMotor(int index) const { return _motors[index]; }
     int motorCount() const { return NUM_MOTORS; }
 
+    // Bus voltage read from motors (all share the same power bus)
+    float getBusVoltage() const { return _bus_voltage; }
+
+    // Sum of absolute motor currents (amps) from IQ_FILT param reads
+    float getTotalCurrent() const;
+
     Robstride* getCanBus() { return _can; }
 
 private:
@@ -98,4 +104,8 @@ private:
     int findMotorByCanId(uint8_t can_id);
     bool enableAndConfigureMotor(int idx, RobstrideRunMode mode);
     int _scan_index = 0;
+
+    float _bus_voltage = 0.0f;
+    float _motor_current[NUM_MOTORS] = {};
+    int   _iq_scan_index = 0;
 };

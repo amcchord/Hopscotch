@@ -151,6 +151,71 @@ void CrsfReceiver::sendFlightMode(const char* mode) {
     _serial->write(frame, 3 + slen + 2);
 }
 
+void CrsfReceiver::sendBatteryTelemetry(float voltage_v, float current_a) {
+    if (!_serial) return;
+
+    // CRSF Battery Sensor frame (type 0x08)
+    // Payload: voltage(u16 BE, decivolts) + current(u16 BE, deciamps)
+    //        + capacity(u24 BE, mAh) + remaining(u8, %)
+    static constexpr int PAYLOAD_LEN = 8;
+
+    uint16_t voltage_dv = static_cast<uint16_t>(voltage_v * 10.0f + 0.5f);
+    uint16_t current_da = static_cast<uint16_t>(current_a * 10.0f + 0.5f);
+
+    uint8_t frame[2 + 1 + PAYLOAD_LEN + 1];
+    frame[0] = CRSF_SYNC_BYTE;
+    frame[1] = PAYLOAD_LEN + 2;
+    frame[2] = CRSF_FRAMETYPE_BATTERY_SENSOR;
+
+    // Voltage (big-endian, decivolts)
+    frame[3] = (voltage_dv >> 8) & 0xFF;
+    frame[4] = voltage_dv & 0xFF;
+
+    // Current (big-endian, deciamps)
+    frame[5] = (current_da >> 8) & 0xFF;
+    frame[6] = current_da & 0xFF;
+
+    // Capacity used (big-endian u24, mAh) -- not available
+    frame[7] = 0;
+    frame[8] = 0;
+    frame[9] = 0;
+
+    // Battery remaining (%) -- not available
+    frame[10] = 0;
+
+    frame[11] = crc8(&frame[2], PAYLOAD_LEN + 1);
+    _serial->write(frame, sizeof(frame));
+}
+
+void CrsfReceiver::sendAttitudeTelemetry(float pitch_deg, float roll_deg, float yaw_deg) {
+    if (!_serial) return;
+
+    // CRSF Attitude frame (type 0x1E)
+    // Payload: pitch(i16 BE) + roll(i16 BE) + yaw(i16 BE), each in radians * 10000
+    static constexpr float D2R = 3.14159265f / 180.0f;
+    static constexpr float SCALE = 10000.0f;
+    static constexpr int PAYLOAD_LEN = 6;
+
+    int16_t pitch_raw = static_cast<int16_t>(pitch_deg * D2R * SCALE);
+    int16_t roll_raw  = static_cast<int16_t>(roll_deg  * D2R * SCALE);
+    int16_t yaw_raw   = static_cast<int16_t>(yaw_deg   * D2R * SCALE);
+
+    uint8_t frame[2 + 1 + PAYLOAD_LEN + 1];
+    frame[0] = CRSF_SYNC_BYTE;
+    frame[1] = PAYLOAD_LEN + 2;
+    frame[2] = CRSF_FRAMETYPE_ATTITUDE;
+
+    frame[3] = (pitch_raw >> 8) & 0xFF;
+    frame[4] = pitch_raw & 0xFF;
+    frame[5] = (roll_raw >> 8) & 0xFF;
+    frame[6] = roll_raw & 0xFF;
+    frame[7] = (yaw_raw >> 8) & 0xFF;
+    frame[8] = yaw_raw & 0xFF;
+
+    frame[9] = crc8(&frame[2], PAYLOAD_LEN + 1);
+    _serial->write(frame, sizeof(frame));
+}
+
 uint16_t CrsfReceiver::getChannel(int ch) const {
     if (ch < 0 || ch >= CRSF_MAX_CHANNELS) return CRSF_CHANNEL_MID;
     return _channels[ch];

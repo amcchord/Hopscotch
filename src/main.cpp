@@ -13,6 +13,7 @@
 #include "crsf.h"
 #include "drive_controller.h"
 #include "arm_controller.h"
+#include "balance_controller.h"
 #include "display.h"
 #include "web_server.h"
 
@@ -25,6 +26,7 @@ static MotorManager     motorMgr;
 static CrsfReceiver     crsfRx;
 static DriveController  driveCtrl;
 static ArmController    armCtrl;
+static BalanceController balanceCtrl;
 static Display          display;
 static WebUI            webUI;
 static Madgwick         ahrsFilter;
@@ -57,6 +59,13 @@ static uint32_t calHoldStart    = 0;
 static bool     calHoldFired    = false;
 static constexpr uint32_t CAL_ENTRY_HOLD_MS = 3000;
 
+// Balance mode state tracking
+static bool  prevBalanceWasActive = false;
+static float prevRollDeg          = 0.0f;
+
+// Periodic debug output toggle (press 'd' + Enter to toggle)
+static bool  debugOutputEnabled = true;
+
 // ---------------------------------------------------------------------------
 // Serial debug console -- simulated input override
 // ---------------------------------------------------------------------------
@@ -70,6 +79,7 @@ static int   serialBufLen = 0;
 static void printSerialHelp() {
     Serial.println();
     Serial.println("--- Serial Debug Commands ---");
+    Serial.println("  d                 Toggle periodic debug output on/off");
     Serial.println("  sim on / sim off  Enable/disable simulated RC input");
     Serial.println("  t <val>           Set sim throttle (-1.0 to 1.0)");
     Serial.println("  s <val>           Set sim steering (-1.0 to 1.0)");
@@ -93,6 +103,13 @@ static void printSerialHelp() {
     Serial.println("  pos <id> <pos> <spdLim>     Send position + speed_limit");
     Serial.println("  spd <id> <speed> <curLim>   Send speed + current_limit");
     Serial.println("  test <id>                   Run automated motor test");
+    Serial.println("--- Balance Mode ---");
+    Serial.println("  bal status                  Print balance state, PID gains, log info");
+    Serial.println("  bal setpoint <deg>          Set balance setpoint (default 90)");
+    Serial.println("  bal okp/oki/okd <val>       Set outer PID Kp/Ki/Kd");
+    Serial.println("  bal ikp/iki/ikd <val>       Set inner PID Kp/Ki/Kd");
+    Serial.println("  bal log                     Dump telemetry log to serial");
+    Serial.println("  bal log clear               Delete telemetry log file");
     Serial.println("  help                        Show this help");
     Serial.println("-----------------------------");
 }
@@ -300,6 +317,61 @@ static void processCalCommand(const char* sub) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Balance serial commands
+// ---------------------------------------------------------------------------
+static void processBalCommand(const char* sub) {
+    if (strcmp(sub, "status") == 0) {
+        balanceCtrl.printStatus();
+
+    } else if (strcmp(sub, "log") == 0) {
+        balanceCtrl.dumpLog();
+
+    } else if (strcmp(sub, "log clear") == 0) {
+        balanceCtrl.clearLog();
+
+    } else if (strncmp(sub, "setpoint ", 9) == 0) {
+        float val = atof(sub + 9);
+        balanceCtrl.setSetpoint(val);
+        Serial.printf("[Balance] Setpoint = %.1f deg\n", val);
+
+    } else if (strncmp(sub, "okp ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setOuterKp(val);
+        Serial.printf("[Balance] Outer Kp = %.4f\n", val);
+
+    } else if (strncmp(sub, "oki ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setOuterKi(val);
+        Serial.printf("[Balance] Outer Ki = %.4f\n", val);
+
+    } else if (strncmp(sub, "okd ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setOuterKd(val);
+        Serial.printf("[Balance] Outer Kd = %.4f\n", val);
+
+    } else if (strncmp(sub, "ikp ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setInnerKp(val);
+        Serial.printf("[Balance] Inner Kp = %.4f\n", val);
+
+    } else if (strncmp(sub, "iki ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setInnerKi(val);
+        Serial.printf("[Balance] Inner Ki = %.4f\n", val);
+
+    } else if (strncmp(sub, "ikd ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setInnerKd(val);
+        Serial.printf("[Balance] Inner Kd = %.4f\n", val);
+
+    } else {
+        Serial.println("[Balance] Usage: bal status | bal setpoint <deg>");
+        Serial.println("         bal okp/oki/okd <val> | bal ikp/iki/ikd <val>");
+        Serial.println("         bal log | bal log clear");
+    }
+}
+
 static void processSerialCommand(const char* cmd) {
     // Skip leading whitespace
     while (*cmd == ' ') cmd++;
@@ -307,6 +379,10 @@ static void processSerialCommand(const char* cmd) {
 
     if (strcmp(cmd, "help") == 0) {
         printSerialHelp();
+
+    } else if (strcmp(cmd, "d") == 0) {
+        debugOutputEnabled = !debugOutputEnabled;
+        Serial.printf("[Debug] Periodic output %s\n", debugOutputEnabled ? "ON" : "OFF");
 
     } else if (strcmp(cmd, "sim on") == 0) {
         simEnabled = true;
@@ -486,6 +562,12 @@ static void processSerialCommand(const char* cmd) {
     } else if (strcmp(cmd, "cal") == 0) {
         Serial.println("[Cal] Usage: cal start | cal stop | cal status");
 
+    } else if (strncmp(cmd, "bal ", 4) == 0) {
+        processBalCommand(cmd + 4);
+
+    } else if (strcmp(cmd, "bal") == 0) {
+        Serial.println("[Balance] Usage: bal status | bal log | bal log clear");
+
     } else {
         Serial.printf("[Cmd] Unknown: '%s' -- type 'help'\n", cmd);
     }
@@ -647,6 +729,7 @@ void setup() {
     driveCtrl.begin(&motorMgr);
     armCtrl.begin(&motorMgr);
     armCtrl.setSettingsManager(&settingsMgr);
+    balanceCtrl.begin(&motorMgr, &armCtrl);
 
     // 7. WiFi AP
     initWifi();
@@ -774,10 +857,31 @@ void loop() {
             calEdge = false;
         }
 
+        // --- Balance controller: read Ch7 and IMU, update state machine ---
+        float ch7_raw = crsfRx.getChannelNormalized(s.channel_map.arm_select_var);
+        bool ch7Active = isSwitchActive(ch7_raw);
+
+        float rollDeg = ahrsFilter.getRoll();
+        float rollRateDps = (rollDeg - prevRollDeg) / dt;
+        prevRollDeg = rollDeg;
+
+        // When Ch7 is active and balance is not yet running, Ch11 edge triggers tip-up.
+        // When balance is active, suppress Ch11's normal jump behavior.
+        bool balanceWantsEdge = ch7Active && !balanceCtrl.isActive() && calEdge;
+        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
+
+        bool balanceActive = balanceCtrl.isActive();
+
+        // If balance just disengaged, re-sync drive controller
+        if (prevBalanceWasActive && !balanceActive) {
+            driveCtrl.emergencyStop();
+        }
+        prevBalanceWasActive = balanceActive;
+
         ArmInput armInput = {};
         armInput.cal_trigger = calEdge;
         armInput.move_trigger = moveEdge;
-        armInput.jump_trigger = calEdge;
+        armInput.jump_trigger = balanceActive ? false : calEdge;
         armInput.speed_channel = arm_speed_raw;
         armInput.nudge_channel = applyDeadband(arm_nudge_raw, deadband_norm);
 
@@ -833,6 +937,12 @@ void loop() {
             if (motorMgr.isArmArmed()) {
                 armCtrl.holdPosition();
             }
+        } else if (balanceActive) {
+            // Balance controller owns back wheels and arms.
+            // Hold front wheels at their current position via drive controller
+            // only if drive is armed (back wheels handled inside balanceCtrl).
+            // Arm controller still called -- override is active inside it.
+            armCtrl.update(armInput, dt);
         } else {
             // 6. Drive control
             if (motorMgr.isDriveArmed()) {
@@ -857,7 +967,8 @@ void loop() {
         }
 
         // 9. Periodic debug output (every 2 seconds = 100 ticks at 50Hz)
-        if (controlTickCount % 100 == 0) {
+        //    Toggle with 'd' command over serial
+        if (debugOutputEnabled && controlTickCount % 100 == 0) {
             uint32_t avgUs = loopTotalUs / 100;
             Serial.println("==================================================");
             Serial.printf("[Loop] t=%lu tick=%lu | avg=%luus max=%luus overruns=%lu\n",
@@ -913,8 +1024,17 @@ void loop() {
                               m.errors);
             }
 
+            Serial.printf("[VBUS] %.1fV  [Current] %.2fA\n",
+                          motorMgr.getBusVoltage(), motorMgr.getTotalCurrent());
+
             // Drive controller per-motor closed-loop status
             driveCtrl.printDebug();
+
+            // Balance controller status (only when not idle)
+            if (balanceCtrl.isActive()) {
+                Serial.printf("[Balance] state=%s  roll=%.1f  setpoint=%.1f\n",
+                              balanceCtrl.getStateString(), rollDeg, balanceCtrl.getSetpoint());
+            }
 
             // CAN bus diagnostics
             canBus.printBusStatus();
@@ -945,11 +1065,19 @@ void loop() {
     }
 
     // -----------------------------------------------------------------------
-    // ~5 Hz CRSF flight mode telemetry to transmitter
+    // ~5 Hz CRSF telemetry to transmitter
     // -----------------------------------------------------------------------
     if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
         lastTelTick = now;
-        const char* state = armCtrl.getStateString();
+
+        const char* state = balanceCtrl.isActive()
+            ? balanceCtrl.getStateString()
+            : armCtrl.getStateString();
         crsfRx.sendFlightMode(state);
+        crsfRx.sendBatteryTelemetry(motorMgr.getBusVoltage(),
+                                    motorMgr.getTotalCurrent());
+        crsfRx.sendAttitudeTelemetry(ahrsFilter.getPitch(),
+                                     ahrsFilter.getRoll(),
+                                     ahrsFilter.getYaw());
     }
 }

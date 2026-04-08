@@ -285,6 +285,8 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
     uint8_t motor_id = (id >> 8) & 0xFF;
     fb.motor_id = motor_id;
 
+    fb.is_param_response = false;
+
     if (comm_type == static_cast<uint8_t>(RobstrideCommType::Feedback)) {
         // Feedback frame: 4x uint16 big-endian (position, velocity, torque, temperature)
         // Each scaled over full 16-bit range with motor-specific limits
@@ -322,11 +324,6 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
         return true;
     }
 
-    // Log any received frame for debugging
-    Serial.printf("[CAN RX] type=%d motor=%d dlc=%d data=", comm_type, motor_id, msg.data_length_code);
-    for (int i = 0; i < msg.data_length_code; i++) Serial.printf("%02X ", msg.data[i]);
-    Serial.println();
-
     // Any other response from a motor means it's alive (param read response, enable ack, etc.)
     if (comm_type == static_cast<uint8_t>(RobstrideCommType::ParamRead) ||
         comm_type == static_cast<uint8_t>(RobstrideCommType::ParamWrite) ||
@@ -334,12 +331,16 @@ bool Robstride::receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms) {
         comm_type == static_cast<uint8_t>(RobstrideCommType::Stop) ||
         comm_type == static_cast<uint8_t>(RobstrideCommType::ObtainID)) {
 
-        // For param read responses, try to extract float value from data[4..7]
         if (comm_type == static_cast<uint8_t>(RobstrideCommType::ParamRead)) {
             uint16_t param_addr = msg.data[0] | (msg.data[1] << 8);
+            float val;
+            memcpy(&val, &msg.data[4], sizeof(float));
+
+            fb.is_param_response = true;
+            fb.param_addr = param_addr;
+            fb.param_value = val;
+
             if (param_addr == RobstrideParam::MOTOR_POSITION) {
-                float val;
-                memcpy(&val, &msg.data[4], sizeof(float));
                 fb.position = val;
             }
         }

@@ -35,6 +35,7 @@ void ArmController::begin(MotorManager* motors) {
     _cycle_direction_forward = true;
     _cal_mode = false;
     _cal_step = CalStep::Idle;
+    _override_active = false;
 }
 
 // Return absolute motor targets for a given arm position.
@@ -202,6 +203,14 @@ void ArmController::update(const ArmInput& input, float dt_sec) {
     // --- Movement and hold only when armed ---
     if (!_motors->isArmArmed()) return;
 
+    // --- External override (balance controller owns the arms) ---
+    if (_override_active) {
+        _motors->sendArmPosition(MotorRole::ArmLeft,  _override_left,  _override_speed);
+        _motors->sendArmPosition(MotorRole::ArmRight, _override_right, _override_speed);
+        _initialized = false;
+        return;
+    }
+
     if (!_initialized) {
         _target_left = _motors->getMotor(MotorRole::ArmLeft).position;
         _target_right = _motors->getMotor(MotorRole::ArmRight).position;
@@ -277,6 +286,25 @@ void ArmController::holdPosition() {
     _motors->sendArmPosition(MotorRole::ArmRight, _target_right, 0.0f);
 
     _initialized = false;
+}
+
+// ---------------------------------------------------------------------------
+// External override (used by balance controller)
+// ---------------------------------------------------------------------------
+
+void ArmController::setOverrideTargets(float left, float right, float speed) {
+    _override_active = true;
+    _override_left   = left;
+    _override_right  = right;
+    _override_speed  = speed;
+}
+
+void ArmController::clearOverride() {
+    if (_override_active) {
+        _override_active = false;
+        _initialized = false;
+        Serial.println("[Arm] Override cleared, returning to normal control");
+    }
 }
 
 float ArmController::getTargetPosition(MotorRole role) const {

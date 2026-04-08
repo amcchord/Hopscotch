@@ -68,6 +68,11 @@ struct RobstrideFeedback {
     uint8_t mode;
     uint16_t errors;
     bool    has_fault;
+
+    // Populated when the response is a param-read reply (comm_type 17)
+    bool     is_param_response = false;
+    uint16_t param_addr  = 0;
+    float    param_value = 0.0f;
 };
 
 class Robstride {

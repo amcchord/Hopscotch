@@ -217,6 +217,22 @@ void MotorManager::processFeedback() {
     for (int i = 0; i < 16; i++) {
         if (!_can->receiveFeedback(fb, 0)) break;
 
+        // Handle param-read responses
+        if (fb.is_param_response) {
+            if (fb.param_addr == RobstrideParam::VBUS) {
+                if (_bus_voltage == 0.0f && fb.param_value > 0.0f) {
+                    Serial.printf("[Motors] First VBUS reading: %.1fV\n", fb.param_value);
+                }
+                _bus_voltage = fb.param_value;
+            } else if (fb.param_addr == RobstrideParam::IQ_FILT) {
+                int idx = findMotorByCanId(fb.motor_id);
+                if (idx >= 0) {
+                    _motor_current[idx] = fb.param_value;
+                }
+            }
+            continue;
+        }
+
         int idx = findMotorByCanId(fb.motor_id);
         if (idx < 0) continue;
 
@@ -270,12 +286,46 @@ void MotorManager::checkTimeouts(uint32_t timeout_ms) {
 void MotorManager::scanNextMotor() {
     if (!_can) return;
 
-    // Round-robin: send motion control ping (all zeros) to each motor.
-    // This provokes a type-0x02 feedback response without commanding movement.
-    MotorState& m = _motors[_scan_index];
-    _can->sendMotionPing(m.can_id);
+    // Scan cycle: 6 motion pings + 1 VBUS read + 1 IQ_FILT read = 8 slots
+    static constexpr int SLOT_VBUS = NUM_MOTORS;
+    static constexpr int SLOT_IQ   = NUM_MOTORS + 1;
+    static constexpr int TOTAL_SLOTS = NUM_MOTORS + 2;
 
-    _scan_index = (_scan_index + 1) % NUM_MOTORS;
+    if (_scan_index < NUM_MOTORS) {
+        MotorState& m = _motors[_scan_index];
+        _can->sendMotionPing(m.can_id);
+    } else if (_scan_index == SLOT_VBUS) {
+        for (int i = 0; i < NUM_MOTORS; i++) {
+            if (_motors[i].online) {
+                _can->readParam(_motors[i].can_id, CAN_HOST_ID, RobstrideParam::VBUS);
+                break;
+            }
+        }
+    } else if (_scan_index == SLOT_IQ) {
+        // Read IQ_FILT from one motor per cycle, rotating through all motors
+        for (int attempt = 0; attempt < NUM_MOTORS; attempt++) {
+            int idx = (_iq_scan_index + attempt) % NUM_MOTORS;
+            if (_motors[idx].online) {
+                _can->readParam(_motors[idx].can_id, CAN_HOST_ID, RobstrideParam::IQ_FILT);
+                _iq_scan_index = (idx + 1) % NUM_MOTORS;
+                break;
+            }
+        }
+    }
+
+    _scan_index = (_scan_index + 1) % TOTAL_SLOTS;
+}
+
+float MotorManager::getTotalCurrent() const {
+    float sum = 0.0f;
+    for (int i = 0; i < NUM_MOTORS; i++) {
+        if (_motors[i].online) {
+            float abs_current = _motor_current[i];
+            if (abs_current < 0.0f) abs_current = -abs_current;
+            sum += abs_current;
+        }
+    }
+    return sum;
 }
 
 bool MotorManager::changeMotorCanIdOnBus(uint8_t old_id, uint8_t new_id) {

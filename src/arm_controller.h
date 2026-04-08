@@ -63,6 +63,11 @@ public:
     bool isInCalMode() const { return _cal_mode; }
     CalStep getCalStep() const { return _cal_step; }
 
+    // External override (used by balance controller)
+    void setOverrideTargets(float left, float right, float speed);
+    void clearOverride();
+    bool isOverridden() const { return _override_active; }
+
 private:
     MotorManager* _motors = nullptr;
     SettingsManager* _settings = nullptr;
@@ -90,6 +95,12 @@ private:
     // Calibration mode
     bool _cal_mode = false;
     CalStep _cal_step = CalStep::Idle;
+
+    // External override
+    bool  _override_active = false;
+    float _override_left   = 0.0f;
+    float _override_right  = 0.0f;
+    float _override_speed  = 0.0f;
 
     mutable char _state_buf[24] = {};
 

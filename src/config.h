@@ -100,6 +100,32 @@ static constexpr float    ARM_JUMP_DELTA_LEFT    = 4.39f;   // delta from forwar
 static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forward ref
 
 // ---------------------------------------------------------------------------
+// Self-balance mode
+// ---------------------------------------------------------------------------
+static constexpr float    BALANCE_SETPOINT_DEG          = 90.0f;   // target roll angle on back wheels
+static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // how close roll must be to engage PID
+static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
+
+static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
+static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
+static constexpr float    BALANCE_ARM_TIP_SPEED         = 1.0f;    // rad/s ramp rate for tip-up
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s ramp rate for return to zero
+
+static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 15.0f;   // rad/s speed limit for balance corrections
+
+static constexpr float    BALANCE_OUTER_KP              = 3.0f;
+static constexpr float    BALANCE_OUTER_KI              = 0.3f;
+static constexpr float    BALANCE_OUTER_KD              = 0.0f;
+static constexpr float    BALANCE_OUTER_I_MAX           = 30.0f;   // integral windup clamp (deg/s)
+
+static constexpr float    BALANCE_INNER_KP              = 0.3f;
+static constexpr float    BALANCE_INNER_KI              = 0.0f;
+static constexpr float    BALANCE_INNER_KD              = 0.0f;
+
+static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
+static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
+
+// ---------------------------------------------------------------------------
 // CRSF telemetry
 // ---------------------------------------------------------------------------
 static constexpr uint32_t CRSF_TELEMETRY_PERIOD_MS = 200;  // ~5 Hz

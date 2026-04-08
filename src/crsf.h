@@ -9,6 +9,8 @@ static constexpr int CRSF_MAX_PACKET_SIZE = 64;
 // CRSF frame types
 static constexpr uint8_t CRSF_FRAMETYPE_RC_CHANNELS_PACKED = 0x16;
 static constexpr uint8_t CRSF_FRAMETYPE_LINK_STATISTICS    = 0x14;
+static constexpr uint8_t CRSF_FRAMETYPE_BATTERY_SENSOR     = 0x08;
+static constexpr uint8_t CRSF_FRAMETYPE_ATTITUDE           = 0x1E;
 static constexpr uint8_t CRSF_FRAMETYPE_FLIGHT_MODE        = 0x21;
 
 // Sync/address bytes
@@ -30,6 +32,12 @@ public:
 
     // Send flight mode telemetry string back to transmitter
     void sendFlightMode(const char* mode);
+
+    // Send battery sensor telemetry (voltage in volts, current in amps)
+    void sendBatteryTelemetry(float voltage_v, float current_a);
+
+    // Send attitude telemetry (pitch, roll, yaw in degrees)
+    void sendAttitudeTelemetry(float pitch_deg, float roll_deg, float yaw_deg);
 
     // Is the receiver link active?
     bool isLinkUp() const;
