@@ -84,30 +84,37 @@ bool MotorManager::enableAndConfigureMotor(int idx, RobstrideRunMode mode) {
     delay(50);
 
     if (ok) {
-        // Zero position AFTER enabling in CSP mode. Per manual section 4.2.6:
-        // "New (CSP/Motion Control): Target updates to 0 instantly -> motor
-        // remains stationary." Zero is blocked in PP but supported in CSP.
-        _can->setZeroPosition(m.can_id, CAN_HOST_ID);
-        delay(50);
+        // Read the motor's actual mechanical position so our coordinate
+        // system aligns with the motor's. This is the ground truth --
+        // don't rely on setZeroPosition which is unreliable.
+        float motor_pos = 0.0f;
+        bool got_pos = _can->readParamSync(m.can_id, CAN_HOST_ID,
+                                           RobstrideParam::MECH_POS, motor_pos, 200);
+        if (!got_pos) {
+            Serial.printf("[Motors] WARNING: could not read MECH_POS from motor %d, assuming 0\n", m.can_id);
+            motor_pos = 0.0f;
+        }
 
         if (mode == RobstrideRunMode::CSP) {
+            // Tell the motor to hold at its current position
             _can->writeFloatParam(m.can_id, CAN_HOST_ID,
-                                  RobstrideParam::SPEED_LIMIT, SPEC_RS05.max_speed);
+                                  RobstrideParam::SPEED_LIMIT, 0.0f);
             delay(5);
             _can->writeFloatParam(m.can_id, CAN_HOST_ID,
-                                  RobstrideParam::TARGET_POSITION, 0.0f);
+                                  RobstrideParam::TARGET_POSITION, motor_pos);
             delay(5);
         }
 
         m.enabled = true;
         m.run_mode = mode;
-        m.position = 0.0f;
+        m.position = motor_pos;
         m.raw_position = 0.0f;
         m.prev_raw_position = 0.0f;
         m.unwrap_offset = 0.0f;
-        m._abs_pos_offset = 0.0f;
+        m._abs_pos_offset = motor_pos;
         m.has_first_feedback = false;
-        Serial.printf("[Motors] Enabled motor ID=%d in CSP mode (zeroed)\n", m.can_id);
+        Serial.printf("[Motors] Enabled motor ID=%d in CSP mode (pos=%.3f)\n",
+                      m.can_id, motor_pos);
     }
     return ok;
 }

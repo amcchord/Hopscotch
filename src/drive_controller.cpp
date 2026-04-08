@@ -70,11 +70,13 @@ void DriveController::update(float throttle, float steering, float dt_sec) {
             }
             _state[i] = DriveMotorState::Driving;
 
-            // Horizon distance = commanded_speed * horizon_sec.
-            // The speed_limit parameter on the motor caps the actual velocity,
-            // so the target only needs to be far enough ahead that the motor
-            // doesn't reach it and decelerate prematurely.
+            // Horizon distance = commanded_speed * horizon_sec, with a minimum
+            // to prevent oscillation at very low speeds. The speed_limit
+            // parameter on the motor caps the actual velocity.
             float horizon_distance = abs_cmd * _horizon_sec;
+            if (horizon_distance < MIN_HORIZON_DISTANCE) {
+                horizon_distance = MIN_HORIZON_DISTANCE;
+            }
 
             float direction = (speeds[i] > 0) ? 1.0f : -1.0f;
             _target_pos[i] = current_pos + direction * horizon_distance;

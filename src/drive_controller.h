@@ -53,5 +53,6 @@ private:
 
     static constexpr float STOP_THRESHOLD = 0.3f;       // rad/s: below this, consider motor stopped
     static constexpr float HOLD_SPEED_LIMIT = 0.5f;     // rad/s: speed limit when holding position
-    static constexpr float DRIVE_COMMAND_THRESHOLD = 0.01f; // rad/s: below this, stick counts as centered
+    static constexpr float DRIVE_COMMAND_THRESHOLD = 0.5f; // rad/s: below this, stick counts as centered
+    static constexpr float MIN_HORIZON_DISTANCE = 2.0f;   // rad: minimum target distance to prevent oscillation
 };
