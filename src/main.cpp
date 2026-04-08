@@ -4,6 +4,7 @@
 #include <LittleFS.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <MadgwickAHRS.h>
 
 #include "config.h"
 #include "settings.h"
@@ -26,6 +27,7 @@ static DriveController  driveCtrl;
 static ArmController    armCtrl;
 static Display          display;
 static WebUI            webUI;
+static Madgwick         ahrsFilter;
 
 // Timing
 static uint32_t lastControlTick  = 0;
@@ -588,6 +590,7 @@ static bool isSwitchActive(float norm_value) {
 void setup() {
     auto cfg = M5.config();
     M5.begin(cfg);
+    ahrsFilter.begin(CONTROL_LOOP_HZ);
 
     Serial.begin(115200);
     delay(1000);
@@ -692,6 +695,16 @@ void loop() {
         lastControlTick = now;
         controlTickCount++;
         float dt = static_cast<float>(CONTROL_LOOP_PERIOD_MS) / 1000.0f;
+
+        // 0. Poll M5 hardware and update AHRS filter
+        M5.update();
+        if (M5.Imu.update()) {
+            auto imu = M5.Imu.getImuData();
+            ahrsFilter.update(
+                imu.gyro.x,  imu.gyro.y,  imu.gyro.z,
+                imu.accel.x, imu.accel.y, imu.accel.z,
+                imu.mag.x,   imu.mag.y,   imu.mag.z);
+        }
 
         // 1. Read CRSF data
         crsfRx.update();
@@ -854,6 +867,9 @@ void loop() {
                           motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
                           throttle, steering, wifiConnected,
                           simEnabled ? "ON" : "off");
+
+            Serial.printf("[IMU] pitch=%+6.1f roll=%+6.1f yaw=%+6.1f\n",
+                          ahrsFilter.getPitch(), ahrsFilter.getRoll(), ahrsFilter.getYaw());
 
             // Reset timing accumulators
             loopMaxUs = 0;
