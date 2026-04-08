@@ -32,14 +32,19 @@ void Display::render(const MotorManager& motors,
                      bool wifi_connected,
                      const char* ip_address,
                      bool drive_armed,
-                     bool arm_armed) {
+                     bool arm_armed,
+                     const ArmController* arm_ctrl) {
     if (!_initialized) return;
 
     _sprite.fillSprite(COL_BG);
 
-    drawStatusBar(wifi_connected, ip_address, drive_armed, arm_armed);
-    drawMotorDiagram(motors);
-    drawChannelBars(crsf);
+    if (arm_ctrl && arm_ctrl->isInCalMode()) {
+        drawCalMode(*arm_ctrl);
+    } else {
+        drawStatusBar(wifi_connected, ip_address, drive_armed, arm_armed);
+        drawMotorDiagram(motors);
+        drawChannelBars(crsf);
+    }
 
     _sprite.pushSprite(&M5.Display, 0, 0);
 }
@@ -195,5 +200,80 @@ void Display::drawChannelBars(const CrsfReceiver& crsf) {
         } else {
             _sprite.print("----");
         }
+    }
+}
+
+void Display::drawCalMode(const ArmController& arm_ctrl) {
+    CalStep step = arm_ctrl.getCalStep();
+
+    // Title
+    _sprite.setTextColor(COL_ORANGE);
+    _sprite.setTextSize(1);
+    _sprite.setCursor(16, 2);
+    _sprite.print("ARM CALIBRATION");
+    _sprite.drawLine(0, 12, SCREEN_W, 12, COL_ORANGE);
+
+    // Step indicators
+    const char* step_labels[] = {"1 FORWARD", "2 CENTER", "3 BACKWARD"};
+    CalStep steps[] = {CalStep::WaitForward, CalStep::WaitCenter, CalStep::WaitBackward};
+
+    for (int i = 0; i < 3; i++) {
+        int y = 20 + i * 18;
+        bool is_current = (step == steps[i]);
+        bool is_done = (static_cast<uint8_t>(step) > static_cast<uint8_t>(steps[i]));
+
+        if (is_current) {
+            _sprite.fillRect(0, y - 1, SCREEN_W, 14, COL_DARKGRAY);
+            _sprite.setTextColor(COL_GREEN);
+            _sprite.setCursor(4, y);
+            _sprite.print("> ");
+        } else if (is_done) {
+            _sprite.setTextColor(COL_GRAY);
+            _sprite.setCursor(4, y);
+            _sprite.print("  ");
+        } else {
+            _sprite.setTextColor(COL_GRAY);
+            _sprite.setCursor(4, y);
+            _sprite.print("  ");
+        }
+        _sprite.print(step_labels[i]);
+
+        if (is_done) {
+            _sprite.setTextColor(COL_GREEN);
+            _sprite.print(" OK");
+        }
+    }
+
+    // Instructions at bottom
+    _sprite.setTextColor(COL_TEXT);
+    int instr_y = 82;
+
+    if (step == CalStep::WaitForward) {
+        _sprite.setCursor(4, instr_y);
+        _sprite.print("Move arms to");
+        _sprite.setCursor(4, instr_y + 12);
+        _sprite.setTextColor(COL_GREEN);
+        _sprite.print("FORWARD position");
+        _sprite.setTextColor(COL_TEXT);
+        _sprite.setCursor(4, instr_y + 28);
+        _sprite.print("Press Ch11");
+    } else if (step == CalStep::WaitCenter) {
+        _sprite.setCursor(4, instr_y);
+        _sprite.print("Move arms to");
+        _sprite.setCursor(4, instr_y + 12);
+        _sprite.setTextColor(COL_GREEN);
+        _sprite.print("CENTER position");
+        _sprite.setTextColor(COL_TEXT);
+        _sprite.setCursor(4, instr_y + 28);
+        _sprite.print("Press Ch11");
+    } else if (step == CalStep::WaitBackward) {
+        _sprite.setCursor(4, instr_y);
+        _sprite.print("Move arms to");
+        _sprite.setCursor(4, instr_y + 12);
+        _sprite.setTextColor(COL_GREEN);
+        _sprite.print("BACKWARD position");
+        _sprite.setTextColor(COL_TEXT);
+        _sprite.setCursor(4, instr_y + 28);
+        _sprite.print("Press Ch11");
     }
 }

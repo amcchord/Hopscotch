@@ -12,6 +12,19 @@ struct ChannelMap {
     uint8_t arm_disarm_arms;
     uint8_t arm_left;
     uint8_t arm_right;
+    uint8_t arm_mode;
+    uint8_t arm_select_group;
+    uint8_t arm_select_var;
+    uint8_t arm_trigger_exec;
+    uint8_t arm_trigger_home;
+};
+
+struct ArmCalibration {
+    float center_left;      // delta from forward (rad)
+    float center_right;     // delta from forward (rad)
+    float backward_left;    // delta from forward (rad)
+    float backward_right;   // delta from forward (rad)
+    bool  calibrated;
 };
 
 struct MotorAssignments {
@@ -33,6 +46,7 @@ struct Settings {
     float    position_horizon_sec;
     float    max_arm_speed;
     float    arm_range;
+    ArmCalibration arm_cal;
 };
 
 class SettingsManager {

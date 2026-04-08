@@ -42,12 +42,17 @@ static constexpr uint32_t CRSF_TIMEOUT_MS     = 500;   // signal-loss threshold
 // ---------------------------------------------------------------------------
 // Default channel mapping (0-indexed CRSF channel numbers)
 // ---------------------------------------------------------------------------
-static constexpr uint8_t DEFAULT_CH_STEERING    = 0;
-static constexpr uint8_t DEFAULT_CH_THROTTLE    = 1;
-static constexpr uint8_t DEFAULT_CH_ARM_DRIVE   = 9;   // Channel 10
-static constexpr uint8_t DEFAULT_CH_ARM_ARMS    = 4;   // Channel 5
-static constexpr uint8_t DEFAULT_CH_ARM_LEFT    = 12;  // Channel 13
-static constexpr uint8_t DEFAULT_CH_ARM_RIGHT   = 13;  // Channel 14
+static constexpr uint8_t DEFAULT_CH_STEERING         = 0;
+static constexpr uint8_t DEFAULT_CH_THROTTLE         = 1;
+static constexpr uint8_t DEFAULT_CH_ARM_DRIVE        = 9;   // Channel 10
+static constexpr uint8_t DEFAULT_CH_ARM_ARMS         = 8;   // Channel 9 (lighted button)
+static constexpr uint8_t DEFAULT_CH_ARM_LEFT         = 12;  // Channel 13 (knob)
+static constexpr uint8_t DEFAULT_CH_ARM_RIGHT        = 13;  // Channel 14 (knob)
+static constexpr uint8_t DEFAULT_CH_ARM_MODE         = 5;   // Channel 6  (3-way switch)
+static constexpr uint8_t DEFAULT_CH_ARM_SELECT_GROUP = 5;   // Channel 6  (3-way switch)
+static constexpr uint8_t DEFAULT_CH_ARM_SELECT_VAR   = 6;   // Channel 7  (3-way switch)
+static constexpr uint8_t DEFAULT_CH_ARM_TRIGGER_EXEC = 10;  // Channel 11 (trigger button)
+static constexpr uint8_t DEFAULT_CH_ARM_TRIGGER_HOME = 11;  // Channel 12 (trigger button)
 
 // ---------------------------------------------------------------------------
 // Control loop timing
@@ -67,8 +72,8 @@ static constexpr uint16_t DEFAULT_DEADBAND           = 50;   // raw CRSF units
 // ---------------------------------------------------------------------------
 // WiFi defaults (overridable via settings.json)
 // ---------------------------------------------------------------------------
-static const char* DEFAULT_WIFI_SSID     = "SvensHaus";
-static const char* DEFAULT_WIFI_PASSWORD = "montreal19";
+static const char* DEFAULT_WIFI_SSID     = "Hopscotch";
+static const char* DEFAULT_WIFI_PASSWORD = "hopscotch";
 
 // ---------------------------------------------------------------------------
 // Robstride motor specs
@@ -82,3 +87,19 @@ struct MotorSpec {
 
 static constexpr MotorSpec SPEC_RS00 = { 17.0f, 50.0f, 500.0f, 5.0f };
 static constexpr MotorSpec SPEC_RS05 = { 17.0f, 33.0f, 500.0f, 5.0f };
+
+// ---------------------------------------------------------------------------
+// Arm speed / nudge / jump
+// ---------------------------------------------------------------------------
+static constexpr uint8_t  CH_ARM_SPEED           = 4;      // Channel 5 (0-indexed)
+static constexpr uint8_t  CH_ARM_NUDGE           = 3;      // Channel 4 (0-indexed)
+static constexpr float    ARM_SLOW_SPEED_RAD_S   = 3.14159265f;  // 30 RPM
+static constexpr float    ARM_MAX_SPEED_RAD_S    = 50.0f;        // RS00 max
+static constexpr float    ARM_NUDGE_MAX_RAD      = 2.0f * 3.14159265f;  // 1 full rotation
+static constexpr float    ARM_JUMP_DELTA_LEFT    = 4.39f;   // delta from forward ref
+static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forward ref
+
+// ---------------------------------------------------------------------------
+// CRSF telemetry
+// ---------------------------------------------------------------------------
+static constexpr uint32_t CRSF_TELEMETRY_PERIOD_MS = 200;  // ~5 Hz

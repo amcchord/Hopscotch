@@ -16,7 +16,7 @@
     ];
 
     function connectWebSocket() {
-        var host = window.location.hostname || "192.168.1.1";
+        var host = window.location.hostname || "192.168.4.1";
         var url = "ws://" + host + "/ws";
         ws = new WebSocket(url);
 

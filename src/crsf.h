@@ -9,6 +9,7 @@ static constexpr int CRSF_MAX_PACKET_SIZE = 64;
 // CRSF frame types
 static constexpr uint8_t CRSF_FRAMETYPE_RC_CHANNELS_PACKED = 0x16;
 static constexpr uint8_t CRSF_FRAMETYPE_LINK_STATISTICS    = 0x14;
+static constexpr uint8_t CRSF_FRAMETYPE_FLIGHT_MODE        = 0x21;
 
 // Sync/address bytes
 static constexpr uint8_t CRSF_SYNC_BYTE = 0xC8;
@@ -26,6 +27,9 @@ public:
 
     // Normalized channel value: -1.0 to +1.0
     float getChannelNormalized(int ch) const;
+
+    // Send flight mode telemetry string back to transmitter
+    void sendFlightMode(const char* mode);
 
     // Is the receiver link active?
     bool isLinkUp() const;

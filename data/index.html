@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Hopscotch Controller</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -38,6 +38,11 @@
                     <span id="arm-armed" class="value">DISARMED</span>
                 </div>
             </div>
+        </section>
+
+        <!-- Emergency Controls -->
+        <section class="panel" id="control-panel">
+            <button class="btn btn-danger" id="btn-disarm">DISARM ALL</button>
         </section>
 
         <!-- Motor Status -->
@@ -94,20 +99,15 @@
             <div id="channel-bars"></div>
         </section>
 
-        <!-- Emergency Controls -->
-        <section class="panel" id="control-panel">
-            <h2>Controls</h2>
-            <button class="btn btn-danger" id="btn-disarm">DISARM ALL</button>
-        </section>
-
         <!-- Settings -->
         <section class="panel" id="settings-panel">
             <h2>Settings</h2>
             <div class="settings-form" id="settings-form">
                 <fieldset>
-                    <legend>WiFi</legend>
+                    <legend>WiFi (Hotspot)</legend>
                     <label>SSID <input type="text" id="set-wifi-ssid"></label>
                     <label>Password <input type="password" id="set-wifi-pass"></label>
+                    <p class="note warning">Changing WiFi settings requires a reboot. Reconnect to the new network name.</p>
                 </fieldset>
                 <fieldset>
                     <legend>Channel Assignments (0-15)</legend>

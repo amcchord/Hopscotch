@@ -13,12 +13,17 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
 body {
-    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-size: 13px;
+    font-size: 15px;
     padding: 8px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 header {
@@ -26,20 +31,20 @@ header {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
-    padding: 8px 12px;
+    padding: 12px 14px;
     background: var(--panel);
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid var(--border);
 }
 
 header h1 {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     flex: 1;
 }
 
 .status-dot {
-    width: 10px; height: 10px;
+    width: 12px; height: 12px;
     border-radius: 50%;
 }
 .status-dot.connected { background: var(--green); }
@@ -48,8 +53,8 @@ header h1 {
 .panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 10px;
+    padding: 14px;
     margin-bottom: 10px;
 }
 
@@ -58,7 +63,7 @@ header h1 {
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-dim);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     letter-spacing: 1px;
 }
 
@@ -71,22 +76,23 @@ header h1 {
 .info-box {
     display: flex;
     flex-direction: column;
-    padding: 6px 10px;
+    padding: 8px 12px;
     background: var(--bg);
-    border-radius: 6px;
+    border-radius: 8px;
     min-width: 60px;
     text-align: center;
+    flex: 1;
 }
 
 .info-box .label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-dim);
     text-transform: uppercase;
 }
 
 .info-box .value {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .info-box .value.armed { color: var(--green); }
@@ -108,14 +114,14 @@ header h1 {
 }
 
 .motor-box {
-    width: 50px; height: 36px;
-    border-radius: 6px;
+    width: 54px; height: 40px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     background: #333;
     color: var(--text);
     border: 2px solid transparent;
@@ -126,10 +132,10 @@ header h1 {
 .motor-box.offline { border-color: #555; background: #222; color: #666; }
 .motor-box.disabled { border-color: var(--yellow); background: #3a3a1b; }
 
-.motor-id { font-size: 9px; color: var(--text-dim); }
+.motor-id { font-size: 10px; color: var(--text-dim); }
 
 .robot-body, .robot-body-lower {
-    width: 60px; height: 36px;
+    width: 60px; height: 40px;
     border: 2px solid var(--border);
     border-radius: 4px;
     display: flex;
@@ -153,10 +159,10 @@ header h1 {
 .motor-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 12px;
 }
 .motor-table th, .motor-table td {
-    padding: 3px 6px;
+    padding: 5px 6px;
     text-align: right;
     border-bottom: 1px solid var(--border);
 }
@@ -164,7 +170,7 @@ header h1 {
     color: var(--text-dim);
     font-weight: 500;
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 /* Channel Bars */
@@ -172,19 +178,19 @@ header h1 {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 .channel-bar .ch-label {
-    width: 24px;
-    font-size: 10px;
+    width: 28px;
+    font-size: 11px;
     color: var(--text-dim);
     text-align: right;
 }
 .channel-bar .bar-track {
     flex: 1;
-    height: 10px;
+    height: 14px;
     background: var(--bg);
-    border-radius: 3px;
+    border-radius: 4px;
     position: relative;
     overflow: hidden;
 }
@@ -192,7 +198,7 @@ header h1 {
     position: absolute;
     top: 0; height: 100%;
     background: var(--accent);
-    border-radius: 3px;
+    border-radius: 4px;
     transition: left 0.05s, width 0.05s;
 }
 .channel-bar .bar-center {
@@ -203,23 +209,25 @@ header h1 {
     background: #555;
 }
 .channel-bar .ch-value {
-    width: 36px;
-    font-size: 10px;
+    width: 40px;
+    font-size: 11px;
     text-align: right;
     color: var(--text-dim);
 }
 
 /* Buttons */
 .btn {
-    padding: 8px 16px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    touch-action: manipulation;
+    min-height: 44px;
 }
 .btn-danger { background: var(--red); color: #fff; }
 .btn-danger:active { background: #c62828; }
@@ -227,38 +235,49 @@ header h1 {
 .btn-primary:active { background: #357abd; }
 .btn-secondary { background: #555; color: var(--text); }
 .btn-warning { background: var(--orange); color: #000; }
-.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-row { display: flex; gap: 8px; margin-top: 10px; }
+.btn-row .btn { flex: 1; }
+
+#btn-disarm {
+    width: 100%;
+    font-size: 18px;
+    font-weight: 800;
+    padding: 16px;
+    min-height: 56px;
+    border-radius: 12px;
+    letter-spacing: 1px;
+}
 
 /* Settings Form */
 fieldset {
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
 }
 legend {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
     padding: 0 4px;
 }
 label {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 4px 0;
-    font-size: 12px;
+    margin: 6px 0;
+    font-size: 14px;
 }
 input[type="text"], input[type="password"], input[type="number"] {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 6px;
     color: var(--text);
-    padding: 4px 8px;
+    padding: 8px 10px;
     font-family: inherit;
-    font-size: 12px;
-    width: 100px;
+    font-size: 14px;
+    width: 120px;
+    min-height: 38px;
 }
-.note { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
-
-#btn-disarm { width: 100%; font-size: 14px; padding: 12px; }
+.note { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+.note.warning { color: var(--orange); }

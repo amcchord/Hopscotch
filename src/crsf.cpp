@@ -129,6 +129,28 @@ void CrsfReceiver::decodeLinkStats(const uint8_t* payload) {
     _link_quality = payload[2];
 }
 
+void CrsfReceiver::sendFlightMode(const char* mode) {
+    if (!_serial || !mode) return;
+
+    int slen = strlen(mode);
+    if (slen > 15) slen = 15;
+
+    // Frame: [addr] [len] [type] [string + null] [crc]
+    // len = type(1) + string(slen) + null(1) + crc(1) = slen + 3
+    uint8_t frame[20];
+    frame[0] = CRSF_SYNC_BYTE;
+    frame[1] = (uint8_t)(slen + 3);
+    frame[2] = CRSF_FRAMETYPE_FLIGHT_MODE;
+    memcpy(&frame[3], mode, slen);
+    frame[3 + slen] = 0x00;
+
+    // CRC covers type byte through end of payload (not addr, len, or crc itself)
+    uint8_t crc = crc8(&frame[2], slen + 2);
+    frame[3 + slen + 1] = crc;
+
+    _serial->write(frame, 3 + slen + 2);
+}
+
 uint16_t CrsfReceiver::getChannel(int ch) const {
     if (ch < 0 || ch >= CRSF_MAX_CHANNELS) return CRSF_CHANNEL_MID;
     return _channels[ch];

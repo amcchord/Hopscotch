@@ -87,6 +87,8 @@ public:
     const MotorState& getMotor(int index) const { return _motors[index]; }
     int motorCount() const { return NUM_MOTORS; }
 
+    Robstride* getCanBus() { return _can; }
+
 private:
     Robstride* _can = nullptr;
     MotorState _motors[NUM_MOTORS];

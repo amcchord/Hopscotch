@@ -1,6 +1,7 @@
 #include "settings.h"
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <cmath>
 #include "config.h"
 
 void SettingsManager::applyDefaults() {
@@ -13,6 +14,11 @@ void SettingsManager::applyDefaults() {
     settings.channel_map.arm_disarm_arms  = DEFAULT_CH_ARM_ARMS;
     settings.channel_map.arm_left         = DEFAULT_CH_ARM_LEFT;
     settings.channel_map.arm_right        = DEFAULT_CH_ARM_RIGHT;
+    settings.channel_map.arm_mode         = DEFAULT_CH_ARM_MODE;
+    settings.channel_map.arm_select_group = DEFAULT_CH_ARM_SELECT_GROUP;
+    settings.channel_map.arm_select_var   = DEFAULT_CH_ARM_SELECT_VAR;
+    settings.channel_map.arm_trigger_exec = DEFAULT_CH_ARM_TRIGGER_EXEC;
+    settings.channel_map.arm_trigger_home = DEFAULT_CH_ARM_TRIGGER_HOME;
 
     settings.deadband = DEFAULT_DEADBAND;
 
@@ -27,6 +33,12 @@ void SettingsManager::applyDefaults() {
     settings.position_horizon_sec = DEFAULT_POSITION_HORIZON_SEC;
     settings.max_arm_speed        = 5.0f;
     settings.arm_range            = 3.14f;
+
+    settings.arm_cal.center_left    = 1.77f;
+    settings.arm_cal.center_right   = -1.77f;
+    settings.arm_cal.backward_left  = 3.54f;
+    settings.arm_cal.backward_right = -3.54f;
+    settings.arm_cal.calibrated     = false;
 }
 
 bool SettingsManager::begin() {
@@ -88,6 +100,11 @@ String SettingsManager::toJson() const {
     ch["arm_disarm_arms"]  = settings.channel_map.arm_disarm_arms;
     ch["arm_left"]         = settings.channel_map.arm_left;
     ch["arm_right"]        = settings.channel_map.arm_right;
+    ch["arm_mode"]         = settings.channel_map.arm_mode;
+    ch["arm_select_group"] = settings.channel_map.arm_select_group;
+    ch["arm_select_var"]   = settings.channel_map.arm_select_var;
+    ch["arm_trigger_exec"] = settings.channel_map.arm_trigger_exec;
+    ch["arm_trigger_home"] = settings.channel_map.arm_trigger_home;
 
     doc["deadband"] = settings.deadband;
 
@@ -103,6 +120,13 @@ String SettingsManager::toJson() const {
     doc["position_horizon_sec"] = settings.position_horizon_sec;
     doc["max_arm_speed"]        = settings.max_arm_speed;
     doc["arm_range"]            = settings.arm_range;
+
+    JsonObject ac = doc["arm_cal"].to<JsonObject>();
+    ac["center_left"]    = settings.arm_cal.center_left;
+    ac["center_right"]   = settings.arm_cal.center_right;
+    ac["backward_left"]  = settings.arm_cal.backward_left;
+    ac["backward_right"] = settings.arm_cal.backward_right;
+    ac["calibrated"]     = settings.arm_cal.calibrated;
 
     String output;
     serializeJsonPretty(doc, output);
@@ -135,6 +159,11 @@ bool SettingsManager::fromJson(const String& json) {
         if (ch["arm_disarm_arms"].is<uint8_t>())  settings.channel_map.arm_disarm_arms = ch["arm_disarm_arms"];
         if (ch["arm_left"].is<uint8_t>())         settings.channel_map.arm_left = ch["arm_left"];
         if (ch["arm_right"].is<uint8_t>())        settings.channel_map.arm_right = ch["arm_right"];
+        if (ch["arm_mode"].is<uint8_t>())         settings.channel_map.arm_mode = ch["arm_mode"];
+        if (ch["arm_select_group"].is<uint8_t>()) settings.channel_map.arm_select_group = ch["arm_select_group"];
+        if (ch["arm_select_var"].is<uint8_t>())   settings.channel_map.arm_select_var = ch["arm_select_var"];
+        if (ch["arm_trigger_exec"].is<uint8_t>()) settings.channel_map.arm_trigger_exec = ch["arm_trigger_exec"];
+        if (ch["arm_trigger_home"].is<uint8_t>()) settings.channel_map.arm_trigger_home = ch["arm_trigger_home"];
     }
 
     if (doc["deadband"].is<uint16_t>()) settings.deadband = doc["deadband"];
@@ -153,6 +182,29 @@ bool SettingsManager::fromJson(const String& json) {
     if (doc["position_horizon_sec"].is<float>())  settings.position_horizon_sec = doc["position_horizon_sec"];
     if (doc["max_arm_speed"].is<float>())         settings.max_arm_speed = doc["max_arm_speed"];
     if (doc["arm_range"].is<float>())             settings.arm_range = doc["arm_range"];
+
+    JsonObject ac = doc["arm_cal"];
+    if (!ac.isNull()) {
+        if (ac["center_left"].is<float>())    settings.arm_cal.center_left = ac["center_left"];
+        if (ac["center_right"].is<float>())   settings.arm_cal.center_right = ac["center_right"];
+        if (ac["backward_left"].is<float>())  settings.arm_cal.backward_left = ac["backward_left"];
+        if (ac["backward_right"].is<float>()) settings.arm_cal.backward_right = ac["backward_right"];
+        if (ac["calibrated"].is<bool>())      settings.arm_cal.calibrated = ac["calibrated"];
+
+        // Migrate old absolute-position format to delta-from-forward format
+        if (ac["forward_left"].is<float>() && ac["forward_right"].is<float>()) {
+            float fwd_l = ac["forward_left"].as<float>();
+            float fwd_r = ac["forward_right"].as<float>();
+            if (fabsf(fwd_l) > 0.001f || fabsf(fwd_r) > 0.001f) {
+                Serial.printf("[Settings] Migrating arm_cal from absolute to delta format (fwd_l=%.3f fwd_r=%.3f)\n",
+                              fwd_l, fwd_r);
+                settings.arm_cal.center_left    -= fwd_l;
+                settings.arm_cal.center_right   -= fwd_r;
+                settings.arm_cal.backward_left  -= fwd_l;
+                settings.arm_cal.backward_right -= fwd_r;
+            }
+        }
+    }
 
     return true;
 }

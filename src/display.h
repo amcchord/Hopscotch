@@ -4,6 +4,7 @@
 #include <M5GFX.h>
 #include "motor_manager.h"
 #include "crsf.h"
+#include "arm_controller.h"
 
 class Display {
 public:
@@ -15,7 +16,8 @@ public:
                 bool wifi_connected,
                 const char* ip_address,
                 bool drive_armed,
-                bool arm_armed);
+                bool arm_armed,
+                const ArmController* arm_ctrl = nullptr);
 
 private:
     M5Canvas _sprite;
@@ -25,6 +27,7 @@ private:
                        bool drive_armed, bool arm_armed);
     void drawMotorDiagram(const MotorManager& motors);
     void drawChannelBars(const CrsfReceiver& crsf);
+    void drawCalMode(const ArmController& arm_ctrl);
 
     // Color helpers
     uint16_t motorColor(const MotorState& m) const;

@@ -28,9 +28,11 @@ static Display          display;
 static WebUI            webUI;
 
 // Timing
-static uint32_t lastControlTick = 0;
-static uint32_t lastDisplayTick = 0;
-static uint32_t lastWsTick      = 0;
+static uint32_t lastControlTick  = 0;
+static uint32_t lastDisplayTick  = 0;
+static uint32_t lastWsTick       = 0;
+static uint32_t lastTelTick      = 0;
+// (lastCalPrintTick removed -- calibration now via TX triggers)
 static uint32_t controlTickCount = 0;
 
 // Loop timing diagnostics
@@ -43,8 +45,15 @@ static bool     wifiConnected = false;
 static String   wifiIP = "0.0.0.0";
 
 // Previous arm switch states for edge detection
-static bool prevDriveArmSwitch = false;
-static bool prevArmArmSwitch   = false;
+static bool prevDriveArmSwitch  = false;
+static bool prevArmArmSwitch    = false;
+static bool prevCalTrigger      = false;
+static bool prevMoveTrigger     = false;
+
+// Ch11 hold timer for entering calibration mode
+static uint32_t calHoldStart    = 0;
+static bool     calHoldFired    = false;
+static constexpr uint32_t CAL_ENTRY_HOLD_MS = 3000;
 
 // ---------------------------------------------------------------------------
 // Serial debug console -- simulated input override
@@ -66,6 +75,10 @@ static void printSerialHelp() {
     Serial.println("  arm arms          Arm robot arm motors");
     Serial.println("  disarm arms       Disarm robot arm motors");
     Serial.println("  status            Print full status");
+    Serial.println("--- Arm Calibration (disarmed only) ---");
+    Serial.println("  cal start         Enter guided calibration mode (3 steps)");
+    Serial.println("  cal stop          Exit calibration mode");
+    Serial.println("  cal status        Print current calibration values");
     Serial.println("--- Low-Level Motor Debug ---");
     Serial.println("  ping <id>                   Ping motor, print feedback");
     Serial.println("  stop <id>                   Stop motor (clear fault)");
@@ -270,6 +283,21 @@ static void runMotorTest(uint8_t id) {
     Serial.println("========================================");
 }
 
+// ---------------------------------------------------------------------------
+// Calibration serial commands
+// ---------------------------------------------------------------------------
+static void processCalCommand(const char* sub) {
+    if (strcmp(sub, "status") == 0) {
+        armCtrl.printCalTable();
+    } else if (strcmp(sub, "start") == 0) {
+        armCtrl.enterCalMode();
+    } else if (strcmp(sub, "stop") == 0) {
+        armCtrl.exitCalMode();
+    } else {
+        Serial.println("[Cal] Usage: cal start | cal stop | cal status");
+    }
+}
+
 static void processSerialCommand(const char* cmd) {
     // Skip leading whitespace
     while (*cmd == ' ') cmd++;
@@ -317,8 +345,9 @@ static void processSerialCommand(const char* cmd) {
         motorMgr.disarmDriveMotors();
 
     } else if (strcmp(cmd, "arm arms") == 0) {
-        Serial.println("[Sim] Arming arm motors...");
+        Serial.println("[Sim] Arming arm motors (ensure arms are in FORWARD position)...");
         motorMgr.armArmMotors();
+        armCtrl.setForwardReference();
 
     } else if (strcmp(cmd, "disarm arms") == 0) {
         Serial.println("[Sim] Disarming arm motors...");
@@ -449,6 +478,12 @@ static void processSerialCommand(const char* cmd) {
         runMotorTest(id);
         testModeActive = false;
 
+    } else if (strncmp(cmd, "cal ", 4) == 0) {
+        processCalCommand(cmd + 4);
+
+    } else if (strcmp(cmd, "cal") == 0) {
+        Serial.println("[Cal] Usage: cal start | cal stop | cal status");
+
     } else {
         Serial.printf("[Cmd] Unknown: '%s' -- type 'help'\n", cmd);
     }
@@ -490,6 +525,7 @@ static void applySettings() {
     // Arm parameters
     armCtrl.setMaxArmSpeed(s.max_arm_speed);
     armCtrl.setArmRange(s.arm_range);
+    armCtrl.setCalibration(s.arm_cal);
 
     Serial.println("[Main] Settings applied to subsystems");
 }
@@ -518,24 +554,16 @@ static bool onCanIdChange(uint8_t old_id, uint8_t new_id) {
 // ---------------------------------------------------------------------------
 static void initWifi() {
     const Settings& s = settingsMgr.settings;
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(s.wifi_ssid, s.wifi_password);
-    Serial.printf("[WiFi] Connecting to %s...\n", s.wifi_ssid);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(s.wifi_ssid, s.wifi_password);
+    wifiIP = WiFi.softAPIP().toString();
+    wifiConnected = true;
+    webUI.setWifiState(true, wifiIP.c_str());
+    Serial.printf("[WiFi] AP started: SSID=%s IP=%s\n", s.wifi_ssid, wifiIP.c_str());
 }
 
 static void updateWifi() {
-    bool connected = (WiFi.status() == WL_CONNECTED);
-    if (connected != wifiConnected) {
-        wifiConnected = connected;
-        if (connected) {
-            wifiIP = WiFi.localIP().toString();
-            Serial.printf("[WiFi] Connected: %s\n", wifiIP.c_str());
-        } else {
-            wifiIP = "0.0.0.0";
-            Serial.println("[WiFi] Disconnected");
-        }
-        webUI.setWifiState(wifiConnected, wifiIP.c_str());
-    }
+    // AP mode is always available -- nothing to poll
 }
 
 // ---------------------------------------------------------------------------
@@ -587,6 +615,12 @@ void setup() {
         settingsMgr.settings.position_horizon_sec = DEFAULT_POSITION_HORIZON_SEC;
         settings_migrated = true;
     }
+    if (settingsMgr.settings.channel_map.arm_mode != DEFAULT_CH_ARM_MODE) {
+        Serial.printf("[Main] Migrating arm_mode channel: %d -> %d\n",
+                      settingsMgr.settings.channel_map.arm_mode, DEFAULT_CH_ARM_MODE);
+        settingsMgr.settings.channel_map.arm_mode = DEFAULT_CH_ARM_MODE;
+        settings_migrated = true;
+    }
     if (settings_migrated) {
         settingsMgr.save();
     }
@@ -609,11 +643,12 @@ void setup() {
     // 6. Controllers
     driveCtrl.begin(&motorMgr);
     armCtrl.begin(&motorMgr);
+    armCtrl.setSettingsManager(&settingsMgr);
 
-    // 7. WiFi
+    // 7. WiFi AP
     initWifi();
 
-    // 8. Web server (starts after WiFi begins connecting)
+    // 8. Web server
     webUI.begin(&settingsMgr, &motorMgr, &crsfRx);
     webUI.onSettingsChanged(onSettingsChanged);
     webUI.onDisarmRequested(onDisarmRequested);
@@ -627,9 +662,17 @@ void setup() {
                   settingsMgr.settings.position_horizon_sec);
     printSerialHelp();
 
+    if (settingsMgr.settings.arm_cal.calibrated) {
+        Serial.println("[Main] Arm calibration loaded from settings (delta format)");
+        armCtrl.printCalTable();
+    } else {
+        Serial.println("[Main] No arm calibration -- use 'cal start' to calibrate (arms must be disarmed)");
+    }
+
     lastControlTick = millis();
     lastDisplayTick = millis();
     lastWsTick = millis();
+    lastTelTick = millis();
 }
 
 // ---------------------------------------------------------------------------
@@ -669,18 +712,64 @@ void loop() {
         float steering_raw = crsfRx.getChannelNormalized(s.channel_map.steering);
         float drive_arm_sw = crsfRx.getChannelNormalized(s.channel_map.arm_disarm_drive);
         float arm_arm_sw   = crsfRx.getChannelNormalized(s.channel_map.arm_disarm_arms);
-        float arm_left_in  = crsfRx.getChannelNormalized(s.channel_map.arm_left);
-        float arm_right_in = crsfRx.getChannelNormalized(s.channel_map.arm_right);
+
+        float arm_move_raw    = crsfRx.getChannelNormalized(s.channel_map.arm_trigger_home);
+        float arm_speed_raw   = crsfRx.getChannelNormalized(CH_ARM_SPEED);
+        float arm_nudge_raw   = crsfRx.getChannelNormalized(CH_ARM_NUDGE);
 
         float throttle = applyDeadband(throttle_raw, deadband_norm);
         float steering = applyDeadband(steering_raw, deadband_norm);
-        float arm_l = applyDeadband(arm_left_in, deadband_norm);
-        float arm_r = applyDeadband(arm_right_in, deadband_norm);
 
         // Override with simulated values if sim mode is active
         if (simEnabled) {
             throttle = simThrottle;
             steering = simSteering;
+        }
+
+        // Ch12 move trigger (always active)
+        bool moveNow = isSwitchActive(arm_move_raw);
+        bool moveEdge = moveNow && !prevMoveTrigger;
+        if (!simEnabled) {
+            prevMoveTrigger = moveNow;
+        }
+
+        // Ch11: always read for cal mode entry (3s hold) and cal step advance (short press)
+        float arm_cal_raw = crsfRx.getChannelNormalized(s.channel_map.arm_trigger_exec);
+        bool calNow = isSwitchActive(arm_cal_raw);
+        bool calEdge = calNow && !prevCalTrigger;
+        if (!simEnabled) {
+            prevCalTrigger = calNow;
+        }
+
+        // 3-second hold on Ch11 enters cal mode (only when arms disarmed and not already in cal mode)
+        if (calNow && !motorMgr.isArmArmed() && !armCtrl.isInCalMode()) {
+            if (calHoldStart == 0) {
+                calHoldStart = now;
+                calHoldFired = false;
+            } else if (!calHoldFired && (now - calHoldStart >= CAL_ENTRY_HOLD_MS)) {
+                calHoldFired = true;
+                armCtrl.enterCalMode();
+                calEdge = false;
+            }
+        } else if (!calNow) {
+            calHoldStart = 0;
+            calHoldFired = false;
+        }
+
+        // Suppress the rising edge that started the hold from being treated as a cal step
+        if (calHoldFired) {
+            calEdge = false;
+        }
+
+        ArmInput armInput = {};
+        armInput.cal_trigger = calEdge;
+        armInput.move_trigger = moveEdge;
+        armInput.jump_trigger = calEdge;
+        armInput.speed_channel = arm_speed_raw;
+        armInput.nudge_channel = applyDeadband(arm_nudge_raw, deadband_norm);
+
+        if (calEdge || moveEdge) {
+            Serial.printf("[ArmInput] cal=%d move=%d jump=%d\n", calEdge, moveEdge, calEdge);
         }
 
         // 4. Arm/disarm on switch edges (only from RC, not sim -- sim uses serial commands)
@@ -705,8 +794,9 @@ void loop() {
             // Arm motors toggle
             if (armSwNow && !prevArmArmSwitch) {
                 if (!motorMgr.isArmArmed()) {
-                    Serial.printf("[Main] t=%lu ARMS ARM requested via RC switch\n", now);
+                    Serial.printf("[Main] t=%lu ARMS ARM requested via RC switch (ensure arms at FORWARD)\n", now);
                     motorMgr.armArmMotors();
+                    armCtrl.setForwardReference();
                 }
             } else if (!armSwNow && prevArmArmSwitch) {
                 if (motorMgr.isArmArmed()) {
@@ -736,11 +826,12 @@ void loop() {
                 driveCtrl.update(throttle, steering, dt);
             }
 
-            // 7. Arm control
-            if (motorMgr.isArmArmed()) {
-                armCtrl.update(arm_l, arm_r, dt);
-            }
+            // 7. Arm control (always called -- calibration works even when disarmed,
+            //    movement/hold gated by isArmArmed inside update)
+            armCtrl.update(armInput, dt);
         }
+
+        // (calibration streaming removed -- now via TX triggers)
 
         // 8. Loop timing measurement
         uint32_t tickElapsedUs = micros() - tickStartUs;
@@ -776,6 +867,22 @@ void loop() {
                 if (i < 15) Serial.print(",");
             }
             Serial.println();
+            {
+                const char* arm_pos_str = armCtrl.isMoving() ? "MOVING" :
+                    (armCtrl.getCurrentPosition() == ArmPosition::Forward ? "FWD" :
+                     armCtrl.getCurrentPosition() == ArmPosition::Center ? "CTR" :
+                     armCtrl.getCurrentPosition() == ArmPosition::Jump ? "JUMP" : "BWD");
+                float fwd_l = armCtrl.getForwardLeft();
+                float fwd_r = armCtrl.getForwardRight();
+                float cur_l = motorMgr.getMotor(MotorRole::ArmLeft).position;
+                float cur_r = motorMgr.getMotor(MotorRole::ArmRight).position;
+                Serial.printf("[Arm] pos=%s cal_mode=%s | L: %.2f (cal %.2f) R: %.2f (cal %.2f)\n",
+                              arm_pos_str,
+                              armCtrl.isInCalMode() ? "YES" : "no",
+                              cur_l, cur_l - fwd_l,
+                              cur_r, cur_r - fwd_r);
+            }
+            Serial.println();
 
             // Motor online status with position/velocity/torque
             for (int i = 0; i < motorMgr.motorCount(); i++) {
@@ -809,7 +916,8 @@ void loop() {
 
         display.render(motorMgr, crsfRx,
                        wifiConnected, wifiIP.c_str(),
-                       motorMgr.isDriveArmed(), motorMgr.isArmArmed());
+                       motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
+                       &armCtrl);
     }
 
     // -----------------------------------------------------------------------
@@ -818,5 +926,14 @@ void loop() {
     if (now - lastWsTick >= WEBSOCKET_PERIOD_MS) {
         lastWsTick = now;
         webUI.sendTelemetry();
+    }
+
+    // -----------------------------------------------------------------------
+    // ~5 Hz CRSF flight mode telemetry to transmitter
+    // -----------------------------------------------------------------------
+    if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
+        lastTelTick = now;
+        const char* state = armCtrl.getStateString();
+        crsfRx.sendFlightMode(state);
     }
 }
