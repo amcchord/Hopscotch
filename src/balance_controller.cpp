@@ -61,11 +61,7 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
 // ---------------------------------------------------------------------------
 
 void BalanceController::balanceTick(const RawImuData& imu, float dt) {
-    // Complementary filter: fuse accel (absolute but noisy) with gyro (fast but drifts)
-    // Roll = rotation around X axis: accel angle from Y and Z gravity components
     float accel_angle = atan2f(imu.accel_y, imu.accel_z) * 57.2957795f;
-
-    // Gyro rate: direct X-axis measurement with light smoothing
     float gyro_raw = imu.gyro_x;
 
     if (!_filter_initialized) {
@@ -75,17 +71,14 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     } else {
         _tilt_angle = COMPLEMENTARY_ALPHA * (_tilt_angle + gyro_raw * dt)
                     + (1.0f - COMPLEMENTARY_ALPHA) * accel_angle;
-        // Low-pass on gyro rate: alpha=0.08 at 200Hz = ~60ms time constant
-        // This exact setting held balance for 20+ seconds in testing
         _gyro_rate = 0.08f * gyro_raw + 0.92f * _gyro_rate;
     }
 
-    // Only run PD when actively balancing
     if (_state != BalanceState::Balancing) return;
     if (!_targets_initialized) return;
 
     float angle_err = _effective_setpoint - _tilt_angle;
-    float motor_vel = _kp * angle_err - _kd * _gyro_rate + _velocity_bias;
+    float motor_vel = _kp * angle_err - _kd * _gyro_rate;
 
     if (motor_vel >  BALANCE_MAX_DRIVE_SPEED) motor_vel =  BALANCE_MAX_DRIVE_SPEED;
     if (motor_vel < -BALANCE_MAX_DRIVE_SPEED) motor_vel = -BALANCE_MAX_DRIVE_SPEED;
@@ -146,9 +139,18 @@ void BalanceController::enterBalancing(float current_roll) {
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
     _targets_initialized = true;
 
-    _wheel_start_pos = (_back_left_target + _back_right_target) * 0.5f;
+    _wheel_start_pos = (_motors->getMotor(MotorRole::BackLeft).position
+                      + _motors->getMotor(MotorRole::BackRight).position) * 0.5f;
     _pos_integral = 0.0f;
-    _prev_wheel_drift = 0.0f;
+    _pos_setpoint_shift = 0.0f;
+
+    _stuck = false;
+    _stuck_start_ms = 0;
+    resetSafetyTimers();
+
+    _last_meas_drift = 0.0f;
+    _last_meas_vel = 0.0f;
+    _last_flags = 0;
 
     _front_left_hold  = _motors->getMotor(MotorRole::FrontLeft).position;
     _front_right_hold = _motors->getMotor(MotorRole::FrontRight).position;
@@ -189,6 +191,20 @@ void BalanceController::forceEngage() {
     enterBalancing(tilt);
 }
 
+void BalanceController::hardAbort(const char* reason) {
+    BalanceState prev = _state;
+    if (prev == BalanceState::Idle) return;
+
+    _state = BalanceState::Idle;
+    _targets_initialized = false;
+    if (_arms) _arms->clearOverride();
+    stopLog();
+
+    const char* prev_str = (prev == BalanceState::Balancing) ? "BALANCE" :
+                           (prev == BalanceState::TippingUp) ? "TIP_UP" : "RET_ARMS";
+    Serial.printf("[Balance] HARD ABORT: %s (was %s)\n", reason, prev_str);
+}
+
 void BalanceController::disengage() {
     BalanceState prev = _state;
 
@@ -207,6 +223,15 @@ void BalanceController::disengage() {
                   prev == BalanceState::TippingUp ? "TIP_UP" : "BALANCE");
 }
 
+void BalanceController::resetSafetyTimers() {
+    _safe_err_timing  = false;
+    _safe_err_start_ms = 0;
+    _safe_rate_timing = false;
+    _safe_rate_start_ms = 0;
+    _safe_sat_timing  = false;
+    _safe_sat_start_ms = 0;
+}
+
 // ---------------------------------------------------------------------------
 // State machine + outer loops (Core 1, 50Hz)
 // ---------------------------------------------------------------------------
@@ -215,7 +240,6 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                                 bool ch7_active, bool ch11_edge, float dt) {
     if (!_motors || !_arms) return;
 
-    // Use complementary filter output when available, fall back to Madgwick
     float tilt = _filter_initialized ? (float)_tilt_angle : roll_deg;
     float rate = _filter_initialized ? (float)_gyro_rate : roll_rate_dps;
 
@@ -270,7 +294,6 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
         bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
 
-        // Compute expected balance from current arm position for engage check
         float tip_dl = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
         float tip_dr = _motors->getMotor(MotorRole::ArmRight).position - _arms->getForwardRight();
         float tip_expected = _base_deg + _ff_gain * (tip_dl + tip_dr) * 0.5f;
@@ -286,20 +309,93 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
     }
 
     case BalanceState::Balancing: {
-        // Feedforward: compute expected balance point from current arm position
+        // --- Feedforward setpoint from arm position ---
         float arm_delta_l = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
         float arm_delta_r = _motors->getMotor(MotorRole::ArmRight).position - _arms->getForwardRight();
         float arm_avg_delta = (arm_delta_l + arm_delta_r) * 0.5f;
         _ff_setpoint = _base_deg + _ff_gain * arm_avg_delta;
 
-        // Safety bailout
+        // --- Measured rear-wheel odometry ---
+        float meas_bl = _motors->getMotor(MotorRole::BackLeft).position;
+        float meas_br = _motors->getMotor(MotorRole::BackRight).position;
+        float meas_drift = (meas_bl + meas_br) * 0.5f - _wheel_start_pos;
+        float meas_vel = (_motors->getMotor(MotorRole::BackLeft).velocity
+                        + _motors->getMotor(MotorRole::BackRight).velocity) * 0.5f;
+
+        _last_meas_drift = meas_drift;
+        _last_meas_vel   = meas_vel;
+
+        uint32_t now = millis();
+
+        // ---------------------------------------------------------------
+        // Safety checks
+        // ---------------------------------------------------------------
+
+        // Immediate hard abort: tilt outside physically reasonable range
+        if (tilt < BALANCE_SAFE_TILT_MIN || tilt > BALANCE_SAFE_TILT_MAX) {
+            Serial.printf("[Balance] SAFETY: tilt %.1f outside [%.0f, %.0f]\n",
+                          tilt, BALANCE_SAFE_TILT_MIN, BALANCE_SAFE_TILT_MAX);
+            hardAbort("tilt out of range (fallen)");
+            return;
+        }
+
+        // Sustained large effective error -> graceful disengage
+        float eff_err = fabsf(_effective_setpoint - tilt);
+        if (eff_err > BALANCE_SAFE_ERR_MAX_DEG) {
+            if (!_safe_err_timing) {
+                _safe_err_timing = true;
+                _safe_err_start_ms = now;
+            } else if (now - _safe_err_start_ms > BALANCE_SAFE_ERR_DURATION_MS) {
+                Serial.printf("[Balance] SAFETY: error %.1f > %.0f for >%lu ms\n",
+                              eff_err, BALANCE_SAFE_ERR_MAX_DEG, BALANCE_SAFE_ERR_DURATION_MS);
+                disengage();
+                return;
+            }
+        } else {
+            _safe_err_timing = false;
+        }
+
+        // Extreme roll rate -> hard abort
+        if (fabsf(rate) > BALANCE_SAFE_RATE_MAX_DPS) {
+            if (!_safe_rate_timing) {
+                _safe_rate_timing = true;
+                _safe_rate_start_ms = now;
+            } else if (now - _safe_rate_start_ms > BALANCE_SAFE_RATE_DURATION_MS) {
+                Serial.printf("[Balance] SAFETY: rate %.1f dps for >%lu ms\n",
+                              fabsf(rate), BALANCE_SAFE_RATE_DURATION_MS);
+                hardAbort("extreme rate");
+                return;
+            }
+        } else {
+            _safe_rate_timing = false;
+        }
+
+        // Prolonged motor command saturation -> graceful disengage
+        float abs_cmd = fabsf((float)_last_motor_vel);
+        if (abs_cmd >= BALANCE_MAX_DRIVE_SPEED * 0.95f) {
+            if (!_safe_sat_timing) {
+                _safe_sat_timing = true;
+                _safe_sat_start_ms = now;
+            } else if (now - _safe_sat_start_ms > BALANCE_SAFE_SAT_DURATION_MS) {
+                Serial.printf("[Balance] SAFETY: motor saturated for >%lu ms\n",
+                              BALANCE_SAFE_SAT_DURATION_MS);
+                disengage();
+                return;
+            }
+        } else {
+            _safe_sat_timing = false;
+        }
+
+        // Original bailout on raw tilt-vs-feedforward
         if (fabsf(_ff_setpoint - tilt) > BALANCE_BAILOUT_THRESHOLD_DEG) {
             Serial.printf("[Balance] BAILOUT  tilt=%.1f ff_sp=%.1f\n", tilt, _ff_setpoint);
             disengage();
             return;
         }
 
-        // Gentle adaptive fine-tuning on top of feedforward
+        // ---------------------------------------------------------------
+        // Adaptive fine-tuning (gentle integral on top of feedforward)
+        // ---------------------------------------------------------------
         float ff_err = _ff_setpoint - tilt;
         if (fabsf(ff_err) < 10.0f && fabsf(rate) < 30.0f) {
             _cumulative_error += ff_err * dt;
@@ -310,44 +406,71 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_adaptive_adjustment >  5.0f) _adaptive_adjustment =  5.0f;
         if (_adaptive_adjustment < -5.0f) _adaptive_adjustment = -5.0f;
 
-        // Position return PID as velocity bias
-        float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
-        float wheel_drift = wheel_avg - _wheel_start_pos;
-        float wheel_vel = (wheel_drift - _prev_wheel_drift) / dt;
-        _prev_wheel_drift = wheel_drift;
+        // ---------------------------------------------------------------
+        // Stuck / wall detection (measured odometry)
+        // ---------------------------------------------------------------
+        float abs_meas_vel = fabsf(meas_vel);
+        bool stuck_condition = (abs_cmd > BALANCE_STUCK_CMD_THRESHOLD)
+                            && (abs_meas_vel < BALANCE_STUCK_VEL_THRESHOLD);
 
-        _pos_integral += wheel_drift * dt;
-        if (_pos_integral >  _pos_integral_max) _pos_integral =  _pos_integral_max;
-        if (_pos_integral < -_pos_integral_max) _pos_integral = -_pos_integral_max;
-
-        // Wall escape: when drift is large but wheels barely move, the robot
-        // is stuck against an obstacle. Normal velocity bias just pushes harder
-        // into the wall. Instead, shift the setpoint to make the robot LEAN AWAY
-        // from the wall, which tips it in the escape direction.
-        bool at_wall = (fabsf(wheel_drift) > 3.0f) && (fabsf(wheel_vel) < 1.0f);
-
-        float wall_setpoint_shift = 0.0f;
-        if (at_wall) {
-            // Drift positive (drove forward, wall ahead): drop setpoint below roll → PD drives backward
-            // Drift negative (drove backward, wall behind): raise setpoint above roll → PD drives forward
-            float wall_lean = -0.5f * wheel_drift;
-            if (wall_lean >  5.0f) wall_lean =  5.0f;
-            if (wall_lean < -5.0f) wall_lean = -5.0f;
-            wall_setpoint_shift = wall_lean;
-            // Disable velocity bias at wall -- it fights the lean escape
-            _velocity_bias = 0.0f;
+        if (stuck_condition) {
+            if (!_stuck) {
+                if (_stuck_start_ms == 0) {
+                    _stuck_start_ms = now;
+                } else if (now - _stuck_start_ms > BALANCE_STUCK_DURATION_MS) {
+                    _stuck = true;
+                    Serial.printf("[Balance] STUCK: cmd=%.1f meas_vel=%.2f drift=%.1f\n",
+                                  (float)_last_motor_vel, meas_vel, meas_drift);
+                }
+            }
         } else {
-            // Normal: velocity bias for position return
-            _velocity_bias = -(_pos_kp * wheel_drift
-                             + _pos_ki * _pos_integral
-                             + _pos_kd * wheel_vel);
+            if (_stuck) {
+                Serial.println("[Balance] Stuck cleared");
+            }
+            _stuck = false;
+            _stuck_start_ms = 0;
         }
 
-        // Effective setpoint = feedforward + adaptive + wall escape
-        _effective_setpoint = _ff_setpoint + _adaptive_adjustment + wall_setpoint_shift;
+        // ---------------------------------------------------------------
+        // Position return as bounded setpoint shift (measured odometry)
+        // Gated by tilt health so attitude recovery always has priority.
+        // ---------------------------------------------------------------
+        float abs_angle_err = fabsf((float)_last_angle_err);
+        float tilt_gate = 1.0f - (abs_angle_err / BALANCE_POS_GATE_ERR_DEG);
+        if (tilt_gate < 0.0f) tilt_gate = 0.0f;
+        if (tilt_gate > 1.0f) tilt_gate = 1.0f;
 
-        // Arm return (1s hold then return)
-        if (!_arms_returning && (millis() - _balance_start_ms >= 1000)) {
+        if (_stuck) {
+            _pos_integral *= BALANCE_STUCK_INTEGRAL_DECAY;
+        } else {
+            _pos_integral += meas_drift * dt * tilt_gate;
+            if (_pos_integral >  BALANCE_POS_INTEGRAL_MAX) _pos_integral =  BALANCE_POS_INTEGRAL_MAX;
+            if (_pos_integral < -BALANCE_POS_INTEGRAL_MAX) _pos_integral = -BALANCE_POS_INTEGRAL_MAX;
+        }
+
+        float raw_shift = -(_pos_kp * meas_drift
+                          + _pos_ki * _pos_integral
+                          + _pos_kd * meas_vel);
+
+        _pos_setpoint_shift = raw_shift * tilt_gate;
+        if (_pos_setpoint_shift >  BALANCE_POS_SHIFT_MAX_DEG) _pos_setpoint_shift =  BALANCE_POS_SHIFT_MAX_DEG;
+        if (_pos_setpoint_shift < -BALANCE_POS_SHIFT_MAX_DEG) _pos_setpoint_shift = -BALANCE_POS_SHIFT_MAX_DEG;
+
+        // ---------------------------------------------------------------
+        // Effective setpoint = feedforward + adaptive + position shift
+        // ---------------------------------------------------------------
+        _effective_setpoint = _ff_setpoint + _adaptive_adjustment + _pos_setpoint_shift;
+
+        // Build flags byte for telemetry
+        _last_flags = (_stuck ? 0x01 : 0)
+                    | (_safe_err_timing ? 0x02 : 0)
+                    | (_safe_rate_timing ? 0x04 : 0)
+                    | (_safe_sat_timing ? 0x08 : 0);
+
+        // ---------------------------------------------------------------
+        // Arm return (hold 1s at tip then return to forward)
+        // ---------------------------------------------------------------
+        if (!_arms_returning && (now - _balance_start_ms >= 1000)) {
             _arms_returning = true;
             _arm_left_goal  = _arms->getForwardLeft();
             _arm_right_goal = _arms->getForwardRight();
@@ -398,6 +521,9 @@ void BalanceController::startLog() {
 
     _last_angle_err = 0.0f;
     _last_motor_vel = 0.0f;
+    _last_meas_drift = 0.0f;
+    _last_meas_vel = 0.0f;
+    _last_flags = 0;
 
     Serial.println("[Balance] Telemetry log started (PSRAM buffer)");
 }
@@ -421,6 +547,10 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.br_vel    = _motors->getMotor(MotorRole::BackRight).velocity;
     s.arm_l     = _motors->getMotor(MotorRole::ArmLeft).position;
     s.arm_r     = _motors->getMotor(MotorRole::ArmRight).position;
+    s.meas_drift = _last_meas_drift;
+    s.meas_vel   = _last_meas_vel;
+    s.pos_shift  = _pos_setpoint_shift;
+    s.flags      = _last_flags;
     _log_count++;
 }
 
@@ -447,16 +577,21 @@ void BalanceController::flushLogToFile() {
         return;
     }
 
-    f.println("t_ms,state,roll,roll_rate,setpoint,angle_err,motor_vel,integral,bl_pos,br_pos,bl_vel,br_vel,arm_l,arm_r");
+    f.println("t_ms,state,roll,roll_rate,setpoint,angle_err,motor_vel,integral,"
+              "bl_pos,br_pos,bl_vel,br_vel,arm_l,arm_r,"
+              "meas_drift,meas_vel,pos_shift,flags");
 
     for (int i = 0; i < _log_count; i++) {
         const BalanceSample& s = _log_buf[i];
-        f.printf("%lu,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.3f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
+        f.printf("%lu,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.3f,"
+                 "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,"
+                 "%.2f,%.2f,%.2f,%d\n",
                  s.t_ms, s.state,
                  s.roll, s.roll_rate, s.setpoint,
                  s.angle_err, s.motor_vel, s.integral,
                  s.bl_pos, s.br_pos, s.bl_vel, s.br_vel,
-                 s.arm_l, s.arm_r);
+                 s.arm_l, s.arm_r,
+                 s.meas_drift, s.meas_vel, s.pos_shift, s.flags);
     }
 
     f.close();
@@ -528,18 +663,25 @@ void BalanceController::printStatus() {
     Serial.printf("  State: %s\n", getStateString());
     Serial.printf("  Feedforward: base=%.1f  ff_gain=%.1f  ff_sp=%.1f\n", _base_deg, _ff_gain, _ff_setpoint);
     Serial.printf("  PD: Kp=%.4f  Kd=%.4f  adapt_rate=%.3f\n", (float)_kp, (float)_kd, _adapt_rate);
+    Serial.printf("  Position: Pkp=%.4f  Pki=%.4f  Pkd=%.4f  gate_err=%.1f\n",
+                  _pos_kp, _pos_ki, _pos_kd, BALANCE_POS_GATE_ERR_DEG);
     Serial.printf("  Balance loop: %d Hz (Core 0)\n", BALANCE_LOOP_HZ);
     Serial.printf("  Complementary filter: tilt=%.1f  gyro_rate=%.1f\n",
                   (float)_tilt_angle, (float)_gyro_rate);
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
 
     if (_state == BalanceState::Balancing) {
-        float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
-        float drift = wheel_avg - _wheel_start_pos;
-        Serial.printf("  Effective setpoint: %.2f  (ff=%.1f + adapt=%+.2f)\n",
-                      (float)_effective_setpoint, _ff_setpoint, _adaptive_adjustment);
-        Serial.printf("  Velocity bias: %+.2f  Wheel drift: %+.1f rad\n",
-                      (float)_velocity_bias, drift);
+        Serial.printf("  Effective setpoint: %.2f  (ff=%.1f + adapt=%+.2f + pos=%+.2f)\n",
+                      (float)_effective_setpoint, _ff_setpoint, _adaptive_adjustment, _pos_setpoint_shift);
+        Serial.printf("  Measured drift: %+.1f rad  Measured vel: %+.1f rad/s\n",
+                      _last_meas_drift, _last_meas_vel);
+        Serial.printf("  Pos integral: %+.1f  Pos shift: %+.2f deg\n",
+                      _pos_integral, _pos_setpoint_shift);
+        Serial.printf("  Stuck: %s  Flags: 0x%02X\n", _stuck ? "YES" : "no", _last_flags);
+        Serial.printf("  Safety: err_timer=%s  rate_timer=%s  sat_timer=%s\n",
+                      _safe_err_timing ? "ACTIVE" : "off",
+                      _safe_rate_timing ? "ACTIVE" : "off",
+                      _safe_sat_timing ? "ACTIVE" : "off");
         Serial.printf("  Last motor vel: %.2f rad/s\n", (float)_last_motor_vel);
     }
 

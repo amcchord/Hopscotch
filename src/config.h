@@ -125,6 +125,29 @@ static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weigh
 static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
 
+// Safety abort thresholds
+static constexpr float    BALANCE_SAFE_TILT_MIN         = 30.0f;    // hard abort below this (fallen forward)
+static constexpr float    BALANCE_SAFE_TILT_MAX         = 150.0f;   // hard abort above this (fallen backward)
+static constexpr float    BALANCE_SAFE_ERR_MAX_DEG      = 35.0f;    // sustained effective-error threshold
+static constexpr uint32_t BALANCE_SAFE_ERR_DURATION_MS  = 2000;     // must persist this long before abort
+static constexpr float    BALANCE_SAFE_RATE_MAX_DPS     = 200.0f;   // extreme roll-rate threshold
+static constexpr uint32_t BALANCE_SAFE_RATE_DURATION_MS = 500;      // must persist this long
+static constexpr uint32_t BALANCE_SAFE_SAT_DURATION_MS  = 3000;     // motor saturated this long -> disengage
+
+// Position return via bounded setpoint shift (uses measured odometry)
+static constexpr float    BALANCE_POS_KP                = 0.15f;    // deg shift per rad of measured drift
+static constexpr float    BALANCE_POS_KI                = 0.02f;    // deg shift per integral unit
+static constexpr float    BALANCE_POS_KD                = 0.05f;    // deg shift per rad/s of measured velocity
+static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 3.0f;     // max setpoint shift magnitude
+static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 50.0f;    // integral clamp
+static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
+
+// Stuck / wall detection (uses measured odometry)
+static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 5.0f;     // |motor_vel| must exceed this
+static constexpr float    BALANCE_STUCK_VEL_THRESHOLD   = 0.5f;     // |measured_vel| must be below this
+static constexpr uint32_t BALANCE_STUCK_DURATION_MS     = 500;      // condition must persist
+static constexpr float    BALANCE_STUCK_INTEGRAL_DECAY  = 0.95f;    // per-tick integral decay when stuck
+
 // ---------------------------------------------------------------------------
 // CRSF telemetry
 // ---------------------------------------------------------------------------

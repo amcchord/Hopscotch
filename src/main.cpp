@@ -1020,6 +1020,9 @@ void loop() {
             // Drive: unconditional disarm on falling edge
             if (!driveSwNow && prevDriveArmSwitch) {
                 Serial.printf("[Main] t=%lu DRIVE DISARM requested via RC switch\n", now);
+                if (balanceCtrl.isActive()) {
+                    balanceCtrl.hardAbort("drive disarmed");
+                }
                 motorMgr.cancelArming();
                 driveCtrl.emergencyStop();
                 motorMgr.disarmDriveMotors();
@@ -1035,6 +1038,9 @@ void loop() {
             // Arms: unconditional disarm on falling edge
             if (!armSwNow && prevArmArmSwitch) {
                 Serial.printf("[Main] t=%lu ARMS DISARM requested via RC switch\n", now);
+                if (balanceCtrl.isActive()) {
+                    balanceCtrl.hardAbort("arms disarmed");
+                }
                 motorMgr.cancelArming();
                 armCtrl.holdPosition();
                 motorMgr.disarmArmMotors();
@@ -1048,6 +1054,9 @@ void loop() {
 
         // 5. Signal loss failsafe (skip in sim mode -- sim provides its own input)
         if (!simEnabled && !crsfRx.isLinkUp()) {
+            if (balanceCtrl.isActive()) {
+                balanceCtrl.hardAbort("CRSF link loss");
+            }
             if (motorMgr.isDriveArmed()) {
                 driveCtrl.emergencyStop();
             }

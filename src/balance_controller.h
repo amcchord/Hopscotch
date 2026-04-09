@@ -31,6 +31,10 @@ struct BalanceSample {
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
     float    arm_l, arm_r;
+    float    meas_drift;
+    float    meas_vel;
+    float    pos_shift;
+    uint8_t  flags;
 };
 
 static constexpr int BALANCE_LOG_MAX_SAMPLES = 1500;
@@ -42,7 +46,7 @@ public:
     // Called from Core 0 at 200Hz -- fast PD balance loop
     void balanceTick(const RawImuData& imu, float dt);
 
-    // Called from Core 1 at 50Hz -- state machine, arms, adaptive setpoint, position PID
+    // Called from Core 1 at 50Hz -- state machine, arms, adaptive setpoint, position shift
     void update(float roll_deg, float roll_rate_dps,
                 bool ch7_active, bool ch11_edge, float dt);
 
@@ -56,6 +60,9 @@ public:
 
     // Force-engage balance from current position (skips tip-up)
     void forceEngage();
+
+    // Immediate hard stop -- call on link-loss, disarm, or fatal safety condition
+    void hardAbort(const char* reason);
 
     // Complementary filter outputs (written by Core 0, read by Core 1)
     float getTiltAngle() const { return _tilt_angle; }
@@ -95,7 +102,7 @@ private:
     // --- Feedforward from arm position ---
     float _base_deg = BALANCE_BASE_DEG;
     float _ff_gain  = BALANCE_FF_GAIN;
-    float _ff_setpoint = BALANCE_BASE_DEG;  // computed each tick from arm position
+    float _ff_setpoint = BALANCE_BASE_DEG;
 
     // --- Complementary filter (Core 0) ---
     volatile float _tilt_angle = 0.0f;
@@ -109,10 +116,7 @@ private:
     // --- Effective setpoint (written by Core 1, read by Core 0) ---
     volatile float _effective_setpoint = BALANCE_BASE_DEG;
 
-    // --- Velocity bias from position PID (written by Core 1, read by Core 0) ---
-    volatile float _velocity_bias = 0.0f;
-
-    // --- Back wheel targets (written by Core 0, read by Core 1 for position PID) ---
+    // --- Back wheel targets (written by Core 0 for position commands) ---
     volatile float _back_left_target  = 0.0f;
     volatile float _back_right_target = 0.0f;
     volatile bool  _targets_initialized = false;
@@ -124,16 +128,34 @@ private:
     // --- Adaptive fine-tuning (Core 1 only, on top of feedforward) ---
     float _adaptive_adjustment = 0.0f;
     float _cumulative_error    = 0.0f;
-    float _adapt_rate = 0.05f; // very gentle fine-tuning only
+    float _adapt_rate = 0.05f;
 
-    // --- Position return PID (Core 1 only) ---
+    // --- Position return as bounded setpoint shift (Core 1, measured odometry) ---
     float _wheel_start_pos    = 0.0f;
-    float _pos_kp             = 1.0f;   // rad/s per rad of drift (velocity bias)
-    float _pos_ki             = 0.3f;   // rad/s per rad*sec of accumulated drift
-    float _pos_kd             = 0.2f;   // rad/s per rad/s of wheel velocity
+    float _pos_kp             = BALANCE_POS_KP;
+    float _pos_ki             = BALANCE_POS_KI;
+    float _pos_kd             = BALANCE_POS_KD;
     float _pos_integral       = 0.0f;
-    float _pos_integral_max   = 100.0f;
-    float _prev_wheel_drift   = 0.0f;
+    float _pos_setpoint_shift = 0.0f;
+
+    // --- Stuck / wall detection (Core 1 only) ---
+    bool     _stuck           = false;
+    uint32_t _stuck_start_ms  = 0;
+
+    // --- Safety abort timers (Core 1 only) ---
+    uint32_t _safe_err_start_ms  = 0;
+    bool     _safe_err_timing    = false;
+    uint32_t _safe_rate_start_ms = 0;
+    bool     _safe_rate_timing   = false;
+    uint32_t _safe_sat_start_ms  = 0;
+    bool     _safe_sat_timing    = false;
+
+    // --- Last values for telemetry (volatile: written by Core 0, read by Core 1) ---
+    volatile float _last_angle_err = 0.0f;
+    volatile float _last_motor_vel = 0.0f;
+    float _last_meas_drift = 0.0f;
+    float _last_meas_vel   = 0.0f;
+    uint8_t _last_flags    = 0;
 
     // Arm ramp state (Core 1 only)
     float _arm_left_target  = 0.0f;
@@ -154,15 +176,12 @@ private:
     uint32_t       _log_start_ms = 0;
     bool           _log_saved  = false;
 
-    // Last values for logging
-    volatile float _last_angle_err = 0.0f;
-    volatile float _last_motor_vel = 0.0f;
-
     static float moveToward(float current, float target, float rate, float dt);
     void enterTippingUp();
     void enterBalancing(float current_roll);
     void enterReturningArms();
     void disengage();
+    void resetSafetyTimers();
     void startLog();
     void logSample(float roll_deg, float roll_rate_dps);
     void stopLog();
