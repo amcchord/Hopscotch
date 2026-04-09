@@ -157,6 +157,7 @@ void BalanceController::enterBalancing(float current_roll) {
 
     _arms_reached_tip = true;
     _arms_returning   = false;
+    _arms_settled     = false;
     _balance_start_ms = millis();
 
     Serial.printf("[Balance] BALANCING @200Hz  base=%.1f ff_gain=%.1f  Kp=%.3f Kd=%.4f  tilt=%.1f  wheels: L=%.2f R=%.2f\n",
@@ -480,6 +481,19 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_arms_returning) {
             _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
             _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
+
+            if (!_arms_settled) {
+                float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
+                float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
+                if (arm_err_l < 0.05f && arm_err_r < 0.05f) {
+                    _arms_settled = true;
+                    _cumulative_error = 0.0f;
+                    _adaptive_adjustment = 0.0f;
+                    _pos_integral = 0.0f;
+                    Serial.printf("[Balance] Arms settled -- adaptive reset (tilt=%.1f base=%.1f)\n",
+                                  tilt, _base_deg);
+                }
+            }
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
                                   _arms_returning ? BALANCE_ARM_RETURN_SPEED : 0.0f);

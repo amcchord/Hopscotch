@@ -128,7 +128,7 @@ private:
     // --- Adaptive fine-tuning (Core 1 only, on top of feedforward) ---
     float _adaptive_adjustment = 0.0f;
     float _cumulative_error    = 0.0f;
-    float _adapt_rate = 0.05f;
+    float _adapt_rate = 0.10f;
 
     // --- Position return as bounded setpoint shift (Core 1, measured odometry) ---
     float _wheel_start_pos    = 0.0f;
@@ -167,6 +167,7 @@ private:
     float _arm_tip_right_goal = 0.0f;
     bool  _arms_reached_tip   = false;
     bool  _arms_returning     = false;
+    bool  _arms_settled       = false;
     uint32_t _balance_start_ms = 0;
 
     // Telemetry logging

@@ -104,7 +104,7 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_BASE_DEG              = 87.0f;   // balance point with arms at forward ref (measured)
+static constexpr float    BALANCE_BASE_DEG              = 88.5f;   // balance point with arms at forward ref
 static constexpr float    BALANCE_FF_GAIN               = 0.0f;    // arms barely affect balance point
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for feedforward at tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
