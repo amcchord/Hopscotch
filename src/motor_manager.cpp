@@ -36,6 +36,9 @@ void MotorManager::begin(Robstride* can_bus) {
 
     _drive_armed = false;
     _arm_armed = false;
+    _arming = {};
+    _arming_just_completed = false;
+    _arming_completed_drive = false;
 
     Serial.println("[Motors] Manager initialized with 6 motors");
 }
@@ -62,123 +65,249 @@ int MotorManager::findMotorByCanId(uint8_t can_id) {
     return -1;
 }
 
-bool MotorManager::enableAndConfigureMotor(int idx, RobstrideRunMode mode) {
-    if (!_can || idx < 0 || idx >= NUM_MOTORS) return false;
-
+void MotorManager::configureMotorAfterEnable(int idx, float motor_pos) {
     MotorState& m = _motors[idx];
+    m.enabled = true;
+    m.run_mode = RobstrideRunMode::CSP;
+    m.position = motor_pos;
+    m.raw_position = 0.0f;
+    m.prev_raw_position = 0.0f;
+    m.unwrap_offset = 0.0f;
+    m._abs_pos_offset = motor_pos;
+    m.has_first_feedback = false;
+    Serial.printf("[Motors] Enabled motor ID=%d in CSP mode (pos=%.3f)\n",
+                  m.can_id, motor_pos);
+}
 
-    // Per RS00 User Manual, the sequence for CSP mode is:
-    //   1. Stop (type 4, clear fault)
-    //   2. Set zero position (type 6) -- works in CSP and MIT modes, blocked in PP
-    //   3. Set run_mode (type 18 param write)
-    //   4. Enable (type 3)
-    //   5. Write limit_spd and loc_ref
+// ---------------------------------------------------------------------------
+// Non-blocking arming: request
+// ---------------------------------------------------------------------------
 
-    _can->stopMotor(m.can_id, CAN_HOST_ID, true);
-    delay(200);
+void MotorManager::requestArmDrive() {
+    if (!_can || isArming()) return;
 
-    _can->setRunMode(m.can_id, CAN_HOST_ID, mode);
-    delay(10);
+    _arming_just_completed = false;
+    _arming.step = ArmingStep::StopMotor;
+    _arming.first_idx = 0;
+    _arming.last_idx = NUM_DRIVE_MOTORS;
+    _arming.current_idx = 0;
+    _arming.step_start_ms = millis();
+    _arming.all_ok = true;
+    _arming.is_drive = true;
+    _arming.pos_received = false;
+    _arming.read_pos = 0.0f;
 
-    bool ok = _can->enableMotor(m.can_id, CAN_HOST_ID);
-    delay(50);
+    Serial.println("[Motors] Arming drive motors (non-blocking)...");
+}
 
-    if (ok) {
-        // Read the motor's actual mechanical position so our coordinate
-        // system aligns with the motor's. This is the ground truth --
-        // don't rely on setZeroPosition which is unreliable.
-        float motor_pos = 0.0f;
-        bool got_pos = _can->readParamSync(m.can_id, CAN_HOST_ID,
-                                           RobstrideParam::MECH_POS, motor_pos, 200);
-        if (!got_pos) {
-            Serial.printf("[Motors] WARNING: could not read MECH_POS from motor %d, assuming 0\n", m.can_id);
-            motor_pos = 0.0f;
+void MotorManager::requestArmArms() {
+    if (!_can || isArming()) return;
+
+    _arming_just_completed = false;
+    _arming.step = ArmingStep::StopMotor;
+    _arming.first_idx = NUM_DRIVE_MOTORS;
+    _arming.last_idx = NUM_MOTORS;
+    _arming.current_idx = NUM_DRIVE_MOTORS;
+    _arming.step_start_ms = millis();
+    _arming.all_ok = true;
+    _arming.is_drive = false;
+    _arming.pos_received = false;
+    _arming.read_pos = 0.0f;
+
+    Serial.println("[Motors] Arming arm motors (non-blocking)...");
+}
+
+// ---------------------------------------------------------------------------
+// Non-blocking arming: cancel (stops any already-enabled motors in this batch)
+// ---------------------------------------------------------------------------
+
+void MotorManager::cancelArming() {
+    if (!isArming()) return;
+
+    Serial.println("[Motors] Arming cancelled");
+
+    for (int i = _arming.first_idx; i < _arming.current_idx; i++) {
+        if (_motors[i].enabled) {
+            _can->stopMotor(_motors[i].can_id, CAN_HOST_ID, false);
+            _motors[i].enabled = false;
         }
+    }
 
-        if (mode == RobstrideRunMode::CSP) {
-            // Tell the motor to hold at its current position
-            _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+    _arming.step = ArmingStep::Idle;
+}
+
+// ---------------------------------------------------------------------------
+// Non-blocking arming: advance one step per call
+// ---------------------------------------------------------------------------
+
+void MotorManager::updateArming() {
+    if (!_can) return;
+
+    _arming_just_completed = false;
+    uint32_t now = millis();
+    uint32_t elapsed = now - _arming.step_start_ms;
+    int idx = _arming.current_idx;
+
+    switch (_arming.step) {
+
+    case ArmingStep::Idle:
+    case ArmingStep::Complete:
+    case ArmingStep::Failed:
+        return;
+
+    case ArmingStep::StopMotor: {
+        MotorState& m = _motors[idx];
+        _can->stopMotor(m.can_id, CAN_HOST_ID, true);
+        _arming.step = ArmingStep::WaitStop;
+        _arming.step_start_ms = now;
+        break;
+    }
+
+    case ArmingStep::WaitStop:
+        if (elapsed >= ARMING_STOP_DELAY_MS) {
+            _arming.step = ArmingStep::SetMode;
+            _arming.step_start_ms = now;
+        }
+        break;
+
+    case ArmingStep::SetMode: {
+        MotorState& m = _motors[idx];
+        _can->setRunMode(m.can_id, CAN_HOST_ID, RobstrideRunMode::CSP);
+        _arming.step = ArmingStep::WaitMode;
+        _arming.step_start_ms = now;
+        break;
+    }
+
+    case ArmingStep::WaitMode:
+        if (elapsed >= ARMING_MODE_DELAY_MS) {
+            _arming.step = ArmingStep::Enable;
+            _arming.step_start_ms = now;
+        }
+        break;
+
+    case ArmingStep::Enable: {
+        MotorState& m = _motors[idx];
+        bool ok = _can->enableMotor(m.can_id, CAN_HOST_ID);
+        if (!ok) {
+            Serial.printf("[Motors] Failed to enable motor ID=%d\n", m.can_id);
+            _arming.all_ok = false;
+            _arming.step = ArmingStep::NextMotor;
+            _arming.step_start_ms = now;
+        } else {
+            _arming.step = ArmingStep::WaitEnable;
+            _arming.step_start_ms = now;
+        }
+        break;
+    }
+
+    case ArmingStep::WaitEnable:
+        if (elapsed >= ARMING_ENABLE_DELAY_MS) {
+            _arming.step = ArmingStep::ReadPos;
+            _arming.step_start_ms = now;
+        }
+        break;
+
+    case ArmingStep::ReadPos: {
+        MotorState& m = _motors[idx];
+        _arming.pos_received = false;
+        _arming.read_pos = 0.0f;
+        _can->readParam(m.can_id, CAN_HOST_ID, RobstrideParam::MECH_POS);
+        _arming.step = ArmingStep::WaitReadPos;
+        _arming.step_start_ms = now;
+        break;
+    }
+
+    case ArmingStep::WaitReadPos: {
+        if (_arming.pos_received) {
+            float motor_pos = _arming.read_pos;
+            configureMotorAfterEnable(idx, motor_pos);
+
+            _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
                                   RobstrideParam::SPEED_LIMIT, 0.0f);
-            delay(5);
-            _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+            _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
                                   RobstrideParam::TARGET_POSITION, motor_pos);
-            delay(5);
-        }
 
-        m.enabled = true;
-        m.run_mode = mode;
-        m.position = motor_pos;
-        m.raw_position = 0.0f;
-        m.prev_raw_position = 0.0f;
-        m.unwrap_offset = 0.0f;
-        m._abs_pos_offset = motor_pos;
-        m.has_first_feedback = false;
-        Serial.printf("[Motors] Enabled motor ID=%d in CSP mode (pos=%.3f)\n",
-                      m.can_id, motor_pos);
+            _arming.step = ArmingStep::WaitConfigure;
+            _arming.step_start_ms = now;
+        } else if (elapsed >= ARMING_READ_POS_TIMEOUT_MS) {
+            Serial.printf("[Motors] WARNING: MECH_POS timeout for motor %d, assuming 0\n",
+                          _motors[idx].can_id);
+            configureMotorAfterEnable(idx, 0.0f);
+
+            _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
+                                  RobstrideParam::SPEED_LIMIT, 0.0f);
+            _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
+                                  RobstrideParam::TARGET_POSITION, 0.0f);
+
+            _arming.step = ArmingStep::WaitConfigure;
+            _arming.step_start_ms = now;
+        }
+        break;
     }
-    return ok;
+
+    case ArmingStep::WaitConfigure:
+        if (elapsed >= ARMING_CONFIGURE_DELAY_MS) {
+            _arming.step = ArmingStep::NextMotor;
+            _arming.step_start_ms = now;
+        }
+        break;
+
+    case ArmingStep::NextMotor: {
+        _arming.current_idx++;
+        if (_arming.current_idx >= _arming.last_idx) {
+            if (_arming.is_drive) {
+                _drive_armed = _arming.all_ok;
+                Serial.printf("[Motors] Drive motors armed: %s\n",
+                              _arming.all_ok ? "OK" : "PARTIAL");
+            } else {
+                _arm_armed = _arming.all_ok;
+                Serial.printf("[Motors] Arm motors armed: %s\n",
+                              _arming.all_ok ? "OK" : "PARTIAL");
+            }
+            _arming.step = ArmingStep::Complete;
+            _arming_just_completed = true;
+            _arming_completed_drive = _arming.is_drive;
+        } else {
+            if (elapsed >= ARMING_INTER_MOTOR_DELAY_MS) {
+                _arming.step = ArmingStep::StopMotor;
+                _arming.step_start_ms = now;
+            }
+        }
+        break;
+    }
+
+    } // switch
 }
 
-bool MotorManager::armDriveMotors() {
-    if (!_can) return false;
+// ---------------------------------------------------------------------------
+// Disarm (always sends stop commands, regardless of armed state)
+// ---------------------------------------------------------------------------
 
-    bool all_ok = true;
-    for (int i = 0; i < NUM_DRIVE_MOTORS; i++) {
-        if (!enableAndConfigureMotor(i, RobstrideRunMode::CSP)) {
-            all_ok = false;
-        }
-        delay(20);
-    }
-    _drive_armed = all_ok;
-    Serial.printf("[Motors] Drive motors armed (CSP): %s\n", all_ok ? "OK" : "PARTIAL");
-    return all_ok;
-}
-
-bool MotorManager::disarmDriveMotors() {
-    if (!_can) return false;
+void MotorManager::disarmDriveMotors() {
+    if (!_can) return;
 
     for (int i = 0; i < NUM_DRIVE_MOTORS; i++) {
         _can->stopMotor(_motors[i].can_id, CAN_HOST_ID, false);
         _motors[i].enabled = false;
-        delay(5);
     }
     _drive_armed = false;
     Serial.println("[Motors] Drive motors disarmed");
-    return true;
 }
 
-bool MotorManager::armArmMotors() {
-    if (!_can) return false;
-
-    bool all_ok = true;
-    for (int i = NUM_DRIVE_MOTORS; i < NUM_MOTORS; i++) {
-        if (!enableAndConfigureMotor(i, RobstrideRunMode::CSP)) {
-            all_ok = false;
-        }
-        delay(20);
-    }
-    _arm_armed = all_ok;
-    Serial.printf("[Motors] Arm motors armed: %s\n", all_ok ? "OK" : "PARTIAL");
-    return all_ok;
-}
-
-bool MotorManager::disarmArmMotors() {
-    if (!_can) return false;
+void MotorManager::disarmArmMotors() {
+    if (!_can) return;
 
     for (int i = NUM_DRIVE_MOTORS; i < NUM_MOTORS; i++) {
         _can->stopMotor(_motors[i].can_id, CAN_HOST_ID, false);
         _motors[i].enabled = false;
-        delay(5);
     }
     _arm_armed = false;
     Serial.println("[Motors] Arm motors disarmed");
-    return true;
 }
 
-bool MotorManager::disarmAll() {
-    bool d = disarmDriveMotors();
-    bool a = disarmArmMotors();
-    return d && a;
+void MotorManager::disarmAll() {
+    disarmDriveMotors();
+    disarmArmMotors();
 }
 
 bool MotorManager::sendDrivePosition(MotorRole role, float position_rad, float speed_limit_rad_s) {
@@ -219,7 +348,12 @@ void MotorManager::processFeedback() {
 
         // Handle param-read responses
         if (fb.is_param_response) {
-            if (fb.param_addr == RobstrideParam::VBUS) {
+            if (fb.param_addr == RobstrideParam::MECH_POS &&
+                _arming.step == ArmingStep::WaitReadPos &&
+                findMotorByCanId(fb.motor_id) == _arming.current_idx) {
+                _arming.read_pos = fb.param_value;
+                _arming.pos_received = true;
+            } else if (fb.param_addr == RobstrideParam::VBUS) {
                 if (_bus_voltage == 0.0f && fb.param_value > 0.0f) {
                     Serial.printf("[Motors] First VBUS reading: %.1fV\n", fb.param_value);
                 }

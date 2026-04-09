@@ -17,14 +17,17 @@ public:
                 const char* ip_address,
                 bool drive_armed,
                 bool arm_armed,
-                const ArmController* arm_ctrl = nullptr);
+                const ArmController* arm_ctrl = nullptr,
+                bool drive_arming = false,
+                bool arm_arming = false);
 
 private:
     M5Canvas _sprite;
     bool _initialized = false;
 
     void drawStatusBar(bool wifi_connected, const char* ip_address,
-                       bool drive_armed, bool arm_armed);
+                       bool drive_armed, bool arm_armed,
+                       bool drive_arming, bool arm_arming);
     void drawMotorDiagram(const MotorManager& motors);
     void drawChannelBars(const CrsfReceiver& crsf);
     void drawCalMode(const ArmController& arm_ctrl);

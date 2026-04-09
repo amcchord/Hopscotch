@@ -421,20 +421,21 @@ static void processSerialCommand(const char* cmd) {
 
     } else if (strcmp(cmd, "arm") == 0) {
         Serial.println("[Sim] Arming drive motors...");
-        motorMgr.armDriveMotors();
+        motorMgr.requestArmDrive();
 
     } else if (strcmp(cmd, "disarm") == 0) {
         Serial.println("[Sim] Disarming drive motors...");
+        motorMgr.cancelArming();
         driveCtrl.emergencyStop();
         motorMgr.disarmDriveMotors();
 
     } else if (strcmp(cmd, "arm arms") == 0) {
         Serial.println("[Sim] Arming arm motors (ensure arms are in FORWARD position)...");
-        motorMgr.armArmMotors();
-        armCtrl.setForwardReference();
+        motorMgr.requestArmArms();
 
     } else if (strcmp(cmd, "disarm arms") == 0) {
         Serial.println("[Sim] Disarming arm motors...");
+        motorMgr.cancelArming();
         armCtrl.holdPosition();
         motorMgr.disarmArmMotors();
 
@@ -629,6 +630,7 @@ static void onSettingsChanged() {
 
 static void onDisarmRequested() {
     Serial.println("[Main] Emergency disarm requested via web");
+    motorMgr.cancelArming();
     driveCtrl.emergencyStop();
     armCtrl.holdPosition();
     motorMgr.disarmAll();
@@ -804,6 +806,12 @@ void loop() {
             motorMgr.scanNextMotor();
             motorMgr.processFeedback();
             motorMgr.checkTimeouts(500);
+            motorMgr.updateArming();
+
+            if (motorMgr.armingJustCompletedArms() && motorMgr.isArmArmed()) {
+                armCtrl.setForwardReference();
+            }
+            motorMgr.clearArmingCompleted();
         }
 
         // 3. Read channel inputs
@@ -898,38 +906,43 @@ void loop() {
             Serial.printf("[ArmInput] cal=%d move=%d jump=%d\n", calEdge, moveEdge, calEdge);
         }
 
-        // 4. Arm/disarm on switch edges (only from RC, not sim -- sim uses serial commands)
+        // 4. Arm/disarm (only from RC, not sim -- sim uses serial commands)
+        //    Level-based arming: while switch is active and not armed, keep
+        //    requesting arm (handles partial failures without re-toggle).
+        //    Unconditional disarm: always send stop on falling edge regardless
+        //    of armed state (fixes partial-arm leaving motors enabled).
         bool driveSwNow = isSwitchActive(drive_arm_sw);
         bool armSwNow   = isSwitchActive(arm_arm_sw);
 
         if (crsfRx.isLinkUp() && !simEnabled) {
-            // Drive arm toggle
-            if (driveSwNow && !prevDriveArmSwitch) {
-                if (!motorMgr.isDriveArmed()) {
+            // Drive: level-based arm
+            if (driveSwNow) {
+                if (!motorMgr.isDriveArmed() && !motorMgr.isArmingDrive()) {
                     Serial.printf("[Main] t=%lu DRIVE ARM requested via RC switch\n", now);
-                    motorMgr.armDriveMotors();
-                }
-            } else if (!driveSwNow && prevDriveArmSwitch) {
-                if (motorMgr.isDriveArmed()) {
-                    Serial.printf("[Main] t=%lu DRIVE DISARM requested via RC switch\n", now);
-                    driveCtrl.emergencyStop();
-                    motorMgr.disarmDriveMotors();
+                    motorMgr.requestArmDrive();
                 }
             }
+            // Drive: unconditional disarm on falling edge
+            if (!driveSwNow && prevDriveArmSwitch) {
+                Serial.printf("[Main] t=%lu DRIVE DISARM requested via RC switch\n", now);
+                motorMgr.cancelArming();
+                driveCtrl.emergencyStop();
+                motorMgr.disarmDriveMotors();
+            }
 
-            // Arm motors toggle
-            if (armSwNow && !prevArmArmSwitch) {
-                if (!motorMgr.isArmArmed()) {
+            // Arms: level-based arm
+            if (armSwNow) {
+                if (!motorMgr.isArmArmed() && !motorMgr.isArmingArms()) {
                     Serial.printf("[Main] t=%lu ARMS ARM requested via RC switch (ensure arms at FORWARD)\n", now);
-                    motorMgr.armArmMotors();
-                    armCtrl.setForwardReference();
+                    motorMgr.requestArmArms();
                 }
-            } else if (!armSwNow && prevArmArmSwitch) {
-                if (motorMgr.isArmArmed()) {
-                    Serial.printf("[Main] t=%lu ARMS DISARM requested via RC switch\n", now);
-                    armCtrl.holdPosition();
-                    motorMgr.disarmArmMotors();
-                }
+            }
+            // Arms: unconditional disarm on falling edge
+            if (!armSwNow && prevArmArmSwitch) {
+                Serial.printf("[Main] t=%lu ARMS DISARM requested via RC switch\n", now);
+                motorMgr.cancelArming();
+                armCtrl.holdPosition();
+                motorMgr.disarmArmMotors();
             }
         }
 
@@ -1062,7 +1075,8 @@ void loop() {
         display.render(motorMgr, crsfRx,
                        wifiConnected, wifiIP.c_str(),
                        motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
-                       &armCtrl);
+                       &armCtrl,
+                       motorMgr.isArmingDrive(), motorMgr.isArmingArms());
     }
 
     // -----------------------------------------------------------------------
@@ -1079,9 +1093,14 @@ void loop() {
     if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
         lastTelTick = now;
 
-        const char* state = balanceCtrl.isActive()
-            ? balanceCtrl.getStateString()
-            : armCtrl.getStateString();
+        const char* state;
+        if (motorMgr.isArming()) {
+            state = "ARMING";
+        } else if (balanceCtrl.isActive()) {
+            state = balanceCtrl.getStateString();
+        } else {
+            state = armCtrl.getStateString();
+        }
         crsfRx.sendFlightMode(state);
         crsfRx.sendBatteryTelemetry(motorMgr.getBusVoltage(),
                                     motorMgr.getTotalCurrent());

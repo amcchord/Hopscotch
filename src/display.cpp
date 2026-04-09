@@ -33,7 +33,9 @@ void Display::render(const MotorManager& motors,
                      const char* ip_address,
                      bool drive_armed,
                      bool arm_armed,
-                     const ArmController* arm_ctrl) {
+                     const ArmController* arm_ctrl,
+                     bool drive_arming,
+                     bool arm_arming) {
     if (!_initialized) return;
 
     _sprite.fillSprite(COL_BG);
@@ -41,7 +43,8 @@ void Display::render(const MotorManager& motors,
     if (arm_ctrl && arm_ctrl->isInCalMode()) {
         drawCalMode(*arm_ctrl);
     } else {
-        drawStatusBar(wifi_connected, ip_address, drive_armed, arm_armed);
+        drawStatusBar(wifi_connected, ip_address, drive_armed, arm_armed,
+                      drive_arming, arm_arming);
         drawMotorDiagram(motors);
         drawChannelBars(crsf);
     }
@@ -50,7 +53,8 @@ void Display::render(const MotorManager& motors,
 }
 
 void Display::drawStatusBar(bool wifi_connected, const char* ip_address,
-                             bool drive_armed, bool arm_armed) {
+                             bool drive_armed, bool arm_armed,
+                             bool drive_arming, bool arm_arming) {
     // Row 0-13: status bar
     if (wifi_connected) {
         _sprite.setTextColor(COL_GREEN);
@@ -65,9 +69,20 @@ void Display::drawStatusBar(bool wifi_connected, const char* ip_address,
         _sprite.print("WiFi: --");
     }
 
-    // Arm status on right
+    // Blink phase for arming indicators (~2 Hz)
+    bool blink_on = (millis() / 250) % 2 == 0;
+
+    // Drive arm status on right
     _sprite.setCursor(90, 1);
-    if (drive_armed) {
+    if (drive_arming) {
+        if (blink_on) {
+            _sprite.setTextColor(COL_ORANGE);
+            _sprite.print("DRV");
+        } else {
+            _sprite.setTextColor(COL_DARKGRAY);
+            _sprite.print("DRV");
+        }
+    } else if (drive_armed) {
         _sprite.setTextColor(COL_GREEN);
         _sprite.print("DRV");
     } else {
@@ -75,8 +90,17 @@ void Display::drawStatusBar(bool wifi_connected, const char* ip_address,
         _sprite.print("drv");
     }
 
+    // Arm motor status on right
     _sprite.setCursor(110, 1);
-    if (arm_armed) {
+    if (arm_arming) {
+        if (blink_on) {
+            _sprite.setTextColor(COL_ORANGE);
+            _sprite.print("AR");
+        } else {
+            _sprite.setTextColor(COL_DARKGRAY);
+            _sprite.print("AR");
+        }
+    } else if (arm_armed) {
         _sprite.setTextColor(COL_GREEN);
         _sprite.print("AR");
     } else {

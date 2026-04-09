@@ -43,6 +43,43 @@ struct MotorState {
     RobstrideRunMode run_mode;
 };
 
+// Non-blocking arming state machine
+enum class ArmingStep : uint8_t {
+    Idle,
+    StopMotor,
+    WaitStop,
+    SetMode,
+    WaitMode,
+    Enable,
+    WaitEnable,
+    ReadPos,
+    WaitReadPos,
+    WaitConfigure,
+    NextMotor,
+    Complete,
+    Failed,
+};
+
+struct ArmingContext {
+    ArmingStep step = ArmingStep::Idle;
+    int first_idx = 0;
+    int last_idx = 0;
+    int current_idx = 0;
+    uint32_t step_start_ms = 0;
+    bool all_ok = true;
+    bool is_drive = false;
+    float read_pos = 0.0f;
+    bool pos_received = false;
+};
+
+// Timing for non-blocking arming steps (ms)
+static constexpr uint32_t ARMING_STOP_DELAY_MS       = 50;
+static constexpr uint32_t ARMING_MODE_DELAY_MS        = 5;
+static constexpr uint32_t ARMING_ENABLE_DELAY_MS      = 20;
+static constexpr uint32_t ARMING_READ_POS_TIMEOUT_MS  = 100;
+static constexpr uint32_t ARMING_CONFIGURE_DELAY_MS   = 5;
+static constexpr uint32_t ARMING_INTER_MOTOR_DELAY_MS = 10;
+
 class MotorManager {
 public:
     void begin(Robstride* can_bus);
@@ -51,12 +88,24 @@ public:
     void setMotorId(MotorRole role, uint8_t can_id);
     uint8_t getMotorId(MotorRole role) const;
 
-    // Arm / disarm
-    bool armDriveMotors();
-    bool disarmDriveMotors();
-    bool armArmMotors();
-    bool disarmArmMotors();
-    bool disarmAll();
+    // Non-blocking arming: request, update each tick, cancel
+    void requestArmDrive();
+    void requestArmArms();
+    void updateArming();
+    void cancelArming();
+
+    bool isArming() const { return _arming.step != ArmingStep::Idle && _arming.step != ArmingStep::Complete && _arming.step != ArmingStep::Failed; }
+    bool isArmingDrive() const { return isArming() && _arming.is_drive; }
+    bool isArmingArms() const { return isArming() && !_arming.is_drive; }
+    bool armingJustCompleted() const { return _arming_just_completed; }
+    bool armingJustCompletedDrive() const { return _arming_just_completed && _arming_completed_drive; }
+    bool armingJustCompletedArms() const { return _arming_just_completed && !_arming_completed_drive; }
+    void clearArmingCompleted() { _arming_just_completed = false; }
+
+    // Disarm (always sends stop commands regardless of armed state)
+    void disarmDriveMotors();
+    void disarmArmMotors();
+    void disarmAll();
 
     bool isDriveArmed() const { return _drive_armed; }
     bool isArmArmed() const { return _arm_armed; }
@@ -101,8 +150,12 @@ private:
     bool _drive_armed = false;
     bool _arm_armed = false;
 
+    ArmingContext _arming;
+    bool _arming_just_completed = false;
+    bool _arming_completed_drive = false;
+
     int findMotorByCanId(uint8_t can_id);
-    bool enableAndConfigureMotor(int idx, RobstrideRunMode mode);
+    void configureMotorAfterEnable(int idx, float motor_pos);
     int _scan_index = 0;
 
     float _bus_voltage = 0.0f;
