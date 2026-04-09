@@ -57,8 +57,10 @@ static constexpr uint8_t DEFAULT_CH_ARM_TRIGGER_HOME = 11;  // Channel 12 (trigg
 // ---------------------------------------------------------------------------
 // Control loop timing
 // ---------------------------------------------------------------------------
-static constexpr uint32_t CONTROL_LOOP_HZ       = 50;
-static constexpr uint32_t CONTROL_LOOP_PERIOD_MS = 1000 / CONTROL_LOOP_HZ;  // 20 ms
+static constexpr uint32_t CONTROL_LOOP_HZ        = 50;
+static constexpr uint32_t CONTROL_LOOP_PERIOD_MS  = 1000 / CONTROL_LOOP_HZ;  // 20 ms
+static constexpr uint32_t BALANCE_LOOP_HZ         = 200;
+static constexpr uint32_t BALANCE_LOOP_PERIOD_US  = 1000000 / BALANCE_LOOP_HZ;  // 5000 us
 static constexpr uint32_t DISPLAY_PERIOD_MS      = 40;   // ~25 fps
 static constexpr uint32_t WEBSOCKET_PERIOD_MS    = 100;  // ~10 Hz
 
@@ -102,20 +104,23 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_SETPOINT_DEG          = 83.0f;   // proven balance point from telemetry
-static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 10.0f;   // engage while approaching gently
-static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage (wait for slow approach)
+static constexpr float    BALANCE_BASE_DEG              = 87.0f;   // balance point with arms at forward ref (measured)
+static constexpr float    BALANCE_FF_GAIN               = 0.0f;    // arms barely affect balance point
+static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for feedforward at tip position
+static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
 
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s -- return fast, force PID to take over
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
 static constexpr float    BALANCE_KP                    = 1.0f;    // rad/s per degree of angle error
-static constexpr float    BALANCE_KD                    = 0.15f;   // rad/s per deg/s of roll rate (filtered)
+static constexpr float    BALANCE_KD                    = 0.12f;   // rad/s per deg/s of roll rate (proven at 20s run)
+
+static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weight in complementary filter
 
 static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";

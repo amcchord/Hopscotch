@@ -61,8 +61,19 @@ static constexpr uint32_t CAL_ENTRY_HOLD_MS = 3000;
 
 // Balance mode state tracking
 static bool  prevBalanceWasActive = false;
-static float prevRollDeg          = 0.0f;
-static float filteredRollRate     = 0.0f;
+
+// Double-tap detection for force-engage
+static uint32_t lastCalEdgeTime = 0;
+static bool     waitingForDoubleTap = false;
+
+// Shared IMU data for balance task on Core 0
+static volatile RawImuData sharedImu = {};
+static volatile bool       sharedImuReady = false;
+static portMUX_TYPE        imuMux = portMUX_INITIALIZER_UNLOCKED;
+static uint32_t            lastBalanceImuTick = 0;
+
+// Balance task handle
+static TaskHandle_t balanceTaskHandle = nullptr;
 
 // Periodic debug output toggle (press 'd' + Enter to toggle)
 static bool  debugOutputEnabled = true;
@@ -105,9 +116,9 @@ static void printSerialHelp() {
     Serial.println("  spd <id> <speed> <curLim>   Send speed + current_limit");
     Serial.println("  test <id>                   Run automated motor test");
     Serial.println("--- Balance Mode ---");
-    Serial.println("  bal status                  Print balance state, PID gains, log info");
-    Serial.println("  bal setpoint <deg>          Set balance setpoint (default 90)");
-    Serial.println("  bal kp/kd/adapt <val>       Set balance PD gains / adapt rate");
+    Serial.println("  bal status                  Print balance state and gains");
+    Serial.println("  bal ffgain/base <val>       Set feedforward gain / base angle");
+    Serial.println("  bal kp/kd/adapt <val>       Set PD gains / adapt rate");
     Serial.println("  bal pkp/pki/pkd <val>       Set position-return PID gains");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
@@ -325,16 +336,24 @@ static void processBalCommand(const char* sub) {
     if (strcmp(sub, "status") == 0) {
         balanceCtrl.printStatus();
 
+    } else if (strcmp(sub, "engage") == 0) {
+        balanceCtrl.forceEngage();
+
     } else if (strcmp(sub, "log") == 0) {
         balanceCtrl.dumpLog();
 
     } else if (strcmp(sub, "log clear") == 0) {
         balanceCtrl.clearLog();
 
-    } else if (strncmp(sub, "setpoint ", 9) == 0) {
-        float val = atof(sub + 9);
-        balanceCtrl.setSetpoint(val);
-        Serial.printf("[Balance] Setpoint = %.1f deg\n", val);
+    } else if (strncmp(sub, "ffgain ", 7) == 0) {
+        float val = atof(sub + 7);
+        balanceCtrl.setFfGain(val);
+        Serial.printf("[Balance] FF gain = %.2f\n", val);
+
+    } else if (strncmp(sub, "base ", 5) == 0) {
+        float val = atof(sub + 5);
+        balanceCtrl.setBaseDeg(val);
+        Serial.printf("[Balance] Base deg = %.1f\n", val);
 
     } else if (strncmp(sub, "kp ", 3) == 0) {
         float val = atof(sub + 3);
@@ -345,11 +364,6 @@ static void processBalCommand(const char* sub) {
         float val = atof(sub + 3);
         balanceCtrl.setKd(val);
         Serial.printf("[Balance] Kd = %.4f\n", val);
-
-    } else if (strncmp(sub, "expo ", 5) == 0) {
-        float val = atof(sub + 5);
-        balanceCtrl.setExpo(val);
-        Serial.printf("[Balance] Expo = %.2f\n", val);
 
     } else if (strncmp(sub, "adapt ", 6) == 0) {
         float val = atof(sub + 6);
@@ -372,7 +386,7 @@ static void processBalCommand(const char* sub) {
         Serial.printf("[Balance] Pos Kd = %.4f\n", val);
 
     } else {
-        Serial.println("[Balance] Usage: bal status | bal setpoint <deg>");
+        Serial.println("[Balance] Usage: bal status | bal ffgain/base <val>");
         Serial.println("         bal kp/kd/adapt <val> | bal pkp/pki/pkd <val>");
         Serial.println("         bal log | bal log clear");
     }
@@ -675,6 +689,36 @@ static bool isSwitchActive(float norm_value) {
 }
 
 // ---------------------------------------------------------------------------
+// Balance task (Core 0, 200Hz)
+// ---------------------------------------------------------------------------
+static void balanceTaskFunc(void* param) {
+    (void)param;
+    TickType_t lastWake = xTaskGetTickCount();
+    uint32_t prevUs = micros();
+
+    Serial.println("[Balance] Core 0 task started at 200Hz");
+
+    for (;;) {
+        uint32_t nowUs = micros();
+        float dt = (float)(nowUs - prevUs) / 1000000.0f;
+        prevUs = nowUs;
+        if (dt <= 0.0f || dt > 0.05f) dt = 0.005f;
+
+        RawImuData imu;
+        portENTER_CRITICAL(&imuMux);
+        imu = *(const RawImuData*)&sharedImu;
+        bool ready = sharedImuReady;
+        portEXIT_CRITICAL(&imuMux);
+
+        if (ready) {
+            balanceCtrl.balanceTick(imu, dt);
+        }
+
+        vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(1000 / BALANCE_LOOP_HZ));
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Setup
 // ---------------------------------------------------------------------------
 void setup() {
@@ -767,6 +811,18 @@ void setup() {
     lastDisplayTick = millis();
     lastWsTick = millis();
     lastTelTick = millis();
+
+    // Launch balance task on Core 0 (Arduino loop runs on Core 1)
+    xTaskCreatePinnedToCore(
+        balanceTaskFunc,
+        "BalanceTask",
+        4096,
+        nullptr,
+        5,              // high priority
+        &balanceTaskHandle,
+        0               // Core 0
+    );
+    Serial.printf("[Main] Balance task launched on Core 0 at %d Hz\n", BALANCE_LOOP_HZ);
 }
 
 // ---------------------------------------------------------------------------
@@ -774,9 +830,35 @@ void setup() {
 // ---------------------------------------------------------------------------
 void loop() {
     uint32_t now = millis();
+    uint32_t nowUs = micros();
 
     // Process serial debug commands (non-blocking)
     pollSerialCommands();
+
+    // -----------------------------------------------------------------------
+    // 200 Hz IMU read -- feeds both Madgwick (for display) and Core 0 balance
+    // -----------------------------------------------------------------------
+    if (nowUs - lastBalanceImuTick >= BALANCE_LOOP_PERIOD_US) {
+        lastBalanceImuTick = nowUs;
+
+        M5.Imu.update();
+        auto imu = M5.Imu.getImuData();
+
+        portENTER_CRITICAL(&imuMux);
+        sharedImu.accel_x = imu.accel.x;
+        sharedImu.accel_y = imu.accel.y;
+        sharedImu.accel_z = imu.accel.z;
+        sharedImu.gyro_x  = imu.gyro.x;
+        sharedImu.gyro_y  = imu.gyro.y;
+        sharedImu.gyro_z  = imu.gyro.z;
+        sharedImuReady = true;
+        portEXIT_CRITICAL(&imuMux);
+
+        ahrsFilter.update(
+            imu.gyro.x,  imu.gyro.y,  imu.gyro.z,
+            imu.accel.x, imu.accel.y, imu.accel.z,
+            imu.mag.x,   imu.mag.y,   imu.mag.z);
+    }
 
     // -----------------------------------------------------------------------
     // 50 Hz control loop
@@ -787,15 +869,8 @@ void loop() {
         controlTickCount++;
         float dt = static_cast<float>(CONTROL_LOOP_PERIOD_MS) / 1000.0f;
 
-        // 0. Poll M5 hardware and update AHRS filter
+        // 0. M5 hardware update (buttons, etc -- IMU handled above at 200Hz)
         M5.update();
-        if (M5.Imu.update()) {
-            auto imu = M5.Imu.getImuData();
-            ahrsFilter.update(
-                imu.gyro.x,  imu.gyro.y,  imu.gyro.z,
-                imu.accel.x, imu.accel.y, imu.accel.z,
-                imu.mag.x,   imu.mag.y,   imu.mag.z);
-        }
 
         // 1. Read CRSF data
         crsfRx.update();
@@ -871,19 +946,39 @@ void loop() {
             calEdge = false;
         }
 
-        // --- Balance controller: read Ch7 and IMU, update state machine ---
+        // --- Balance controller: state machine at 50Hz (PD runs at 200Hz on Core 0) ---
         float ch7_raw = crsfRx.getChannelNormalized(s.channel_map.arm_select_var);
         bool ch7Active = isSwitchActive(ch7_raw);
 
-        float rollDeg = ahrsFilter.getRoll();
-        float rawRollRate = (rollDeg - prevRollDeg) / dt;
-        prevRollDeg = rollDeg;
-        filteredRollRate = 0.25f * rawRollRate + 0.75f * filteredRollRate;
-        float rollRateDps = filteredRollRate;
+        // Use complementary filter output from Core 0 (or Madgwick fallback)
+        float rollDeg = balanceCtrl.getTiltAngle();
+        float rollRateDps = balanceCtrl.getGyroRate();
 
-        // When Ch7 is active and balance is not yet running, Ch11 edge triggers tip-up.
-        // When balance is active, suppress Ch11's normal jump behavior.
-        bool balanceWantsEdge = ch7Active && !balanceCtrl.isActive() && calEdge;
+        // Double-tap vs single-tap Ch11 detection while Ch7 high
+        bool balanceWantsEdge = false;
+        if (ch7Active && !balanceCtrl.isActive()) {
+            if (calEdge) {
+                if (waitingForDoubleTap && (now - lastCalEdgeTime < 500)) {
+                    // Second tap within 500ms: force-engage
+                    Serial.println("[Main] Double-tap Ch11 detected -- force engage!");
+                    balanceCtrl.forceEngage();
+                    waitingForDoubleTap = false;
+                    calEdge = false;
+                } else {
+                    // First tap: wait to see if a second comes
+                    waitingForDoubleTap = true;
+                    lastCalEdgeTime = now;
+                }
+            }
+            // 500ms passed after single tap without second: fire normal tip-up
+            if (waitingForDoubleTap && !calEdge && (now - lastCalEdgeTime > 500)) {
+                balanceWantsEdge = true;
+                waitingForDoubleTap = false;
+                Serial.println("[Main] Single tap Ch11 -- normal tip-up");
+            }
+        } else {
+            waitingForDoubleTap = false;
+        }
         balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
 
         bool balanceDriving = balanceCtrl.isControllingDrive();
@@ -1001,8 +1096,9 @@ void loop() {
                           throttle, steering, wifiConnected,
                           simEnabled ? "ON" : "off");
 
-            Serial.printf("[IMU] pitch=%+6.1f roll=%+6.1f yaw=%+6.1f\n",
-                          ahrsFilter.getPitch(), ahrsFilter.getRoll(), ahrsFilter.getYaw());
+            Serial.printf("[IMU] pitch=%+6.1f roll=%+6.1f yaw=%+6.1f  [CF] tilt=%+6.1f rate=%+6.1f\n",
+                          ahrsFilter.getPitch(), ahrsFilter.getRoll(), ahrsFilter.getYaw(),
+                          balanceCtrl.getTiltAngle(), balanceCtrl.getGyroRate());
 
             // Reset timing accumulators
             loopMaxUs = 0;
@@ -1055,7 +1151,7 @@ void loop() {
             // Balance controller status (only when not idle)
             if (balanceCtrl.isActive()) {
                 Serial.printf("[Balance] state=%s  roll=%.1f  setpoint=%.1f\n",
-                              balanceCtrl.getStateString(), rollDeg, balanceCtrl.getSetpoint());
+                              balanceCtrl.getStateString(), rollDeg, (float)balanceCtrl.getEffectiveSetpoint());
             }
 
             // CAN bus diagnostics

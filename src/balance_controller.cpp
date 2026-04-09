@@ -29,6 +29,7 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
     _arms   = arms;
     _state  = BalanceState::Idle;
     _targets_initialized = false;
+    _filter_initialized = false;
     _logging = false;
     _log_count = 0;
     _log_saved = false;
@@ -56,7 +57,57 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
 }
 
 // ---------------------------------------------------------------------------
-// State transitions
+// Complementary filter + PD balance (Core 0, 200Hz)
+// ---------------------------------------------------------------------------
+
+void BalanceController::balanceTick(const RawImuData& imu, float dt) {
+    // Complementary filter: fuse accel (absolute but noisy) with gyro (fast but drifts)
+    // Roll = rotation around X axis: accel angle from Y and Z gravity components
+    float accel_angle = atan2f(imu.accel_y, imu.accel_z) * 57.2957795f;
+
+    // Gyro rate: direct X-axis measurement with light smoothing
+    float gyro_raw = imu.gyro_x;
+
+    if (!_filter_initialized) {
+        _tilt_angle = accel_angle;
+        _gyro_rate = gyro_raw;
+        _filter_initialized = true;
+    } else {
+        _tilt_angle = COMPLEMENTARY_ALPHA * (_tilt_angle + gyro_raw * dt)
+                    + (1.0f - COMPLEMENTARY_ALPHA) * accel_angle;
+        // Low-pass on gyro rate: alpha=0.08 at 200Hz = ~60ms time constant
+        // This exact setting held balance for 20+ seconds in testing
+        _gyro_rate = 0.08f * gyro_raw + 0.92f * _gyro_rate;
+    }
+
+    // Only run PD when actively balancing
+    if (_state != BalanceState::Balancing) return;
+    if (!_targets_initialized) return;
+
+    float angle_err = _effective_setpoint - _tilt_angle;
+    float motor_vel = _kp * angle_err - _kd * _gyro_rate + _velocity_bias;
+
+    if (motor_vel >  BALANCE_MAX_DRIVE_SPEED) motor_vel =  BALANCE_MAX_DRIVE_SPEED;
+    if (motor_vel < -BALANCE_MAX_DRIVE_SPEED) motor_vel = -BALANCE_MAX_DRIVE_SPEED;
+
+    float pos_delta = motor_vel * dt;
+    _back_left_target  += pos_delta;
+    _back_right_target += pos_delta;
+
+    if (_motors->isDriveArmed()) {
+        _motors->sendDrivePosition(MotorRole::BackLeft,  _back_left_target,  BALANCE_MAX_DRIVE_SPEED);
+        _motors->sendDrivePosition(MotorRole::BackRight, _back_right_target, BALANCE_MAX_DRIVE_SPEED);
+
+        _motors->sendDrivePosition(MotorRole::FrontLeft,  _front_left_hold,  0.0f);
+        _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
+    }
+
+    _last_angle_err = angle_err;
+    _last_motor_vel = motor_vel;
+}
+
+// ---------------------------------------------------------------------------
+// State transitions (Core 1 only)
 // ---------------------------------------------------------------------------
 
 void BalanceController::enterTippingUp() {
@@ -86,11 +137,10 @@ void BalanceController::enterTippingUp() {
 void BalanceController::enterBalancing(float current_roll) {
     _state = BalanceState::Balancing;
 
-    // Initialize so adaptive setpoint starts at current roll (zero initial error).
-    // Formula: adaptive_sp = setpoint_deg - adapt_rate * cumulative_error
-    // So: cumulative_error = (setpoint_deg - current_roll) / adapt_rate
-    _cumulative_error = (_setpoint_deg - current_roll) / _adapt_rate;
-    _adaptive_setpoint = current_roll;
+    _adaptive_adjustment = 0.0f;
+    _cumulative_error = 0.0f;
+    _ff_setpoint = current_roll;
+    _effective_setpoint = current_roll;
 
     _back_left_target  = _motors->getMotor(MotorRole::BackLeft).position;
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
@@ -107,8 +157,9 @@ void BalanceController::enterBalancing(float current_roll) {
     _arms_returning   = false;
     _balance_start_ms = millis();
 
-    Serial.printf("[Balance] BALANCING (PD+adapt+posPID)  sp=%.1f Kp=%.3f Kd=%.4f adapt=%.2f  wheels: L=%.2f R=%.2f\n",
-                  _setpoint_deg, _kp, _kd, _adapt_rate, _back_left_target, _back_right_target);
+    Serial.printf("[Balance] BALANCING @200Hz  base=%.1f ff_gain=%.1f  Kp=%.3f Kd=%.4f  tilt=%.1f  wheels: L=%.2f R=%.2f\n",
+                  _base_deg, _ff_gain, (float)_kp, (float)_kd, (float)_tilt_angle,
+                  (float)_back_left_target, (float)_back_right_target);
 }
 
 void BalanceController::enterReturningArms() {
@@ -122,6 +173,20 @@ void BalanceController::enterReturningArms() {
     stopLog();
 
     Serial.println("[Balance] RETURNING ARMS to forward reference");
+}
+
+void BalanceController::forceEngage() {
+    if (!_motors || !_arms) return;
+    if (!_motors->isDriveArmed()) {
+        Serial.println("[Balance] Cannot engage -- drive not armed");
+        return;
+    }
+    float tilt = _filter_initialized ? (float)_tilt_angle : 0.0f;
+    Serial.printf("[Balance] FORCE ENGAGE at tilt=%.1f\n", tilt);
+    _arms_returning = false;
+    _arms_reached_tip = true;
+    startLog();
+    enterBalancing(tilt);
 }
 
 void BalanceController::disengage() {
@@ -143,12 +208,16 @@ void BalanceController::disengage() {
 }
 
 // ---------------------------------------------------------------------------
-// Main update (called at 50 Hz from main loop)
+// State machine + outer loops (Core 1, 50Hz)
 // ---------------------------------------------------------------------------
 
 void BalanceController::update(float roll_deg, float roll_rate_dps,
                                 bool ch7_active, bool ch11_edge, float dt) {
     if (!_motors || !_arms) return;
+
+    // Use complementary filter output when available, fall back to Madgwick
+    float tilt = _filter_initialized ? (float)_tilt_angle : roll_deg;
+    float rate = _filter_initialized ? (float)_gyro_rate : roll_rate_dps;
 
     if (_logging && (millis() - _log_start_ms >= BALANCE_LOG_DURATION_MS)) {
         stopLog();
@@ -201,44 +270,47 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
         bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
 
-        float tip_error = fabsf(_setpoint_deg - roll_deg);
+        // Compute expected balance from current arm position for engage check
+        float tip_dl = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
+        float tip_dr = _motors->getMotor(MotorRole::ArmRight).position - _arms->getForwardRight();
+        float tip_expected = _base_deg + _ff_gain * (tip_dl + tip_dr) * 0.5f;
+        float tip_error = fabsf(tip_expected - tilt);
         if (arms_done &&
             tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
-            fabsf(roll_rate_dps) < BALANCE_ENGAGE_RATE_MAX_DPS) {
-            enterBalancing(roll_deg);
+            fabsf(rate) < BALANCE_ENGAGE_RATE_MAX_DPS) {
+            enterBalancing(tilt);
         }
 
-        logSample(roll_deg, roll_rate_dps);
+        logSample(tilt, rate);
         break;
     }
 
     case BalanceState::Balancing: {
-        // Safety bailout (use base setpoint, not adaptive)
-        if (fabsf(_setpoint_deg - roll_deg) > BALANCE_BAILOUT_THRESHOLD_DEG) {
-            Serial.printf("[Balance] BAILOUT  roll=%.1f err=%.1f\n", roll_deg, _setpoint_deg - roll_deg);
+        // Feedforward: compute expected balance point from current arm position
+        float arm_delta_l = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
+        float arm_delta_r = _motors->getMotor(MotorRole::ArmRight).position - _arms->getForwardRight();
+        float arm_avg_delta = (arm_delta_l + arm_delta_r) * 0.5f;
+        _ff_setpoint = _base_deg + _ff_gain * arm_avg_delta;
+
+        // Safety bailout
+        if (fabsf(_ff_setpoint - tilt) > BALANCE_BAILOUT_THRESHOLD_DEG) {
+            Serial.printf("[Balance] BAILOUT  tilt=%.1f ff_sp=%.1f\n", tilt, _ff_setpoint);
             disengage();
             return;
         }
 
-        // Adaptive setpoint: track cumulative error to find the true balance point.
-        // If the robot consistently sits below the setpoint, the setpoint drifts down
-        // to meet it. This separates "finding equilibrium" from "maintaining balance."
-        // Only adapt the setpoint when the robot is in a calm, steady state.
-        // Freeze during pushes, large errors, and fast motion so the
-        // setpoint doesn't chase transient disturbances.
-        float base_err = _setpoint_deg - roll_deg;
-        if (fabsf(base_err) < 12.0f && fabsf(roll_rate_dps) < 30.0f) {
-            _cumulative_error += base_err * dt;
-            if (_cumulative_error >  50.0f) _cumulative_error =  50.0f;
-            if (_cumulative_error < -50.0f) _cumulative_error = -50.0f;
+        // Gentle adaptive fine-tuning on top of feedforward
+        float ff_err = _ff_setpoint - tilt;
+        if (fabsf(ff_err) < 10.0f && fabsf(rate) < 30.0f) {
+            _cumulative_error += ff_err * dt;
+            if (_cumulative_error >  20.0f) _cumulative_error =  20.0f;
+            if (_cumulative_error < -20.0f) _cumulative_error = -20.0f;
         }
+        _adaptive_adjustment = _adapt_rate * _cumulative_error;
+        if (_adaptive_adjustment >  5.0f) _adaptive_adjustment =  5.0f;
+        if (_adaptive_adjustment < -5.0f) _adaptive_adjustment = -5.0f;
 
-        _adaptive_setpoint = _setpoint_deg - _adapt_rate * _cumulative_error;
-        if (_adaptive_setpoint > _setpoint_deg + 8.0f) _adaptive_setpoint = _setpoint_deg + 8.0f;
-        if (_adaptive_setpoint < _setpoint_deg - 8.0f) _adaptive_setpoint = _setpoint_deg - 8.0f;
-
-        // Position PID: drives the robot back toward its starting wheel position.
-        // Outputs a lean angle offset (degrees) that shifts the balance setpoint.
+        // Position return PID as velocity bias
         float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
         float wheel_drift = wheel_avg - _wheel_start_pos;
         float wheel_vel = (wheel_drift - _prev_wheel_drift) / dt;
@@ -248,52 +320,48 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_pos_integral >  _pos_integral_max) _pos_integral =  _pos_integral_max;
         if (_pos_integral < -_pos_integral_max) _pos_integral = -_pos_integral_max;
 
-        float pos_correction = _pos_kp * wheel_drift
+        // Wall escape: when drift is large but wheels barely move, the robot
+        // is stuck against an obstacle. Normal velocity bias just pushes harder
+        // into the wall. Instead, shift the setpoint to make the robot LEAN AWAY
+        // from the wall, which tips it in the escape direction.
+        bool at_wall = (fabsf(wheel_drift) > 3.0f) && (fabsf(wheel_vel) < 1.0f);
+
+        float wall_setpoint_shift = 0.0f;
+        if (at_wall) {
+            // Drift positive (drove forward, wall ahead): drop setpoint below roll → PD drives backward
+            // Drift negative (drove backward, wall behind): raise setpoint above roll → PD drives forward
+            float wall_lean = -0.5f * wheel_drift;
+            if (wall_lean >  5.0f) wall_lean =  5.0f;
+            if (wall_lean < -5.0f) wall_lean = -5.0f;
+            wall_setpoint_shift = wall_lean;
+            // Disable velocity bias at wall -- it fights the lean escape
+            _velocity_bias = 0.0f;
+        } else {
+            // Normal: velocity bias for position return
+            _velocity_bias = -(_pos_kp * wheel_drift
                              + _pos_ki * _pos_integral
-                             + _pos_kd * wheel_vel;
-
-        // Balance PD with adaptive setpoint and position correction.
-        // Positive drift (drove forward) → positive correction → lean backward → drive back.
-        float angle_err = (_adaptive_setpoint + pos_correction) - roll_deg;
-        float motor_vel = _kp * angle_err - _kd * roll_rate_dps;
-
-        // Clamp to max drive speed
-        if (motor_vel >  BALANCE_MAX_DRIVE_SPEED) motor_vel =  BALANCE_MAX_DRIVE_SPEED;
-        if (motor_vel < -BALANCE_MAX_DRIVE_SPEED) motor_vel = -BALANCE_MAX_DRIVE_SPEED;
-
-        // Accumulate position targets for back wheels
-        float pos_delta = motor_vel * dt;
-        _back_left_target  += pos_delta;
-        _back_right_target += pos_delta;
-
-        if (_motors->isDriveArmed()) {
-            _motors->sendDrivePosition(MotorRole::BackLeft,  _back_left_target,  BALANCE_MAX_DRIVE_SPEED);
-            _motors->sendDrivePosition(MotorRole::BackRight, _back_right_target, BALANCE_MAX_DRIVE_SPEED);
-
-            _motors->sendDrivePosition(MotorRole::FrontLeft,  _front_left_hold,  0.0f);
-            _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
+                             + _pos_kd * wheel_vel);
         }
 
-        // Hold arms at tip for 1 second, then return -- don't lean on them
+        // Effective setpoint = feedforward + adaptive + wall escape
+        _effective_setpoint = _ff_setpoint + _adaptive_adjustment + wall_setpoint_shift;
+
+        // Arm return (1s hold then return)
         if (!_arms_returning && (millis() - _balance_start_ms >= 1000)) {
             _arms_returning = true;
             _arm_left_goal  = _arms->getForwardLeft();
             _arm_right_goal = _arms->getForwardRight();
-            _arm_ramp_speed = BALANCE_ARM_RETURN_SPEED;
             Serial.println("[Balance] Arms beginning return to forward");
         }
 
         if (_arms_returning) {
-            _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  _arm_ramp_speed, dt);
-            _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, _arm_ramp_speed, dt);
+            _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
+            _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
-                                  _arms_returning ? _arm_ramp_speed : 0.0f);
+                                  _arms_returning ? BALANCE_ARM_RETURN_SPEED : 0.0f);
 
-        _last_angle_err = angle_err;
-        _last_motor_vel = motor_vel;
-
-        logSample(roll_deg, roll_rate_dps);
+        logSample(tilt, rate);
         break;
     }
 
@@ -316,7 +384,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 }
 
 // ---------------------------------------------------------------------------
-// Telemetry logging -- buffered in PSRAM, flushed to LittleFS on stop
+// Telemetry logging
 // ---------------------------------------------------------------------------
 
 void BalanceController::startLog() {
@@ -343,7 +411,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.state     = static_cast<uint8_t>(_state);
     s.roll      = roll_deg;
     s.roll_rate = roll_rate_dps;
-    s.setpoint  = (_state == BalanceState::Balancing) ? _adaptive_setpoint : _setpoint_deg;
+    s.setpoint  = (_state == BalanceState::Balancing) ? (float)_effective_setpoint : _ff_setpoint;
     s.angle_err = _last_angle_err;
     s.motor_vel = _last_motor_vel;
     s.integral  = _cumulative_error;
@@ -458,20 +526,21 @@ const char* BalanceController::getStateString() const {
 void BalanceController::printStatus() {
     Serial.println("=== BALANCE STATUS ===");
     Serial.printf("  State: %s\n", getStateString());
-    Serial.printf("  Setpoint: %.1f deg\n", _setpoint_deg);
-    Serial.printf("  PD: Kp=%.4f  Kd=%.4f  adapt_rate=%.3f\n", _kp, _kd, _adapt_rate);
+    Serial.printf("  Feedforward: base=%.1f  ff_gain=%.1f  ff_sp=%.1f\n", _base_deg, _ff_gain, _ff_setpoint);
+    Serial.printf("  PD: Kp=%.4f  Kd=%.4f  adapt_rate=%.3f\n", (float)_kp, (float)_kd, _adapt_rate);
+    Serial.printf("  Balance loop: %d Hz (Core 0)\n", BALANCE_LOOP_HZ);
+    Serial.printf("  Complementary filter: tilt=%.1f  gyro_rate=%.1f\n",
+                  (float)_tilt_angle, (float)_gyro_rate);
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
 
     if (_state == BalanceState::Balancing) {
         float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
         float drift = wheel_avg - _wheel_start_pos;
-        float pos_corr = _pos_kp * drift + _pos_ki * _pos_integral;
-        Serial.printf("  Adaptive setpoint: %.2f (base: %.1f, shift: %+.2f)\n",
-                      _adaptive_setpoint, _setpoint_deg, _adaptive_setpoint - _setpoint_deg);
-        Serial.printf("  Cumulative error: %.2f\n", _cumulative_error);
-        Serial.printf("  Wheel drift: %+.1f rad  pos_correction: %+.2f deg  (P=%+.2f I=%+.2f)\n",
-                      drift, pos_corr, _pos_kp * drift, _pos_ki * _pos_integral);
-        Serial.printf("  Last motor vel: %.2f rad/s\n", _last_motor_vel);
+        Serial.printf("  Effective setpoint: %.2f  (ff=%.1f + adapt=%+.2f)\n",
+                      (float)_effective_setpoint, _ff_setpoint, _adaptive_adjustment);
+        Serial.printf("  Velocity bias: %+.2f  Wheel drift: %+.1f rad\n",
+                      (float)_velocity_bias, drift);
+        Serial.printf("  Last motor vel: %.2f rad/s\n", (float)_last_motor_vel);
     }
 
     if (hasLog()) {
