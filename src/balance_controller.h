@@ -47,6 +47,9 @@ public:
     void setKp(float v) { _kp = v; }
     void setKd(float v) { _kd = v; }
     void setAdaptRate(float v) { _adapt_rate = v; }
+    void setPosKp(float v) { _pos_kp = v; }
+    void setPosKi(float v) { _pos_ki = v; }
+    void setPosKd(float v) { _pos_kd = v; }
     void setSetpoint(float v) { _setpoint_deg = v; _adaptive_setpoint = v; }
 
     float getKp() const { return _kp; }
@@ -77,12 +80,21 @@ private:
     // Adaptive setpoint: tracks the true balance point via cumulative error
     float _adaptive_setpoint = BALANCE_SETPOINT_DEG;
     float _cumulative_error  = 0.0f;
-    float _adapt_rate = 0.5f;  // deg of setpoint shift per degree*second of cumulative error
+    float _adapt_rate = 2.0f;  // deg of setpoint shift per degree*second of cumulative error
 
     // Back wheel position targets (accumulated)
     float _back_left_target  = 0.0f;
     float _back_right_target = 0.0f;
     bool  _targets_initialized = false;
+
+    // Wheel position PID -- drives robot back toward starting position
+    float _wheel_start_pos    = 0.0f;
+    float _pos_kp             = 0.3f;   // deg lean per rad of drift
+    float _pos_ki             = 0.2f;   // deg lean per rad*sec of accumulated drift
+    float _pos_kd             = 0.05f;  // deg lean per rad/s of wheel velocity
+    float _pos_integral       = 0.0f;
+    float _pos_integral_max   = 100.0f;
+    float _prev_wheel_drift   = 0.0f;
 
     // Front wheel hold positions
     float _front_left_hold  = 0.0f;

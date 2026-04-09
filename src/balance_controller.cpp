@@ -93,6 +93,10 @@ void BalanceController::enterBalancing() {
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
     _targets_initialized = true;
 
+    _wheel_start_pos = (_back_left_target + _back_right_target) * 0.5f;
+    _pos_integral = 0.0f;
+    _prev_wheel_drift = 0.0f;
+
     _front_left_hold  = _motors->getMotor(MotorRole::FrontLeft).position;
     _front_right_hold = _motors->getMotor(MotorRole::FrontRight).position;
 
@@ -100,7 +104,7 @@ void BalanceController::enterBalancing() {
     _arms_returning   = false;
     _balance_start_ms = millis();
 
-    Serial.printf("[Balance] BALANCING (PD+adapt)  setpoint=%.1f  Kp=%.3f Kd=%.4f adapt=%.2f  back_pos: L=%.2f R=%.2f\n",
+    Serial.printf("[Balance] BALANCING (PD+adapt+posPID)  sp=%.1f Kp=%.3f Kd=%.4f adapt=%.2f  wheels: L=%.2f R=%.2f\n",
                   _setpoint_deg, _kp, _kd, _adapt_rate, _back_left_target, _back_right_target);
 }
 
@@ -226,11 +230,27 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         }
 
         _adaptive_setpoint = _setpoint_deg - _adapt_rate * _cumulative_error;
-        if (_adaptive_setpoint > _setpoint_deg + 5.0f) _adaptive_setpoint = _setpoint_deg + 5.0f;
-        if (_adaptive_setpoint < _setpoint_deg - 5.0f) _adaptive_setpoint = _setpoint_deg - 5.0f;
+        if (_adaptive_setpoint > _setpoint_deg + 8.0f) _adaptive_setpoint = _setpoint_deg + 8.0f;
+        if (_adaptive_setpoint < _setpoint_deg - 8.0f) _adaptive_setpoint = _setpoint_deg - 8.0f;
 
-        // Pure PD on the adaptive setpoint
-        float angle_err = _adaptive_setpoint - roll_deg;
+        // Position PID: drives the robot back toward its starting wheel position.
+        // Outputs a lean angle offset (degrees) that shifts the balance setpoint.
+        float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
+        float wheel_drift = wheel_avg - _wheel_start_pos;
+        float wheel_vel = (wheel_drift - _prev_wheel_drift) / dt;
+        _prev_wheel_drift = wheel_drift;
+
+        _pos_integral += wheel_drift * dt;
+        if (_pos_integral >  _pos_integral_max) _pos_integral =  _pos_integral_max;
+        if (_pos_integral < -_pos_integral_max) _pos_integral = -_pos_integral_max;
+
+        float pos_correction = _pos_kp * wheel_drift
+                             + _pos_ki * _pos_integral
+                             + _pos_kd * wheel_vel;
+
+        // Balance PD with adaptive setpoint and position correction.
+        // Positive drift (drove forward) → positive correction → lean backward → drive back.
+        float angle_err = (_adaptive_setpoint + pos_correction) - roll_deg;
         float motor_vel = _kp * angle_err - _kd * roll_rate_dps;
 
         // Clamp to max drive speed
@@ -439,9 +459,14 @@ void BalanceController::printStatus() {
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
 
     if (_state == BalanceState::Balancing) {
+        float wheel_avg = (_back_left_target + _back_right_target) * 0.5f;
+        float drift = wheel_avg - _wheel_start_pos;
+        float pos_corr = _pos_kp * drift + _pos_ki * _pos_integral;
         Serial.printf("  Adaptive setpoint: %.2f (base: %.1f, shift: %+.2f)\n",
                       _adaptive_setpoint, _setpoint_deg, _adaptive_setpoint - _setpoint_deg);
         Serial.printf("  Cumulative error: %.2f\n", _cumulative_error);
+        Serial.printf("  Wheel drift: %+.1f rad  pos_correction: %+.2f deg  (P=%+.2f I=%+.2f)\n",
+                      drift, pos_corr, _pos_kp * drift, _pos_ki * _pos_integral);
         Serial.printf("  Last motor vel: %.2f rad/s\n", _last_motor_vel);
     }
 

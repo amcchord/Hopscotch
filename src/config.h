@@ -102,7 +102,7 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_SETPOINT_DEG          = 90.0f;   // target roll angle on back wheels
+static constexpr float    BALANCE_SETPOINT_DEG          = 83.0f;   // true balance point (measured from telemetry)
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 10.0f;   // engage while approaching gently
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage (wait for slow approach)
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this

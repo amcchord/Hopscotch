@@ -107,7 +107,8 @@ static void printSerialHelp() {
     Serial.println("--- Balance Mode ---");
     Serial.println("  bal status                  Print balance state, PID gains, log info");
     Serial.println("  bal setpoint <deg>          Set balance setpoint (default 90)");
-    Serial.println("  bal kp/kd/adapt <val>       Set PD gains / adaptive setpoint rate");
+    Serial.println("  bal kp/kd/adapt <val>       Set balance PD gains / adapt rate");
+    Serial.println("  bal pkp/pki/pkd <val>       Set position-return PID gains");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
     Serial.println("  help                        Show this help");
@@ -350,9 +351,24 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setAdaptRate(val);
         Serial.printf("[Balance] Adapt rate = %.4f\n", val);
 
+    } else if (strncmp(sub, "pkp ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setPosKp(val);
+        Serial.printf("[Balance] Pos Kp = %.4f\n", val);
+
+    } else if (strncmp(sub, "pki ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setPosKi(val);
+        Serial.printf("[Balance] Pos Ki = %.4f\n", val);
+
+    } else if (strncmp(sub, "pkd ", 4) == 0) {
+        float val = atof(sub + 4);
+        balanceCtrl.setPosKd(val);
+        Serial.printf("[Balance] Pos Kd = %.4f\n", val);
+
     } else {
         Serial.println("[Balance] Usage: bal status | bal setpoint <deg>");
-        Serial.println("         bal kp/kd/adapt <val>");
+        Serial.println("         bal kp/kd/adapt <val> | bal pkp/pki/pkd <val>");
         Serial.println("         bal log | bal log clear");
     }
 }
