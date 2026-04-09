@@ -346,6 +346,11 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setKd(val);
         Serial.printf("[Balance] Kd = %.4f\n", val);
 
+    } else if (strncmp(sub, "expo ", 5) == 0) {
+        float val = atof(sub + 5);
+        balanceCtrl.setExpo(val);
+        Serial.printf("[Balance] Expo = %.2f\n", val);
+
     } else if (strncmp(sub, "adapt ", 6) == 0) {
         float val = atof(sub + 6);
         balanceCtrl.setAdaptRate(val);

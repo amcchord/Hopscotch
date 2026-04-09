@@ -102,7 +102,7 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_SETPOINT_DEG          = 83.0f;   // true balance point (measured from telemetry)
+static constexpr float    BALANCE_SETPOINT_DEG          = 83.0f;   // proven balance point from telemetry
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 10.0f;   // engage while approaching gently
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage (wait for slow approach)
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -114,8 +114,8 @@ static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s -- r
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
-static constexpr float    BALANCE_KP                    = 1.0f;    // rad/s per degree of angle error (restoring force)
-static constexpr float    BALANCE_KD                    = 0.15f;   // rad/s per deg/s of roll rate (damping via heavily filtered rate)
+static constexpr float    BALANCE_KP                    = 1.0f;    // rad/s per degree of angle error
+static constexpr float    BALANCE_KD                    = 0.15f;   // rad/s per deg/s of roll rate (filtered)
 
 static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";

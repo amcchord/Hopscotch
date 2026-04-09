@@ -83,11 +83,14 @@ void BalanceController::enterTippingUp() {
     startLog();
 }
 
-void BalanceController::enterBalancing() {
+void BalanceController::enterBalancing(float current_roll) {
     _state = BalanceState::Balancing;
 
-    _adaptive_setpoint = _setpoint_deg;
-    _cumulative_error  = 0.0f;
+    // Initialize so adaptive setpoint starts at current roll (zero initial error).
+    // Formula: adaptive_sp = setpoint_deg - adapt_rate * cumulative_error
+    // So: cumulative_error = (setpoint_deg - current_roll) / adapt_rate
+    _cumulative_error = (_setpoint_deg - current_roll) / _adapt_rate;
+    _adaptive_setpoint = current_roll;
 
     _back_left_target  = _motors->getMotor(MotorRole::BackLeft).position;
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
@@ -202,7 +205,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (arms_done &&
             tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
             fabsf(roll_rate_dps) < BALANCE_ENGAGE_RATE_MAX_DPS) {
-            enterBalancing();
+            enterBalancing(roll_deg);
         }
 
         logSample(roll_deg, roll_rate_dps);
@@ -220,10 +223,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Adaptive setpoint: track cumulative error to find the true balance point.
         // If the robot consistently sits below the setpoint, the setpoint drifts down
         // to meet it. This separates "finding equilibrium" from "maintaining balance."
-        // Only adapt the setpoint when roll is reasonably close to balance.
-        // If the robot is far off (>15 deg), don't let the setpoint chase the fall.
+        // Only adapt the setpoint when the robot is in a calm, steady state.
+        // Freeze during pushes, large errors, and fast motion so the
+        // setpoint doesn't chase transient disturbances.
         float base_err = _setpoint_deg - roll_deg;
-        if (fabsf(base_err) < 15.0f) {
+        if (fabsf(base_err) < 12.0f && fabsf(roll_rate_dps) < 30.0f) {
             _cumulative_error += base_err * dt;
             if (_cumulative_error >  50.0f) _cumulative_error =  50.0f;
             if (_cumulative_error < -50.0f) _cumulative_error = -50.0f;

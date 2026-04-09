@@ -46,6 +46,7 @@ public:
     // PD gain setters for serial tuning
     void setKp(float v) { _kp = v; }
     void setKd(float v) { _kd = v; }
+    void setExpo(float v) { _expo = v; }
     void setAdaptRate(float v) { _adapt_rate = v; }
     void setPosKp(float v) { _pos_kp = v; }
     void setPosKi(float v) { _pos_ki = v; }
@@ -76,11 +77,12 @@ private:
     // PD gains (tunable at runtime via serial)
     float _kp = BALANCE_KP;
     float _kd = BALANCE_KD;
+    float _expo = 1.5f;  // error exponent: 1.0=linear, 1.5=aggressive for large errors
 
     // Adaptive setpoint: tracks the true balance point via cumulative error
     float _adaptive_setpoint = BALANCE_SETPOINT_DEG;
     float _cumulative_error  = 0.0f;
-    float _adapt_rate = 2.0f;  // deg of setpoint shift per degree*second of cumulative error
+    float _adapt_rate = 0.5f;  // deg of setpoint shift per degree*second of cumulative error
 
     // Back wheel position targets (accumulated)
     float _back_left_target  = 0.0f;
@@ -125,7 +127,7 @@ private:
 
     static float moveToward(float current, float target, float rate, float dt);
     void enterTippingUp();
-    void enterBalancing();
+    void enterBalancing(float current_roll);
     void enterReturningArms();
     void disengage();
     void startLog();
