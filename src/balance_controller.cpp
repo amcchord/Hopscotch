@@ -130,7 +130,7 @@ void BalanceController::enterTippingUp() {
 void BalanceController::enterBalancing(float current_roll) {
     _state = BalanceState::Balancing;
 
-    _setpoint = current_roll;
+    _setpoint = 0.0f;
     _filtered_vel = 0.0f;
     _effective_setpoint = current_roll;
 
@@ -156,6 +156,7 @@ void BalanceController::enterBalancing(float current_roll) {
 
     _arms_reached_tip = true;
     _arms_returning   = false;
+    _arms_settled     = false;
     _balance_start_ms = millis();
 
     Serial.printf("[Balance] BALANCING @200Hz  vel_gain=%.3f  Kp=%.3f Kd=%.4f  tilt=%.1f  setpoint=%.1f\n",
@@ -292,7 +293,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
         bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
 
-        float tip_expected = BALANCE_SETPOINT_CENTER;
+        float tip_expected = BALANCE_SETPOINT_ARMS_TIP;
         float tip_error = fabsf(tip_expected - tilt);
         if (arms_done &&
             tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
@@ -372,24 +373,41 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             _safe_sat_timing = false;
         }
 
-        if (fabsf(_setpoint - tilt) > BALANCE_BAILOUT_THRESHOLD_DEG) {
-            Serial.printf("[Balance] BAILOUT  tilt=%.1f sp=%.1f\n", tilt, _setpoint);
+        if (fabsf(_effective_setpoint - tilt) > BALANCE_BAILOUT_THRESHOLD_DEG) {
+            Serial.printf("[Balance] BAILOUT  tilt=%.1f sp=%.1f\n", tilt, (float)_effective_setpoint);
             disengage();
             return;
         }
 
         // ---------------------------------------------------------------
-        // Command-integrating setpoint tracker
+        // Arm-scheduled setpoint base
         //
-        // Integrate the PD motor command to find the balance point.
-        // If PD consistently commands forward, the setpoint is too low
-        // (robot leaning forward) -- raise it. Works whether wheels
-        // are free or blocked against a wall, because the signal comes
-        // from the controller output, not wheel feedback.
+        // Linearly interpolate between ARMS_TIP and ARMS_FWD balance
+        // points based on how far the arms have returned. This gives
+        // the PD the correct target at every arm position.
+        // ---------------------------------------------------------------
+        float arm_delta_l = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
+        float arm_delta_r = _motors->getMotor(MotorRole::ArmRight).position - _arms->getForwardRight();
+        float arm_avg_delta = (arm_delta_l + arm_delta_r) * 0.5f;
+        float tip_avg_delta = (BALANCE_ARM_TIP_LEFT + BALANCE_ARM_TIP_RIGHT) * 0.5f;
+
+        float arm_frac = 0.0f;
+        if (tip_avg_delta > 0.01f) {
+            arm_frac = arm_avg_delta / tip_avg_delta;
+        }
+        if (arm_frac < 0.0f) arm_frac = 0.0f;
+        if (arm_frac > 1.0f) arm_frac = 1.0f;
+
+        float scheduled_sp = BALANCE_SETPOINT_ARMS_FWD
+                           + arm_frac * (BALANCE_SETPOINT_ARMS_TIP - BALANCE_SETPOINT_ARMS_FWD);
+
+        // ---------------------------------------------------------------
+        // Command-integrating fine adjustment
         //
-        // Nonlinear filter: large commands get through quickly (to
-        // respond to arm snap-back and disturbances), small commands
-        // are heavily filtered (to prevent oscillation at balance).
+        // On top of the scheduled base, integrate the PD motor command
+        // to handle surface tilt, battery offset, and wall escape.
+        // Nonlinear filter: large commands respond quickly, small
+        // commands are heavily filtered to prevent oscillation.
         // ---------------------------------------------------------------
         float cmd = (float)_last_motor_vel;
         float abs_cmd_local = fabsf(cmd);
@@ -397,24 +415,24 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (alpha > 0.10f) alpha = 0.10f;
         _filtered_vel = alpha * cmd + (1.0f - alpha) * _filtered_vel;
 
-        float sp_delta = _vel_gain * _filtered_vel * dt;
+        float sp_delta = -_vel_gain * _filtered_vel * dt;
 
         if (sp_delta >  BALANCE_SETPOINT_RATE_MAX * dt) sp_delta =  BALANCE_SETPOINT_RATE_MAX * dt;
         if (sp_delta < -BALANCE_SETPOINT_RATE_MAX * dt) sp_delta = -BALANCE_SETPOINT_RATE_MAX * dt;
 
         _setpoint += sp_delta;
 
-        if (_setpoint < BALANCE_SETPOINT_MIN) _setpoint = BALANCE_SETPOINT_MIN;
-        if (_setpoint > BALANCE_SETPOINT_MAX) _setpoint = BALANCE_SETPOINT_MAX;
+        if (_setpoint < -5.0f) _setpoint = -5.0f;
+        if (_setpoint >  5.0f) _setpoint =  5.0f;
 
         // ---------------------------------------------------------------
-        // Effective setpoint = command-tracked setpoint only.
-        // The command integrator handles balance, position return, AND
-        // wall escape through a single mechanism: integrate what the
-        // PD is asking for, and shift setpoint accordingly.
+        // Effective setpoint = arm-scheduled base + integrator trim
         // ---------------------------------------------------------------
         _pos_setpoint_shift = 0.0f;
-        _effective_setpoint = _setpoint;
+        _effective_setpoint = scheduled_sp + _setpoint;
+
+        if (_effective_setpoint < BALANCE_SETPOINT_MIN) _effective_setpoint = BALANCE_SETPOINT_MIN;
+        if (_effective_setpoint > BALANCE_SETPOINT_MAX) _effective_setpoint = BALANCE_SETPOINT_MAX;
 
         _last_flags = (_stuck ? 0x01 : 0)
                     | (_safe_err_timing ? 0x02 : 0)
@@ -625,8 +643,8 @@ void BalanceController::printStatus() {
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
 
     if (_state == BalanceState::Balancing) {
-        Serial.printf("  Setpoint: %.2f  (vel_integ=%.2f + pos=%+.2f)\n",
-                      (float)_effective_setpoint, _setpoint, _pos_setpoint_shift);
+        Serial.printf("  Setpoint: %.2f  (scheduled + trim=%+.2f)\n",
+                      (float)_effective_setpoint, _setpoint);
         Serial.printf("  Measured drift: %+.1f rad  Measured vel: %+.1f rad/s\n",
                       _last_meas_drift, _last_meas_vel);
         Serial.printf("  Stuck: %s  Flags: 0x%02X\n", _stuck ? "YES" : "no", _last_flags);

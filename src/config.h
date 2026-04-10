@@ -104,11 +104,12 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_SETPOINT_CENTER       = 88.5f;   // soft center for safety clamp reference
+static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 92.0f;   // balance point with arms at forward ref
+static constexpr float    BALANCE_SETPOINT_ARMS_TIP     = 86.5f;   // balance point with arms at tip position
 static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safety clamp (fallen forward)
 static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
-static constexpr float    BALANCE_VEL_GAIN              = 1.0f;    // deg per (rad/s) per second of command integration
-static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 5.0f;    // max deg/s setpoint can change
+static constexpr float    BALANCE_VEL_GAIN              = 0.5f;    // deg per (rad/s) per second of command integration (trim only)
+static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 2.0f;    // max deg/s trim can change
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -120,7 +121,7 @@ static constexpr float    BALANCE_ARM_RETURN_SPEED      = 10.0f;   // rad/s -- s
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
-static constexpr float    BALANCE_KP                    = 1.5f;    // rad/s per degree of angle error
+static constexpr float    BALANCE_KP                    = 2.0f;    // rad/s per degree of angle error
 static constexpr float    BALANCE_KD                    = 0.08f;   // rad/s per deg/s of roll rate
 
 static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weight in complementary filter

@@ -106,7 +106,7 @@ private:
     float _filtered_vel = 0.0f;
 
     // --- Effective setpoint (written by Core 1, read by Core 0) ---
-    volatile float _effective_setpoint = BALANCE_SETPOINT_CENTER;
+    volatile float _effective_setpoint = BALANCE_SETPOINT_ARMS_TIP;
 
     // --- Back wheel targets (written by Core 0 for position commands) ---
     volatile float _back_left_target  = 0.0f;
@@ -154,6 +154,7 @@ private:
     float _arm_tip_right_goal = 0.0f;
     bool  _arms_reached_tip   = false;
     bool  _arms_returning     = false;
+    bool  _arms_settled       = false;
     uint32_t _balance_start_ms = 0;
 
     // Telemetry logging
