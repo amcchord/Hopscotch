@@ -117,8 +117,8 @@ static void printSerialHelp() {
     Serial.println("  test <id>                   Run automated motor test");
     Serial.println("--- Balance Mode ---");
     Serial.println("  bal status                  Print balance state and gains");
-    Serial.println("  bal ffgain/base <val>       Set feedforward gain / base angle");
-    Serial.println("  bal kp/kd/adapt <val>       Set PD gains / adapt rate");
+    Serial.println("  bal kp/kd <val>             Set PD gains");
+    Serial.println("  bal vgain <val>             Set velocity integrator gain");
     Serial.println("  bal pkp/pki/pkd <val>       Set position-return PID gains");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
@@ -345,16 +345,6 @@ static void processBalCommand(const char* sub) {
     } else if (strcmp(sub, "log clear") == 0) {
         balanceCtrl.clearLog();
 
-    } else if (strncmp(sub, "ffgain ", 7) == 0) {
-        float val = atof(sub + 7);
-        balanceCtrl.setFfGain(val);
-        Serial.printf("[Balance] FF gain = %.2f\n", val);
-
-    } else if (strncmp(sub, "base ", 5) == 0) {
-        float val = atof(sub + 5);
-        balanceCtrl.setBaseDeg(val);
-        Serial.printf("[Balance] Base deg = %.1f\n", val);
-
     } else if (strncmp(sub, "kp ", 3) == 0) {
         float val = atof(sub + 3);
         balanceCtrl.setKp(val);
@@ -365,10 +355,10 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setKd(val);
         Serial.printf("[Balance] Kd = %.4f\n", val);
 
-    } else if (strncmp(sub, "adapt ", 6) == 0) {
+    } else if (strncmp(sub, "vgain ", 6) == 0) {
         float val = atof(sub + 6);
-        balanceCtrl.setAdaptRate(val);
-        Serial.printf("[Balance] Adapt rate = %.4f\n", val);
+        balanceCtrl.setVelGain(val);
+        Serial.printf("[Balance] Vel gain = %.4f\n", val);
 
     } else if (strncmp(sub, "pkp ", 4) == 0) {
         float val = atof(sub + 4);
@@ -386,8 +376,8 @@ static void processBalCommand(const char* sub) {
         Serial.printf("[Balance] Pos Kd = %.4f\n", val);
 
     } else {
-        Serial.println("[Balance] Usage: bal status | bal ffgain/base <val>");
-        Serial.println("         bal kp/kd/adapt <val> | bal pkp/pki/pkd <val>");
+        Serial.println("[Balance] Usage: bal status | bal engage");
+        Serial.println("         bal kp/kd/vgain <val> | bal pkp/pki/pkd <val>");
         Serial.println("         bal log | bal log clear");
     }
 }

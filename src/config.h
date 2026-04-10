@@ -104,25 +104,28 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 // ---------------------------------------------------------------------------
 // Self-balance mode
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_BASE_DEG              = 88.5f;   // balance point with arms at forward ref
-static constexpr float    BALANCE_FF_GAIN               = 0.0f;    // arms barely affect balance point
-static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for feedforward at tip position
+static constexpr float    BALANCE_SETPOINT_CENTER       = 88.5f;   // soft center for safety clamp reference
+static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safety clamp (fallen forward)
+static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
+static constexpr float    BALANCE_VEL_GAIN              = 1.0f;    // deg per (rad/s) per second of command integration
+static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 5.0f;    // max deg/s setpoint can change
+static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
 
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 0.5f;    // rad/s
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 10.0f;   // rad/s -- snap back fast, less prolonged disturbance
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
-static constexpr float    BALANCE_KP                    = 1.0f;    // rad/s per degree of angle error
-static constexpr float    BALANCE_KD                    = 0.12f;   // rad/s per deg/s of roll rate (proven at 20s run)
+static constexpr float    BALANCE_KP                    = 1.5f;    // rad/s per degree of angle error
+static constexpr float    BALANCE_KD                    = 0.08f;   // rad/s per deg/s of roll rate
 
 static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weight in complementary filter
 
-static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 30000;   // telemetry recording window
+static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 60000;   // telemetry recording window
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
 
 // Safety abort thresholds
@@ -135,18 +138,19 @@ static constexpr uint32_t BALANCE_SAFE_RATE_DURATION_MS = 500;      // must pers
 static constexpr uint32_t BALANCE_SAFE_SAT_DURATION_MS  = 3000;     // motor saturated this long -> disengage
 
 // Position return via bounded setpoint shift (uses measured odometry)
-static constexpr float    BALANCE_POS_KP                = 0.15f;    // deg shift per rad of measured drift
-static constexpr float    BALANCE_POS_KI                = 0.02f;    // deg shift per integral unit
-static constexpr float    BALANCE_POS_KD                = 0.05f;    // deg shift per rad/s of measured velocity
-static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 3.0f;     // max setpoint shift magnitude
+static constexpr float    BALANCE_POS_KP                = 0.4f;     // deg shift per rad of measured drift
+static constexpr float    BALANCE_POS_KI                = 0.05f;    // deg shift per integral unit
+static constexpr float    BALANCE_POS_KD                = 0.15f;    // deg shift per rad/s of measured velocity
+static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 5.0f;     // max setpoint shift magnitude
 static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 50.0f;    // integral clamp
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
 
 // Stuck / wall detection (uses measured odometry)
-static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 5.0f;     // |motor_vel| must exceed this
+static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this
 static constexpr float    BALANCE_STUCK_VEL_THRESHOLD   = 0.5f;     // |measured_vel| must be below this
-static constexpr uint32_t BALANCE_STUCK_DURATION_MS     = 500;      // condition must persist
+static constexpr uint32_t BALANCE_STUCK_DURATION_MS     = 300;      // condition must persist
 static constexpr float    BALANCE_STUCK_INTEGRAL_DECAY  = 0.95f;    // per-tick integral decay when stuck
+static constexpr float    BALANCE_STUCK_ESCAPE_RATE     = 3.0f;     // deg/s to shift setpoint away when stuck
 
 // ---------------------------------------------------------------------------
 // CRSF telemetry

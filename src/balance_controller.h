@@ -27,7 +27,7 @@ struct BalanceSample {
     float    setpoint;
     float    angle_err;
     float    motor_vel;
-    float    integral;
+    float    vel_integrator;
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
     float    arm_l, arm_r;
@@ -37,7 +37,7 @@ struct BalanceSample {
     uint8_t  flags;
 };
 
-static constexpr int BALANCE_LOG_MAX_SAMPLES = 1500;
+static constexpr int BALANCE_LOG_MAX_SAMPLES = 3000;
 
 class BalanceController {
 public:
@@ -46,7 +46,7 @@ public:
     // Called from Core 0 at 200Hz -- fast PD balance loop
     void balanceTick(const RawImuData& imu, float dt);
 
-    // Called from Core 1 at 50Hz -- state machine, arms, adaptive setpoint, position shift
+    // Called from Core 1 at 50Hz -- state machine, arms, velocity-integrating setpoint
     void update(float roll_deg, float roll_rate_dps,
                 bool ch7_active, bool ch11_edge, float dt);
 
@@ -58,31 +58,23 @@ public:
 
     const char* getStateString() const;
 
-    // Force-engage balance from current position (skips tip-up)
     void forceEngage();
-
-    // Immediate hard stop -- call on link-loss, disarm, or fatal safety condition
     void hardAbort(const char* reason);
 
-    // Complementary filter outputs (written by Core 0, read by Core 1)
     float getTiltAngle() const { return _tilt_angle; }
     float getGyroRate() const { return _gyro_rate; }
 
     // Gain setters for serial tuning
     void setKp(float v) { _kp = v; }
     void setKd(float v) { _kd = v; }
-    void setFfGain(float v) { _ff_gain = v; }
-    void setBaseDeg(float v) { _base_deg = v; }
-    void setAdaptRate(float v) { _adapt_rate = v; }
+    void setVelGain(float v) { _vel_gain = v; }
     void setPosKp(float v) { _pos_kp = v; }
     void setPosKi(float v) { _pos_ki = v; }
     void setPosKd(float v) { _pos_kd = v; }
 
     float getKp() const { return _kp; }
     float getKd() const { return _kd; }
-    float getFfGain() const { return _ff_gain; }
-    float getBaseDeg() const { return _base_deg; }
-    float getAdaptRate() const { return _adapt_rate; }
+    float getVelGain() const { return _vel_gain; }
     float getEffectiveSetpoint() const { return _effective_setpoint; }
 
     // Telemetry log
@@ -99,11 +91,6 @@ private:
 
     volatile BalanceState _state = BalanceState::Idle;
 
-    // --- Feedforward from arm position ---
-    float _base_deg = BALANCE_BASE_DEG;
-    float _ff_gain  = BALANCE_FF_GAIN;
-    float _ff_setpoint = BALANCE_BASE_DEG;
-
     // --- Complementary filter (Core 0) ---
     volatile float _tilt_angle = 0.0f;
     volatile float _gyro_rate  = 0.0f;
@@ -113,8 +100,13 @@ private:
     volatile float _kp = BALANCE_KP;
     volatile float _kd = BALANCE_KD;
 
+    // --- Velocity-integrating setpoint (Core 1 writes, Core 0 reads) ---
+    float _setpoint = 0.0f;
+    float _vel_gain = BALANCE_VEL_GAIN;
+    float _filtered_vel = 0.0f;
+
     // --- Effective setpoint (written by Core 1, read by Core 0) ---
-    volatile float _effective_setpoint = BALANCE_BASE_DEG;
+    volatile float _effective_setpoint = BALANCE_SETPOINT_CENTER;
 
     // --- Back wheel targets (written by Core 0 for position commands) ---
     volatile float _back_left_target  = 0.0f;
@@ -124,11 +116,6 @@ private:
     // Front wheel hold positions
     float _front_left_hold  = 0.0f;
     float _front_right_hold = 0.0f;
-
-    // --- Adaptive fine-tuning (Core 1 only, on top of feedforward) ---
-    float _adaptive_adjustment = 0.0f;
-    float _cumulative_error    = 0.0f;
-    float _adapt_rate = 0.10f;
 
     // --- Position return as bounded setpoint shift (Core 1, measured odometry) ---
     float _wheel_start_pos    = 0.0f;
@@ -167,7 +154,6 @@ private:
     float _arm_tip_right_goal = 0.0f;
     bool  _arms_reached_tip   = false;
     bool  _arms_returning     = false;
-    bool  _arms_settled       = false;
     uint32_t _balance_start_ms = 0;
 
     // Telemetry logging
