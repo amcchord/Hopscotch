@@ -1,6 +1,6 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v3: Arm-Scheduled Setpoint + Command Integrator)
+## Current Architecture (v8: Arm-Scheduled Setpoint + Wide Capture Shift + Position PI Only)
 
 ### Core 0 (200Hz) - Balance PD
 - Complementary filter: alpha=0.996 (angle), gyro filter alpha=0.08 (~60ms time constant)
@@ -12,11 +12,15 @@
 
 ### Core 1 (50Hz) - State Machine + Setpoint Management
 - **Arm-scheduled base setpoint**: linearly interpolates between ARMS_TIP (86.5) and ARMS_FWD (92.0) based on current arm position
-- **Command integrator trim**: integrates filtered PD motor command to handle surface/battery/wall offsets
-  - Nonlinear filter: alpha 0.01 (small cmds) to 0.10 (large cmds)
-  - Gain: 0.5 deg/(rad/s)/s, rate max: 2.0 deg/s, trim clamp: +/-5 deg
-  - Sign: `trim -= vel_gain * filtered_cmd * dt` (positive cmd = sp too high = lower trim)
-- **Effective setpoint = scheduled_base + trim**
+- **Temporary capture shift**: at engage, starts from the measured roll so the handoff is smooth, then fades that offset out as the arms return
+  - Capture shift clamped to +/-15 deg (covers all practical engage angles)
+- **No command integrator trim** -- any form of trim creates positive feedback with position PI (v5/v6/v7 all proved this)
+- **Always-active outer position PI**: uses wheel odometry from engage origin
+  - Mostly PI: Kp=0.30, Ki=0.15, Kd=0.03
+  - Shift clamp +/-5 deg, rate limit 3 deg/s, deadband 0.2 rad, integral max 200
+  - Angle-error gate: `pos_gate = 1 - |angle_err| / 8 deg` suppresses correction during catch transient
+  - Position integral handles both drift correction AND balance-point offsets
+- **Effective setpoint = scheduled_base + capture_shift + position_shift**
 - Safety: tilt range [30,150], sustained error >35 for 2s, rate >200 dps for 500ms, saturation >3s
 
 ### Arm Tip-Up
@@ -24,7 +28,9 @@
 - Tip offsets: left=2.61, right=1.89 rad from forward ref
 - Engage after: arms done AND |tip_expected - roll| < 15 AND |rate| < 50
 - **Arm return: 10 rad/s** (fast snap-back, ~0.25s)
-- Arms begin returning 1s after balance engage
+- Arms begin returning after balance has actually been captured:
+  - |effective_sp - roll| <= 1 deg, |roll_rate| <= 4 dps, |motor_cmd| <= 1 rad/s for 400 ms
+  - Failsafe return after 2.5s so the robot cannot stay stuck in the tip pose forever
 
 ### Controls
 - Ch7 high + single Ch11: Normal tip-up sequence
@@ -32,7 +38,7 @@
 - `bal engage`: Force-engage via serial
 - `bal kp/kd <val>`: Tune PD gains
 - `bal vgain <val>`: Tune command integrator gain
-- `bal pkp/pki/pkd <val>`: Tune position return (currently disabled)
+- `bal pkp/pki/pkd <val>`: Tune delayed position-hold gains
 - `d`: Toggle periodic debug output
 
 ---
@@ -73,13 +79,13 @@
 - Position shift PID removed entirely -- velocity integrator handles position return
 - **Problem**: velocity integrator has no signal when stuck at wall (vel=0)
 
-### Phase 7: Command Integrator (current approach)
+### Phase 7: Command Integrator
 - Changed from integrating wheel velocity to integrating **PD motor command**
 - Motor command has signal even when wheels are blocked (wall escape for free)
 - Removed all stuck/wall detection -- command integrator handles it naturally
 - **Problem**: integrator gain tuning -- too high causes positive feedback runaway, too low fails to track arm return
 
-### Phase 8: Arm-Scheduled Setpoint + Command Integrator Trim (current)
+### Phase 8: Arm-Scheduled Setpoint + Command Integrator Trim
 - **Breakthrough**: separate the known arm-position-to-balance-point mapping from the unknown trim
 - Scheduled base: linear interpolation from 86.5 (arms at tip) to 92.0 (arms at forward ref)
 - Command integrator is now just a trim (+/-5 deg) on top of the scheduled base
@@ -90,7 +96,68 @@
 - Kp increased to 2.0 for more aggressive correction
 - Scheduled base refined to 92.0 based on telemetry (avg roll during stable = 91.99)
 
-**Latest issue (current)**: integrator trim sign was wrong -- positive motor cmd was raising trim instead of lowering it, causing slow runaway. Fixed by flipping sign to `trim -= gain * cmd * dt`.
+### Phase 9: April 10 Handoff + Roll-Away Debugging
+- **Fixed premature arm return**: older code returned arms after a fixed 1s even if the robot was still catching itself.
+  - New gate waits for actual capture before arm return.
+  - `bal_20260410_200016.csv`: arm return waited 2.56s, balance duration 15.5s, confirmed stand-up reliability improved.
+- **Roll-away remained**: with good capture, the robot still translated across the test bench.
+  - `bal_20260410_200016.csv`: drift swung from -5.22 rad to +12.27 rad with motor commands saturating during wall impacts.
+- **Attempted delayed position hold**: added measured-odometry position shift only after arms-forward/calm state, with a fresh wheel origin.
+  - `bal_20260410_200622.csv`: balance capture was clean, but position correction was still too early/strong in the transient and the run lasted 9.4s.
+  - `bal_20260410_201026.csv`: much better balance duration (22.9s) and position hold eventually locked, but the bot had already rolled away before the hold could help; drift reached about -15 rad.
+- **Bad experiment: immediate wheel-velocity damping**: added a temporary setpoint shift proportional to wheel velocity.
+  - `bal_20260410_201448.csv`: clearly worse. It destabilized the catch phase with |cmd| averaging 16-22 rad/s and roll swinging 43-114 deg.
+  - Reverted. Do not reintroduce raw wheel-velocity damping without a much more careful design.
+- **Current uploaded fix**: keep the low engage angle only as a temporary capture shift that fades out as the arms return.
+  - Previous code incorrectly let the low tip-up capture offset behave like permanent trim; that caused the robot to chase a too-low setpoint and roll away.
+  - Current code starts trim at 0, fades capture shift by arm fraction, then lets the command integrator learn only true load/terrain trim.
+  - Delayed, gentle position hold remains as a secondary correction after the robot is calm.
+  - Status: uploaded after `bal_20260410_201448.csv`; needs the next telemetry run for validation.
+
+### Phase 10: Always-Active Outer Position PI Loop
+- **Problem**: delayed position hold activated too late. `bal_20260410_201026.csv` showed clean balance (22.9s, 0.11 deg pre-return error) but -11.2 rad drift because position correction waited for arms-forward + calm + 500ms settle.
+- **Solution**: replaced delayed position hold with an always-active outer PI loop that adjusts balance setpoint toward odometer zero from the moment balance engages.
+  - Angle-error gate (`pos_gate = 1 - |angle_err| / 8 deg`) naturally suppresses position correction during the catch phase when angle error is large.
+  - Engage position used as wheel origin immediately; no delayed origin lock.
+  - Mostly PI design: Kp=0.40, Ki=0.03, Kd=0.02 (minimal D, just enough to damp overshoot).
+  - More authority: max shift 4 deg (was 2), rate limit 2 deg/s (was 1), deadband 0.3 rad (was 1.0).
+  - Integral max raised to 100 (was 50).
+- **Removed**: `BALANCE_POS_HOLD_*` delayed-activation constants, `_position_hold_enabled`/`_position_hold_stable` members, settle timer logic.
+- **Kept unchanged**: command integrator trim (still reduced to 20% when position correction active), arm-scheduled setpoint, capture shift, 200Hz inner PD, safety systems.
+- **First run result** (`bal_20260410_204824.csv`, 23.7s): persistent ~2Hz oscillation, robot always rolling forward into hands.
+  - Engage at 80.33, arms returned at 2.56s. Capture was ok but not clean (pre-return |rate|=16.5 dps, |cmd|=3.83).
+  - Mid-run: roll oscillating 85-97 deg at 40-55 dps, drift swinging wildly.
+  - Final window: settled into persistent oscillation around 91.5-95.6 deg at 20-30 dps. trim=+1.16, drift=-1.68 rad, pos_shift=+0.3.
+  - **Root cause**: Kp=0.40 is too aggressive for the inner loop bandwidth. Each degree of position-driven setpoint shift causes 2 rad/s motor command (inner Kp=2.0), which accelerates the robot. The position PI overshoots, reverses, and creates a sustained pendulum-on-wheels oscillation. The command integrator trim climbed positive trying to fight the oscillation instead of finding true balance.
+  - **Fix**: drastically reduce Kp to 0.10 (4x slower), raise Ki to 0.04 (let integral do the steady-state work), drop Kd to 0.01, widen deadband to 0.5 rad. The outer loop must be much slower than the inner balance loop to avoid exciting oscillation.
+- **Second run result** (`bal_20260410_205347.csv`, 23.7s): clean capture (0.12 deg err, 1.01 dps rate), balanced briefly at 92.3 deg with drift only -1.85 rad. Then disturbance tipped robot backward, causing runaway.
+  - **Root cause identified: positive feedback between command integrator trim and position PI.**
+  - When robot drifts forward, position PI raises setpoint (correct). Higher setpoint creates sustained positive motor command. Command integrator sees sustained cmd and also raises trim. Both push setpoint higher together. Trim reached +3.7, pos_shift maxed at +4.0, setpoint at 99 deg (7 deg above true balance ~92). Motor stuck at +10 rad/s constantly.
+  - Final state: robot at 93.9 deg with setpoint at 99, 5 deg gap maintained by constant +10 rad/s forward wheel drive balanced against gravity.
+  - **This is the classic dual-integrator positive feedback problem.**
+- **Fix: remove command integrator trim entirely.** This is how real inverted pendulums (Segway, nBot, etc.) work: inner PD on angle, outer PI on position, nothing else. The position PI's integral naturally handles balance-point offsets: if the scheduled setpoint is slightly wrong, the robot drifts, the integral accumulates, and the setpoint corrects. One integrator, no positive feedback.
+  - Position PI gains: Kp=0.15, Ki=0.08, Kd=0.02, max shift 5 deg, integral max 200.
+  - Effective setpoint = scheduled_base + capture_shift + pos_shift (no more trim term).
+- **Third run result** (`bal_20260410_210127.csv`, 7.4s): violent oscillation from first tick, never achieved balance.
+  - Engaged at 76.29 deg -- very low. Needed 10.2 deg capture shift but clamp was 8 deg, so setpoint was 2.3 deg above actual roll.
+  - Without command integrator, nothing adapted the setpoint. PD oscillations grew from 15 dps to 220 dps. Robot fell backward to 103 deg.
+  - **Root cause**: capture shift clamp too tight (8 deg) AND no fast setpoint adaptation during catch phase.
+- **Fix: restore command integrator WITH trim decay to prevent positive feedback.**
+  - Trim decay: when position PI shift > 0.3 deg, trim decays toward 0 at 0.99/tick (~1.5s half-life). Trim adapts freely during catch (pos_shift near 0), then fades out once position PI takes over.
+  - Capture shift clamp raised to 15 deg (covers all practical engage angles).
+  - Trim clamp reduced to 3 deg (was 5).
+  - Position PI unchanged (Kp=0.15, Ki=0.08, Kd=0.02).
+- **Fourth run result** (`bal_20260410_210747.csv`, 20s): clean capture (0.21 deg err), started stable, then same drift/oscillation pattern.
+  - Trim decay of 0.99/tick too weak -- trim growth rate (driven by sustained motor commands from the feedback loop) exceeds decay rate. Trim still climbed to +2.03, pos_shift maxed at +4.12, setpoint=97.9 vs true balance ~92.
+  - **Conclusion: any command integrator, even with decay, creates positive feedback with the position PI.** The trim adds to the setpoint, the PD reacts, the position PI also reacts, both corrections compound.
+- **Fix: remove command integrator for real this time.** The v6 failure (bal_20260410_210127.csv) was caused by the tight capture shift clamp (8 deg), not by the absence of trim. With the 15 deg clamp now in place, the initial setpoint matches the roll perfectly and no fast adaptation is needed. The position PI alone handles the steady-state balance offset through its integral term.
+- **Fifth run result** (`bal_20260410_211316.csv`, 33.2s): **best architecture yet.** No trim runaway. Clean capture, beautiful balance (0.1 deg error at t=30s). But position PI too sluggish -- robot drifted 2+ rad before correction built up, hit bench edge at t=41s.
+  - The architecture is correct (no positive feedback). The gains are just too conservative.
+  - Without the trim amplifying things, we can safely increase position PI gains.
+  - **Fix**: Kp 0.15->0.30, Ki 0.08->0.15, Kd 0.02->0.03, deadband 0.5->0.2 rad, rate limit 2->3 deg/s.
+- **Sixth run result** (`bal_20260410_222145.csv`, 38.9s): clean capture, excellent balance. But robot drifted to wall and STAYED there. pos_shift climbed to 4.7 (near max 5) but wheels stopped and drift froze at -4.1 rad.
+  - **Root cause: position-controlled motors break tilt-to-translation coupling.** The position PI shifts the setpoint (robot leans), but the Robstride motors in position mode hold the lean angle with internal torque at a FIXED wheel position. The wheels don't actually move. In a torque/velocity-controlled Segway, holding a lean requires sustained wheel acceleration -> translation. In position mode, the motor just applies holding torque -> no translation.
+  - **Fix: add direct wheel velocity offset** driven by drift error. The position PI manages tilt (for disturbance rejection), but a new velocity term (`_wheel_vel_offset = -0.3 * drift_err * pos_gate`) directly pushes the wheels toward origin in the 200Hz loop. This provides the missing translational coupling.
 
 ---
 
@@ -116,6 +183,16 @@
 | `bal_20260409_232108.csv` | ~3s | Setpoint seed to 92.5 while arms still at tip -- immediate runaway |
 | `bal_20260409_232735.csv` | 21.1s | Arm-scheduled setpoint, trim drifting wrong direction |
 | `bal_20260409_233040.csv` | 12.0s | Kp=2.0, 4s perfect balance, then trim sign bug caused runaway |
+| `bal_20260410_200016.csv` | 15.5s | Capture-gated arm return worked (2.56s delay), but wall bouncing/drift remained |
+| `bal_20260410_200622.csv` | 9.4s | Early delayed-position-hold test; capture clean, but roll-away still present |
+| `bal_20260410_201026.csv` | 22.9s | Best April 10 post-capture run; balanced well, but drift reached ~-15 rad before hold stabilized |
+| `bal_20260410_201448.csv` | 5.7s | **Bad velocity-damping experiment**: severe oscillation/saturation, reverted |
+| `bal_20260410_204824.csv` | 23.7s | Always-active pos PI (Kp=0.40): persistent ~2Hz oscillation, Kp too aggressive for inner loop |
+| `bal_20260410_205347.csv` | 23.7s | Pos PI (Kp=0.10): clean initial balance, then trim+PI positive feedback runaway to sp=99 |
+| `bal_20260410_210127.csv` | 7.4s | No trim: engaged at 76 deg, capture clamp too tight, no adaptation, violent oscillation |
+| `bal_20260410_210747.csv` | 20.0s | Trim+decay: clean start, but 0.99 decay too weak, trim+PI still compounded to sp=97.9 |
+| `bal_20260410_211316.csv` | 33.2s | **No trim + wide capture**: correct architecture, 0.1 deg balance, but PI too slow; drifted to bench edge |
+| `bal_20260410_222145.csv` | 38.9s | Stronger PI gains: excellent balance, but position-controlled motors don't translate from tilt alone; stuck at wall |
 
 ---
 
@@ -140,3 +217,21 @@
 9. **The true balance point with arms at forward ref is ~92.0 degrees** (confirmed across multiple runs averaging roll during stable periods).
 
 10. **Double-tap Ch11 for force-engage** allows testing balance at any arm position without tip-up.
+
+11. **Arm return should be capture-gated, not timer-only.** April 10 testing showed fixed-timer arm return can work in clean cases, but capture gating is more reliable across engage angles.
+
+12. **The low engage angle is a handoff condition, not a balance trim.** If the robot engages at 80-84 deg and that offset is preserved into arms-forward balance, it will chase the wrong setpoint and roll away.
+
+13. **Position hold must start from a stable origin.** Locking the origin at balance engage includes the whole stand-up/arm-return translation. Current approach waits until arms are forward and the bot is calm, then resets the wheel origin.
+
+14. **Raw wheel-velocity damping was destabilizing.** The April 10 velocity-brake experiment made balance much worse; avoid direct velocity-to-setpoint damping unless it is redesigned and heavily gated.
+
+15. **Use `scripts/analyze_balance_logs.py` after every run.** Watch `eng_roll`, `ret_s`, `pre_rate`, `pre_cmd`, `trim`, `pos_shift`, `meas_drift`, and flags. The most useful failure signatures so far have been high pre-return rate/cmd, permanent trim near clamp, and large drift before position hold locks.
+
+16. **Position correction must be always-active, not delayed.** Waiting for arms-forward + calm + settle timer means the robot has already rolled away 10+ rad by the time correction starts. The angle-error gate provides the necessary protection during the catch phase without requiring explicit delayed activation.
+
+17. **The command integrator trim and position PI create a positive feedback loop.** When the robot drifts, the position PI adjusts the setpoint. The resulting sustained motor command causes the command integrator to also adjust the setpoint in the same direction. Both corrections compound, pushing the setpoint far from the true balance angle (observed: setpoint at 99 vs true balance ~92).
+
+18. **Use a single outer PI on position, no separate trim integrator.** This is the standard inverted pendulum architecture (Segway, nBot, etc.). The position integral naturally handles balance-point offsets: if the scheduled setpoint is wrong, the robot drifts, the integral accumulates, and the setpoint corrects. One integrator eliminates positive feedback.
+
+19. **Position-controlled motors break tilt-to-translation coupling.** In a torque/velocity-controlled Segway, holding a tilt off-balance requires sustained wheel acceleration, which inherently translates the robot. With Robstride motors in position mode, the motor applies holding torque at a fixed position -- the robot leans but the wheels don't move. A direct wheel velocity offset driven by drift error is needed to provide the translational coupling that position control eliminates.

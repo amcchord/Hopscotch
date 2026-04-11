@@ -107,6 +107,7 @@ private:
 
     // --- Effective setpoint (written by Core 1, read by Core 0) ---
     volatile float _effective_setpoint = BALANCE_SETPOINT_ARMS_TIP;
+    volatile float _wheel_vel_offset = 0.0f;
 
     // --- Back wheel targets (written by Core 0 for position commands) ---
     volatile float _back_left_target  = 0.0f;
@@ -124,6 +125,8 @@ private:
     float _pos_kd             = BALANCE_POS_KD;
     float _pos_integral       = 0.0f;
     float _pos_setpoint_shift = 0.0f;
+    float _engage_capture_shift = 0.0f;
+    float _engage_arm_frac = 1.0f;
 
     // --- Stuck / wall detection (Core 1 only) ---
     bool     _stuck           = false;
@@ -167,6 +170,7 @@ private:
 
     static float clampf(float value, float min_value, float max_value);
     static float moveToward(float current, float target, float rate, float dt);
+    float computeArmFraction() const;
     float computeScheduledSetpoint() const;
     void enterTippingUp();
     void enterBalancing(float current_roll);

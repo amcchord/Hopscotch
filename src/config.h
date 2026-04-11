@@ -110,7 +110,9 @@ static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safet
 static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
 static constexpr float    BALANCE_VEL_GAIN              = 0.5f;    // deg per (rad/s) per second of command integration (trim only)
 static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 2.0f;    // max deg/s trim can change
-static constexpr float    BALANCE_TRIM_MAX_DEG          = 5.0f;    // max engage/load/terrain trim on top of scheduled base
+static constexpr float    BALANCE_TRIM_MAX_DEG          = 3.0f;    // trim clamp -- reduced to limit positive feedback with position PI
+static constexpr float    BALANCE_TRIM_DECAY             = 0.99f;  // per-tick decay when position PI active (~1.5s half-life at 50Hz)
+static constexpr float    BALANCE_CAPTURE_SHIFT_MAX_DEG = 15.0f;   // cover large engage angle differences
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -144,14 +146,16 @@ static constexpr float    BALANCE_SAFE_RATE_MAX_DPS     = 200.0f;   // extreme r
 static constexpr uint32_t BALANCE_SAFE_RATE_DURATION_MS = 500;      // must persist this long
 static constexpr uint32_t BALANCE_SAFE_SAT_DURATION_MS  = 3000;     // motor saturated this long -> disengage
 
-// Position return via bounded setpoint shift (uses measured odometry)
-static constexpr float    BALANCE_POS_KP                = 0.4f;     // deg shift per rad of measured drift
-static constexpr float    BALANCE_POS_KI                = 0.05f;    // deg shift per integral unit
-static constexpr float    BALANCE_POS_KD                = 0.15f;    // deg shift per rad/s of measured velocity
-static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 5.0f;     // max setpoint shift magnitude
-static constexpr float    BALANCE_POS_SHIFT_RATE_MAX    = 4.0f;     // max deg/s position return shift can change
-static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.5f;     // don't chase small bench/encoder drift
-static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 50.0f;    // integral clamp
+// Outer position PI loop -- always active, gated by angle error
+// This is the ONLY setpoint correction (no command integrator trim -- see lesson 17/18)
+// Start I-heavy: integral drives sustained setpoint change -> sustained motor_vel -> translation
+static constexpr float    BALANCE_POS_KP                = 0.15f;    // proportional: provides braking as robot approaches home
+static constexpr float    BALANCE_POS_KI                = 0.12f;    // integral: sustained correction, reduced from 0.20 to limit overshoot
+static constexpr float    BALANCE_POS_KD                = 0.05f;    // velocity damping: brakes the return to prevent overshoot
+static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 8.0f;     // more authority so integral doesn't max out and stall
+static constexpr float    BALANCE_POS_SHIFT_RATE_MAX    = 3.0f;     // rate limit = effective translation speed command
+static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.2f;     // react to drift early
+static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 200.0f;   // integral clamp
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
 
 // Stuck / wall detection (uses measured odometry)

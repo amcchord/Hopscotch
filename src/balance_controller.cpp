@@ -26,9 +26,9 @@ float BalanceController::clampf(float value, float min_value, float max_value) {
     return value;
 }
 
-float BalanceController::computeScheduledSetpoint() const {
+float BalanceController::computeArmFraction() const {
     if (!_motors || !_arms) {
-        return BALANCE_SETPOINT_ARMS_TIP;
+        return 1.0f;
     }
 
     float arm_delta_l = _motors->getMotor(MotorRole::ArmLeft).position - _arms->getForwardLeft();
@@ -40,8 +40,11 @@ float BalanceController::computeScheduledSetpoint() const {
     if (tip_avg_delta > 0.01f) {
         arm_frac = arm_avg_delta / tip_avg_delta;
     }
-    arm_frac = clampf(arm_frac, 0.0f, 1.0f);
+    return clampf(arm_frac, 0.0f, 1.0f);
+}
 
+float BalanceController::computeScheduledSetpoint() const {
+    float arm_frac = computeArmFraction();
     return BALANCE_SETPOINT_ARMS_FWD
          + arm_frac * (BALANCE_SETPOINT_ARMS_TIP - BALANCE_SETPOINT_ARMS_FWD);
 }
@@ -157,10 +160,13 @@ void BalanceController::enterBalancing(float current_roll) {
     _state = BalanceState::Balancing;
 
     float scheduled_sp = computeScheduledSetpoint();
-    _setpoint = clampf(current_roll - scheduled_sp,
-                       -BALANCE_TRIM_MAX_DEG, BALANCE_TRIM_MAX_DEG);
+    _engage_arm_frac = computeArmFraction();
+    _engage_capture_shift = clampf(current_roll - scheduled_sp,
+                                   -BALANCE_CAPTURE_SHIFT_MAX_DEG,
+                                   BALANCE_CAPTURE_SHIFT_MAX_DEG);
+    _setpoint = 0.0f;
     _filtered_vel = 0.0f;
-    _effective_setpoint = clampf(scheduled_sp + _setpoint,
+    _effective_setpoint = clampf(scheduled_sp + _engage_capture_shift,
                                  BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
 
     _back_left_target  = _motors->getMotor(MotorRole::BackLeft).position;
@@ -189,9 +195,9 @@ void BalanceController::enterBalancing(float current_roll) {
     _capture_stable   = false;
     _capture_stable_start_ms = 0;
 
-    Serial.printf("[Balance] BALANCING @200Hz  vel_gain=%.3f  Kp=%.3f Kd=%.4f  tilt=%.1f  base=%.1f  trim=%.2f  eff=%.1f\n",
+    Serial.printf("[Balance] BALANCING @200Hz  vel_gain=%.3f  Kp=%.3f Kd=%.4f  tilt=%.1f  base=%.1f  capture=%.2f  eff=%.1f\n",
                   _vel_gain, (float)_kp, (float)_kd, (float)_tilt_angle,
-                  scheduled_sp, _setpoint, (float)_effective_setpoint);
+                  scheduled_sp, _engage_capture_shift, (float)_effective_setpoint);
 }
 
 void BalanceController::enterReturningArms() {
@@ -417,71 +423,42 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // points based on how far the arms have returned. This gives
         // the PD the correct target at every arm position.
         // ---------------------------------------------------------------
+        float arm_frac = computeArmFraction();
         float scheduled_sp = computeScheduledSetpoint();
-        bool position_return_active = _arms_returning
-                                    && (fabsf(meas_drift) > BALANCE_POS_DEADBAND_RAD
-                                        || fabsf(_pos_setpoint_shift) > 0.10f);
-
-        // ---------------------------------------------------------------
-        // Command-integrating fine adjustment
-        //
-        // On top of the scheduled base, integrate the PD motor command
-        // to handle surface tilt, battery offset, and wall escape.
-        // Nonlinear filter: large commands respond quickly, small
-        // commands are heavily filtered to prevent oscillation.
-        // ---------------------------------------------------------------
-        float cmd = (float)_last_motor_vel;
-        float abs_cmd_local = fabsf(cmd);
-        float alpha = 0.01f + 0.09f * (abs_cmd_local / BALANCE_MAX_DRIVE_SPEED);
-        if (alpha > 0.10f) alpha = 0.10f;
-        _filtered_vel = alpha * cmd + (1.0f - alpha) * _filtered_vel;
-
-        float sp_delta = 0.0f;
-        if (!position_return_active) {
-            sp_delta = -_vel_gain * _filtered_vel * dt;
+        float capture_weight = 1.0f;
+        if (_arms_returning) {
+            capture_weight = (_engage_arm_frac > 0.05f)
+                           ? clampf(arm_frac / _engage_arm_frac, 0.0f, 1.0f)
+                           : 1.0f;
         }
+        float capture_shift = _engage_capture_shift * capture_weight;
 
-        if (sp_delta >  BALANCE_SETPOINT_RATE_MAX * dt) sp_delta =  BALANCE_SETPOINT_RATE_MAX * dt;
-        if (sp_delta < -BALANCE_SETPOINT_RATE_MAX * dt) sp_delta = -BALANCE_SETPOINT_RATE_MAX * dt;
-
-        _setpoint += sp_delta;
-
-        _setpoint = clampf(_setpoint, -BALANCE_TRIM_MAX_DEG, BALANCE_TRIM_MAX_DEG);
-
-        // ---------------------------------------------------------------
-        // Effective setpoint = arm-scheduled base + integrator trim
-        // ---------------------------------------------------------------
-        float base_effective_setpoint = clampf(scheduled_sp + _setpoint,
+        float base_effective_setpoint = clampf(scheduled_sp + capture_shift,
                                                BALANCE_SETPOINT_MIN,
                                                BALANCE_SETPOINT_MAX);
 
-        float target_pos_shift = 0.0f;
-        if (_arms_returning) {
-            float drift_err = 0.0f;
-            if (fabsf(meas_drift) > BALANCE_POS_DEADBAND_RAD) {
-                drift_err = meas_drift > 0.0f
-                          ? meas_drift - BALANCE_POS_DEADBAND_RAD
-                          : meas_drift + BALANCE_POS_DEADBAND_RAD;
-            }
-
-            float pos_gate = 1.0f - clampf(fabsf(base_effective_setpoint - tilt)
-                                           / BALANCE_POS_GATE_ERR_DEG,
-                                           0.0f, 1.0f);
-
-            _pos_integral += drift_err * pos_gate * dt;
-            _pos_integral = clampf(_pos_integral,
-                                   -BALANCE_POS_INTEGRAL_MAX,
-                                   BALANCE_POS_INTEGRAL_MAX);
-
-            float raw_shift = -(_pos_kp * drift_err
-                              + _pos_ki * _pos_integral
-                              + _pos_kd * meas_vel);
-            target_pos_shift = clampf(raw_shift * pos_gate,
-                                      -BALANCE_POS_SHIFT_MAX_DEG,
-                                      BALANCE_POS_SHIFT_MAX_DEG);
-        } else {
-            _pos_integral = 0.0f;
+        float drift_err = 0.0f;
+        if (fabsf(meas_drift) > BALANCE_POS_DEADBAND_RAD) {
+            drift_err = meas_drift > 0.0f
+                      ? meas_drift - BALANCE_POS_DEADBAND_RAD
+                      : meas_drift + BALANCE_POS_DEADBAND_RAD;
         }
+
+        float pos_gate = 1.0f - clampf(fabsf(_effective_setpoint - tilt)
+                                       / BALANCE_POS_GATE_ERR_DEG,
+                                       0.0f, 1.0f);
+
+        _pos_integral += drift_err * pos_gate * dt;
+        _pos_integral = clampf(_pos_integral,
+                               -BALANCE_POS_INTEGRAL_MAX,
+                               BALANCE_POS_INTEGRAL_MAX);
+
+        float raw_shift = (_pos_kp * drift_err
+                        + _pos_ki * _pos_integral
+                        + _pos_kd * meas_vel);
+        float target_pos_shift = clampf(raw_shift * pos_gate,
+                                        -BALANCE_POS_SHIFT_MAX_DEG,
+                                        BALANCE_POS_SHIFT_MAX_DEG);
 
         _pos_setpoint_shift = moveToward(_pos_setpoint_shift,
                                          target_pos_shift,
@@ -532,13 +509,14 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
                                   _arms_returning ? BALANCE_ARM_RETURN_SPEED : 0.0f);
 
+        bool pos_correcting = fabsf(_pos_setpoint_shift) > 0.05f;
         _last_flags = (_stuck ? 0x01 : 0)
                     | (_safe_err_timing ? 0x02 : 0)
                     | (_safe_rate_timing ? 0x04 : 0)
                     | (_safe_sat_timing ? 0x08 : 0)
                     | (_capture_stable ? 0x10 : 0)
                     | (_arms_returning ? 0x20 : 0)
-                    | (position_return_active ? 0x40 : 0);
+                    | (pos_correcting ? 0xC0 : 0);
 
         logSample(tilt, rate);
         break;
@@ -718,7 +696,8 @@ void BalanceController::printStatus() {
     Serial.println("=== BALANCE STATUS ===");
     Serial.printf("  State: %s\n", getStateString());
     Serial.printf("  PD: Kp=%.4f  Kd=%.4f\n", (float)_kp, (float)_kd);
-    Serial.printf("  Vel integrator: gain=%.4f  filtered_vel=%.2f\n", _vel_gain, _filtered_vel);
+    Serial.printf("  Position PI: Pkp=%.4f  Pki=%.4f  Pkd=%.4f  shift=%.2f\n",
+                  _pos_kp, _pos_ki, _pos_kd, _pos_setpoint_shift);
     Serial.printf("  Position: Pkp=%.4f  Pki=%.4f  Pkd=%.4f  gate_err=%.1f\n",
                   _pos_kp, _pos_ki, _pos_kd, BALANCE_POS_GATE_ERR_DEG);
     Serial.printf("  Balance loop: %d Hz (Core 0)\n", BALANCE_LOOP_HZ);
