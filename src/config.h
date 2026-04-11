@@ -110,9 +110,15 @@ static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safet
 static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
 static constexpr float    BALANCE_VEL_GAIN              = 0.5f;    // deg per (rad/s) per second of command integration (trim only)
 static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 2.0f;    // max deg/s trim can change
+static constexpr float    BALANCE_TRIM_MAX_DEG          = 5.0f;    // max engage/load/terrain trim on top of scheduled base
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
+static constexpr float    BALANCE_CAPTURE_ERR_MAX_DEG   = 1.0f;    // must be this close to effective setpoint before arm return
+static constexpr float    BALANCE_CAPTURE_RATE_MAX_DPS  = 4.0f;    // max roll rate for a "captured" balance state
+static constexpr float    BALANCE_CAPTURE_CMD_MAX       = 1.0f;    // max PD command magnitude for a "captured" state
+static constexpr uint32_t BALANCE_CAPTURE_SETTLE_MS     = 400;     // capture must stay quiet this long before arm return
+static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 2500;    // fail-safe: don't hold the tip pose forever
 
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
@@ -143,6 +149,8 @@ static constexpr float    BALANCE_POS_KP                = 0.4f;     // deg shift
 static constexpr float    BALANCE_POS_KI                = 0.05f;    // deg shift per integral unit
 static constexpr float    BALANCE_POS_KD                = 0.15f;    // deg shift per rad/s of measured velocity
 static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 5.0f;     // max setpoint shift magnitude
+static constexpr float    BALANCE_POS_SHIFT_RATE_MAX    = 4.0f;     // max deg/s position return shift can change
+static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.5f;     // don't chase small bench/encoder drift
 static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 50.0f;    // integral clamp
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
 

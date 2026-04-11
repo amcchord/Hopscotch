@@ -154,8 +154,9 @@ private:
     float _arm_tip_right_goal = 0.0f;
     bool  _arms_reached_tip   = false;
     bool  _arms_returning     = false;
-    bool  _arms_settled       = false;
     uint32_t _balance_start_ms = 0;
+    bool     _capture_stable   = false;
+    uint32_t _capture_stable_start_ms = 0;
 
     // Telemetry logging
     BalanceSample* _log_buf    = nullptr;
@@ -164,7 +165,9 @@ private:
     uint32_t       _log_start_ms = 0;
     bool           _log_saved  = false;
 
+    static float clampf(float value, float min_value, float max_value);
     static float moveToward(float current, float target, float rate, float dt);
+    float computeScheduledSetpoint() const;
     void enterTippingUp();
     void enterBalancing(float current_roll);
     void enterReturningArms();
