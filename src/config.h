@@ -192,14 +192,17 @@ static constexpr bool     BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN = true;  // res
 //   Arms can rotate both toward center AND past forward (opposite direction),
 //   giving symmetric bidirectional CG authority (~9 deg each way from forward).
 static constexpr float    BALANCE_SETPOINT_ARMS_CENTER  = 83.0f;    // balance point at center (measured)
-static constexpr float    BALANCE_ARM_BAL_MAX_FRAC      = 0.50f;    // max arm fraction in either direction
+static constexpr float    BALANCE_ARM_BAL_MAX_FRAC      = 0.25f;    // max arm fraction in either direction (center_delta ~1.77 rad, so 0.25 = 0.44 rad = 25 deg max arm motion)
 static constexpr float    BALANCE_ARM_BAL_FRAC_RATE     = 0.30f;    // max frac change per second (~1.7s to reach max -- smooth)
 static constexpr float    BALANCE_ARM_BAL_MOTOR_SPEED   = 2.0f;     // rad/s speed limit sent to arm motors
 static constexpr float    BALANCE_ARM_BAL_KP            = 0.05f;    // proportional on drift (frac per rad)
 static constexpr float    BALANCE_ARM_BAL_KI            = 0.025f;   // integral on drift
 static constexpr float    BALANCE_ARM_BAL_KD            = 0.015f;   // derivative on drift rate
-static constexpr float    BALANCE_ARM_BAL_INTEGRAL_MAX  = 0.50f;    // integral clamp (frac units)
+static constexpr float    BALANCE_ARM_BAL_INTEGRAL_MAX  = 0.25f;    // integral clamp (frac units, match max_frac)
 static constexpr float    BALANCE_ARM_BAL_DEADBAND_RAD  = 0.15f;    // ignore drift below this
+static constexpr float    BALANCE_ARM_BAL_DECAY         = 0.995f;   // per-tick integral decay (~2.8s half-life at 50Hz)
+static constexpr float    BALANCE_ARM_SP_TRACK_RATE     = 0.15f;    // frac/s setpoint tracking (slower than arm motion)
+static constexpr float    BALANCE_ARM_BAL_EARLY_FRAC_RATE = 0.15f;  // frac/s during arm return (gentler than post-ramp)
 
 // Stuck / wall detection (uses measured odometry)
 static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this

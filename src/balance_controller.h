@@ -28,12 +28,14 @@ struct BalanceSample {
     float    angle_err;
     float    motor_vel;
     float    arm_bal_frac;
+    float    arm_sp_frac;
+    float    arm_bal_integ;
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
     float    arm_l, arm_r;
+    float    arm_l_tgt, arm_r_tgt;
     float    meas_drift;
     float    meas_vel;
-    float    pos_shift;
     uint8_t  flags;
 };
 
@@ -168,9 +170,10 @@ private:
     bool     _capture_stable   = false;
     uint32_t _capture_stable_start_ms = 0;
 
-    // Arm balance assist (Core 1 only, active after ramp_complete)
+    // Arm balance assist (Core 1 only)
     float _arm_bal_frac        = 0.0f;
     float _arm_bal_integral    = 0.0f;
+    float _arm_sp_frac         = 0.0f;
     bool  _arm_bal_active      = false;
     float _arm_bal_kp          = BALANCE_ARM_BAL_KP;
     float _arm_bal_ki          = BALANCE_ARM_BAL_KI;
