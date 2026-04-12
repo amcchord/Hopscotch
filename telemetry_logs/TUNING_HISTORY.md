@@ -1,6 +1,6 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v8: Arm-Scheduled Setpoint + Wide Capture Shift + Position PI Only)
+## Current Architecture (v10: Position PI with Leaky Origin)
 
 ### Core 0 (200Hz) - Balance PD
 - Complementary filter: alpha=0.996 (angle), gyro filter alpha=0.08 (~60ms time constant)
@@ -10,16 +10,19 @@
 - Max drive speed: 25 rad/s
 - Back wheels only (front wheels held at engage position)
 
-### Core 1 (50Hz) - State Machine + Setpoint Management
+### Core 1 (50Hz) - State Machine + Position PI with Leaky Origin
 - **Arm-scheduled base setpoint**: linearly interpolates between ARMS_TIP (86.5) and ARMS_FWD (92.0) based on current arm position
 - **Temporary capture shift**: at engage, starts from the measured roll so the handoff is smooth, then fades that offset out as the arms return
   - Capture shift clamped to +/-15 deg (covers all practical engage angles)
 - **No command integrator trim** -- any form of trim creates positive feedback with position PI (v5/v6/v7 all proved this)
-- **Always-active outer position PI**: uses wheel odometry from engage origin
-  - Mostly PI: Kp=0.30, Ki=0.15, Kd=0.03
-  - Shift clamp +/-5 deg, rate limit 3 deg/s, deadband 0.2 rad, integral max 200
-  - Angle-error gate: `pos_gate = 1 - |angle_err| / 8 deg` suppresses correction during catch transient
-  - Position integral handles both drift correction AND balance-point offsets
+- **Position PI with leaky origin**:
+  - Kp=0.40, Ki=0.15, Kd=0.05
+  - Shift clamp +/-5 deg, rate limit 4 deg/s, deadband 0.15 rad, integral max 200
+  - Angle-error gate: `pos_gate = 1 - |angle_err| / 8 deg`
+  - **Leaky origin**: `_wheel_start_pos += 0.15 * (current_pos - _wheel_start_pos) * dt` (~7s time constant)
+    - Origin slowly moves toward the robot's current position
+    - The PI only corrects recent drift (bounded to 1-2 rad), preventing saturation
+    - Old drift is gradually accepted as the new "home"
 - **Effective setpoint = scheduled_base + capture_shift + position_shift**
 - Safety: tilt range [30,150], sustained error >35 for 2s, rate >200 dps for 500ms, saturation >3s
 
@@ -176,6 +179,28 @@
 - **Eleventh run** (`bal_20260411_092847.csv`, 20.6s): PI gated until ramp complete -- correct behavior. But 5 deg/s ramp still too fast. During the 2.8s ramp from 78→92, the PD saturated at 25 rad/s for 1+ seconds (robot falling forward, gravity winning). Drift reached +10 rad during ramp, then violent overshoot to 115 deg, then oscillation, drift to -12 rad. PI maxed pos_shift at -6.0, robot settled at sp=86 with drift=-11.5.
   - **Root cause: the ramp speed is not the issue -- it's the distance.** Tilting from 78 to 92 (14 deg) requires massive wheel movement regardless of speed. At 5 deg/s, the robot spends 1.5s in the "far from balance" zone (78-84 deg) where gravity pulls hard forward and the PD saturates. At 1 deg/s, the robot passes through this zone over 6 seconds with gentle motor commands that don't create massive drift.
 
+### Phase 11: Full-State Feedback (Wheel Velocity Offset)
+- **Problem identified**: the position PI adjusts the tilt setpoint, but in CSP position mode, shifting the balance angle barely translates the robot. The PD tracks instantly, so angle_err stays near 0, motor_vel stays near 0, wheels barely move. The 50.4s record run (`bal_20260410_224228.csv`) showed a 6 deg setpoint shift producing only 0.07 rad of wheel movement over 14 seconds. The 094120 run showed pos_shift saturated at -6.0 but drift frozen at -9.7 rad.
+- **Root cause**: CSP motors hold lean with internal servo torque at a fixed wheel position. In a torque-controlled Segway, maintaining a lean requires sustained wheel acceleration -> translation. In CSP mode, this coupling is broken.
+- **Fix**: add a direct wheel velocity offset to the motor command, computed from drift and wheel velocity. This is the missing K3/K4 of the standard full-state-feedback controller: `motor_vel = Kp*angle_err - Kd*gyro_rate + wheel_vel_offset`. The velocity offset is independent of tilt angle -- it directly drives the wheels toward origin regardless of what angle the robot balances at.
+- **Architecture**: two outer-loop outputs with distinct roles:
+  - Position PI (tilt trim): handles CG offset, slope, balance-point error. +/-3 deg authority.
+  - Wheel velocity offset (translation): drives wheels toward origin. +/-5 rad/s authority.
+- **Reduced PI authority**: Kp 0.40->0.25, Ki 0.15->0.10, shift max 6->3 deg. PI is now trim only.
+- **Velocity offset gains**: vel_kp=0.80, vel_kd=0.15, max=5.0, rate=3.0. Same gating (pos_gate, ramp_complete) as PI.
+- **Telemetry improvements**: constants block (# KEY=VALUE) emitted before CSV header in `bal log`, new `vel_offset` and `pos_gate` columns, `_ramp_complete` flag bit.
+
+### Phase 12: Velocity Offset Failed -- Leaky Origin Fix
+- **Result of vel_offset** (`bal_20260411_221653.csv`, 46.9s): the velocity offset did not produce sustained wheel velocity. At steady state the PD cancels the vel_offset by shifting tilt equilibrium: `tilt = setpoint + vel_offset / Kp`. With vel_offset=3.0 and Kp=2.0, the robot sits 1.5 deg above setpoint -- mathematically equivalent to a setpoint shift of vel_offset/Kp degrees. No translation occurs.
+  - Worse: the tilt offset created positive feedback with the PI (same dual-integrator problem as Phase 10). vel_offset pushed roll above setpoint, PI lowered setpoint, drift grew, vel_offset grew further. By t=38s, oscillation erupted at +/-33 dps with motor commands at +/-6 rad/s.
+- **Root cause is fundamental**: in CSP position mode, any additive term in the motor command (whether setpoint shift or velocity offset) reaches equilibrium where motor_vel=0 and wheels stop. The PD is too fast -- it absorbs the offset into tilt angle within a few hundred ms. The missing translation coupling cannot be restored without changing motor control mode.
+- **Fix: remove velocity offset, add leaky origin.** Since CSP mode fundamentally prevents return-to-origin, the correct strategy is to stop fighting accumulated drift and accept the current location.
+  - `_wheel_start_pos += ORIGIN_LEAK * (current_pos - _wheel_start_pos) * dt` with leak=0.15 (1/s), ~7s time constant.
+  - The PI only sees recent drift (bounded to ~1-2 rad). It never saturates on large accumulated drift.
+  - Old drift is gradually accepted as the new "home."
+- **Restored PI gains**: Kp=0.40, Ki=0.15, shift max=5 deg (moderate authority for recent-drift correction).
+- **Removed**: all velocity offset code, config, serial commands, gain members.
+
 ---
 
 ## Telemetry Files (Chronological)
@@ -258,3 +283,11 @@
 18. **Use a single outer PI on position, no separate trim integrator.** This is the standard inverted pendulum architecture (Segway, nBot, etc.). The position integral naturally handles balance-point offsets: if the scheduled setpoint is wrong, the robot drifts, the integral accumulates, and the setpoint corrects. One integrator eliminates positive feedback.
 
 19. **Position-controlled motors break tilt-to-translation coupling.** In a torque/velocity-controlled Segway, holding a tilt off-balance requires sustained wheel acceleration, which inherently translates the robot. With Robstride motors in position mode, the motor applies holding torque at a fixed position -- the robot leans but the wheels don't move. A direct wheel velocity offset driven by drift error is needed to provide the translational coupling that position control eliminates.
+
+20. **Velocity offset in CSP mode is mathematically equivalent to a setpoint shift.** Adding vel_offset to the motor command reaches equilibrium at `tilt = setpoint + vel_offset / Kp` where motor_vel=0. The PD absorbs the offset into a tilt angle change within a few hundred ms. No sustained wheel velocity occurs. This is identical to the setpoint-shift approach that was already proven insufficient.
+
+21. **Any additive offset creates positive feedback with the PI.** Whether it's a command integrator trim (Phase 10) or a velocity offset (Phase 11), the tilt offset makes the PI see roll above/below setpoint, the PI adjusts, drift grows, the offset grows further. The feedback loop is structural in CSP mode.
+
+22. **Leaky origin ("drift acceptance") prevents PI saturation.** Instead of fighting large accumulated drift, slowly move the wheel origin toward the current position (0.15/s, ~7s time constant). The PI only sees recent drift (1-2 rad max), never saturates, and the robot accepts its current location as "home" over time. This is a pragmatic fix for CSP mode's fundamental limitation.
+
+23. **For true return-to-origin, switch to Speed mode.** In Speed mode, motor_vel directly commands wheel velocity (not integrated into position targets). The PD cannot cancel a velocity offset because there is no position target for the motor servo to hold. This is a larger architectural change for future work.

@@ -27,7 +27,7 @@ struct BalanceSample {
     float    setpoint;
     float    angle_err;
     float    motor_vel;
-    float    vel_integrator;
+    float    arm_bal_frac;
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
     float    arm_l, arm_r;
@@ -71,6 +71,10 @@ public:
     void setPosKp(float v) { _pos_kp = v; }
     void setPosKi(float v) { _pos_ki = v; }
     void setPosKd(float v) { _pos_kd = v; }
+    void setArmBalKp(float v) { _arm_bal_kp = v; }
+    void setArmBalKi(float v) { _arm_bal_ki = v; }
+    void setArmBalKd(float v) { _arm_bal_kd = v; }
+    void setArmBalMaxFrac(float v) { _arm_bal_max_frac = v; }
 
     float getKp() const { return _kp; }
     float getKd() const { return _kd; }
@@ -163,6 +167,17 @@ private:
     uint32_t _balance_start_ms = 0;
     bool     _capture_stable   = false;
     uint32_t _capture_stable_start_ms = 0;
+
+    // Arm balance assist (Core 1 only, active after ramp_complete)
+    float _arm_bal_frac        = 0.0f;
+    float _arm_bal_integral    = 0.0f;
+    bool  _arm_bal_active      = false;
+    float _arm_bal_kp          = BALANCE_ARM_BAL_KP;
+    float _arm_bal_ki          = BALANCE_ARM_BAL_KI;
+    float _arm_bal_kd          = BALANCE_ARM_BAL_KD;
+    float _arm_bal_max_frac    = BALANCE_ARM_BAL_MAX_FRAC;
+    float _arm_center_left     = 0.0f;
+    float _arm_center_right    = 0.0f;
 
     // Telemetry logging
     BalanceSample* _log_buf    = nullptr;

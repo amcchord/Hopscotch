@@ -130,7 +130,7 @@ static constexpr float    BALANCE_TRIM_DECAY             = 0.99f;  // per-tick d
 static constexpr float    BALANCE_CAPTURE_SHIFT_MAX_DEG = 15.0f;   // cover large engage angle differences
 static constexpr bool     BALANCE_USE_SCHEDULED_SP      = true;    // if false, base setpoint stays at ARMS_FWD (92) always
 static constexpr bool     BALANCE_USE_CAPTURE_SHIFT     = true;    // if false, no capture shift -- engage directly at scheduled sp
-static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 10.0f;   // max deg/s base setpoint can change (sweet spot: best at 10)
+static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 3.0f;    // max deg/s base setpoint can change (10 caused violent oscillation)
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -157,7 +157,7 @@ static constexpr float    BALANCE_KD                    = 0.08f;   // rad/s per 
 
 static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weight in complementary filter
 
-static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 60000;   // telemetry recording window
+static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 120000;  // telemetry recording window (flush deferred, safe to be long)
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
 
 // Safety abort thresholds
@@ -184,6 +184,22 @@ static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.15f;    // react ear
 static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 200.0f;   // integral clamp
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
 static constexpr bool     BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN = true;  // reset wheel origin when arms reach forward
+
+// Arm balance assist (active after arms reach forward)
+//   The arms shift CG to physically change the balance angle.
+//   With setpoint frozen at ARMS_FWD, the CG-induced balance shift
+//   creates sustained wheel motion (actual translation) to correct drift.
+//   Arms can rotate both toward center AND past forward (opposite direction),
+//   giving symmetric bidirectional CG authority (~9 deg each way from forward).
+static constexpr float    BALANCE_SETPOINT_ARMS_CENTER  = 83.0f;    // balance point at center (measured)
+static constexpr float    BALANCE_ARM_BAL_MAX_FRAC      = 0.50f;    // max arm fraction in either direction
+static constexpr float    BALANCE_ARM_BAL_FRAC_RATE     = 0.30f;    // max frac change per second (~1.7s to reach max -- smooth)
+static constexpr float    BALANCE_ARM_BAL_MOTOR_SPEED   = 2.0f;     // rad/s speed limit sent to arm motors
+static constexpr float    BALANCE_ARM_BAL_KP            = 0.05f;    // proportional on drift (frac per rad)
+static constexpr float    BALANCE_ARM_BAL_KI            = 0.025f;   // integral on drift
+static constexpr float    BALANCE_ARM_BAL_KD            = 0.015f;   // derivative on drift rate
+static constexpr float    BALANCE_ARM_BAL_INTEGRAL_MAX  = 0.50f;    // integral clamp (frac units)
+static constexpr float    BALANCE_ARM_BAL_DEADBAND_RAD  = 0.15f;    // ignore drift below this
 
 // Stuck / wall detection (uses measured odometry)
 static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this

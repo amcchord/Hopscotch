@@ -41,6 +41,19 @@ def expand_inputs(paths: list[str]) -> list[Path]:
     return results
 
 
+def parse_config(path: Path) -> dict[str, str]:
+    """Parse # KEY=VALUE lines at the top of the CSV."""
+    config: dict[str, str] = {}
+    for line in path.read_text(errors="replace").splitlines():
+        line = line.strip()
+        if not line.startswith("#"):
+            break
+        if "=" in line:
+            key, _, value = line.lstrip("# ").partition("=")
+            config[key.strip()] = value.strip()
+    return config
+
+
 def load_rows(path: Path) -> list[dict[str, str]]:
     lines = path.read_text(errors="replace").splitlines()
     header_idx = next((i for i, line in enumerate(lines) if line.startswith("t_ms,")), None)
@@ -62,10 +75,12 @@ def as_float(row: dict[str, str], key: str) -> float:
         return math.nan
 
 
-def trim_series(rows: Iterable[dict[str, str]]) -> list[float]:
+def vel_offset_series(rows: Iterable[dict[str, str]]) -> list[float]:
     result: list[float] = []
     for row in rows:
-        if "vel_integ" in row:
+        if "vel_offset" in row:
+            result.append(as_float(row, "vel_offset"))
+        elif "vel_integ" in row:
             result.append(as_float(row, "vel_integ"))
         else:
             result.append(math.nan)
@@ -104,7 +119,7 @@ def summarize(path: Path) -> dict[str, object] | None:
             "pre_rate": math.nan,
             "pre_cmd": math.nan,
             "final_sp": math.nan,
-            "final_trim": math.nan,
+            "final_vel_off": math.nan,
             "final_drift": math.nan,
             "note": "no balance state",
         }
@@ -138,18 +153,17 @@ def summarize(path: Path) -> dict[str, object] | None:
         pre_cmd = math.nan
 
     final_window = balance_rows[-min(100, len(balance_rows)) :]
-    final_trim_values = trim_series(final_window)
+    final_vel_values = vel_offset_series(final_window)
 
     notes: list[str] = []
-    if "vel_integ" not in balance_rows[0]:
+    has_vel_offset = "vel_offset" in balance_rows[0]
+    if not has_vel_offset and "vel_integ" not in balance_rows[0]:
         notes.append("legacy schema")
     if not math.isnan(pre_rate) and pre_rate > 4.0:
         notes.append("arm return before settle")
     if not math.isnan(pre_cmd) and pre_cmd > 1.0:
         notes.append("high cmd at return")
-    if notes == ["legacy schema"]:
-        notes.append("clean capture")
-    elif not notes:
+    if not notes:
         notes.append("clean capture")
 
     drift_key = "meas_drift" if "meas_drift" in balance_rows[0] else ""
@@ -165,7 +179,7 @@ def summarize(path: Path) -> dict[str, object] | None:
         "pre_rate": pre_rate,
         "pre_cmd": pre_cmd,
         "final_sp": mean(as_float(row, "setpoint") for row in final_window),
-        "final_trim": mean(final_trim_values),
+        "final_vel_off": mean(final_vel_values),
         "final_drift": mean(as_float(row, drift_key) for row in final_window) if drift_key else math.nan,
         "note": ", ".join(notes),
     }
@@ -183,7 +197,7 @@ def main() -> int:
     header = (
         f"{'file':24} {'tip_s':>6} {'bal_s':>6} {'eng_roll':>8} {'eng_rate':>8} "
         f"{'ret_s':>6} {'pre_err':>8} {'pre_rate':>9} {'pre_cmd':>8} "
-        f"{'final_sp':>8} {'trim':>8} {'drift':>8}  note"
+        f"{'final_sp':>8} {'vel_off':>8} {'drift':>8}  note"
     )
     print(header)
     print("-" * len(header))
@@ -199,15 +213,34 @@ def main() -> int:
             f"{fmt(summary['pre_rate'], 9, 2)} "
             f"{fmt(summary['pre_cmd'], 8, 2)} "
             f"{fmt(summary['final_sp'], 8, 2)} "
-            f"{fmt(summary['final_trim'], 8, 2)} "
+            f"{fmt(summary['final_vel_off'], 8, 2)} "
             f"{fmt(summary['final_drift'], 8, 2)}  "
             f"{summary['note']}"
         )
 
     if args.details:
         print()
-        for summary in summaries:
+        for path in paths:
+            config = parse_config(path)
+            summary = next((s for s in summaries if s["file"] == path.name), None)
+            if summary is None:
+                continue
+
             print(summary["file"])
+            if config:
+                gains = []
+                for key in ("inner_kp", "inner_kd", "pos_kp", "pos_ki", "pos_kd", "vel_kp", "vel_kd"):
+                    if key in config:
+                        gains.append(f"{key}={config[key]}")
+                if gains:
+                    print(f"  config: {', '.join(gains)}")
+                extras = []
+                for key in ("pos_shift_max", "vel_max", "base_sp_fwd", "base_sp_tip"):
+                    if key in config:
+                        extras.append(f"{key}={config[key]}")
+                if extras:
+                    print(f"          {', '.join(extras)}")
+
             print(
                 f"  engage: roll={fmt(summary['eng_roll'], 0, 2).strip()} deg, "
                 f"rate={fmt(summary['eng_rate'], 0, 2).strip()} dps"
@@ -220,7 +253,7 @@ def main() -> int:
             )
             print(
                 f"  final window: sp={fmt(summary['final_sp'], 0, 2).strip()} deg, "
-                f"trim={fmt(summary['final_trim'], 0, 2).strip()} deg, "
+                f"vel_off={fmt(summary['final_vel_off'], 0, 2).strip()} rad/s, "
                 f"drift={fmt(summary['final_drift'], 0, 2).strip()} rad"
             )
             print(f"  note: {summary['note']}")
