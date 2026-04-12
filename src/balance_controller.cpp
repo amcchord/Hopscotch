@@ -166,8 +166,11 @@ void BalanceController::enterBalancing(float current_roll) {
                                    BALANCE_CAPTURE_SHIFT_MAX_DEG);
     _setpoint = 0.0f;
     _filtered_vel = 0.0f;
-    _effective_setpoint = clampf(scheduled_sp + _engage_capture_shift,
-                                 BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
+    float initial_base = BALANCE_USE_CAPTURE_SHIFT
+                       ? scheduled_sp + _engage_capture_shift
+                       : scheduled_sp;
+    _smoothed_base_sp = initial_base;
+    _effective_setpoint = clampf(initial_base, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
 
     _back_left_target  = _motors->getMotor(MotorRole::BackLeft).position;
     _back_right_target = _motors->getMotor(MotorRole::BackRight).position;
@@ -191,6 +194,8 @@ void BalanceController::enterBalancing(float current_roll) {
 
     _arms_reached_tip = true;
     _arms_returning   = false;
+    _arms_returned    = false;
+    _ramp_complete    = false;
     _balance_start_ms = millis();
     _capture_stable   = false;
     _capture_stable_start_ms = 0;
@@ -423,47 +428,77 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // points based on how far the arms have returned. This gives
         // the PD the correct target at every arm position.
         // ---------------------------------------------------------------
-        float arm_frac = computeArmFraction();
-        float scheduled_sp = computeScheduledSetpoint();
-        float capture_weight = 1.0f;
-        if (_arms_returning) {
-            capture_weight = (_engage_arm_frac > 0.05f)
-                           ? clampf(arm_frac / _engage_arm_frac, 0.0f, 1.0f)
-                           : 1.0f;
-        }
-        float capture_shift = _engage_capture_shift * capture_weight;
+        float scheduled_sp = BALANCE_USE_SCHEDULED_SP
+                           ? computeScheduledSetpoint()
+                           : BALANCE_SETPOINT_ARMS_FWD;
 
-        float base_effective_setpoint = clampf(scheduled_sp + capture_shift,
-                                               BALANCE_SETPOINT_MIN,
-                                               BALANCE_SETPOINT_MAX);
-
-        float drift_err = 0.0f;
-        if (fabsf(meas_drift) > BALANCE_POS_DEADBAND_RAD) {
-            drift_err = meas_drift > 0.0f
-                      ? meas_drift - BALANCE_POS_DEADBAND_RAD
-                      : meas_drift + BALANCE_POS_DEADBAND_RAD;
+        float capture_shift = 0.0f;
+        if (BALANCE_USE_CAPTURE_SHIFT) {
+            float arm_frac = computeArmFraction();
+            float capture_weight = 1.0f;
+            if (_arms_returning) {
+                capture_weight = (_engage_arm_frac > 0.05f)
+                               ? clampf(arm_frac / _engage_arm_frac, 0.0f, 1.0f)
+                               : 1.0f;
+            }
+            capture_shift = _engage_capture_shift * capture_weight;
         }
 
-        float pos_gate = 1.0f - clampf(fabsf(_effective_setpoint - tilt)
-                                       / BALANCE_POS_GATE_ERR_DEG,
-                                       0.0f, 1.0f);
+        float raw_base_sp = clampf(scheduled_sp + capture_shift,
+                                   BALANCE_SETPOINT_MIN,
+                                   BALANCE_SETPOINT_MAX);
 
-        _pos_integral += drift_err * pos_gate * dt;
-        _pos_integral = clampf(_pos_integral,
-                               -BALANCE_POS_INTEGRAL_MAX,
-                               BALANCE_POS_INTEGRAL_MAX);
+        if (BALANCE_BASE_SP_RATE_MAX > 0.0f) {
+            _smoothed_base_sp = moveToward(_smoothed_base_sp, raw_base_sp,
+                                           BALANCE_BASE_SP_RATE_MAX, dt);
+        } else {
+            _smoothed_base_sp = raw_base_sp;
+        }
+        float base_effective_setpoint = _smoothed_base_sp;
 
-        float raw_shift = (_pos_kp * drift_err
-                        + _pos_ki * _pos_integral
-                        + _pos_kd * meas_vel);
-        float target_pos_shift = clampf(raw_shift * pos_gate,
-                                        -BALANCE_POS_SHIFT_MAX_DEG,
-                                        BALANCE_POS_SHIFT_MAX_DEG);
+        if (!_ramp_complete && _arms_returned
+            && fabsf(_smoothed_base_sp - raw_base_sp) < 0.1f) {
+            _ramp_complete = true;
+            if (BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN) {
+                _wheel_start_pos = (meas_bl + meas_br) * 0.5f;
+                _pos_integral = 0.0f;
+                _pos_setpoint_shift = 0.0f;
+                meas_drift = 0.0f;
+                _last_meas_drift = 0.0f;
+            }
+            Serial.printf("[Balance] Ramp complete -- PI active, origin reset (sp=%.1f)\n",
+                          _smoothed_base_sp);
+        }
 
-        _pos_setpoint_shift = moveToward(_pos_setpoint_shift,
-                                         target_pos_shift,
-                                         BALANCE_POS_SHIFT_RATE_MAX,
-                                         dt);
+        if (_ramp_complete) {
+            float drift_err = 0.0f;
+            if (fabsf(meas_drift) > BALANCE_POS_DEADBAND_RAD) {
+                drift_err = meas_drift > 0.0f
+                          ? meas_drift - BALANCE_POS_DEADBAND_RAD
+                          : meas_drift + BALANCE_POS_DEADBAND_RAD;
+            }
+
+            float pos_gate = 1.0f - clampf(fabsf(_effective_setpoint - tilt)
+                                           / BALANCE_POS_GATE_ERR_DEG,
+                                           0.0f, 1.0f);
+
+            _pos_integral += drift_err * pos_gate * dt;
+            _pos_integral = clampf(_pos_integral,
+                                   -BALANCE_POS_INTEGRAL_MAX,
+                                   BALANCE_POS_INTEGRAL_MAX);
+
+            float raw_shift = (_pos_kp * drift_err
+                            + _pos_ki * _pos_integral
+                            + _pos_kd * meas_vel);
+            float target_pos_shift = clampf(raw_shift * pos_gate,
+                                            -BALANCE_POS_SHIFT_MAX_DEG,
+                                            BALANCE_POS_SHIFT_MAX_DEG);
+
+            _pos_setpoint_shift = moveToward(_pos_setpoint_shift,
+                                             target_pos_shift,
+                                             BALANCE_POS_SHIFT_RATE_MAX,
+                                             dt);
+        }
 
         _effective_setpoint = base_effective_setpoint + _pos_setpoint_shift;
         _effective_setpoint = clampf(_effective_setpoint, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
@@ -505,6 +540,16 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_arms_returning) {
             _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
             _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
+
+            if (!_arms_returned) {
+                float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
+                float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
+                if (arm_err_l < 0.08f && arm_err_r < 0.08f) {
+                    _arms_returned = true;
+                    Serial.printf("[Balance] Arms returned (drift=%.2f, base_sp=%.1f, target=%.1f)\n",
+                                  meas_drift, _smoothed_base_sp, raw_base_sp);
+                }
+            }
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
                                   _arms_returning ? BALANCE_ARM_RETURN_SPEED : 0.0f);

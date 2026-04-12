@@ -126,6 +126,7 @@ private:
     float _pos_integral       = 0.0f;
     float _pos_setpoint_shift = 0.0f;
     float _engage_capture_shift = 0.0f;
+    float _smoothed_base_sp = 0.0f;
     float _engage_arm_frac = 1.0f;
 
     // --- Stuck / wall detection (Core 1 only) ---
@@ -157,6 +158,8 @@ private:
     float _arm_tip_right_goal = 0.0f;
     bool  _arms_reached_tip   = false;
     bool  _arms_returning     = false;
+    bool  _arms_returned      = false;
+    bool  _ramp_complete      = false;
     uint32_t _balance_start_ms = 0;
     bool     _capture_stable   = false;
     uint32_t _capture_stable_start_ms = 0;

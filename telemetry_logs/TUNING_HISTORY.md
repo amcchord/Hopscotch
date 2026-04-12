@@ -158,6 +158,23 @@
 - **Sixth run result** (`bal_20260410_222145.csv`, 38.9s): clean capture, excellent balance. But robot drifted to wall and STAYED there. pos_shift climbed to 4.7 (near max 5) but wheels stopped and drift froze at -4.1 rad.
   - **Root cause: position-controlled motors break tilt-to-translation coupling.** The position PI shifts the setpoint (robot leans), but the Robstride motors in position mode hold the lean angle with internal torque at a FIXED wheel position. The wheels don't actually move. In a torque/velocity-controlled Segway, holding a lean requires sustained wheel acceleration -> translation. In position mode, the motor just applies holding torque -> no translation.
   - **Fix: add direct wheel velocity offset** driven by drift error. The position PI manages tilt (for disturbance rejection), but a new velocity term (`_wheel_vel_offset = -0.3 * drift_err * pos_gate`) directly pushes the wheels toward origin in the 200Hz loop. This provides the missing translational coupling.
+- Wheel velocity offset tried (`bal_20260410_223145.csv`): no meaningful improvement -- position PI gate bug discovered.
+  - **pos_gate was using `base_effective_setpoint` (without pos_shift) instead of `_effective_setpoint`.** The gate saw the gap between the base sp (92) and the tilted robot (97) as "angle error" and throttled the PI to 37.5%. At max shift, gate would be 0%. **Fixed: gate now uses effective setpoint.**
+- Sign flip: PI was pushing the robot INTO the wall. raw_shift negation was wrong. **Fixed: removed the leading negation** so negative drift → negative pos_shift → lower setpoint → lean forward → return.
+- **Seventh run** (`bal_20260410_223740.csv`, 41.5s): **first return-to-origin!** Robot drifted to -2.5 rad, PI lowered setpoint, robot reversed and swung back to +7 rad (massive overshoot). Ki=0.20 too high.
+  - Gains retuned: Kp 0.05→0.15, Ki 0.20→0.12, Kd 0.01→0.05 for less overshoot.
+- **Eighth run** (`bal_20260410_224228.csv`, **50.4s NEW RECORD**): clean capture, eventually found stable balance at sp=84, drift=-3.84. But took 15+ seconds of ramping the setpoint down from 91.5 to 84.0. Robot barely translated during the ramp -- drift went from -3.45 to -3.38 over 14 seconds despite 5.3 deg of setpoint change.
+  - **Confirmed: angle offset alone barely translates the robot.** Position-controlled motors can hold any lean angle with internal torque at fixed wheel position. A 5 deg setpoint shift produced only 0.07 rad of actual wheel movement in 14 seconds.
+  - pos_shift maxed at -8.0. Robot found static balance at sp=84 with drift frozen at -3.84.
+  - Need a mechanism that directly drives wheel movement, not just lean angle.
+- **Ninth run** (`bal_20260411_091031.csv`, 7.7s): with origin-reset-on-arm-return + PI gains Kp=0.40/Ki=0.15/Kd=0.12. Capture shift faded in 0.25s (no rate limit yet), robot overshot to 98 deg, PD slammed wheels creating -6.35 rad drift in 1 second. PI overshot recovering. Toppled.
+  - **Root cause: base setpoint transition too fast** (13 deg in 0.25s = 52 deg/s). PD overshoots, creates massive initial drift.
+  - Added `BALANCE_BASE_SP_RATE_MAX = 5.0 deg/s` to rate-limit the base setpoint transition.
+- **Tenth run** (`bal_20260411_092019.csv`, 11.5s): rate limit working (ramp took ~1.7s), but drift accumulated to +3.84 rad during the ramp. PI saw positive drift during the ramp and ADDED to the setpoint (compounding), causing overshoot to 100 deg then violent oscillation.
+  - **Problem: PI runs during the base SP ramp and interferes.** The ramp intentionally changes the setpoint from ~84 to 92. Drift accumulates during this ramp. The PI sees the drift and adjusts pos_shift, but this fights/amplifies the ramp depending on sign.
+  - **Fix needed: delay PI activation until the base setpoint ramp finishes.** Reset wheel origin only after `_smoothed_base_sp` reaches its target. This way the ramp completes undisturbed, then the PI starts fresh from drift=0.
+- **Eleventh run** (`bal_20260411_092847.csv`, 20.6s): PI gated until ramp complete -- correct behavior. But 5 deg/s ramp still too fast. During the 2.8s ramp from 78→92, the PD saturated at 25 rad/s for 1+ seconds (robot falling forward, gravity winning). Drift reached +10 rad during ramp, then violent overshoot to 115 deg, then oscillation, drift to -12 rad. PI maxed pos_shift at -6.0, robot settled at sp=86 with drift=-11.5.
+  - **Root cause: the ramp speed is not the issue -- it's the distance.** Tilting from 78 to 92 (14 deg) requires massive wheel movement regardless of speed. At 5 deg/s, the robot spends 1.5s in the "far from balance" zone (78-84 deg) where gravity pulls hard forward and the PD saturates. At 1 deg/s, the robot passes through this zone over 6 seconds with gentle motor commands that don't create massive drift.
 
 ---
 
@@ -193,6 +210,12 @@
 | `bal_20260410_210747.csv` | 20.0s | Trim+decay: clean start, but 0.99 decay too weak, trim+PI still compounded to sp=97.9 |
 | `bal_20260410_211316.csv` | 33.2s | **No trim + wide capture**: correct architecture, 0.1 deg balance, but PI too slow; drifted to bench edge |
 | `bal_20260410_222145.csv` | 38.9s | Stronger PI gains: excellent balance, but position-controlled motors don't translate from tilt alone; stuck at wall |
+| `bal_20260410_223145.csv` | 34.7s | Gate bug fix + velocity offset: no improvement, PI gate was self-throttling |
+| `bal_20260410_223740.csv` | 41.5s | **Sign fix + I-heavy**: first return-to-origin! But Ki=0.20 caused massive overshoot (+7 rad) |
+| `bal_20260410_224228.csv` | **50.4s** | **NEW RECORD**: Kp=0.15/Ki=0.12/Kd=0.05, stable balance at sp=84. But angle-only shift barely translates |
+| `bal_20260411_091031.csv` | 7.7s | Origin reset + no rate limit: overshoot to 98, -6.35 rad drift in 1s |
+| `bal_20260411_092019.csv` | 11.5s | Rate limit 5 deg/s: ramp gentler but PI interfered during ramp, amplified drift |
+| `bal_20260411_092847.csv` | 20.6s | PI gated until ramp done: correct, but 5 deg/s still too fast; PD saturated during ramp |
 
 ---
 

@@ -103,6 +103,21 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 
 // ---------------------------------------------------------------------------
 // Self-balance mode
+//
+// Two cascaded control loops:
+//
+//   OUTER LOOP (50Hz, Core 1) -- Position PI
+//     Input:  wheel odometry (rad) from engage origin
+//     Output: balance angle offset (deg) added to scheduled setpoint
+//     Goal:   keep robot near its starting position on the ground
+//
+//   INNER LOOP (200Hz, Core 0) -- Balance PD
+//     Input:  tilt angle (deg) from complementary filter, gyro rate (deg/s)
+//     Output: motor velocity command (rad/s) integrated into wheel position targets
+//     Goal:   keep robot upright at the effective setpoint angle
+//
+//   effective_setpoint = arm_scheduled_base + capture_shift + pos_shift
+//
 // ---------------------------------------------------------------------------
 static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 92.0f;   // balance point with arms at forward ref
 static constexpr float    BALANCE_SETPOINT_ARMS_TIP     = 86.5f;   // balance point with arms at tip position
@@ -113,6 +128,9 @@ static constexpr float    BALANCE_SETPOINT_RATE_MAX     = 2.0f;    // max deg/s 
 static constexpr float    BALANCE_TRIM_MAX_DEG          = 3.0f;    // trim clamp -- reduced to limit positive feedback with position PI
 static constexpr float    BALANCE_TRIM_DECAY             = 0.99f;  // per-tick decay when position PI active (~1.5s half-life at 50Hz)
 static constexpr float    BALANCE_CAPTURE_SHIFT_MAX_DEG = 15.0f;   // cover large engage angle differences
+static constexpr bool     BALANCE_USE_SCHEDULED_SP      = true;    // if false, base setpoint stays at ARMS_FWD (92) always
+static constexpr bool     BALANCE_USE_CAPTURE_SHIFT     = true;    // if false, no capture shift -- engage directly at scheduled sp
+static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 10.0f;   // max deg/s base setpoint can change (sweet spot: best at 10)
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -129,6 +147,11 @@ static constexpr float    BALANCE_ARM_RETURN_SPEED      = 10.0f;   // rad/s -- s
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
+// Inner loop PD gains (200Hz, Core 0)
+//   Input:  angle_err = effective_setpoint - tilt_angle (deg)
+//   Input:  gyro_rate (deg/s)
+//   Output: motor_vel = Kp * angle_err - Kd * gyro_rate (rad/s)
+//   motor_vel is integrated into wheel position targets each tick
 static constexpr float    BALANCE_KP                    = 2.0f;    // rad/s per degree of angle error
 static constexpr float    BALANCE_KD                    = 0.08f;   // rad/s per deg/s of roll rate
 
@@ -146,17 +169,21 @@ static constexpr float    BALANCE_SAFE_RATE_MAX_DPS     = 200.0f;   // extreme r
 static constexpr uint32_t BALANCE_SAFE_RATE_DURATION_MS = 500;      // must persist this long
 static constexpr uint32_t BALANCE_SAFE_SAT_DURATION_MS  = 3000;     // motor saturated this long -> disengage
 
-// Outer position PI loop -- always active, gated by angle error
-// This is the ONLY setpoint correction (no command integrator trim -- see lesson 17/18)
-// Start I-heavy: integral drives sustained setpoint change -> sustained motor_vel -> translation
-static constexpr float    BALANCE_POS_KP                = 0.15f;    // proportional: provides braking as robot approaches home
-static constexpr float    BALANCE_POS_KI                = 0.12f;    // integral: sustained correction, reduced from 0.20 to limit overshoot
-static constexpr float    BALANCE_POS_KD                = 0.05f;    // velocity damping: brakes the return to prevent overshoot
-static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 8.0f;     // more authority so integral doesn't max out and stall
-static constexpr float    BALANCE_POS_SHIFT_RATE_MAX    = 3.0f;     // rate limit = effective translation speed command
-static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.2f;     // react to drift early
+// Outer position PI loop (50Hz, Core 1) -- always active, gated by angle error
+//   Input:  meas_drift = avg(back_wheel_pos) - wheel_origin (rad)
+//   Input:  meas_vel = avg(back_wheel_velocity) (rad/s)
+//   Output: pos_shift (deg) added to effective_setpoint
+//   If BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN is true, wheel origin resets when arms finish
+//   returning so PI only corrects post-balance drift. If false, origin stays at engage position.
+static constexpr float    BALANCE_POS_KP                = 0.20f;    // proportional: halved from 0.40 to reduce oscillation
+static constexpr float    BALANCE_POS_KI                = 0.15f;    // integral: sustained correction for steady-state
+static constexpr float    BALANCE_POS_KD                = 0.20f;    // velocity damping: increased from 0.12 to damp oscillation
+static constexpr float    BALANCE_POS_SHIFT_MAX_DEG     = 6.0f;     // authority (origin resets at arm return, so less needed)
+static constexpr float    BALANCE_POS_SHIFT_RATE_MAX    = 4.0f;     // faster rate for quicker response
+static constexpr float    BALANCE_POS_DEADBAND_RAD      = 0.15f;    // react early
 static constexpr float    BALANCE_POS_INTEGRAL_MAX      = 200.0f;   // integral clamp
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at which position authority -> 0
+static constexpr bool     BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN = true;  // reset wheel origin when arms reach forward
 
 // Stuck / wall detection (uses measured odometry)
 static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this
