@@ -395,11 +395,16 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setArmBalMaxFrac(val);
         Serial.printf("[Balance] Arm Bal Max Frac = %.4f\n", val);
 
+    } else if (strncmp(sub, "vtrim ", 6) == 0) {
+        float val = atof(sub + 6);
+        balanceCtrl.setVelTrimGain(val);
+        Serial.printf("[Balance] Vel Trim Gain = %.4f\n", val);
+
     } else {
         Serial.println("[Balance] Usage: bal status | bal engage");
         Serial.println("         bal kp/kd/vgain <val> | bal pkp/pki/pkd <val>");
         Serial.println("         bal akp/aki/akd <val> | bal abmax <val>");
-        Serial.println("         bal log | bal log clear");
+        Serial.println("         bal vtrim <val> | bal log | bal log clear");
     }
 }
 

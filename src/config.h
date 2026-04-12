@@ -201,8 +201,13 @@ static constexpr float    BALANCE_ARM_BAL_KD            = 0.015f;   // derivativ
 static constexpr float    BALANCE_ARM_BAL_INTEGRAL_MAX  = 0.25f;    // integral clamp (frac units, match max_frac)
 static constexpr float    BALANCE_ARM_BAL_DEADBAND_RAD  = 0.15f;    // ignore drift below this
 static constexpr float    BALANCE_ARM_BAL_DECAY         = 0.995f;   // per-tick integral decay (~2.8s half-life at 50Hz)
-static constexpr float    BALANCE_ARM_SP_TRACK_RATE     = 0.15f;    // frac/s setpoint tracking (slower than arm motion)
-static constexpr float    BALANCE_ARM_BAL_EARLY_FRAC_RATE = 0.15f;  // frac/s during arm return (gentler than post-ramp)
+
+// Velocity trim: slow integrator that finds the true balance angle
+//   Integrates measured wheel velocity to adjust setpoint.
+//   If wheels creep, the setpoint is wrong; trim corrects it.
+static constexpr float    BALANCE_VEL_TRIM_GAIN         = 0.10f;    // deg per (rad/s * s)
+static constexpr float    BALANCE_VEL_TRIM_MAX_DEG      = 2.0f;     // max trim clamp
+static constexpr float    BALANCE_VEL_TRIM_FILTER       = 0.02f;    // velocity filter alpha (~1s time constant at 50Hz)
 
 // Stuck / wall detection (uses measured odometry)
 static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this
