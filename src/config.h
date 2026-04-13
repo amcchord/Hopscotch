@@ -119,7 +119,7 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 //   effective_setpoint = arm_scheduled_base + capture_shift + pos_shift
 //
 // ---------------------------------------------------------------------------
-static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 92.0f;   // balance point with arms at forward ref
+static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 91.0f;   // balance point with arms at forward ref
 static constexpr float    BALANCE_SETPOINT_ARMS_TIP     = 86.5f;   // balance point with arms at tip position
 static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safety clamp (fallen forward)
 static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
@@ -130,7 +130,7 @@ static constexpr float    BALANCE_TRIM_DECAY             = 0.99f;  // per-tick d
 static constexpr float    BALANCE_CAPTURE_SHIFT_MAX_DEG = 15.0f;   // cover large engage angle differences
 static constexpr bool     BALANCE_USE_SCHEDULED_SP      = true;    // if false, base setpoint stays at ARMS_FWD (92) always
 static constexpr bool     BALANCE_USE_CAPTURE_SHIFT     = true;    // if false, no capture shift -- engage directly at scheduled sp
-static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 3.0f;    // max deg/s base setpoint can change (10 caused violent oscillation)
+static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 5.0f;    // moderate catch: fast enough to not drag, slow enough to not spike
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
 static constexpr float    BALANCE_ENGAGE_RATE_MAX_DPS   = 50.0f;   // max roll rate to engage
 static constexpr float    BALANCE_BAILOUT_THRESHOLD_DEG = 45.0f;   // disengage if error exceeds this
@@ -138,12 +138,12 @@ static constexpr float    BALANCE_CAPTURE_ERR_MAX_DEG   = 1.0f;    // must be th
 static constexpr float    BALANCE_CAPTURE_RATE_MAX_DPS  = 4.0f;    // max roll rate for a "captured" balance state
 static constexpr float    BALANCE_CAPTURE_CMD_MAX       = 1.0f;    // max PD command magnitude for a "captured" state
 static constexpr uint32_t BALANCE_CAPTURE_SETTLE_MS     = 400;     // capture must stay quiet this long before arm return
-static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 2500;    // fail-safe: don't hold the tip pose forever
+static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 1000;    // start returning arms quickly (was 2500 -- too long at unstable tip)
 
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.61f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.89f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 10.0f;   // rad/s -- snap back fast, less prolonged disturbance
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 10.0f;   // rad/s -- fast snap back (slow was worse, prolonged low-sp phase)
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 25.0f;   // rad/s speed limit for balance corrections
 
@@ -186,28 +186,32 @@ static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // error at 
 static constexpr bool     BALANCE_POS_RESET_ORIGIN_ON_ARM_RETURN = true;  // reset wheel origin when arms reach forward
 
 // Arm balance assist (active after arms reach forward)
-//   The arms shift CG to physically change the balance angle.
-//   With setpoint frozen at ARMS_FWD, the CG-induced balance shift
-//   creates sustained wheel motion (actual translation) to correct drift.
-//   Arms can rotate both toward center AND past forward (opposite direction),
-//   giving symmetric bidirectional CG authority (~9 deg each way from forward).
+//   Dual-purpose: fast velocity reflex + drift correction.
+//   No integral -- vel_trim handles steady-state, arms provide fast physical forces.
+//   Arms spring back naturally when velocity and drift are near zero.
 static constexpr float    BALANCE_SETPOINT_ARMS_CENTER  = 83.0f;    // balance point at center (measured)
-static constexpr float    BALANCE_ARM_BAL_MAX_FRAC      = 0.25f;    // max arm fraction in either direction (center_delta ~1.77 rad, so 0.25 = 0.44 rad = 25 deg max arm motion)
-static constexpr float    BALANCE_ARM_BAL_FRAC_RATE     = 0.30f;    // max frac change per second (~1.7s to reach max -- smooth)
+static constexpr float    BALANCE_ARM_BAL_MAX_FRAC      = 0.25f;    // max arm fraction in either direction
+static constexpr float    BALANCE_ARM_BAL_FRAC_RATE     = 0.30f;    // max frac change per second
 static constexpr float    BALANCE_ARM_BAL_MOTOR_SPEED   = 2.0f;     // rad/s speed limit sent to arm motors
-static constexpr float    BALANCE_ARM_BAL_KP            = 0.05f;    // proportional on drift (frac per rad)
-static constexpr float    BALANCE_ARM_BAL_KI            = 0.025f;   // integral on drift
-static constexpr float    BALANCE_ARM_BAL_KD            = 0.015f;   // derivative on drift rate
-static constexpr float    BALANCE_ARM_BAL_INTEGRAL_MAX  = 0.25f;    // integral clamp (frac units, match max_frac)
+static constexpr float    BALANCE_ARM_VEL_GAIN          = 0.02f;    // frac per rad/s of wheel velocity (fast reflex)
+static constexpr float    BALANCE_ARM_DRIFT_GAIN        = 0.03f;    // frac per rad of drift (position correction)
 static constexpr float    BALANCE_ARM_BAL_DEADBAND_RAD  = 0.15f;    // ignore drift below this
-static constexpr float    BALANCE_ARM_BAL_DECAY         = 0.995f;   // per-tick integral decay (~2.8s half-life at 50Hz)
 
 // Velocity trim: slow integrator that finds the true balance angle
 //   Integrates measured wheel velocity to adjust setpoint.
 //   If wheels creep, the setpoint is wrong; trim corrects it.
-static constexpr float    BALANCE_VEL_TRIM_GAIN         = 0.10f;    // deg per (rad/s * s)
-static constexpr float    BALANCE_VEL_TRIM_MAX_DEG      = 2.0f;     // max trim clamp
-static constexpr float    BALANCE_VEL_TRIM_FILTER       = 0.02f;    // velocity filter alpha (~1s time constant at 50Hz)
+static constexpr float    BALANCE_VEL_TRIM_GAIN         = 0.20f;    // deg per (rad/s * s) (was 0.10, faster convergence)
+static constexpr float    BALANCE_VEL_TRIM_MAX_DEG      = 4.0f;     // max trim clamp (was 2.0 -- more authority)
+static constexpr float    BALANCE_VEL_TRIM_FILTER       = 0.05f;    // velocity filter alpha (~0.4s time constant at 50Hz)
+static constexpr float    BALANCE_VEL_TRIM_GATE_DEG     = 3.0f;     // integrate trim when |angle_err| < this (was 2.0)
+static constexpr float    BALANCE_VEL_TRIM_DRIFT_GAIN   = 0.005f;   // deg per (rad_drift * s) -- gentle pull toward origin
+
+// Setpoint dither: small oscillation that probes the environment
+//   In free space: symmetric wheel motion, vel_trim sees mean vel ≈ 0
+//   Against a wall: one direction blocked, asymmetric vel, vel_trim detects and corrects
+//   Solves the CSP dead-zone where steady-state cmd=0, vel=0 gives no signal
+static constexpr float    BALANCE_DITHER_AMPLITUDE_DEG  = 0.2f;     // +/- degrees of setpoint oscillation
+static constexpr float    BALANCE_DITHER_FREQ_HZ        = 0.3f;     // oscillation frequency
 
 // Stuck / wall detection (uses measured odometry)
 static constexpr float    BALANCE_STUCK_CMD_THRESHOLD   = 2.0f;     // |motor_vel| must exceed this

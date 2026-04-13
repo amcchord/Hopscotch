@@ -375,26 +375,6 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setPosKd(val);
         Serial.printf("[Balance] Pos Kd = %.4f\n", val);
 
-    } else if (strncmp(sub, "akp ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setArmBalKp(val);
-        Serial.printf("[Balance] Arm Bal Kp = %.4f\n", val);
-
-    } else if (strncmp(sub, "aki ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setArmBalKi(val);
-        Serial.printf("[Balance] Arm Bal Ki = %.4f\n", val);
-
-    } else if (strncmp(sub, "akd ", 4) == 0) {
-        float val = atof(sub + 4);
-        balanceCtrl.setArmBalKd(val);
-        Serial.printf("[Balance] Arm Bal Kd = %.4f\n", val);
-
-    } else if (strncmp(sub, "abmax ", 6) == 0) {
-        float val = atof(sub + 6);
-        balanceCtrl.setArmBalMaxFrac(val);
-        Serial.printf("[Balance] Arm Bal Max Frac = %.4f\n", val);
-
     } else if (strncmp(sub, "vtrim ", 6) == 0) {
         float val = atof(sub + 6);
         balanceCtrl.setVelTrimGain(val);
@@ -403,7 +383,6 @@ static void processBalCommand(const char* sub) {
     } else {
         Serial.println("[Balance] Usage: bal status | bal engage");
         Serial.println("         bal kp/kd/vgain <val> | bal pkp/pki/pkd <val>");
-        Serial.println("         bal akp/aki/akd <val> | bal abmax <val>");
         Serial.println("         bal vtrim <val> | bal log | bal log clear");
     }
 }

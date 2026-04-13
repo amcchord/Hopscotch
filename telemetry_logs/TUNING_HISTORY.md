@@ -291,3 +291,52 @@
 22. **Leaky origin ("drift acceptance") prevents PI saturation.** Instead of fighting large accumulated drift, slowly move the wheel origin toward the current position (0.15/s, ~7s time constant). The PI only sees recent drift (1-2 rad max), never saturates, and the robot accepts its current location as "home" over time. This is a pragmatic fix for CSP mode's fundamental limitation.
 
 23. **For true return-to-origin, switch to Speed mode.** In Speed mode, motor_vel directly commands wheel velocity (not integrated into position targets). The PD cannot cancel a velocity offset because there is no position target for the motor servo to hold. This is a larger architectural change for future work.
+
+---
+
+## Phase 13: Arm CG Balance Assist (Apr 12)
+
+- Arms shift CG to physically change the balance angle, creating a mismatch vs the frozen setpoint that drives wheel motion.
+- Center-delta calibration: left=+1.77 rad, right=-1.77 rad. Balance point at center = 83 deg, at forward = ~91 deg.
+- Max arm fraction 0.25 (±25 deg arm motion, ±2.25 deg balance shift).
+- Arm balance PID (Kp on drift + Ki integral + Kd on velocity) with integral decay (0.995/tick).
+- **Problem**: integral stuck at max 97% of time. Arms never returned to forward. The integral decay was overwhelmed by proportional+integral refill from sustained drift.
+- **Problem**: tracking setpoint (sp follows arm CG) was counterproductive -- it neutralized the CG-setpoint mismatch and in some cases amplified drift by raising sp when arms went past forward.
+- **Solution**: reverted to frozen setpoint. Arms create mismatch vs fixed sp, producing sustained (if small) wheel drive.
+
+## Phase 14: Velocity Trim Integrator (Apr 12)
+
+- **Breakthrough**: the correct balance angle is where wheel velocity averages to zero. Integrating measured wheel velocity into a setpoint trim automatically finds the true balance point.
+- `vel_trim -= gain * filtered_wheel_vel * gate * dt` with gain=0.20, filter alpha=0.05, gate=3.0 deg.
+- Gate prevents trim corruption during wild oscillations (only integrates when |angle_err| < 3 deg).
+- **Best unassisted result**: 85% stable, vel_trim converged to +0.28 deg, drift ended at -3.66 rad.
+- The true balance point varies run to run (gyro init, weight distribution). The vel_trim finds it automatically each time.
+
+## Phase 15: Unified Architecture (Apr 12)
+
+- Replaced arm PID with simpler dual-component arms: velocity reflex (`ARM_VEL_GAIN * wheel_vel`) + drift correction (`ARM_DRIFT_GAIN * drift_err`). No integral -- arms spring back naturally.
+- Vel_trim has three inputs: wheel velocity (finds balance), motor command (captures "trying"), wheel drift (pulls toward origin).
+- **Problem**: cmd_gain added oscillation noise during catch phase. Removed.
+- **Problem**: drift_gain at 0.03 created feedback oscillation with the inner PD at moderate drift. Reduced to 0.005.
+- **Problem**: in CSP mode, once balanced, setpoint changes produce zero wheel translation. The trim finds the right angle but drift is uncorrectable through setpoint shifts alone.
+
+## Phase 16: Aggressive Catch + Dither (Apr 12)
+
+- Reduced ARM_HOLD_MAX_MS from 2500 to 1000. Arms start returning 1.5s sooner, less time at unstable tip balance.
+- BASE_SP_RATE_MAX tuned to 5.0 deg/s (3.0 was too slow = prolonged error; 15.0 was too fast = sharp spike).
+- **Key insight**: CSP position mode creates a dead zone at steady state (cmd=0, vel=0, no signal). Setpoint dither (±0.2 deg at 0.3 Hz) probes the environment like a person rocking to feel which way they can move.
+  - In free space: symmetric wheel motion, mean vel ≈ 0, trim stable.
+  - Against a wall: one direction blocked, asymmetric vel, vel_trim detects and corrects.
+  - Solves the fundamental CSP problem where the robot "happily balances at the wrong position" with no signal to correct.
+
+## Lessons Learned (continued)
+
+24. **The arm balance integral gets stuck when proportional saturates.** With Kp=0.05 and drift=-5 rad, proportional alone produces 0.25 frac (at max). The integral can never decay because proportional keeps refilling. Remove the integral; let vel_trim handle steady-state.
+
+25. **Command integrator in the vel_trim adds oscillation noise.** During the 1.4 Hz catch oscillation, the PD commands swing ±7 rad/s. The cmd_gain integrates these into trim, whipsawing it. Remove cmd_gain from vel_trim.
+
+26. **The initial rollaway is dominated by time at the tip balance point, not the ramp speed.** At ARM_HOLD_MAX_MS=2500, the robot sits at 86.5 deg for 2.5s before arms return, drifting 3+ rad. Reducing to 1000ms cuts this significantly.
+
+27. **CSP dead zone at steady state.** Once balanced, cmd≈0, vel≈0, drift is frozen. No outer loop has a signal to work with. Setpoint dither (small periodic oscillation) creates a probing signal that the vel_trim can detect and act on.
+
+28. **The true balance point is NOT 92.0 degrees.** The vel_trim consistently converges to sp=91.0+0.3 to +1.3 of trim. BALANCE_SETPOINT_ARMS_FWD should be ~91.0, with the trim finding the exact offset each run.
