@@ -525,7 +525,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                                            / BALANCE_POS_GATE_ERR_DEG,
                                            0.0f, 1.0f);
 
-            float vel_component   = BALANCE_ARM_VEL_GAIN * _filtered_wheel_vel;
+            float vel_component   = -BALANCE_ARM_VEL_GAIN * _filtered_wheel_vel;
             float drift_component = BALANCE_ARM_DRIFT_GAIN * drift_err;
 
             float target_frac = clampf((vel_component + drift_component) * pos_gate,
@@ -564,28 +564,23 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, arm_speed);
 
-        // Velocity trim: slowly adjusts setpoint to find the angle where
-        // wheel velocity averages to zero (the true balance point).
+        // Odometry PID + Vel trim: find the balance angle that produces
+        // a target velocity pushing the robot back toward origin.
         if (_ramp_complete) {
             _filtered_wheel_vel += BALANCE_VEL_TRIM_FILTER * (meas_vel - _filtered_wheel_vel);
 
+            float target_vel = -BALANCE_ODO_KP * meas_drift - BALANCE_ODO_KD * meas_vel;
+            target_vel = clampf(target_vel, -BALANCE_ODO_MAX_VEL, BALANCE_ODO_MAX_VEL);
+
+            float vel_error = _filtered_wheel_vel - target_vel;
             float trim_gate = 1.0f - clampf(fabsf(_effective_setpoint - tilt)
                                              / BALANCE_VEL_TRIM_GATE_DEG,
                                              0.0f, 1.0f);
-            _vel_trim -= _vel_trim_gain * _filtered_wheel_vel * trim_gate * dt;
-            _vel_trim -= BALANCE_VEL_TRIM_DRIFT_GAIN * meas_drift * trim_gate * dt;
-
+            _vel_trim -= _vel_trim_gain * vel_error * trim_gate * dt;
             _vel_trim = clampf(_vel_trim, -BALANCE_VEL_TRIM_MAX_DEG, BALANCE_VEL_TRIM_MAX_DEG);
         }
 
-        float dither = 0.0f;
-        if (_ramp_complete) {
-            float t_sec = (float)(now - _balance_start_ms) / 1000.0f;
-            dither = BALANCE_DITHER_AMPLITUDE_DEG
-                   * sinf(2.0f * 3.14159265f * BALANCE_DITHER_FREQ_HZ * t_sec);
-        }
-
-        _effective_setpoint = base_effective_setpoint + _vel_trim + dither;
+        _effective_setpoint = base_effective_setpoint + _vel_trim;
         _effective_setpoint = clampf(_effective_setpoint, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
 
         bool arm_correcting = fabsf(_arm_bal_frac) > 0.01f;
@@ -746,12 +741,9 @@ void BalanceController::dumpLog() {
     Serial.printf("# vel_trim_max=%.2f\n", BALANCE_VEL_TRIM_MAX_DEG);
     Serial.printf("# vel_trim_filter=%.4f\n", BALANCE_VEL_TRIM_FILTER);
     Serial.printf("# vel_trim_gate=%.2f\n", BALANCE_VEL_TRIM_GATE_DEG);
-    Serial.printf("# vel_trim_drift_gain=%.4f\n", BALANCE_VEL_TRIM_DRIFT_GAIN);
-    Serial.printf("# dither_amplitude=%.2f\n", BALANCE_DITHER_AMPLITUDE_DEG);
-    Serial.printf("# dither_freq=%.2f\n", BALANCE_DITHER_FREQ_HZ);
-    Serial.printf("# vel_trim_drift_gain=%.4f\n", BALANCE_VEL_TRIM_DRIFT_GAIN);
-    Serial.printf("# stuck_cmd_threshold=%.2f\n", BALANCE_STUCK_CMD_THRESHOLD);
-    Serial.printf("# stuck_vel_threshold=%.2f\n", BALANCE_STUCK_VEL_THRESHOLD);
+    Serial.printf("# odo_kp=%.4f\n", BALANCE_ODO_KP);
+    Serial.printf("# odo_kd=%.4f\n", BALANCE_ODO_KD);
+    Serial.printf("# odo_max_vel=%.2f\n", BALANCE_ODO_MAX_VEL);
     Serial.printf("# arm_center_left=%.4f\n", _arm_center_left);
     Serial.printf("# arm_center_right=%.4f\n", _arm_center_right);
     Serial.printf("# base_sp_fwd=%.2f\n", BALANCE_SETPOINT_ARMS_FWD);
