@@ -1,16 +1,59 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v11: Speed-Mode Cascade -- see Phase 14)
+## Current Architecture (v12: Speed-Mode Cascade + Arm Assist, July 2026)
 
-- Back wheels in **Robstride Speed mode** during balance; 200 Hz inner PD
-  (Kp=2.0, Kd=0.08) sends wheel velocity commands directly.
-- 50 Hz outer cascade: position P (drift -> target velocity) -> velocity PI
-  (velocity error -> tilt setpoint offset, single integrator).
-- Arm-position -> balance-point **calibration curve** (piecewise linear,
-  fitted from telemetry) replaces the two-point interpolation.
-- Effective setpoint = arm_curve(arm_frac) + capture_shift + sp_offset.
-- All exit paths zero wheel speed, then restore CSP.
-- Details, fitted model, and the first-session test ladder: Phase 14 below.
+### Inner loop (200 Hz, Core 0)
+- Back wheels in **Robstride Speed mode**; PD (Kp=2.0, Kd=0.08 on
+  complementary-filter tilt) commands wheel velocity directly.
+- Yaw sync: differential correction holds the L/R wheel position
+  difference at its engage value (+/-1.5 rad/s).
+- Two-stage dead-man on the Core 1 heartbeat: >300ms stale -> authority
+  clamped to 20 rad/s; >1.5s -> wheels stopped.
+
+### Outer cascade (50 Hz, Core 1)
+- Position P (drift -> target velocity, origin = engage position) ->
+  velocity PI (dual-slope: 0.7 below 0.8 rad/s, 2.2 above) -> tilt
+  setpoint offset, rate-limited 12 deg/s, clamped +/-8 deg.
+- High-velocity shed: braking-by-lean authority fades 8->14 rad/s
+  (leaning back needs forward acceleration; near the speed ceiling that
+  self-defeats).
+- Single integrator = equilibrium learner: calm-gated, glide-boosted,
+  seeded from persisted settings.balance_trim, saved back after >=8s runs.
+
+### Setpoint schedule (self-calibrating)
+- effective_sp = curve(tip_frac) + center_frac*(CENTER-FWD) + stored trim
+  + run_curve_shift + capture_shift + sp_offset.
+- Arm deltas decomposed onto calibrated tip + center axes.
+- **Capture self-calibration**: every settled capture (at the tip stance)
+  re-zeros the curve's absolute level for that run -- anchors provide
+  shape only.
+
+### Arm assist (the robot's second actuator)
+- Neutral = forward pose (= top-dead-center when standing). Excursions
+  +0.45 (arms back, brakes forward motion) / -0.30 (arms forward of
+  vertical, brakes backward motion) of the calibrated center axis.
+- **Engagement lifecycle**: READY -> ACTIVE -> (one recoil HANDOFF) ->
+  COOLDOWN; re-arms only after 400ms of genuine calm. External bumps
+  arrive out of calm; self-oscillation never re-establishes it -- the
+  arms structurally cannot sustain a limit cycle.
+- Fast attack (80ms tau, 12 rad/s motors, ~raw velocity input), 0.65s
+  release; wheel velocity-P yields up to 60% while arms are deployed.
+- **Emergency throw**: wheels railed + velocity error above threshold =
+  roll-away; arms bypass the lifecycle to their full stop.
+
+### Safety & infrastructure
+- CAN bus-off auto-recovery; motor-side CAN watchdog (0x200C, ~1s);
+  verified (read-back) writes for symmetry-critical motor params;
+  stale-wheel-feedback abort (400ms); level-based drive-disarm stop
+  enforcement; non-blocking USB CDC; loop profiler dumped with `bal log`.
+- Telemetry: 50Hz PSRAM log with config header; scripts/
+  analyze_balance_logs.py (--plot), scripts/fit_balance_model.py.
+
+### Known open items
+- Standup tow: curve shape between tip and forward still approximate;
+  refit from accumulated capture data.
+- Sub-second Core 1 stalls (profiler points at preemption); dead-man
+  makes them survivable but the source is unfound.
 
 ## Previous Architecture (v10: Position PI with Leaky Origin)
 
@@ -731,6 +774,97 @@ Two operator-designed fixes implemented:
 - Lesson 42: **the robot measures its own balance point at every capture;
   use it.** Fixed anchors drift between attempts (battery seat, surface);
   the settled capture is ground truth, free, once per standup.
+
+**Run 22** (`bal_20260702_232626.csv`, 42.6s, committed at 9f579c8):
+- **Capture calibration works**: measured 84.99 at tip -> predicted 87.9
+  arms-forward; actual equilibrium 88.35. Error 0.45 deg (was 5 deg).
+- Standup still towed +13 rad: the HIGH-slope velocity gain (tap recovery)
+  engaged on the mandatory standup glide and whipped the setpoint 1.5 deg
+  past equilibrium. Fix: only the low slope is active until ramp complete.
+- Push response: arms threw 0.44 in ~200ms, forward motion killed in 0.5s
+  -- then **overcorrection fall**: the wheel P whipped +6.6 -> -2.0 deg
+  while the still-deployed arms were ALSO pulling the setpoint down via
+  the center term (-2.8 deg). Setpoint dove 9 deg in 0.5s; robot ran
+  backward -10 rad/s and fell.
+- Fixes: (1) wheel velocity-P authority scales down by up to 60% while
+  arms are deployed (actuator coordination -- the corrections were
+  stacking), (2) sp_offset rate 16 -> 12 deg/s.
+- Lesson 43: **two actuators correcting the same error double-count.**
+  When a secondary actuator deploys, the primary must yield authority
+  proportionally, or the combined response overshoots.
+
+**Run 23** (`bal_20260703_093643.csv`, 2.3s, two failed standups, safety
+abort): a 430ms Core 1 stall hit at the most fragile moment (arm return +
+base ramp both in progress). Chain: robot fell forward during the stall;
+the dead-man SOFT clamp (8 rad/s) throttled the catch (cmd pinned at
+exactly 8.0); Core 1 woke, yanked it back, overshot backward past the
+recovery envelope (cmd railed -30, vel -16, rate +150); fell. Meanwhile
+the arm return marched the CG down through the whole fight.
+- Fixes:
+  1. Soft dead-man clamp 8 -> 20 rad/s: stale-setpoint creep is <8 rad/s,
+     so the tight clamp never protected against creep -- it only throttled
+     genuine catches. (Second time the dead-man's response caused the
+     failure it guards against; see lesson 37.)
+  2. Arm return pauses while |cmd|>10 or |rate|>30 dps -- the return
+     starts calm (capture gate) and now STAYS calm.
+- prof: bal 905ms (mostly the known engage mode-switch), crsf 844ms
+  (unexplained -- preemption suspected). Sub-second stalls remain a fact
+  of this firmware; the balance loop must survive them, and now does with
+  full catch authority.
+- Lesson 44: **degraded modes must not throttle the recovery they exist
+  to enable.** Bound what the failure mode actually produces (small creep
+  commands), not what the healthy controller needs (large catch commands).
+
+**Run 24** (`bal_20260703_094448.csv`, 52.5s): four findings, four fixes.
+1. **Standup tow (+15.7 rad)**: capture calibration nailed the level, but
+   the CSP-era curve SHAPE (flat middle, dip at frac 0.15) made the sp lag
+   the true equilibrium through the arm return -- gliding forward at up to
+   5.5 rad/s mid-return is the direct signature. Curve replaced with a
+   monotonic tip->fwd rise (84.0 / 82.5 / 81.1); level comes from capture.
+2. **Best stability ever recorded**: quiet roll std 0.28 deg, dominant
+   motion 0.15 deg at 0.23 Hz (the position loop breathing). Left alone.
+3. **Arm kick-in latency ~0.35s** (threshold cross to useful deployment):
+   input filter cut to ~raw (tau 20ms) -- the one-shot latch tolerates
+   noise blips, so filter lag buys nothing.
+4. **Backward push overcorrected (-10 rad)**: the sign-latch left the arms
+   stranded positive (relaxing from the prior forward push) so the
+   backward push got wheels-only at full whip. Latch amended: strong
+   opposite demand clears the arms out FAST (2x attack tau), and
+   re-deploy unlocks at |dev|<0.10 instead of 0.03. Still never swings
+   through neutral -- anti-flip-flop preserved.
+- Lesson 45: **back-to-back opposite disturbances are the norm, not the
+  exception** (every push has a catch-recoil). One-shot latches need a
+  fast hand-off path for the counter-direction.
+
+**Run 25** (`bal_20260703_095326.csv`, 54.6s): the fast-arm changes brought
+the oscillator back at 0.56 Hz -- arms deployed 83% of the time, 89
+direction reversals, arm-vel correlation +0.79 at 340ms. Bumps in BOTH
+directions handled well (the handoff works); the arms just never leave the
+loop afterward. Standup tow still present (noted, deferred).
+- **Fix: arm engagement state machine** (READY -> ACTIVE -> HANDOFF ->
+  COOLDOWN). The discriminator between an external bump and self-
+  oscillation is CALM: a bump arrives out of calm; an oscillation never
+  re-establishes it. One event = at most two swings (push + recoil
+  handoff), then arms hold neutral until |vel_err|<1 and |rate|<15 dps
+  for 400ms re-arms them. Full-speed response preserved from READY;
+  sustained oscillation is structurally denied arm participation.
+- Lesson 46: **gate the helper on the event boundary, not on the signal.**
+  Signal-level gates (thresholds, filters, latches) all eventually leak
+  during sustained excitation; an explicit engagement lifecycle with a
+  calm-based re-arm cannot.
+
+**Run 26 feedback** (state machine validated on-robot): disturbance
+response confirmed good with settling restored. Operator tweaks applied:
+- Release tau 1.0 -> 0.65s (~50% quicker return to neutral).
+- **Emergency arm throw**: if the wheels are railed (>=90% of max cmd)
+  while velocity error is still above the arm threshold, a roll-away is
+  in progress and the wheels have nothing left -- the arms bypass the
+  engagement lifecycle and throw to their FULL stop in the braking
+  direction. Exits as a normal ACTIVE engagement (relax + cooldown).
+  Wheel saturation is the one unambiguous "use everything" signal: no
+  double-counting concern because the primary actuator is pinned.
+- Standup weirdness still open (curve shape refit pending, needs a few
+  more captures for data).
 
 **Test ladder for the first Speed-mode session** (one variable at a time):
 1. **Wheels-up mode switch**: robot on a stand, drive armed. Serial:

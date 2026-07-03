@@ -272,6 +272,9 @@ void BalanceController::enterBalancing(float current_roll) {
 
     _arm_assist_frac = BALANCE_ARM_ASSIST_BIAS_FRAC;
     _arm_assist_vel  = 0.0f;
+    _arm_stage       = 3;      // COOLDOWN: standup transients must not deploy arms
+    _arm_sign        = 0.0f;
+    _arm_calm_ms     = 0.0f;
     _run_curve_shift = 0.0f;
     const ArmCalibration& cal = _arms->getCalibration();
     _arm_center_left  = cal.center_left;
@@ -703,8 +706,15 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Arm return, then arm assist ownership after the ramp completes
         // ---------------------------------------------------------------
         if (_arms_returning && !_ramp_complete) {
-            _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
-            _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
+            // Crisis pause: don't keep marching the CG while the wheels are
+            // fighting (run 093643: the return continued blindly through a
+            // stall-induced catch and fed the backward overshoot). The
+            // capture gate ensures the return STARTS calm; this keeps it so.
+            bool crisis = fabsf((float)_last_motor_vel) > 10.0f || fabsf(rate) > 30.0f;
+            if (!crisis) {
+                _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
+                _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
+            }
 
             if (!_arms_returned) {
                 float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
@@ -768,9 +778,12 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Dual-slope velocity response: gentle below the knee so the
         // setpoint doesn't chase idle velocity ripple (0.3 Hz sway,
         // bal_20260702_164034), full authority above it for taps.
+        // During the standup ramp only the low slope applies -- forward
+        // glide is REQUIRED to stand up, and the tap-recovery slope whipped
+        // the setpoint 1.5 deg past equilibrium (+13 rad tow, run 232626).
         float abs_err = fabsf(vel_err);
         float p_term;
-        if (abs_err <= BALANCE_VEL_SP_KNEE) {
+        if (abs_err <= BALANCE_VEL_SP_KNEE || !_ramp_complete) {
             p_term = BALANCE_VEL_SP_KP_LOW * vel_err;
         } else {
             float sign = 1.0f;
@@ -778,6 +791,15 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             p_term = sign * (BALANCE_VEL_SP_KP_LOW * BALANCE_VEL_SP_KNEE
                              + _vel_sp_kp * (abs_err - BALANCE_VEL_SP_KNEE));
         }
+
+        // Actuator coordination: a deployed arm is already shifting the
+        // equilibrium (its center-term lowers/raises the scheduled sp).
+        // Scale the wheel P authority down while arms are out so the two
+        // corrections don't stack (double-counted into a -10 rad/s
+        // backward overcorrection, run 232626).
+        float arm_dev = fabsf(_arm_assist_frac - BALANCE_ARM_ASSIST_BIAS_FRAC);
+        float arm_share = clampf(arm_dev / BALANCE_ARM_ASSIST_RANGE_POS, 0.0f, 1.0f);
+        p_term *= (1.0f - 0.6f * arm_share);
 
         // High-velocity shed: near the wheel speed ceiling, braking-by-lean
         // self-defeats (more lean = more acceleration = saturation = crash,
@@ -822,24 +844,91 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                                   -BALANCE_ARM_ASSIST_RANGE_NEG,
                                   BALANCE_ARM_ASSIST_RANGE_POS);
 
-            float dev = _arm_assist_frac - BALANCE_ARM_ASSIST_BIAS_FRAC;
-            bool same_dir = (dev >= 0.0f && demand > 0.0f)
-                         || (dev <= 0.0f && demand < 0.0f);
-            bool near_neutral = fabsf(dev) < 0.03f;
-
-            if (demand != 0.0f && (same_dir || near_neutral)
-                && fabsf(demand) > fabsf(dev)) {
-                // Attack: deepen the deployment, fast
-                float alpha = clampf(dt / BALANCE_ARM_ASSIST_TAU_IN, 0.0f, 1.0f);
-                _arm_assist_frac += alpha * ((BALANCE_ARM_ASSIST_BIAS_FRAC + demand)
-                                             - _arm_assist_frac);
+            // Engagement state machine. Discriminator between an external
+            // bump and self-oscillation: a bump ARRIVES OUT OF CALM; an
+            // oscillation never re-establishes calm (0.56 Hz arm flip-flop,
+            // 89 reversals, run 095326). One event = at most two swings
+            // (push + recoil handoff), then the arms hold neutral until the
+            // robot has been genuinely calm -- the wheels-only loop is
+            // proven stable and extinguishes any residual oscillation.
+            bool calm_now = fabsf(vel_err) < 1.0f && fabsf(rate) < 15.0f;
+            if (calm_now) {
+                _arm_calm_ms += dt * 1000.0f;
             } else {
-                // Relax: monotonic slow return to neutral. Opposite-sign
-                // demands are IGNORED until the arms are back near neutral.
-                float alpha = clampf(dt / BALANCE_ARM_ASSIST_TAU_OUT, 0.0f, 1.0f);
-                _arm_assist_frac += alpha * (BALANCE_ARM_ASSIST_BIAS_FRAC
-                                             - _arm_assist_frac);
+                _arm_calm_ms = 0.0f;
             }
+
+            float dev = _arm_assist_frac - BALANCE_ARM_ASSIST_BIAS_FRAC;
+            bool near_neutral = fabsf(dev) < 0.10f;
+            float dsign = 0.0f;
+            if (demand > 0.0f) dsign = 1.0f;
+            if (demand < 0.0f) dsign = -1.0f;
+
+            float target = BALANCE_ARM_ASSIST_BIAS_FRAC;
+            float tau = BALANCE_ARM_ASSIST_TAU_OUT;
+
+            switch (_arm_stage) {
+            case 0:  // READY: armed at neutral, full-speed response available
+                if (dsign != 0.0f) {
+                    _arm_sign = dsign;
+                    _arm_stage = 1;
+                    target = BALANCE_ARM_ASSIST_BIAS_FRAC + demand;
+                    tau = BALANCE_ARM_ASSIST_TAU_IN;
+                }
+                break;
+
+            case 1:  // ACTIVE
+            case 2:  // HANDOFF (opposite swing of the same event)
+                if (dsign == _arm_sign && fabsf(demand) > fabsf(dev)) {
+                    // Deepen with the disturbance
+                    target = BALANCE_ARM_ASSIST_BIAS_FRAC + demand;
+                    tau = BALANCE_ARM_ASSIST_TAU_IN;
+                } else if (dsign == -_arm_sign && fabsf(demand) > 0.10f
+                           && _arm_stage == 1) {
+                    if (near_neutral) {
+                        // Recoil handoff: one opposite swing allowed
+                        _arm_sign = dsign;
+                        _arm_stage = 2;
+                        target = BALANCE_ARM_ASSIST_BIAS_FRAC + demand;
+                        tau = BALANCE_ARM_ASSIST_TAU_IN;
+                    } else {
+                        // Clear out fast to make the handoff possible
+                        tau = BALANCE_ARM_ASSIST_TAU_IN * 2.0f;
+                    }
+                }
+                // else: relax slow (default target/tau)
+                if (near_neutral && fabsf(demand) < 0.05f) {
+                    _arm_stage = 3;
+                    _arm_calm_ms = 0.0f;
+                }
+                break;
+
+            default: // COOLDOWN: hold neutral until genuine calm re-arms
+                if (_arm_calm_ms > 400.0f) {
+                    _arm_stage = 0;
+                }
+                break;
+            }
+
+            // EMERGENCY OVERRIDE: wheels railed while velocity error is
+            // still large = roll-away in progress. The wheels have nothing
+            // left to give, so lifecycle rules don't apply -- throw the
+            // arms to their full stop in the braking direction.
+            bool wheels_railed = fabsf((float)_last_motor_vel)
+                               >= BALANCE_MAX_DRIVE_SPEED * BALANCE_ARM_EMERGENCY_CMD_FRAC;
+            if (wheels_railed && fabsf(vel_err) > BALANCE_ARM_ASSIST_THRESH) {
+                _arm_sign  = (vel_err > 0.0f) ? 1.0f : -1.0f;
+                _arm_stage = 1;   // exits as a normal ACTIVE engagement
+                if (vel_err > 0.0f) {
+                    target = BALANCE_ARM_ASSIST_BIAS_FRAC + BALANCE_ARM_ASSIST_RANGE_POS;
+                } else {
+                    target = BALANCE_ARM_ASSIST_BIAS_FRAC - BALANCE_ARM_ASSIST_RANGE_NEG;
+                }
+                tau = BALANCE_ARM_ASSIST_TAU_IN;
+            }
+
+            float alpha = clampf(dt / tau, 0.0f, 1.0f);
+            _arm_assist_frac += alpha * (target - _arm_assist_frac);
 
             float fwd_l = _arms->getForwardLeft();
             float fwd_r = _arms->getForwardRight();

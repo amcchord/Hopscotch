@@ -163,12 +163,13 @@ struct BalanceSpAnchor {
     float setpoint_deg;
 };
 static constexpr BalanceSpAnchor BALANCE_SP_CURVE[] = {
-    // Shape from the CSP-era fit; absolute level re-zeroed -5.3 deg after
-    // the battery reseat (see BALANCE_SETPOINT_ARMS_FWD). Engage data from
-    // run 224649 (tip capture at roll ~81.3) corroborates the shifted tip.
+    // Monotonic tip->forward rise. The CSP-era shape (flat middle, dip at
+    // 0.15, jump at the end) made the setpoint lag the true equilibrium
+    // through the arm return -- the robot towed forward +15 rad chasing it
+    // (run 094448). Absolute level is re-zeroed at every settled capture;
+    // these anchors only need the right SHAPE.
     { 0.00f, 84.0f },   // arms forward
-    { 0.15f, 81.6f },   // balance point drops fast in early arm travel
-    { 0.50f, 82.0f },   // mid travel (sparse data: refine from new logs)
+    { 0.50f, 82.5f },   // mid return
     { 1.00f, 81.1f },   // arms at tip
 };
 static constexpr int BALANCE_SP_CURVE_LEN =
@@ -206,7 +207,10 @@ static constexpr uint32_t BALANCE_FEEDBACK_STALE_MS     = 400;      // abort if 
 // 200Hz inner PD on Core 0 can hold balance on a stale setpoint for a
 // while; it just must not be allowed to run away.
 static constexpr uint32_t BALANCE_DEADMAN_SOFT_MS       = 300;      // clamp wheel authority (keep balancing)
-static constexpr float    BALANCE_DEADMAN_SOFT_CMD_MAX  = 8.0f;     // rad/s clamp in degraded mode
+static constexpr float    BALANCE_DEADMAN_SOFT_CMD_MAX  = 20.0f;    // rad/s clamp in degraded mode. Stale-setpoint creep is
+                                                                    // <8 rad/s so a tight clamp never stopped creep -- it only
+                                                                    // throttled real catches (fall during a 430ms stall with
+                                                                    // cmd pinned at 8.0, run 093643)
 static constexpr uint32_t BALANCE_DEADMAN_HARD_MS       = 1500;     // stop wheels entirely
 
 // Outer cascade (50Hz, Core 1) -- active after the base setpoint ramp
@@ -226,7 +230,8 @@ static constexpr float    BALANCE_VEL_SP_KNEE           = 0.8f;     // rad/s bou
 static constexpr float    BALANCE_VEL_SP_KI             = 0.35f;    // deg/s per rad/s of velocity error (single integrator)
 static constexpr float    BALANCE_SP_OFFSET_MAX_DEG     = 8.0f;     // setpoint offset clamp (6 railed for 6.6s during the
                                                                     // escalating-tap run -- it was the binding constraint)
-static constexpr float    BALANCE_SP_OFFSET_RATE        = 16.0f;    // deg/s rate limit -- still step-free by construction
+static constexpr float    BALANCE_SP_OFFSET_RATE        = 12.0f;    // deg/s rate limit -- still step-free; 16 allowed a
+                                                                    // +6.6 -> -2.0 whipsaw in 0.5s (run 232626 overcorrection)
 static constexpr float    BALANCE_VEL_FILTER_ALPHA      = 0.35f;    // wheel velocity LPF (~55ms) -- earlier lean-in on taps
 static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // angle error at which outer-loop authority -> 0
 
@@ -269,15 +274,19 @@ static constexpr float    BALANCE_ARM_ASSIST_RANGE_POS  = 0.45f;    // toward ca
                                                                     // motion) -- proven territory
 static constexpr float    BALANCE_ARM_ASSIST_RANGE_NEG  = 0.30f;    // forward of vertical (brakes backward motion) --
                                                                     // mechanically unverified beyond this, extend after check
-static constexpr float    BALANCE_ARM_ASSIST_VEL_TAU    = 0.05f;    // s, minimal extra LPF: the input is already smoothed by
-                                                                    // the 55ms cascade filter. Total lag is what turned the
-                                                                    // arms into an oscillator (240ms, run 225359) AND what
-                                                                    // made them miss pushes (run 225944) -- lag is the enemy
-                                                                    // in both directions; the threshold does the gating now.
+static constexpr float    BALANCE_ARM_ASSIST_VEL_TAU    = 0.02f;    // s, essentially raw: motor velocity feedback is clean and
+                                                                    // every ms of filter lag delays the arm throw (0.35s
+                                                                    // push-to-deploy measured in run 094448). The one-shot
+                                                                    // latch makes a rare noise blip cost a bump, not a cycle.
 static constexpr float    BALANCE_ARM_ASSIST_TAU_IN     = 0.08f;    // s, deploy time constant: fast IS the feature
-static constexpr float    BALANCE_ARM_ASSIST_TAU_OUT    = 1.0f;     // s, release: slow monotonic return to neutral. Safe to be
-                                                                    // leisurely now -- the sign-latch means release never has
-                                                                    // to hurry to make room for a counter-deploy
+static constexpr float    BALANCE_ARM_ASSIST_TAU_OUT    = 0.65f;    // s, release: monotonic return to neutral (operator asked
+                                                                    // for ~50% quicker than the 1.0s it shipped with)
+
+// Emergency arm throw: wheels railed while still carrying velocity error
+// means a roll-away in progress -- the wheels have nothing left, so any
+// arm authority is pure gain. Bypasses the engagement lifecycle and throws
+// the arms to their full stop in the braking direction.
+static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.90f;   // of BALANCE_MAX_DRIVE_SPEED = "wheels railed"
 static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm motor speed limit
 
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium

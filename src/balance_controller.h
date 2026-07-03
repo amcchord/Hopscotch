@@ -137,6 +137,10 @@ private:
     float _vel_sp_ki          = BALANCE_VEL_SP_KI;
     float _arm_assist_frac    = 0.0f;   // arm excursion toward center (0..MAX_FRAC)
     float _arm_assist_vel     = 0.0f;   // dedicated slow LPF of vel_err for the assist
+    // Arm engagement state machine: 0=READY 1=ACTIVE 2=HANDOFF 3=COOLDOWN
+    uint8_t _arm_stage        = 3;
+    float   _arm_sign         = 0.0f;   // engagement direction (+1/-1)
+    float   _arm_calm_ms      = 0.0f;   // accumulated calm time for re-arming
     float _arm_center_left    = 0.0f;   // calibrated center-axis deltas from forward
     float _arm_center_right   = 0.0f;
     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)

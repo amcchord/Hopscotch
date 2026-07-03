@@ -29,7 +29,11 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 ### Self-Balance Mode
 
-An optional balancing mode activated via RC switch combinations. On engage, the rear wheels are switched from CSP position mode to Robstride Speed mode: a 200 Hz complementary-filter + PD control loop on Core 0 commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin, and an arm-position-to-balance-point calibration curve keeps the setpoint correct as the arms tip the body up and return. Safety monitors (tilt limits, sustained error, excessive roll rate, command saturation) automatically disengage balance mode and restore CSP if the robot is falling.
+An optional balancing mode activated via RC switch combinations. On engage, the rear wheels are switched from CSP position mode to Robstride Speed mode: a 200 Hz complementary-filter + PD control loop on Core 0 commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin.
+
+The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals across runs. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) that makes them decisive on disturbances but structurally unable to sustain an oscillation, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
+
+The full design record -- 26 instrumented runs, 46 lessons -- lives in `telemetry_logs/TUNING_HISTORY.md`.
 
 ### Web Dashboard
 
