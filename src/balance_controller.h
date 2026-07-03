@@ -5,6 +5,7 @@
 #include <freertos/semphr.h>
 #include "motor_manager.h"
 #include "arm_controller.h"
+#include "settings.h"
 #include "config.h"
 
 enum class BalanceState : uint8_t {
@@ -27,8 +28,8 @@ struct BalanceSample {
     float    setpoint;
     float    angle_err;
     float    motor_vel;
-    float    arm_bal_frac;
-    float    vel_trim;
+    float    sp_offset;
+    float    target_vel;
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
     float    arm_l, arm_r;
@@ -43,6 +44,7 @@ static constexpr int BALANCE_LOG_MAX_SAMPLES = 3000;
 class BalanceController {
 public:
     void begin(MotorManager* motors, ArmController* arms);
+    void setSettingsManager(SettingsManager* mgr) { _settings = mgr; }
 
     // Called from Core 0 at 200Hz -- fast PD balance loop
     void balanceTick(const RawImuData& imu, float dt);
@@ -68,15 +70,12 @@ public:
     // Gain setters for serial tuning
     void setKp(float v) { _kp = v; }
     void setKd(float v) { _kd = v; }
-    void setVelGain(float v) { _vel_gain = v; }
-    void setPosKp(float v) { _pos_kp = v; }
-    void setPosKi(float v) { _pos_ki = v; }
-    void setPosKd(float v) { _pos_kd = v; }
-    void setVelTrimGain(float v) { _vel_trim_gain = v; }
+    void setDriftVelKp(float v) { _drift_vel_kp = v; }
+    void setVelSpKp(float v) { _vel_sp_kp = v; }
+    void setVelSpKi(float v) { _vel_sp_ki = v; }
 
     float getKp() const { return _kp; }
     float getKd() const { return _kd; }
-    float getVelGain() const { return _vel_gain; }
     float getEffectiveSetpoint() const { return _effective_setpoint; }
 
     // Telemetry log
@@ -88,8 +87,9 @@ public:
     void printStatus();
 
 private:
-    MotorManager*   _motors = nullptr;
-    ArmController*  _arms   = nullptr;
+    MotorManager*    _motors   = nullptr;
+    ArmController*   _arms     = nullptr;
+    SettingsManager* _settings = nullptr;
 
     volatile BalanceState _state = BalanceState::Idle;
 
@@ -102,38 +102,48 @@ private:
     volatile float _kp = BALANCE_KP;
     volatile float _kd = BALANCE_KD;
 
-    // --- Velocity-integrating setpoint (Core 1 writes, Core 0 reads) ---
-    float _setpoint = 0.0f;
-    float _vel_gain = BALANCE_VEL_GAIN;
-    float _filtered_vel = 0.0f;
-
     // --- Effective setpoint (written by Core 1, read by Core 0) ---
     volatile float _effective_setpoint = BALANCE_SETPOINT_ARMS_TIP;
-    volatile float _wheel_vel_offset = 0.0f;
 
-    // --- Back wheel targets (written by Core 0 for position commands) ---
-    volatile float _back_left_target  = 0.0f;
-    volatile float _back_right_target = 0.0f;
+    // --- Yaw sync: differential wheel correction (Core 1 writes, Core 0 reads) ---
+    // Half-difference applied as left = cmd - corr, right = cmd + corr.
+    volatile float _yaw_corr = 0.0f;
+    float _yaw_lock_diff = 0.0f;   // left-right wheel position diff at engage (rad)
+
+    // --- Speed-mode gate (Core 1 writes, Core 0 reads) ---
     volatile bool  _targets_initialized = false;
+    bool _speed_mode_active = false;
+
+    // Dead-man: Core 1 stamps this every update(); if it goes stale while
+    // balancing, Core 0 stops the wheels instead of driving blind on a
+    // frozen setpoint (a stalled Core 1 also cannot process the RC switch).
+    volatile uint32_t _last_update_ms = 0;
 
     // Front wheel hold positions
     float _front_left_hold  = 0.0f;
     float _front_right_hold = 0.0f;
 
-    // --- Position return as bounded setpoint shift (Core 1, measured odometry) ---
+    // --- Setpoint handoff state (Core 1 only) ---
     float _wheel_start_pos    = 0.0f;
-    float _pos_kp             = BALANCE_POS_KP;
-    float _pos_ki             = BALANCE_POS_KI;
-    float _pos_kd             = BALANCE_POS_KD;
-    float _pos_integral       = 0.0f;
-    float _pos_setpoint_shift = 0.0f;
     float _engage_capture_shift = 0.0f;
     float _smoothed_base_sp = 0.0f;
     float _engage_arm_frac = 1.0f;
+    float _engage_trim = 0.0f;   // stored trim captured at engage, part of base sp
+    float _run_curve_shift = 0.0f;  // per-run curve re-zero measured at capture
 
-    // --- Stuck / wall detection (Core 1 only) ---
-    bool     _stuck           = false;
-    uint32_t _stuck_start_ms  = 0;
+    // --- Outer cascade: position P -> velocity PI (Core 1 only) ---
+    float _drift_vel_kp       = BALANCE_DRIFT_VEL_KP;
+    float _vel_sp_kp          = BALANCE_VEL_SP_KP;
+    float _vel_sp_ki          = BALANCE_VEL_SP_KI;
+    float _arm_assist_frac    = 0.0f;   // arm excursion toward center (0..MAX_FRAC)
+    float _arm_assist_vel     = 0.0f;   // dedicated slow LPF of vel_err for the assist
+    float _arm_center_left    = 0.0f;   // calibrated center-axis deltas from forward
+    float _arm_center_right   = 0.0f;
+    float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)
+    float _sp_offset          = 0.0f;   // deg, added to base setpoint
+    float _filtered_wheel_vel = 0.0f;   // rad/s
+    float _last_target_vel    = 0.0f;   // rad/s, for telemetry
+    uint32_t _ramp_complete_ms = 0;     // when the outer cascade activated
 
     // --- Safety abort timers (Core 1 only) ---
     uint32_t _safe_err_start_ms  = 0;
@@ -166,17 +176,6 @@ private:
     bool     _capture_stable   = false;
     uint32_t _capture_stable_start_ms = 0;
 
-    // Arm balance assist (Core 1 only)
-    float _arm_bal_frac        = 0.0f;
-    bool  _arm_bal_active      = false;
-    float _arm_center_left     = 0.0f;
-    float _arm_center_right    = 0.0f;
-
-    // Velocity trim integrator (Core 1 only, active after ramp_complete)
-    float _vel_trim            = 0.0f;
-    float _filtered_wheel_vel  = 0.0f;
-    float _vel_trim_gain       = BALANCE_VEL_TRIM_GAIN;
-
     // Telemetry logging
     BalanceSample* _log_buf    = nullptr;
     int            _log_count  = 0;
@@ -186,12 +185,15 @@ private:
 
     static float clampf(float value, float min_value, float max_value);
     static float moveToward(float current, float target, float rate, float dt);
+    void armAxisFractions(float& tip_frac, float& center_frac) const;
     float computeArmFraction() const;
     float computeScheduledSetpoint() const;
     void enterTippingUp();
     void enterBalancing(float current_roll);
     void enterReturningArms();
     void disengage();
+    void exitSpeedMode();
+    void persistLearnedTrim();
     void resetSafetyTimers();
     void startLog();
     void logSample(float roll_deg, float roll_rate_dps);

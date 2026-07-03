@@ -74,13 +74,43 @@ bool Robstride::sendFrame(uint32_t ext_id, const uint8_t* data, uint8_t len) {
         memcpy(msg.data, data, len);
     }
 
-    esp_err_t err = twai_transmit(&msg, pdMS_TO_TICKS(10));
+    // Short timeout: at 1 Mbps a frame is ~130 us, so 2 ms covers a full TX
+    // queue. A longer timeout would stall the 200 Hz balance loop whenever
+    // the bus degrades.
+    esp_err_t err = twai_transmit(&msg, pdMS_TO_TICKS(2));
     if (err != ESP_OK) {
         tx_fail_count++;
         return false;
     }
     tx_ok_count++;
     return true;
+}
+
+bool Robstride::maintainBus() {
+    if (!_initialized) return false;
+
+    twai_status_info_t status;
+    if (twai_get_status_info(&status) != ESP_OK) return false;
+
+    if (status.state == TWAI_STATE_RUNNING) {
+        return true;
+    }
+
+    uint32_t now = millis();
+    if (status.state == TWAI_STATE_BUS_OFF) {
+        if (now - _last_recovery_ms > 500) {
+            _last_recovery_ms = now;
+            Serial.println("[CAN] BUS-OFF detected -- initiating recovery");
+            twai_initiate_recovery();
+        }
+    } else if (status.state == TWAI_STATE_STOPPED) {
+        // Recovery finished (or driver stopped); restart it
+        if (twai_start() == ESP_OK) {
+            Serial.println("[CAN] Bus recovered -- driver restarted");
+        }
+    }
+    // TWAI_STATE_RECOVERING: wait for the 128 bus-idle occurrences
+    return false;
 }
 
 bool Robstride::broadcastScan(uint8_t host_id) {
@@ -177,6 +207,19 @@ bool Robstride::writeU8Param(uint8_t motor_id, uint8_t host_id,
     data[5] = 0;
     data[6] = 0;
     data[7] = 0;
+
+    uint32_t can_id = makeCanId(RobstrideCommType::ParamWrite, 0, motor_id, host_id);
+    return sendFrame(can_id, data, 8);
+}
+
+bool Robstride::writeU32Param(uint8_t motor_id, uint8_t host_id,
+                               uint16_t param_addr, uint32_t value) {
+    uint8_t data[8] = {0};
+    data[0] = param_addr & 0xFF;
+    data[1] = (param_addr >> 8) & 0xFF;
+    data[2] = 0;
+    data[3] = 0;
+    memcpy(&data[4], &value, sizeof(uint32_t));
 
     uint32_t can_id = makeCanId(RobstrideCommType::ParamWrite, 0, motor_id, host_id);
     return sendFrame(can_id, data, 8);

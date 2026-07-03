@@ -44,6 +44,35 @@ static uint32_t loopMaxUs = 0;
 static uint32_t loopTotalUs = 0;
 static uint32_t loopOverruns = 0;
 
+// Section profiler: worst-case duration per subsystem plus the largest gap
+// between loop() iterations. A big loop gap with small section maxima means
+// an external task starved the loop (WiFi/AsyncTCP); a big section max
+// names the offender directly. Dumped as # prof_* lines with `bal log`.
+enum ProfSection { PROF_IMU = 0, PROF_CTL, PROF_DISP, PROF_WS, PROF_TEL,
+                   PROF_CRSF, PROF_CAN, PROF_BAL, PROF_ADRV, PROF_COUNT };
+static const char* profNames[PROF_COUNT] = { "imu", "ctl", "disp", "ws", "tel",
+                                             "crsf", "can", "bal", "adrv" };
+static uint32_t profMaxUs[PROF_COUNT] = {};
+static uint32_t profLoopGapMaxUs = 0;
+static uint32_t profLastLoopUs = 0;
+
+static inline void profRecord(ProfSection s, uint32_t start_us) {
+    uint32_t dur = micros() - start_us;
+    if (dur > profMaxUs[s]) profMaxUs[s] = dur;
+}
+
+static void printLoopProfile() {
+    for (int i = 0; i < PROF_COUNT; i++) {
+        Serial.printf("# prof_%s_max_us=%lu\n", profNames[i], (unsigned long)profMaxUs[i]);
+    }
+    Serial.printf("# prof_loopgap_max_us=%lu\n", (unsigned long)profLoopGapMaxUs);
+}
+
+static void resetLoopProfile() {
+    for (int i = 0; i < PROF_COUNT; i++) profMaxUs[i] = 0;
+    profLoopGapMaxUs = 0;
+}
+
 // WiFi state
 static bool     wifiConnected = false;
 static String   wifiIP = "0.0.0.0";
@@ -117,9 +146,9 @@ static void printSerialHelp() {
     Serial.println("  test <id>                   Run automated motor test");
     Serial.println("--- Balance Mode ---");
     Serial.println("  bal status                  Print balance state and gains");
-    Serial.println("  bal kp/kd <val>             Set PD gains");
-    Serial.println("  bal vgain <val>             Set velocity integrator gain");
-    Serial.println("  bal pkp/pki/pkd <val>       Set position-return PID gains");
+    Serial.println("  bal kp/kd <val>             Set inner PD gains");
+    Serial.println("  bal dkp <val>               Set drift -> target velocity gain");
+    Serial.println("  bal vkp/vki <val>           Set velocity PI gains (setpoint offset)");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
     Serial.println("  help                        Show this help");
@@ -340,7 +369,9 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.forceEngage();
 
     } else if (strcmp(sub, "log") == 0) {
+        printLoopProfile();
         balanceCtrl.dumpLog();
+        resetLoopProfile();
 
     } else if (strcmp(sub, "log clear") == 0) {
         balanceCtrl.clearLog();
@@ -355,35 +386,38 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.setKd(val);
         Serial.printf("[Balance] Kd = %.4f\n", val);
 
-    } else if (strncmp(sub, "vgain ", 6) == 0) {
-        float val = atof(sub + 6);
-        balanceCtrl.setVelGain(val);
-        Serial.printf("[Balance] Vel gain = %.4f\n", val);
-
-    } else if (strncmp(sub, "pkp ", 4) == 0) {
+    } else if (strncmp(sub, "dkp ", 4) == 0) {
         float val = atof(sub + 4);
-        balanceCtrl.setPosKp(val);
-        Serial.printf("[Balance] Pos Kp = %.4f\n", val);
+        balanceCtrl.setDriftVelKp(val);
+        Serial.printf("[Balance] Drift vel Kp = %.4f\n", val);
 
-    } else if (strncmp(sub, "pki ", 4) == 0) {
+    } else if (strncmp(sub, "vkp ", 4) == 0) {
         float val = atof(sub + 4);
-        balanceCtrl.setPosKi(val);
-        Serial.printf("[Balance] Pos Ki = %.4f\n", val);
+        balanceCtrl.setVelSpKp(val);
+        Serial.printf("[Balance] Vel-sp Kp = %.4f\n", val);
 
-    } else if (strncmp(sub, "pkd ", 4) == 0) {
+    } else if (strncmp(sub, "vki ", 4) == 0) {
         float val = atof(sub + 4);
-        balanceCtrl.setPosKd(val);
-        Serial.printf("[Balance] Pos Kd = %.4f\n", val);
+        balanceCtrl.setVelSpKi(val);
+        Serial.printf("[Balance] Vel-sp Ki = %.4f\n", val);
 
-    } else if (strncmp(sub, "vtrim ", 6) == 0) {
-        float val = atof(sub + 6);
-        balanceCtrl.setVelTrimGain(val);
-        Serial.printf("[Balance] Vel Trim Gain = %.4f\n", val);
+    } else if (strncmp(sub, "trim ", 5) == 0) {
+        float val = atof(sub + 5);
+        settingsMgr.settings.balance_trim = val;
+        settingsMgr.save();
+        Serial.printf("[Balance] Stored equilibrium trim = %.2f deg (saved)\n", val);
+
+    } else if (strcmp(sub, "trim") == 0) {
+        Serial.printf("[Balance] Stored equilibrium trim = %.2f deg\n",
+                      settingsMgr.settings.balance_trim);
 
     } else {
         Serial.println("[Balance] Usage: bal status | bal engage");
-        Serial.println("         bal kp/kd/vgain <val> | bal pkp/pki/pkd <val>");
-        Serial.println("         bal vtrim <val> | bal log | bal log clear");
+        Serial.println("         bal kp/kd <val>   inner PD gains");
+        Serial.println("         bal dkp <val>     drift -> target vel gain");
+        Serial.println("         bal vkp/vki <val> velocity PI -> setpoint offset");
+        Serial.println("         bal trim [<val>]  show/set stored equilibrium trim");
+        Serial.println("         bal log | bal log clear");
     }
 }
 
@@ -639,6 +673,9 @@ static void onSettingsChanged() {
 
 static void onDisarmRequested() {
     Serial.println("[Main] Emergency disarm requested via web");
+    if (balanceCtrl.isActive()) {
+        balanceCtrl.hardAbort("web disarm");
+    }
     motorMgr.cancelArming();
     driveCtrl.emergencyStop();
     armCtrl.holdPosition();
@@ -722,6 +759,10 @@ void setup() {
     ahrsFilter.begin(CONTROL_LOOP_HZ);
 
     Serial.begin(115200);
+    // Native USB CDC: NEVER block on writes. With the cable unplugged the
+    // default 100ms-per-write timeout froze the control loop for seconds
+    // during print bursts (untethered runaways, runs 172527/173132).
+    Serial.setTxTimeoutMs(0);
     delay(1000);
     Serial.println();
     Serial.println();
@@ -777,6 +818,7 @@ void setup() {
     armCtrl.begin(&motorMgr);
     armCtrl.setSettingsManager(&settingsMgr);
     balanceCtrl.begin(&motorMgr, &armCtrl);
+    balanceCtrl.setSettingsManager(&settingsMgr);
 
     // 7. WiFi AP
     initWifi();
@@ -827,6 +869,14 @@ void loop() {
     uint32_t now = millis();
     uint32_t nowUs = micros();
 
+    // Loop gap: time since the previous loop() iteration. Catches stalls
+    // caused by other tasks starving the loop, not just our own sections.
+    if (profLastLoopUs != 0) {
+        uint32_t gap = nowUs - profLastLoopUs;
+        if (gap > profLoopGapMaxUs) profLoopGapMaxUs = gap;
+    }
+    profLastLoopUs = nowUs;
+
     // Process serial debug commands (non-blocking)
     pollSerialCommands();
 
@@ -835,6 +885,7 @@ void loop() {
     // -----------------------------------------------------------------------
     if (nowUs - lastBalanceImuTick >= BALANCE_LOOP_PERIOD_US) {
         lastBalanceImuTick = nowUs;
+        uint32_t prof_start = micros();
 
         M5.Imu.update();
         auto imu = M5.Imu.getImuData();
@@ -853,6 +904,8 @@ void loop() {
             imu.gyro.x,  imu.gyro.y,  imu.gyro.z,
             imu.accel.x, imu.accel.y, imu.accel.z,
             imu.mag.x,   imu.mag.y,   imu.mag.z);
+
+        profRecord(PROF_IMU, prof_start);
     }
 
     // -----------------------------------------------------------------------
@@ -868,11 +921,15 @@ void loop() {
         M5.update();
 
         // 1. Read CRSF data
+        uint32_t prof_crsf = micros();
         crsfRx.update();
+        profRecord(PROF_CRSF, prof_crsf);
 
         // 2. Scan for motors and process feedback (skip during test mode
         //    so the test's readParamSync can use the CAN bus exclusively)
         if (!testModeActive) {
+            uint32_t prof_can = micros();
+            canBus.maintainBus();
             motorMgr.scanNextMotor();
             motorMgr.processFeedback();
             motorMgr.checkTimeouts(500);
@@ -882,6 +939,7 @@ void loop() {
                 armCtrl.setForwardReference();
             }
             motorMgr.clearArmingCompleted();
+            profRecord(PROF_CAN, prof_can);
         }
 
         // 3. Read channel inputs
@@ -974,7 +1032,9 @@ void loop() {
         } else {
             waitingForDoubleTap = false;
         }
+        uint32_t prof_bal = micros();
         balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
+        profRecord(PROF_BAL, prof_bal);
 
         bool balanceDriving = balanceCtrl.isControllingDrive();
         bool balanceActive  = balanceCtrl.isActive();
@@ -1022,6 +1082,12 @@ void loop() {
                 driveCtrl.emergencyStop();
                 motorMgr.disarmDriveMotors();
             }
+            // Drive: LEVEL-based safety guarantee. While the switch is low,
+            // any wheel still reporting motion gets stop commands re-sent
+            // (covers stop frames lost during CAN bus-off).
+            if (!driveSwNow) {
+                motorMgr.enforceDriveStopped(now);
+            }
 
             // Arms: level-based arm
             if (armSwNow) {
@@ -1063,9 +1129,12 @@ void loop() {
             // Hold front wheels at their current position via drive controller
             // only if drive is armed (back wheels handled inside balanceCtrl).
             // Arm controller still called -- override is active inside it.
+            uint32_t prof_adrv = micros();
             armCtrl.update(armInput, dt);
+            profRecord(PROF_ADRV, prof_adrv);
         } else {
             // 6. Drive control
+            uint32_t prof_adrv = micros();
             if (motorMgr.isDriveArmed()) {
                 driveCtrl.update(throttle, steering, dt);
             }
@@ -1073,11 +1142,13 @@ void loop() {
             // 7. Arm control (always called -- calibration works even when disarmed,
             //    movement/hold gated by isArmArmed inside update)
             armCtrl.update(armInput, dt);
+            profRecord(PROF_ADRV, prof_adrv);
         }
 
         // (calibration streaming removed -- now via TX triggers)
 
         // 8. Loop timing measurement
+        profRecord(PROF_CTL, tickStartUs);
         uint32_t tickElapsedUs = micros() - tickStartUs;
         loopTotalUs += tickElapsedUs;
         if (tickElapsedUs > loopMaxUs) {
@@ -1164,27 +1235,38 @@ void loop() {
         }
     }
 
+    // While balancing, display and WebSocket work is throttled hard: both
+    // compete for Core 1 time and neither matters mid-run (Core 1 stalls
+    // dropped the robot in run 173619).
+    bool balancing = balanceCtrl.isActive();
+
     // -----------------------------------------------------------------------
-    // ~25 fps display update
+    // ~25 fps display update (5 fps while balancing)
     // -----------------------------------------------------------------------
-    if (now - lastDisplayTick >= DISPLAY_PERIOD_MS) {
+    uint32_t display_period = balancing ? 200 : DISPLAY_PERIOD_MS;
+    if (now - lastDisplayTick >= display_period) {
         lastDisplayTick = now;
 
         updateWifi();
 
+        uint32_t prof_start = micros();
         display.render(motorMgr, crsfRx,
                        wifiConnected, wifiIP.c_str(),
                        motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
                        &armCtrl,
                        motorMgr.isArmingDrive(), motorMgr.isArmingArms());
+        profRecord(PROF_DISP, prof_start);
     }
 
     // -----------------------------------------------------------------------
-    // ~10 Hz WebSocket telemetry
+    // ~10 Hz WebSocket telemetry (1 Hz while balancing)
     // -----------------------------------------------------------------------
-    if (now - lastWsTick >= WEBSOCKET_PERIOD_MS) {
+    uint32_t ws_period = balancing ? 1000 : WEBSOCKET_PERIOD_MS;
+    if (now - lastWsTick >= ws_period) {
         lastWsTick = now;
+        uint32_t prof_start = micros();
         webUI.sendTelemetry();
+        profRecord(PROF_WS, prof_start);
     }
 
     // -----------------------------------------------------------------------
@@ -1192,6 +1274,7 @@ void loop() {
     // -----------------------------------------------------------------------
     if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
         lastTelTick = now;
+        uint32_t prof_start = micros();
 
         const char* state;
         if (motorMgr.isArming()) {
@@ -1207,5 +1290,6 @@ void loop() {
         crsfRx.sendAttitudeTelemetry(ahrsFilter.getPitch(),
                                      ahrsFilter.getRoll(),
                                      ahrsFilter.getYaw());
+        profRecord(PROF_TEL, prof_start);
     }
 }

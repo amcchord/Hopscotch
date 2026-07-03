@@ -29,7 +29,7 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 ### Self-Balance Mode
 
-An optional balancing mode activated via RC switch combinations. A 200 Hz complementary-filter + PD control loop runs on Core 0 and commands the rear drive wheels while the front wheels hold position. The arms tip the body up, then the controller takes over to maintain balance. Safety monitors (tilt limits, sustained error, excessive roll rate, motor saturation, stuck detection) automatically disengage the balance mode if the robot is falling.
+An optional balancing mode activated via RC switch combinations. On engage, the rear wheels are switched from CSP position mode to Robstride Speed mode: a 200 Hz complementary-filter + PD control loop on Core 0 commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin, and an arm-position-to-balance-point calibration curve keeps the setpoint correct as the arms tip the body up and return. Safety monitors (tilt limits, sustained error, excessive roll rate, command saturation) automatically disengage balance mode and restore CSP if the robot is falling.
 
 ### Web Dashboard
 
@@ -116,7 +116,7 @@ Or:
 The firmware runs two cores of the ESP32-S3:
 
 - **Core 1** — Main 50 Hz control loop: CRSF parsing, arming logic, drive controller, arm controller, balance state machine, failsafe, display, WebSocket telemetry
-- **Core 0** — 200 Hz balance tick: IMU read, complementary filter, PD loop, wheel position commands (only active during balance mode)
+- **Core 0** — 200 Hz balance tick: IMU read, complementary filter, PD loop, wheel speed commands (only active during balance mode)
 
 ### Module Map
 
@@ -151,10 +151,11 @@ Compile-time defaults live in `src/config.h`. Most parameters can be overridden 
 Balance gains can also be tuned live over serial without reflashing:
 
 ```
-bal kp 1.2
-bal kd 0.15
-bal base 89.0
-bal pkp 0.2
+bal kp 2.0      # inner PD: rad/s wheel speed per deg of angle error
+bal kd 0.08     # inner PD: rad/s per deg/s of roll rate
+bal dkp 0.05    # outer: target return velocity per rad of drift
+bal vkp 0.8     # outer: deg of setpoint offset per rad/s of velocity error
+bal vki 0.05    # outer: integral gain (the single integrator)
 ```
 
 See `docs/PROJECT.md` for the full Robstride CAN protocol reference and detailed documentation.

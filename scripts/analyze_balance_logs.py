@@ -24,6 +24,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print a short per-file detail block in addition to the summary table.",
     )
+    parser.add_argument(
+        "--plot",
+        action="store_true",
+        help="Write a per-run PNG (tilt/setpoint, commands, drift) to telemetry_logs/plots/.",
+    )
+    parser.add_argument(
+        "--plot-dir",
+        default=str(REPO_ROOT / "telemetry_logs" / "plots"),
+        help="Output directory for --plot (default: telemetry_logs/plots/).",
+    )
     return parser.parse_args()
 
 
@@ -78,7 +88,9 @@ def as_float(row: dict[str, str], key: str) -> float:
 def vel_offset_series(rows: Iterable[dict[str, str]]) -> list[float]:
     result: list[float] = []
     for row in rows:
-        if "vel_offset" in row:
+        if "sp_offset" in row:
+            result.append(as_float(row, "sp_offset"))
+        elif "vel_offset" in row:
             result.append(as_float(row, "vel_offset"))
         elif "vel_integ" in row:
             result.append(as_float(row, "vel_integ"))
@@ -156,8 +168,9 @@ def summarize(path: Path) -> dict[str, object] | None:
     final_vel_values = vel_offset_series(final_window)
 
     notes: list[str] = []
-    has_vel_offset = "vel_offset" in balance_rows[0]
-    if not has_vel_offset and "vel_integ" not in balance_rows[0]:
+    has_new_schema = any(key in balance_rows[0]
+                         for key in ("sp_offset", "vel_offset", "vel_integ"))
+    if not has_new_schema:
         notes.append("legacy schema")
     if not math.isnan(pre_rate) and pre_rate > 4.0:
         notes.append("arm return before settle")
@@ -183,6 +196,82 @@ def summarize(path: Path) -> dict[str, object] | None:
         "final_drift": mean(as_float(row, drift_key) for row in final_window) if drift_key else math.nan,
         "note": ", ".join(notes),
     }
+
+
+def plot_run(path: Path, out_dir: Path) -> Path | None:
+    """Write a 3-panel PNG (tilt/setpoint, commands/velocity, drift) for one run."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("matplotlib not available -- skipping plots "
+              "(install with: .venv/bin/pip install matplotlib)")
+        return None
+
+    rows = load_rows(path)
+    if not rows:
+        return None
+
+    def series(key: str) -> list[float]:
+        return [as_float(row, key) for row in rows]
+
+    t = [v / 1000.0 for v in series("t_ms")]
+    states = [row.get("state", "") for row in rows]
+    roll = series("roll")
+    setpoint = series("setpoint")
+    cmd = series("motor_vel")
+    bl_vel = series("bl_vel")
+    br_vel = series("br_vel")
+    wheel_vel = [(a + b) / 2.0 for a, b in zip(bl_vel, br_vel)]
+    drift = series("meas_drift") if "meas_drift" in rows[0] else None
+    sp_off_key = next((k for k in ("sp_offset", "vel_trim", "pos_shift") if k in rows[0]), None)
+
+    engage_t = next((tv for tv, st in zip(t, states) if st == "2"), None)
+
+    fig, axes = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
+
+    ax = axes[0]
+    ax.plot(t, roll, label="roll (deg)", linewidth=0.9)
+    ax.plot(t, setpoint, label="setpoint (deg)", linewidth=0.9, linestyle="--")
+    ax.set_ylabel("deg")
+    ax.set_title(path.name)
+    ax.legend(loc="upper right", fontsize=8)
+    ax.grid(True, alpha=0.3)
+
+    ax = axes[1]
+    ax.plot(t, cmd, label="motor_vel cmd (rad/s)", linewidth=0.9)
+    ax.plot(t, wheel_vel, label="measured wheel vel (rad/s)", linewidth=0.9, alpha=0.8)
+    if sp_off_key is not None:
+        ax.plot(t, series(sp_off_key), label=f"{sp_off_key} (deg)", linewidth=0.9, linestyle=":")
+    ax.set_ylabel("rad/s / deg")
+    ax.legend(loc="upper right", fontsize=8)
+    ax.grid(True, alpha=0.3)
+
+    ax = axes[2]
+    if drift is not None:
+        ax.plot(t, drift, label="meas_drift (rad)", linewidth=0.9)
+    else:
+        bl_pos = series("bl_pos")
+        br_pos = series("br_pos")
+        avg0 = (bl_pos[0] + br_pos[0]) / 2.0 if bl_pos else 0.0
+        ax.plot(t, [(a + b) / 2.0 - avg0 for a, b in zip(bl_pos, br_pos)],
+                label="wheel pos - start (rad)", linewidth=0.9)
+    ax.set_ylabel("rad")
+    ax.set_xlabel("time (s)")
+    ax.legend(loc="upper right", fontsize=8)
+    ax.grid(True, alpha=0.3)
+
+    if engage_t is not None:
+        for ax in axes:
+            ax.axvline(engage_t, color="green", alpha=0.4, linewidth=1)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / (path.stem + ".png")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=110)
+    plt.close(fig)
+    return out_path
 
 
 def main() -> int:
@@ -257,6 +346,12 @@ def main() -> int:
                 f"drift={fmt(summary['final_drift'], 0, 2).strip()} rad"
             )
             print(f"  note: {summary['note']}")
+
+    if args.plot:
+        out_dir = Path(args.plot_dir)
+        written = [out for path in paths if (out := plot_run(path, out_dir)) is not None]
+        if written:
+            print(f"\nWrote {len(written)} plot(s) to {out_dir}")
 
     return 0
 
