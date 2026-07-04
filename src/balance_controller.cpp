@@ -750,10 +750,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Arm return, then arm assist ownership after the ramp completes
         // ---------------------------------------------------------------
         if (_arms_returning && !_ramp_complete) {
-            // Crisis pause: don't keep marching the CG while the wheels are
-            // fighting (run 093643: the return continued blindly through a
-            // stall-induced catch and fed the backward overshoot). The
-            // capture gate ensures the return STARTS calm; this keeps it so.
+            // Crisis pause: don't march the CG during an outright fight
+            // (run 093643). NOTE: a tighter "self-pacing" lag gate was tried
+            // (run 223630 postmortem) and reverted -- it kept the robot
+            // stuck in fragile mid-return stances for seconds (run 224227).
+            // At 1.5 rad/s the return is slow enough to track.
             bool crisis = fabsf((float)_last_motor_vel) > 10.0f || fabsf(rate) > 30.0f;
             if (!crisis) {
                 // Proportional return: scale per-arm speed by remaining
@@ -916,7 +917,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // (push + recoil handoff), then the arms hold neutral until the
             // robot has been genuinely calm -- the wheels-only loop is
             // proven stable and extinguishes any residual oscillation.
-            bool calm_now = fabsf(vel_err) < 1.0f && fabsf(rate) < 15.0f;
+            bool calm_now = fabsf(vel_err) < BALANCE_ARM_CALM_VEL
+                         && fabsf(rate) < BALANCE_ARM_CALM_RATE;
             if (calm_now) {
                 _arm_calm_ms += dt * 1000.0f;
             } else {
@@ -969,7 +971,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                 break;
 
             default: // COOLDOWN: hold neutral until genuine calm re-arms
-                if (_arm_calm_ms > 400.0f) {
+                if (_arm_calm_ms > BALANCE_ARM_CALM_MS) {
                     _arm_stage = 0;
                 }
                 break;

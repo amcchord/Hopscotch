@@ -892,6 +892,75 @@ loop afterward. Standup tow still present (noted, deferred).
   rad/s, base sp rate 3 -> 4 deg/s (operator call). The position loop
   walks it back afterward.
 
+**Run 28** (`bal_20260703_222915.csv`, 23.1s): mechanical standup fastest
+yet (arms home 1.5s, cascade at 1.46s) and balance held -- but the robot
+breathed +/-1 deg all run and never truly stilled. Consequence: the calm
+re-arm condition (|vel_err|<1.0 for 400ms) sits INSIDE the breathing band,
+so the arms stayed locked in COOLDOWN the entire run. The tap at t=21.7
+got ZERO arm response through vel +12 rad/s; the emergency throw (90% of
+max cmd = 27 rad/s) fired at t=22.9 with roll already at 68. Rolled away.
+- Fixes: calm re-arm re-banded to sit outside breathing, inside
+  oscillation (vel<1.8 rad/s, rate<20 dps, 300ms; breathing is +/-1.5,
+  the 0.56 Hz oscillator was +/-4.5); emergency throw at 60% of max cmd
+  (18 rad/s -- above any oscillation's +/-8, fires ~0.5s earlier).
+- Lesson 48: **a re-arm condition calibrated inside the plant's normal
+  motion band disarms the helper permanently.** Band boundaries must be
+  measured from the actual quiet-state statistics, not guessed.
+
+**Run 29** (`bal_20260703_223630.csv`, 2.4s, standup runaway): the 2.5
+rad/s arm return was dynamically infeasible. Arms home in 1.05s = the
+physical equilibrium moved 3 deg in 1s while the robot's tilt never left
+84 -- a velocity-mode PD chases a moving equilibrium with VELOCITY, not
+the acceleration needed to tilt, so the gap never closed and the chase
+ran away (+18 rad/s, faceplant). The base-ramp velocity gate worked
+(base slowed to 1.2 deg/s) but is irrelevant: the ARMS set the real
+equilibrium and kept marching. The ramp-phase velocity damper added
++1.7 deg of pro-cyclical chase fuel on top.
+- Fixes: (1) return speed back to 1.5 rad/s (halving return time
+  quadruples required acceleration); (2) **self-pacing arm return** --
+  pauses while the robot lags (|base sp - tilt| > 1.5 deg or wheel vel
+  > 2.5 rad/s), resumes when caught up: the equilibrium can no longer
+  outrun the robot, structurally; (3) ramp-phase velocity damper clamped
+  to braking only (may lower the setpoint, never raise it).
+- Lesson 49: **gate the actuator that moves the physical equilibrium,
+  not just the reference that follows it.** Slowing the setpoint while
+  the arms marched was theater.
+
+**Run 30** (`bal_20260703_224227.csv`, 9.5s): the self-pacing arm return
+made things WORSE, exactly opposite its intent. The lag gate (gap>1.5 or
+vel>2.5) paused the return 56% of the time, holding the robot in the
+FRAGILE tip/mid-return stance for seconds (capture at 81.7 followed by a
+violent fight: roll swung 72-85, cmd railed 22, drift ran +10 -- operator
+help needed). The robot is hardest to balance exactly where the gate kept
+parking it; getting the arms home QUICKLY (at a trackable rate) is safer
+than pausing en route.
+- Reverted: self-pacing lag gate and the ramp-phase p_term>0 clamp (both
+  from the run-29 postmortem -- the correct fix from that crash was ONLY
+  the return-speed revert to 1.5 rad/s, which stays). Crisis pause stays.
+- Lesson 50: **the mid-return stance is the most fragile configuration --
+  minimize time spent there, don't add mechanisms that extend it.** The
+  run-29 runaway had one cause (2.5 rad/s return); the two extra
+  "protections" added alongside the real fix were net harm. When a change
+  breaks something, revert THE change, don't wrap it in compensators.
+
+**Run 31** (`bal_20260703_224824.csv`, 4.9s): **THE STALL SOURCE, CAUGHT.**
+prof_crsf_max = 31.4 SECONDS. CrsfReceiver::update()'s drain loop --
+`while (_serial->available()) read()` -- is unbounded: during an RX byte
+storm (RF noise / receiver garbage at 420kbaud) bytes arrive as fast as
+they are drained and available() never goes false. This run froze Core 1
+seven times (0.6s, 2.5s, 8.7s, 11.4s, 31s...); the robot fell during an
+11s freeze mid-standup with the setpoint frozen and the dead-man clamping.
+In hindsight this one loop explains EVERY mystery stall since the Speed-
+mode rebuild began: 449ms (false abort, run 27), 740ms (dropped robot,
+run 173619), the 2-8s engage weirdness, the profiler forever blaming the
+crsf section.
+- Fix: hard byte budget per update (1024 bytes ~ 3x legitimate per-tick
+  traffic, worst case ~1-2ms). A byte storm now costs dropped radio
+  frames, not the robot.
+- Lesson 51: **every `while (peripheral has data)` loop is unbounded by
+  contract.** Drain loops in control firmware need byte/time budgets --
+  the peripheral, not the code, decides when an unbounded loop exits.
+
 **Run 26 feedback** (state machine validated on-robot): disturbance
 response confirmed good with settling restored. Operator tweaks applied:
 - Release tau 1.0 -> 0.65s (~50% quicker return to neutral).

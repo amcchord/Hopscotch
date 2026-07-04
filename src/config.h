@@ -163,11 +163,12 @@ static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 1000;    // start retu
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.71f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.96f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 2.5f;    // rad/s. The standup tow displacement is fixed by physics
-                                                                   // (~(B/A)*delta_tilt, measured +11 rad); a faster return
-                                                                   // compresses the tow window. Capture calibration keeps the
-                                                                   // setpoint tracking. (10 was violent in the CSP era; 1.5
-                                                                   // dragged the tow out.)
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 1.5f;    // rad/s. 2.5 was dynamically infeasible: the equilibrium
+                                                                   // moved 3 deg in 1s while the robot's tilt never budged --
+                                                                   // velocity-mode PD chases a moving equilibrium with
+                                                                   // velocity, not the acceleration needed to tilt (runaway,
+                                                                   // run 223630). Halving return time quadruples the required
+                                                                   // acceleration.
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 30.0f;   // rad/s speed limit (railed at 25 during the 17 rad/s
                                                                    // tap recovery in bal_20260702_161437; RS05 max is 33)
@@ -320,11 +321,20 @@ static constexpr float    BALANCE_ARM_ASSIST_TAU_IN     = 0.08f;    // s, deploy
 static constexpr float    BALANCE_ARM_ASSIST_TAU_OUT    = 0.65f;    // s, release: monotonic return to neutral (operator asked
                                                                     // for ~50% quicker than the 1.0s it shipped with)
 
-// Emergency arm throw: wheels railed while still carrying velocity error
-// means a roll-away in progress -- the wheels have nothing left, so any
-// arm authority is pure gain. Bypasses the engagement lifecycle and throws
-// the arms to their full stop in the braking direction.
-static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.90f;   // of BALANCE_MAX_DRIVE_SPEED = "wheels railed"
+// Calm definition for re-arming the assist. Must sit OUTSIDE the robot's
+// normal breathing band (+/-1.5 rad/s -- calm<1.0 locked the arms in
+// COOLDOWN for an entire run and a tap got zero arm help, run 222915) but
+// INSIDE the oscillation band (the 0.56 Hz limit cycle ran +/-4.5 rad/s).
+static constexpr float    BALANCE_ARM_CALM_VEL          = 1.8f;     // rad/s
+static constexpr float    BALANCE_ARM_CALM_RATE         = 20.0f;    // dps
+static constexpr float    BALANCE_ARM_CALM_MS           = 300.0f;   // sustained before re-arm
+
+// Emergency arm throw: wheels far into their authority while still carrying
+// velocity error means a roll-away in progress -- any arm authority is pure
+// gain. Bypasses the engagement lifecycle and throws the arms to their full
+// stop in the braking direction. 60% of max (=18 rad/s) is well above any
+// observed oscillation command (+/-8) and fires ~0.5s earlier than 90% did.
+static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.60f;
 static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm motor speed limit
 
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
