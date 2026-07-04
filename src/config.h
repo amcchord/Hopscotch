@@ -61,6 +61,17 @@ static constexpr uint32_t CONTROL_LOOP_HZ        = 50;
 static constexpr uint32_t CONTROL_LOOP_PERIOD_MS  = 1000 / CONTROL_LOOP_HZ;  // 20 ms
 static constexpr uint32_t BALANCE_LOOP_HZ         = 200;
 static constexpr uint32_t BALANCE_LOOP_PERIOD_US  = 1000000 / BALANCE_LOOP_HZ;  // 5000 us
+
+// Control-core / comms-core split. Core 0 hosts the networking stack (WiFi
+// task is pinned there by the framework, async_tcp/lwip pinned there via
+// build flags); Core 1 is the dedicated control core. Priorities: sentinel
+// (stall forensics) > 200Hz balance PD > 50Hz control > loopTask (display/
+// WebSocket/debug at priority 1) -- nothing on the comms core can preempt
+// control, and on the control core only control preempts control.
+static constexpr int      CONTROL_CORE           = 1;
+static constexpr int      CONTROL_TASK_PRIORITY  = 12;
+static constexpr int      BALANCE_TASK_PRIORITY  = 18;
+static constexpr int      SENTINEL_TASK_PRIORITY = 24;
 static constexpr uint32_t DISPLAY_PERIOD_MS      = 40;   // ~25 fps
 static constexpr uint32_t WEBSOCKET_PERIOD_MS    = 100;  // ~10 Hz
 
@@ -126,13 +137,17 @@ static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 84.0f;   // balance po
                                                                    // 224649 equilibrated at 82.9 with the integral railed at -8
                                                                    // compensating. Anchors re-zeroed to the current physical
                                                                    // reality; the learned trim tracks future (smaller) shifts.
-static constexpr float    BALANCE_SETPOINT_ARMS_TIP     = 81.1f;   // balance point with arms at tip position (shifted with FWD)
+static constexpr float    BALANCE_SETPOINT_ARMS_TIP     = 82.1f;   // balance point with arms at tip position. Refit from the
+                                                                   // Speed-mode capture calibrations (Jul 2026): the true
+                                                                   // tip->fwd equilibrium drop is ~1.9 deg (measured +1.0..+3.3
+                                                                   // across runs), not the 2.9 the old anchors assumed.
 static constexpr float    BALANCE_SETPOINT_MIN          = 70.0f;   // hard safety clamp (fallen forward)
 static constexpr float    BALANCE_SETPOINT_MAX          = 110.0f;  // hard safety clamp (fallen backward)
 static constexpr float    BALANCE_CAPTURE_SHIFT_MAX_DEG = 15.0f;   // cover large engage angle differences
 static constexpr bool     BALANCE_USE_SCHEDULED_SP      = true;    // if false, base setpoint stays at ARMS_FWD always
 static constexpr bool     BALANCE_USE_CAPTURE_SHIFT     = true;    // if false, no capture shift -- engage directly at scheduled sp
-static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 3.0f;    // slower ramp: less overshoot momentum at ramp end (5 caused 6-deg overshoot)
+static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 4.0f;    // must not bottleneck the 2.5 rad/s arm return (the curve
+                                                                   // needs ~2.9 deg over ~1s of return)
 static constexpr float    BALANCE_RAMP_VEL_SLOW         = 2.0f;    // rad/s wheel speed at which the base ramp fully pauses --
                                                                    // the ramp waits for the robot instead of towing it
                                                                    // (standup surge, runs 164837/171838)
@@ -148,7 +163,11 @@ static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 1000;    // start retu
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.71f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.96f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
-static constexpr float    BALANCE_ARM_RETURN_SPEED      = 1.5f;    // rad/s -- gentle return over ~1.7s (10 caused violent overshoot oscillation)
+static constexpr float    BALANCE_ARM_RETURN_SPEED      = 2.5f;    // rad/s. The standup tow displacement is fixed by physics
+                                                                   // (~(B/A)*delta_tilt, measured +11 rad); a faster return
+                                                                   // compresses the tow window. Capture calibration keeps the
+                                                                   // setpoint tracking. (10 was violent in the CSP era; 1.5
+                                                                   // dragged the tow out.)
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 30.0f;   // rad/s speed limit (railed at 25 during the 17 rad/s
                                                                    // tap recovery in bal_20260702_161437; RS05 max is 33)
@@ -168,9 +187,14 @@ static constexpr BalanceSpAnchor BALANCE_SP_CURVE[] = {
     // through the arm return -- the robot towed forward +15 rad chasing it
     // (run 094448). Absolute level is re-zeroed at every settled capture;
     // these anchors only need the right SHAPE.
-    { 0.00f, 84.0f },   // arms forward
-    { 0.50f, 82.5f },   // mid return
-    { 1.00f, 81.1f },   // arms at tip
+    // Shape refit from Speed-mode data (Jul 2026, fit_balance_model.py
+    // --speed-only + per-run tip-vs-forward equilibrium deltas): total drop
+    // ~1.9 deg, close to linear across the return. The old 2.9 deg drop
+    // overshot the real shift, holding the setpoint ~1 deg above the true
+    // equilibrium through the return = 2 rad/s of tow velocity.
+    { 0.00f, 84.0f },    // arms forward
+    { 0.50f, 83.05f },   // mid return
+    { 1.00f, 82.1f },    // arms at tip
 };
 static constexpr int BALANCE_SP_CURVE_LEN =
     sizeof(BALANCE_SP_CURVE) / sizeof(BALANCE_SP_CURVE[0]);
@@ -185,9 +209,15 @@ static constexpr float    BALANCE_KD                    = 0.08f;   // rad/s per 
 
 static constexpr float    COMPLEMENTARY_ALPHA           = 0.996f;  // gyro weight in complementary filter
 
-// Speed-mode motor configuration (applied when balance engages)
+// Speed-mode motor configuration (applied at the START of tip-up, while the
+// robot is static on all fours -- the blocking switch/verified writes there
+// cost nothing, and a failed switch aborts a standup that never started.
+// Doing it at engage stalled Core 1 for 0.4-7.3s in EVERY logged run, right
+// at the moment the capture begins.)
 static constexpr float    BALANCE_SPEED_ACC_RAD         = 100.0f;  // rad/s^2 velocity-mode accel limit (default 20 is too slow for balance)
 static constexpr float    BALANCE_SPEED_CURRENT_LIMIT_A = 14.0f;   // near motor max (16): recoveries were torque-starved at 10
+static constexpr uint32_t BALANCE_TIPUP_SPEED_REFRESH_MS = 250;    // re-send 0-speed during tip-up so the motor-side CAN
+                                                                   // watchdog (0x200C, ~1s) never fires mid-tip
 
 static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 120000;  // telemetry recording window (flush deferred, safe to be long)
 static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
@@ -220,6 +250,14 @@ static constexpr uint32_t BALANCE_DEADMAN_HARD_MS       = 1500;     // stop whee
 // telemetry.
 static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.05f;    // rad/s of return velocity per rad of drift
 static constexpr float    BALANCE_DRIFT_MAX_VEL         = 1.0f;     // max return velocity (rad/s)
+// Early position P: the position loop also runs DURING the standup ramp
+// (origin at engage) at reduced gain, so standup drift is opposed as it
+// develops instead of repaid after ramp completion. Sim (balance_sim.py
+// standup-matrix): fewer standup falls and ~20% less peak tow, with no
+// interference with the ramp (the gain is low and the angle-error gate
+// still applies). The integrator stays ramp-gated (single-integrator rule).
+static constexpr float    BALANCE_RAMP_DRIFT_KP         = 0.03f;    // rad/s per rad of drift during the ramp
+static constexpr float    BALANCE_RAMP_DRIFT_MAX_VEL    = 0.6f;     // clamp during the ramp (rad/s)
 static constexpr float    BALANCE_VEL_SP_KP             = 2.2f;     // deg per rad/s of velocity error ABOVE the soft knee
                                                                     // (tap/disturbance regime -- keeps the athletic recovery)
 static constexpr float    BALANCE_VEL_SP_KP_LOW         = 0.7f;     // deg per rad/s BELOW the knee (station-keeping regime).

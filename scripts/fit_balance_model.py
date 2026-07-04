@@ -46,7 +46,28 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("paths", nargs="*", help="CSV files or directories (default: telemetry_logs/)")
     parser.add_argument("--json", help="Write fitted parameters to this JSON file")
+    parser.add_argument("--speed-only", action="store_true",
+                        help="Only use logs recorded in Speed mode (# motor_mode=speed header). "
+                             "CSP-era logs bias the fit: the position servo hides the true "
+                             "equilibrium and the velocity-loop lag.")
     return parser.parse_args()
+
+
+def parse_config_header(path: Path) -> dict[str, str]:
+    """Parse # KEY=VALUE lines preceding the CSV header."""
+    config: dict[str, str] = {}
+    for line in path.read_text(errors="replace").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("t_ms,"):
+            break
+        if stripped.startswith("#") and "=" in stripped:
+            key, _, value = stripped.lstrip("# ").partition("=")
+            config[key.strip()] = value.strip()
+    return config
+
+
+def is_speed_mode_log(path: Path) -> bool:
+    return parse_config_header(path).get("motor_mode") == "speed"
 
 
 def expand_inputs(paths: list[str]) -> list[Path]:
@@ -242,6 +263,82 @@ def fit_motor_lag(runs: list[RunData]) -> float:
     return 1.0 / k
 
 
+SPEED_ACC_LIMIT = 100.0  # rad/s^2, motor-side acc limit written at engage
+
+
+def fit_motor_lag_speed(runs: list[RunData]) -> float:
+    """Speed-mode lag fit: simulate a slew-limited first-order response to the
+    logged command and pick the tau that best reproduces the measured velocity.
+
+    The motor-side acceleration limit (100 rad/s^2) is modeled explicitly so
+    the fitted tau is the true small-signal velocity-loop lag, not an artifact
+    of large-step slewing. The naive vdot-regression is badly biased on 50 Hz
+    logs of a 200 Hz loop; simulating the whole trajectory is robust to that.
+    """
+    taus = np.arange(0.02, 0.32, 0.01)
+    sse = np.zeros(len(taus))
+    for run in runs:
+        cmd = run.cmd
+        v_meas = run.wheel_vel
+        ok = np.isfinite(cmd) & np.isfinite(v_meas)
+        if ok.sum() < 200:
+            continue
+        # Small-signal mask: large excursions are dominated by the acc limit,
+        # current-limit torque starvation, and the 160 ms round-robin feedback
+        # staleness -- including them biases tau high (200+ ms vs the true
+        # ~60 ms small-signal lag).
+        small = ok & (np.abs(cmd) < 10.0) & (np.abs(v_meas) < 10.0)
+        if small.sum() < 200:
+            continue
+        for i, tau in enumerate(taus):
+            v_hat = np.zeros(len(cmd))
+            v_hat[0] = v_meas[0] if math.isfinite(v_meas[0]) else 0.0
+            max_dv = SPEED_ACC_LIMIT * DT
+            for j in range(1, len(cmd)):
+                c = cmd[j - 1] if math.isfinite(cmd[j - 1]) else v_hat[j - 1]
+                dv = (DT / (tau + DT)) * (c - v_hat[j - 1])
+                dv = min(max(dv, -max_dv), max_dv)
+                v_hat[j] = v_hat[j - 1] + dv
+            sse[i] += float(np.nansum((v_hat[small] - v_meas[small]) ** 2))
+    if not sse.any():
+        return 0.05
+    return float(taus[int(np.argmin(sse))])
+
+
+# ---------------------------------------------------------------------------
+# 2b. Noise levels (for realistic simulation)
+# ---------------------------------------------------------------------------
+
+def fit_noise(runs: list[RunData]) -> dict:
+    """Measure quiet-window signal ripple: what the simulator should inject.
+
+    Quiet = stable balance AND wheels nearly still, so the measured std is
+    sensor/process noise rather than actual maneuvering.
+    """
+    roll_std: list[float] = []
+    rate_std: list[float] = []
+    vel_std: list[float] = []
+    for run in runs:
+        for lo, hi in stable_windows(run):
+            v = run.wheel_vel[lo:hi]
+            if np.nanmean(np.abs(v)) > 0.5:
+                continue  # gliding, not quiet
+            roll = run.roll[lo:hi]
+            rate = run.roll_rate[lo:hi]
+            if len(roll) < 25:
+                continue
+            roll_std.append(float(np.nanstd(roll - np.nanmean(roll))))
+            rate_std.append(float(np.nanstd(rate)))
+            vel_std.append(float(np.nanstd(v)))
+    if not roll_std:
+        return {"roll_std_deg": 0.3, "rate_std_dps": 3.0, "wheel_vel_std": 0.3}
+    return {
+        "roll_std_deg": float(np.median(roll_std)),
+        "rate_std_dps": float(np.median(rate_std)),
+        "wheel_vel_std": float(np.median(vel_std)),
+    }
+
+
 # ---------------------------------------------------------------------------
 # 3. Arm-position -> balance-point curve
 # ---------------------------------------------------------------------------
@@ -264,17 +361,43 @@ def stable_windows(run: RunData, err_max: float = 1.5, rate_max: float = 5.0,
     return windows
 
 
-def fit_arm_curve(runs: list[RunData]) -> list[dict]:
-    """Collect (tip_frac, mean roll) points from stable windows, binned."""
+def fit_arm_curve(runs: list[RunData], require_still: bool = False) -> list[dict]:
+    """Collect (tip_frac, mean roll) points from stable windows, binned.
+
+    With require_still (Speed-mode data), only windows where the wheels are
+    nearly stationary count: in Speed mode a static angle error produces a
+    steady glide, so a gliding window is NOT at equilibrium.
+    """
     points: list[tuple[float, float, float]] = []  # (tip_frac, roll, weight)
     for run in runs:
         for lo, hi in stable_windows(run):
+            if require_still:
+                mean_v = float(np.nanmean(np.abs(run.wheel_vel[lo:hi])))
+                if not math.isfinite(mean_v) or mean_v > 0.5:
+                    continue
             frac = float(np.nanmean(run.tip_frac[lo:hi]))
             roll = float(np.nanmean(run.roll[lo:hi]))
             # During stable balance the robot IS at its equilibrium, so mean
             # roll in the window is a direct balance-point measurement.
             if math.isfinite(frac) and math.isfinite(roll):
                 points.append((frac, roll, (hi - lo) * DT))
+
+    # Capture points: the settled capture at the tip stance (first ~1.5 s of
+    # balancing, arms still at tip, calm) is a direct equilibrium measurement
+    # even though it is shorter than the stable-window minimum.
+    for run in runs:
+        n = min(len(run.t), int(2.0 / DT))
+        calm = (
+            (np.abs(run.setpoint[:n] - run.roll[:n]) < 1.0)
+            & (np.abs(run.roll_rate[:n]) < 4.0)
+            & (np.abs(run.cmd[:n]) < 1.0)
+            & (run.tip_frac[:n] > 0.7)
+        )
+        if calm.sum() >= int(0.3 / DT):
+            frac = float(np.nanmean(run.tip_frac[:n][calm]))
+            roll = float(np.nanmean(run.roll[:n][calm]))
+            if math.isfinite(frac) and math.isfinite(roll):
+                points.append((frac, roll, calm.sum() * DT))
 
     if not points:
         return []
@@ -347,26 +470,36 @@ def closed_loop_matrix(A: float, B: float, tau_m: float,
     return M
 
 
-def model_uncertainty_set(A_fit: float, B_fit: float) -> list[tuple[float, float]]:
+def model_uncertainty_set(A_fit: float, B_fit: float,
+                          tight: bool = False) -> list[tuple[float, float]]:
     """Plausible (A, B) pairs the recommended gains must stabilize.
 
     Closed-loop identification is biased (the PD correlates wheel accel with
     tilt), so require stability for A at 0.5x-2x and B at 0.7x-1.4x of the
-    fitted values.
+    fitted values. Speed-mode fits (r2 up to 0.84) deserve a tighter set:
+    A x0.7-1.4, B x0.8-1.25.
     """
-    return [(A_fit * fa, B_fit * fb)
-            for fa in (0.5, 1.0, 2.0)
-            for fb in (0.7, 1.0, 1.4)]
+    if tight:
+        fas = (0.7, 1.0, 1.4)
+        fbs = (0.8, 1.0, 1.25)
+    else:
+        fas = (0.5, 1.0, 2.0)
+        fbs = (0.7, 1.0, 1.4)
+    return [(A_fit * fa, B_fit * fb) for fa in fas for fb in fbs]
 
 
-def recommend_gains(A_fit: float, B_fit: float, tau_m: float) -> list[dict]:
+def recommend_gains(A_fit: float, B_fit: float, tau_m: float,
+                    tau_m_trusted: bool = False) -> list[dict]:
     """Grid-search outer gains stable across the whole model uncertainty set."""
-    models = model_uncertainty_set(A_fit, B_fit)
-    # The CSP-derived tau_m is an artifact of the position servo and does not
-    # predict the Speed-mode velocity loop. Require stability across a
-    # realistic Speed-mode lag range instead.
-    taus = (0.03, 0.08)
-    _ = tau_m
+    models = model_uncertainty_set(A_fit, B_fit, tight=tau_m_trusted)
+    if tau_m_trusted:
+        # Speed-mode fit: the measured lag is the real velocity-loop lag.
+        taus = (max(tau_m * 0.6, 0.01), tau_m * 1.6)
+    else:
+        # The CSP-derived tau_m is an artifact of the position servo and does
+        # not predict the Speed-mode velocity loop. Require stability across a
+        # realistic Speed-mode lag range instead.
+        taus = (0.03, 0.08)
 
     kx_grid = [0.02, 0.05, 0.08, 0.12, 0.20]
     kv_grid = [0.3, 0.5, 0.6, 0.8, 1.0, 1.4]
@@ -419,6 +552,10 @@ def recommend_gains(A_fit: float, B_fit: float, tau_m: float) -> list[dict]:
 def main() -> int:
     args = parse_args()
     paths = expand_inputs(args.paths)
+    if args.speed_only:
+        before = len(paths)
+        paths = [p for p in paths if is_speed_mode_log(p)]
+        print(f"Speed-mode filter: {len(paths)} of {before} files have # motor_mode=speed")
     runs = [run for path in paths if (run := extract_run(path)) is not None]
     print(f"Loaded {len(runs)} runs with >=2s of balance data (from {len(paths)} files)\n")
 
@@ -437,14 +574,26 @@ def main() -> int:
               f"eq={s['theta_eq']:6.2f} r2={s['r2']:.2f} n={s['n']}")
 
     # 2. Motor lag
-    tau_m = fit_motor_lag(runs)
-    print(f"\n=== Motor velocity tracking (CSP-era data, first-order fit) ===")
-    print(f"  tau_m   = {tau_m*1000:6.1f}  ms")
-    print("  NOTE: measured through the CSP position servo. Speed mode should be")
-    print("  similar or faster; re-run against Speed-mode logs after Phase 2.")
+    if args.speed_only:
+        tau_m = fit_motor_lag_speed(runs)
+        print(f"\n=== Motor velocity tracking (Speed-mode data, trajectory fit) ===")
+        print(f"  tau_m   = {tau_m*1000:6.1f}  ms  (real velocity-loop lag)")
+    else:
+        tau_m = fit_motor_lag(runs)
+        print(f"\n=== Motor velocity tracking (CSP-era data, first-order fit) ===")
+        print(f"  tau_m   = {tau_m*1000:6.1f}  ms")
+        print("  NOTE: measured through the CSP position servo. Speed mode should be")
+        print("  similar or faster; re-run against Speed-mode logs after Phase 2.")
+
+    # 2b. Noise
+    noise = fit_noise(runs)
+    print(f"\n=== Quiet-window noise (simulator injection levels) ===")
+    print(f"  roll std      = {noise['roll_std_deg']:.3f} deg")
+    print(f"  roll rate std = {noise['rate_std_dps']:.3f} dps")
+    print(f"  wheel vel std = {noise['wheel_vel_std']:.3f} rad/s")
 
     # 3. Arm curve
-    curve = fit_arm_curve(runs)
+    curve = fit_arm_curve(runs, require_still=args.speed_only)
     print("\n=== Arm tip-fraction -> balance point (stable windows) ===")
     if curve:
         print(f"  {'tip_frac':>8} {'balance_deg':>11} {'windows':>7} {'seconds':>8}")
@@ -457,10 +606,14 @@ def main() -> int:
 
     # 4. Gain recommendation
     print("\n=== Recommended outer gains (position P -> velocity PI, Speed mode) ===")
+    if args.speed_only:
+        lag_note = f"motor lag {tau_m*0.6*1000:.0f}-{tau_m*1.6*1000:.0f} ms (fitted)"
+    else:
+        lag_note = "Speed-mode motor lag 30-80 ms (assumed)"
     print(f"  fitted model A={A:.2f}, B={B:.3f}; gains must stabilize A x0.5-2,")
-    print("  B x0.7-1.4, Speed-mode motor lag 30-80 ms. "
+    print(f"  B x0.7-1.4, {lag_note}. "
           f"Inner Kp={INNER_KP}, Kd={INNER_KD}, vel filter 100 ms.")
-    recs = recommend_gains(A, B, tau_m)
+    recs = recommend_gains(A, B, tau_m, tau_m_trusted=args.speed_only)
     if recs:
         print(f"  {'kx':>6} {'kv':>6} {'ki':>6} {'wrst_re':>8} {'wrst_dmp':>8} {'slow_pole':>9}")
         for r in recs:
@@ -479,6 +632,8 @@ def main() -> int:
     if args.json:
         payload = {
             "A": A, "B": B, "omega0": omega0, "tau_m": tau_m,
+            "speed_only": args.speed_only,
+            "noise": noise,
             "arm_curve": curve, "gain_candidates": recs,
             "segment_fits": seg_fits,
         }

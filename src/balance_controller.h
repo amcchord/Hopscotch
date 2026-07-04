@@ -113,11 +113,13 @@ private:
     // --- Speed-mode gate (Core 1 writes, Core 0 reads) ---
     volatile bool  _targets_initialized = false;
     bool _speed_mode_active = false;
+    uint32_t _last_speed_refresh_ms = 0;   // 0-speed keepalive during tip-up
 
     // Dead-man: Core 1 stamps this every update(); if it goes stale while
     // balancing, Core 0 stops the wheels instead of driving blind on a
     // frozen setpoint (a stalled Core 1 also cannot process the RC switch).
     volatile uint32_t _last_update_ms = 0;
+    uint32_t _loop_wake_ms = 0;   // when Core 1 last woke from a stall
 
     // Front wheel hold positions
     float _front_left_hold  = 0.0f;

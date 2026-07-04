@@ -45,20 +45,81 @@ static uint32_t loopTotalUs = 0;
 static uint32_t loopOverruns = 0;
 
 // Section profiler: worst-case duration per subsystem plus the largest gap
-// between loop() iterations. A big loop gap with small section maxima means
-// an external task starved the loop (WiFi/AsyncTCP); a big section max
-// names the offender directly. Dumped as # prof_* lines with `bal log`.
+// between control-task iterations. A big ctl gap with small section maxima
+// means an external task starved the control core; a big section max names
+// the offender directly. Dumped as # prof_* lines with `bal log`.
 enum ProfSection { PROF_IMU = 0, PROF_CTL, PROF_DISP, PROF_WS, PROF_TEL,
                    PROF_CRSF, PROF_CAN, PROF_BAL, PROF_ADRV, PROF_COUNT };
 static const char* profNames[PROF_COUNT] = { "imu", "ctl", "disp", "ws", "tel",
                                              "crsf", "can", "bal", "adrv" };
 static uint32_t profMaxUs[PROF_COUNT] = {};
-static uint32_t profLoopGapMaxUs = 0;
+static uint32_t profLoopGapMaxUs = 0;    // loopTask (display/WS) gap -- low prio, gaps expected
 static uint32_t profLastLoopUs = 0;
+static uint32_t profCtlGapMaxUs = 0;     // control-task gap -- THE stall metric
+static uint32_t ctlLastTickUs = 0;
 
 static inline void profRecord(ProfSection s, uint32_t start_us) {
     uint32_t dur = micros() - start_us;
     if (dur > profMaxUs[s]) profMaxUs[s] = dur;
+}
+
+// ---------------------------------------------------------------------------
+// Stall forensics
+//
+// Every control-task gap >100ms is recorded as an event with:
+//  - which profiler section grew since the last event (our own blocking code
+//    names itself; 'none' = the whole task was preempted between sections)
+//  - the sentinel gap: a tiny priority-24 task on the control core stamps a
+//    timestamp every 10ms. If the sentinel ALSO gapped for the stall
+//    duration, the whole core was dark (flash-cache stall during a LittleFS
+//    write, or interrupts disabled); if the sentinel kept running, the
+//    control task was blocked in its own code or preempted by a task with
+//    priority between the control task and 24.
+// Dumped as # stall_* lines with `bal log`.
+// ---------------------------------------------------------------------------
+static constexpr uint32_t STALL_EVENT_MIN_US = 100000;   // 100 ms
+
+struct StallEvent {
+    uint32_t t_ms;
+    uint32_t gap_us;
+    uint32_t sentinel_gap_us;
+    int8_t   section;        // ProfSection that grew, or -1
+    uint8_t  bal_state;
+};
+static constexpr int STALL_RING_LEN = 8;
+static StallEvent stallRing[STALL_RING_LEN];
+static uint32_t   stallCount = 0;
+static uint32_t   profMaxAtLastEvent[PROF_COUNT] = {};
+static volatile uint32_t sentinelGapMaxUs = 0;
+
+// NOTE: naming the preempting task directly via uxTaskGetSystemState runtime
+// deltas is not possible on this framework build (espressif32@6.7.0 ships
+// with CONFIG_FREERTOS_USE_TRACE_FACILITY / GENERATE_RUN_TIME_STATS off).
+// The sentinel-gap discriminator plus section attribution covers the same
+// diagnostic question: own code vs preemption vs whole-core blackout.
+
+static void recordStallEvent(uint32_t now_ms, uint32_t gap_us, uint8_t bal_state) {
+    // Which section grew the most since the last event?
+    int8_t section = -1;
+    uint32_t best_delta = 0;
+    for (int i = 0; i < PROF_COUNT; i++) {
+        uint32_t delta = profMaxUs[i] - profMaxAtLastEvent[i];
+        if (profMaxUs[i] >= profMaxAtLastEvent[i] && delta > best_delta) {
+            best_delta = delta;
+            section = (int8_t)i;
+        }
+        profMaxAtLastEvent[i] = profMaxUs[i];
+    }
+    if (best_delta < gap_us / 2) section = -1;  // stall not inside our code
+
+    StallEvent& e = stallRing[stallCount % STALL_RING_LEN];
+    e.t_ms = now_ms;
+    e.gap_us = gap_us;
+    e.sentinel_gap_us = sentinelGapMaxUs;
+    e.section = section;
+    e.bal_state = bal_state;
+    stallCount++;
+    sentinelGapMaxUs = 0;
 }
 
 static void printLoopProfile() {
@@ -66,11 +127,29 @@ static void printLoopProfile() {
         Serial.printf("# prof_%s_max_us=%lu\n", profNames[i], (unsigned long)profMaxUs[i]);
     }
     Serial.printf("# prof_loopgap_max_us=%lu\n", (unsigned long)profLoopGapMaxUs);
+    Serial.printf("# prof_ctlgap_max_us=%lu\n", (unsigned long)profCtlGapMaxUs);
+    Serial.printf("# stall_events=%lu\n", (unsigned long)stallCount);
+    uint32_t shown = (stallCount < STALL_RING_LEN) ? stallCount : STALL_RING_LEN;
+    for (uint32_t i = 0; i < shown; i++) {
+        const StallEvent& e = stallRing[i];
+        const char* sec = "none";
+        if (e.section >= 0 && e.section < PROF_COUNT) sec = profNames[e.section];
+        Serial.printf("# stall_%lu=t:%lu,gap_us:%lu,sentinel_us:%lu,sec:%s,state:%u\n",
+                      (unsigned long)i, (unsigned long)e.t_ms,
+                      (unsigned long)e.gap_us, (unsigned long)e.sentinel_gap_us,
+                      sec, e.bal_state);
+    }
 }
 
 static void resetLoopProfile() {
-    for (int i = 0; i < PROF_COUNT; i++) profMaxUs[i] = 0;
+    for (int i = 0; i < PROF_COUNT; i++) {
+        profMaxUs[i] = 0;
+        profMaxAtLastEvent[i] = 0;
+    }
     profLoopGapMaxUs = 0;
+    profCtlGapMaxUs = 0;
+    stallCount = 0;
+    sentinelGapMaxUs = 0;
 }
 
 // WiFi state
@@ -101,8 +180,18 @@ static volatile bool       sharedImuReady = false;
 static portMUX_TYPE        imuMux = portMUX_INITIALIZER_UNLOCKED;
 static uint32_t            lastBalanceImuTick = 0;
 
-// Balance task handle
-static TaskHandle_t balanceTaskHandle = nullptr;
+// Task handles (control core split)
+static TaskHandle_t balanceTaskHandle  = nullptr;
+static TaskHandle_t controlTaskHandle  = nullptr;
+static TaskHandle_t sentinelTaskHandle = nullptr;
+static void controlTaskFunc(void* param);
+static void sentinelTaskFunc(void* param);
+
+// Snapshots for the debug burst (written by control task, read by loopTask)
+static volatile float dbgThrottle = 0.0f;
+static volatile float dbgSteering = 0.0f;
+static uint32_t lastDebugTick = 0;
+static uint32_t lastDebugTickCount = 0;
 
 // Periodic debug output toggle (press 'd' + Enter to toggle)
 static bool  debugOutputEnabled = true;
@@ -728,7 +817,7 @@ static void balanceTaskFunc(void* param) {
     TickType_t lastWake = xTaskGetTickCount();
     uint32_t prevUs = micros();
 
-    Serial.println("[Balance] Core 0 task started at 200Hz");
+    Serial.printf("[Balance] 200Hz PD task started on core %d\n", xPortGetCoreID());
 
     for (;;) {
         uint32_t nowUs = micros();
@@ -848,34 +937,65 @@ void setup() {
     lastDisplayTick = millis();
     lastWsTick = millis();
     lastTelTick = millis();
+    lastDebugTick = millis();
 
-    // Launch balance task on Core 0 (Arduino loop runs on Core 1)
+    // Control-core / comms-core split: everything control-critical runs on
+    // core CONTROL_CORE (1), above loopTask (priority 1) and out of reach of
+    // the networking stack (WiFi/lwip/async_tcp all on core 0). The 200 Hz
+    // PD outranks the 50 Hz control tick; the forensics sentinel outranks
+    // both so it can witness whole-core stalls.
     xTaskCreatePinnedToCore(
         balanceTaskFunc,
         "BalanceTask",
         4096,
         nullptr,
-        5,              // high priority
+        BALANCE_TASK_PRIORITY,
         &balanceTaskHandle,
-        0               // Core 0
+        CONTROL_CORE
     );
-    Serial.printf("[Main] Balance task launched on Core 0 at %d Hz\n", BALANCE_LOOP_HZ);
+    xTaskCreatePinnedToCore(
+        controlTaskFunc,
+        "ControlTask",
+        8192,
+        nullptr,
+        CONTROL_TASK_PRIORITY,
+        &controlTaskHandle,
+        CONTROL_CORE
+    );
+    xTaskCreatePinnedToCore(
+        sentinelTaskFunc,
+        "StallSentinel",
+        2048,
+        nullptr,
+        SENTINEL_TASK_PRIORITY,
+        &sentinelTaskHandle,
+        CONTROL_CORE
+    );
+    Serial.printf("[Main] Control core split: balance %dHz prio %d, control prio %d, sentinel prio %d on core %d\n",
+                  BALANCE_LOOP_HZ, BALANCE_TASK_PRIORITY, CONTROL_TASK_PRIORITY,
+                  SENTINEL_TASK_PRIORITY, CONTROL_CORE);
 }
 
 // ---------------------------------------------------------------------------
-// Main loop
+// Control tick -- runs on the dedicated control task (core 1, priority 12,
+// 200 Hz cadence). Everything control-critical lives here: serial commands
+// (CAN access stays single-threaded), IMU, CRSF RX/TX, CAN scan/feedback,
+// arming, balance state machine, drive and arm control.
 // ---------------------------------------------------------------------------
-void loop() {
+static void controlTick() {
     uint32_t now = millis();
     uint32_t nowUs = micros();
 
-    // Loop gap: time since the previous loop() iteration. Catches stalls
-    // caused by other tasks starving the loop, not just our own sections.
-    if (profLastLoopUs != 0) {
-        uint32_t gap = nowUs - profLastLoopUs;
-        if (gap > profLoopGapMaxUs) profLoopGapMaxUs = gap;
+    // Control gap: time since the previous control iteration. THE stall
+    // metric -- >100 ms gaps are recorded as forensic events.
+    if (ctlLastTickUs != 0) {
+        uint32_t gap = nowUs - ctlLastTickUs;
+        if (gap > profCtlGapMaxUs) profCtlGapMaxUs = gap;
+        if (gap > STALL_EVENT_MIN_US) {
+            recordStallEvent(now, gap, (uint8_t)balanceCtrl.getState());
+        }
     }
-    profLastLoopUs = nowUs;
+    ctlLastTickUs = nowUs;
 
     // Process serial debug commands (non-blocking)
     pollSerialCommands();
@@ -963,6 +1083,8 @@ void loop() {
             throttle = simThrottle;
             steering = simSteering;
         }
+        dbgThrottle = throttle;
+        dbgSteering = steering;
 
         // Ch12 move trigger (always active)
         bool moveNow = isSwitchActive(arm_move_raw);
@@ -1158,86 +1280,89 @@ void loop() {
             loopOverruns++;
         }
 
-        // 9. Periodic debug output (every 2 seconds = 100 ticks at 50Hz)
-        //    Toggle with 'd' command over serial
-        if (debugOutputEnabled && controlTickCount % 100 == 0) {
-            uint32_t avgUs = loopTotalUs / 100;
-            Serial.println("==================================================");
-            Serial.printf("[Loop] t=%lu tick=%lu | avg=%luus max=%luus overruns=%lu\n",
-                          now, controlTickCount, avgUs, loopMaxUs, loopOverruns);
-            Serial.printf("[Loop] link=%d rssi=%d lq=%d | drv_armed=%d arm_armed=%d | thr=%.2f str=%.2f | wifi=%d | sim=%s\n",
-                          crsfRx.isLinkUp(), crsfRx.getRssi(), crsfRx.getLinkQuality(),
-                          motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
-                          throttle, steering, wifiConnected,
-                          simEnabled ? "ON" : "off");
-
-            Serial.printf("[IMU] pitch=%+6.1f roll=%+6.1f yaw=%+6.1f  [CF] tilt=%+6.1f rate=%+6.1f\n",
-                          ahrsFilter.getPitch(), ahrsFilter.getRoll(), ahrsFilter.getYaw(),
-                          balanceCtrl.getTiltAngle(), balanceCtrl.getGyroRate());
-
-            // Reset timing accumulators
-            loopMaxUs = 0;
-            loopTotalUs = 0;
-            loopOverruns = 0;
-
-            // Raw channel values
-            Serial.print("[CRSF] CH: ");
-            for (int i = 0; i < 16; i++) {
-                Serial.printf("%d", crsfRx.getChannel(i));
-                if (i < 15) Serial.print(",");
-            }
-            Serial.println();
-            {
-                const char* arm_pos_str = armCtrl.isMoving() ? "MOVING" :
-                    (armCtrl.getCurrentPosition() == ArmPosition::Forward ? "FWD" :
-                     armCtrl.getCurrentPosition() == ArmPosition::Center ? "CTR" :
-                     armCtrl.getCurrentPosition() == ArmPosition::Jump ? "JUMP" : "BWD");
-                float fwd_l = armCtrl.getForwardLeft();
-                float fwd_r = armCtrl.getForwardRight();
-                float cur_l = motorMgr.getMotor(MotorRole::ArmLeft).position;
-                float cur_r = motorMgr.getMotor(MotorRole::ArmRight).position;
-                Serial.printf("[Arm] pos=%s cal_mode=%s | L: %.2f (cal %.2f) R: %.2f (cal %.2f)\n",
-                              arm_pos_str,
-                              armCtrl.isInCalMode() ? "YES" : "no",
-                              cur_l, cur_l - fwd_l,
-                              cur_r, cur_r - fwd_r);
-            }
-            Serial.println();
-
-            // Motor online status with position/velocity/torque
-            for (int i = 0; i < motorMgr.motorCount(); i++) {
-                const MotorState& m = motorMgr.getMotor(i);
-                Serial.printf("[Motor] ID=%2d %s | pos=%7.2f (raw=%6.2f off=%6.2f) | vel=%6.1f rad/s (%5.0f RPM) | trq=%5.2f Nm | tmp=%.1fC | err=0x%02X\n",
-                              m.can_id,
-                              m.online ? "ON " : "OFF",
-                              m.position, m.raw_position, m.unwrap_offset,
-                              m.velocity, m.velocity * RAD_S_TO_RPM,
-                              m.torque,
-                              m.temperature,
-                              m.errors);
-            }
-
-            Serial.printf("[VBUS] %.1fV  [Current] %.2fA\n",
-                          motorMgr.getBusVoltage(), motorMgr.getTotalCurrent());
-
-            // Drive controller per-motor closed-loop status
-            driveCtrl.printDebug();
-
-            // Balance controller status (only when not idle)
-            if (balanceCtrl.isActive()) {
-                Serial.printf("[Balance] state=%s  roll=%.1f  setpoint=%.1f\n",
-                              balanceCtrl.getStateString(), rollDeg, (float)balanceCtrl.getEffectiveSetpoint());
-            }
-
-            // CAN bus diagnostics
-            canBus.printBusStatus();
-            Serial.println("==================================================");
-        }
+        // (Periodic debug burst moved to loopTask -- Serial output must never
+        // sit on the control path.)
     }
 
-    // While balancing, display and WebSocket work is throttled hard: both
-    // compete for Core 1 time and neither matters mid-run (Core 1 stalls
-    // dropped the robot in run 173619).
+    // -----------------------------------------------------------------------
+    // ~5 Hz CRSF telemetry to transmitter (stays with control: it shares the
+    // CRSF UART with crsfRx.update())
+    // -----------------------------------------------------------------------
+    if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
+        lastTelTick = now;
+        uint32_t prof_start = micros();
+
+        const char* state;
+        if (motorMgr.isArming()) {
+            state = "ARMING";
+        } else if (balanceCtrl.isActive()) {
+            state = balanceCtrl.getStateString();
+        } else {
+            state = armCtrl.getStateString();
+        }
+        crsfRx.sendFlightMode(state);
+        crsfRx.sendBatteryTelemetry(motorMgr.getBusVoltage(),
+                                    motorMgr.getTotalCurrent());
+        crsfRx.sendAttitudeTelemetry(ahrsFilter.getPitch(),
+                                     ahrsFilter.getRoll(),
+                                     ahrsFilter.getYaw());
+        profRecord(PROF_TEL, prof_start);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Control task (core 1, priority 12): the 50 Hz control loop plus the 200 Hz
+// IMU read, isolated from display/WebSocket/debug (loopTask, priority 1) and
+// from the networking stack (pinned to core 0). Nothing that can run on this
+// core below priority 12 can delay a control tick anymore.
+// ---------------------------------------------------------------------------
+static void controlTaskFunc(void* param) {
+    (void)param;
+    TickType_t lastWake = xTaskGetTickCount();
+    Serial.printf("[Main] Control task started on core %d\n", xPortGetCoreID());
+    for (;;) {
+        controlTick();
+        vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(1000 / BALANCE_LOOP_HZ));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Sentinel task (core 1, priority 24): stall forensics discriminator. If a
+// control-task stall coincides with a sentinel gap, the whole core was dark
+// (flash-cache stall or interrupts disabled); if the sentinel kept ticking,
+// the control task was blocked in its own code or preempted by a
+// priority-12..23 task.
+// ---------------------------------------------------------------------------
+static void sentinelTaskFunc(void* param) {
+    (void)param;
+    uint32_t lastUs = micros();
+    for (;;) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        uint32_t nowUs = micros();
+        uint32_t gap = nowUs - lastUs;
+        lastUs = nowUs;
+        if (gap > sentinelGapMaxUs) sentinelGapMaxUs = gap;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Main loop (loopTask, core 1, priority 1): everything that is allowed to be
+// late. Display, WebSocket telemetry, and the periodic debug burst.
+// ---------------------------------------------------------------------------
+void loop() {
+    uint32_t now = millis();
+    uint32_t nowUs = micros();
+
+    // loopTask gap -- expected to grow under control-task preemption; only
+    // interesting when it dwarfs the control gap.
+    if (profLastLoopUs != 0) {
+        uint32_t gap = nowUs - profLastLoopUs;
+        if (gap > profLoopGapMaxUs) profLoopGapMaxUs = gap;
+    }
+    profLastLoopUs = nowUs;
+
+    // While balancing, display and WebSocket work is throttled hard: they
+    // share the core (at low priority) and neither matters mid-run.
     bool balancing = balanceCtrl.isActive();
 
     // -----------------------------------------------------------------------
@@ -1270,26 +1395,89 @@ void loop() {
     }
 
     // -----------------------------------------------------------------------
-    // ~5 Hz CRSF telemetry to transmitter
+    // Periodic debug output (every 2 seconds). Toggle with 'd' over serial.
+    // Reads control-task state without locks -- diagnostic output only.
     // -----------------------------------------------------------------------
-    if (now - lastTelTick >= CRSF_TELEMETRY_PERIOD_MS) {
-        lastTelTick = now;
-        uint32_t prof_start = micros();
+    if (debugOutputEnabled && now - lastDebugTick >= 2000) {
+        lastDebugTick = now;
+        uint32_t ticks = controlTickCount - lastDebugTickCount;
+        lastDebugTickCount = controlTickCount;
+        uint32_t avgUs = (ticks > 0) ? (loopTotalUs / ticks) : 0;
 
-        const char* state;
-        if (motorMgr.isArming()) {
-            state = "ARMING";
-        } else if (balanceCtrl.isActive()) {
-            state = balanceCtrl.getStateString();
-        } else {
-            state = armCtrl.getStateString();
+        Serial.println("==================================================");
+        Serial.printf("[Loop] t=%lu tick=%lu | avg=%luus max=%luus overruns=%lu ctlgap=%luus\n",
+                      now, controlTickCount, avgUs, loopMaxUs, loopOverruns,
+                      (unsigned long)profCtlGapMaxUs);
+        Serial.printf("[Loop] link=%d rssi=%d lq=%d | drv_armed=%d arm_armed=%d | thr=%.2f str=%.2f | wifi=%d | sim=%s\n",
+                      crsfRx.isLinkUp(), crsfRx.getRssi(), crsfRx.getLinkQuality(),
+                      motorMgr.isDriveArmed(), motorMgr.isArmArmed(),
+                      (float)dbgThrottle, (float)dbgSteering, wifiConnected,
+                      simEnabled ? "ON" : "off");
+
+        Serial.printf("[IMU] pitch=%+6.1f roll=%+6.1f yaw=%+6.1f  [CF] tilt=%+6.1f rate=%+6.1f\n",
+                      ahrsFilter.getPitch(), ahrsFilter.getRoll(), ahrsFilter.getYaw(),
+                      balanceCtrl.getTiltAngle(), balanceCtrl.getGyroRate());
+
+        // Reset timing accumulators
+        loopMaxUs = 0;
+        loopTotalUs = 0;
+        loopOverruns = 0;
+
+        // Raw channel values
+        Serial.print("[CRSF] CH: ");
+        for (int i = 0; i < 16; i++) {
+            Serial.printf("%d", crsfRx.getChannel(i));
+            if (i < 15) Serial.print(",");
         }
-        crsfRx.sendFlightMode(state);
-        crsfRx.sendBatteryTelemetry(motorMgr.getBusVoltage(),
-                                    motorMgr.getTotalCurrent());
-        crsfRx.sendAttitudeTelemetry(ahrsFilter.getPitch(),
-                                     ahrsFilter.getRoll(),
-                                     ahrsFilter.getYaw());
-        profRecord(PROF_TEL, prof_start);
+        Serial.println();
+        {
+            const char* arm_pos_str = armCtrl.isMoving() ? "MOVING" :
+                (armCtrl.getCurrentPosition() == ArmPosition::Forward ? "FWD" :
+                 armCtrl.getCurrentPosition() == ArmPosition::Center ? "CTR" :
+                 armCtrl.getCurrentPosition() == ArmPosition::Jump ? "JUMP" : "BWD");
+            float fwd_l = armCtrl.getForwardLeft();
+            float fwd_r = armCtrl.getForwardRight();
+            float cur_l = motorMgr.getMotor(MotorRole::ArmLeft).position;
+            float cur_r = motorMgr.getMotor(MotorRole::ArmRight).position;
+            Serial.printf("[Arm] pos=%s cal_mode=%s | L: %.2f (cal %.2f) R: %.2f (cal %.2f)\n",
+                          arm_pos_str,
+                          armCtrl.isInCalMode() ? "YES" : "no",
+                          cur_l, cur_l - fwd_l,
+                          cur_r, cur_r - fwd_r);
+        }
+        Serial.println();
+
+        // Motor online status with position/velocity/torque
+        for (int i = 0; i < motorMgr.motorCount(); i++) {
+            const MotorState& m = motorMgr.getMotor(i);
+            Serial.printf("[Motor] ID=%2d %s | pos=%7.2f (raw=%6.2f off=%6.2f) | vel=%6.1f rad/s (%5.0f RPM) | trq=%5.2f Nm | tmp=%.1fC | err=0x%02X\n",
+                          m.can_id,
+                          m.online ? "ON " : "OFF",
+                          m.position, m.raw_position, m.unwrap_offset,
+                          m.velocity, m.velocity * RAD_S_TO_RPM,
+                          m.torque,
+                          m.temperature,
+                          m.errors);
+        }
+
+        Serial.printf("[VBUS] %.1fV  [Current] %.2fA\n",
+                      motorMgr.getBusVoltage(), motorMgr.getTotalCurrent());
+
+        // Drive controller per-motor closed-loop status
+        driveCtrl.printDebug();
+
+        // Balance controller status (only when not idle)
+        if (balanceCtrl.isActive()) {
+            Serial.printf("[Balance] state=%s  roll=%.1f  setpoint=%.1f\n",
+                          balanceCtrl.getStateString(), balanceCtrl.getTiltAngle(),
+                          (float)balanceCtrl.getEffectiveSetpoint());
+        }
+
+        // CAN bus diagnostics
+        canBus.printBusStatus();
+        Serial.println("==================================================");
     }
+
+    // loopTask has nothing time-critical left -- yield the core
+    delay(2);
 }

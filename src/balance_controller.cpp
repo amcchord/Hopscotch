@@ -199,6 +199,26 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
 // ---------------------------------------------------------------------------
 
 void BalanceController::enterTippingUp() {
+    // Switch the back wheels CSP -> Speed BEFORE anything moves. The robot
+    // is static on all fours, so the blocking delays and verified param
+    // writes (0.4-7.3s of Core 1 stall in every logged run when this
+    // happened at engage) cost nothing here -- and a failed switch aborts
+    // a standup that never started instead of hard-aborting a robot that
+    // is already up on its arms. At 0 rad/s the velocity servo holds the
+    // wheels against the arm push (integral action).
+    bool ok_l = _motors->setDriveRunMode(MotorRole::BackLeft, RobstrideRunMode::Speed,
+                                         BALANCE_SPEED_ACC_RAD, BALANCE_SPEED_CURRENT_LIMIT_A);
+    bool ok_r = _motors->setDriveRunMode(MotorRole::BackRight, RobstrideRunMode::Speed,
+                                         BALANCE_SPEED_ACC_RAD, BALANCE_SPEED_CURRENT_LIMIT_A);
+    if (!ok_l || !ok_r) {
+        _motors->setDriveRunMode(MotorRole::BackLeft,  RobstrideRunMode::CSP);
+        _motors->setDriveRunMode(MotorRole::BackRight, RobstrideRunMode::CSP);
+        Serial.println("[Balance] Tip-up REFUSED: speed mode switch failed");
+        return;
+    }
+    _speed_mode_active = true;
+    _last_speed_refresh_ms = millis();
+
     _state = BalanceState::TippingUp;
     _targets_initialized = false;
 
@@ -216,7 +236,7 @@ void BalanceController::enterTippingUp() {
 
     _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
 
-    Serial.printf("[Balance] TIPPING UP  arm goal: L=%.2f R=%.2f\n",
+    Serial.printf("[Balance] TIPPING UP (wheels pre-switched to Speed)  arm goal: L=%.2f R=%.2f\n",
                   _arm_left_goal, _arm_right_goal);
 
     startLog();
@@ -280,8 +300,10 @@ void BalanceController::enterBalancing(float current_roll) {
     _arm_center_left  = cal.center_left;
     _arm_center_right = cal.center_right;
 
-    // Switch back wheels CSP -> Speed (blocking, ~40 ms per motor; the robot
-    // is still supported by the arms at this point).
+    // Normally the wheels were already switched to Speed mode at the start
+    // of tip-up (setDriveRunMode is a fast no-op when the mode matches).
+    // The force-engage path (no tip-up) still pays the blocking switch here
+    // -- acceptable for a hand-supported testing feature.
     bool ok_l = _motors->setDriveRunMode(MotorRole::BackLeft, RobstrideRunMode::Speed,
                                          BALANCE_SPEED_ACC_RAD, BALANCE_SPEED_CURRENT_LIMIT_A);
     bool ok_r = _motors->setDriveRunMode(MotorRole::BackRight, RobstrideRunMode::Speed,
@@ -425,7 +447,13 @@ void BalanceController::resetSafetyTimers() {
 void BalanceController::update(float roll_deg, float roll_rate_dps,
                                 bool ch7_active, bool ch11_edge, float dt) {
     if (!_motors || !_arms) return;
-    _last_update_ms = millis();
+    {
+        uint32_t now0 = millis();
+        if (_last_update_ms != 0 && now0 - _last_update_ms > 200) {
+            _loop_wake_ms = now0;   // just woke from a Core 1 stall
+        }
+        _last_update_ms = now0;
+    }
 
     float tilt = _filter_initialized ? (float)_tilt_angle : roll_deg;
     float rate = _filter_initialized ? (float)_gyro_rate : roll_rate_dps;
@@ -479,6 +507,16 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float motor_speed = (speed_l > speed_r) ? speed_l : speed_r;
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, motor_speed);
 
+        // The back wheels are already in Speed mode holding 0: refresh the
+        // command every 250ms so the motor-side CAN watchdog (~1s) never
+        // stops them during the ~9s tip.
+        uint32_t now_tip = millis();
+        if (now_tip - _last_speed_refresh_ms >= BALANCE_TIPUP_SPEED_REFRESH_MS) {
+            _last_speed_refresh_ms = now_tip;
+            _motors->sendDriveSpeed(MotorRole::BackLeft,  0.0f);
+            _motors->sendDriveSpeed(MotorRole::BackRight, 0.0f);
+        }
+
         float arm_err_l = fabsf(_arm_left_target - _arm_tip_left_goal);
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
         bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
@@ -522,9 +560,15 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Stale wheel feedback = CAN bus trouble. Balancing blind in Speed
         // mode is how wheels end up spinning into a fall -- abort instead.
         // (Healthy feedback cadence is ~160 ms per motor from the scan cycle.)
+        // Grace window after a Core 1 stall: feedback timestamps are updated
+        // by Core 1 itself, so a loop stall is indistinguishable from dead
+        // CAN until processFeedback has had a moment to refresh (a 449ms
+        // stall triggered a spurious abort mid-recovery, run 222223).
+        bool stale_grace = (now - _loop_wake_ms) < 500 && _loop_wake_ms != 0;
         uint32_t fb_age_l = now - _motors->getMotor(MotorRole::BackLeft).last_feedback_ms;
         uint32_t fb_age_r = now - _motors->getMotor(MotorRole::BackRight).last_feedback_ms;
-        if (fb_age_l > BALANCE_FEEDBACK_STALE_MS || fb_age_r > BALANCE_FEEDBACK_STALE_MS) {
+        if (!stale_grace
+            && (fb_age_l > BALANCE_FEEDBACK_STALE_MS || fb_age_r > BALANCE_FEEDBACK_STALE_MS)) {
             Serial.printf("[Balance] SAFETY: wheel feedback stale (L=%lums R=%lums)\n",
                           (unsigned long)fb_age_l, (unsigned long)fb_age_r);
             hardAbort("wheel feedback stale (CAN)");
@@ -712,8 +756,22 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // capture gate ensures the return STARTS calm; this keeps it so.
             bool crisis = fabsf((float)_last_motor_vel) > 10.0f || fabsf(rate) > 30.0f;
             if (!crisis) {
-                _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  BALANCE_ARM_RETURN_SPEED, dt);
-                _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, BALANCE_ARM_RETURN_SPEED, dt);
+                // Proportional return: scale per-arm speed by remaining
+                // distance so both arms reach forward TOGETHER. Equal-rate
+                // return finished the short (right) arm first; the axis
+                // decomposition read the imbalance as a center excursion
+                // and the equilibrium dipped ~1 deg mid-return for nothing.
+                float dist_l = fabsf(_arm_left_goal  - _arm_left_target);
+                float dist_r = fabsf(_arm_right_goal - _arm_right_target);
+                float longest = (dist_l > dist_r) ? dist_l : dist_r;
+                float speed_l = BALANCE_ARM_RETURN_SPEED;
+                float speed_r = BALANCE_ARM_RETURN_SPEED;
+                if (longest > 0.001f) {
+                    speed_l *= dist_l / longest;
+                    speed_r *= dist_r / longest;
+                }
+                _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  speed_l, dt);
+                _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, speed_r, dt);
             }
 
             if (!_arms_returned) {
@@ -754,6 +812,13 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_ramp_complete) {
             target_vel = clampf(-_drift_vel_kp * meas_drift,
                                 -BALANCE_DRIFT_MAX_VEL, BALANCE_DRIFT_MAX_VEL);
+        } else {
+            // Early position P: oppose standup drift as it develops (low
+            // gain, origin at engage) instead of repaying it all after the
+            // ramp. The integrator stays ramp-gated -- this only biases the
+            // velocity damper's target, it cannot wind up.
+            target_vel = clampf(-BALANCE_RAMP_DRIFT_KP * meas_drift,
+                                -BALANCE_RAMP_DRIFT_MAX_VEL, BALANCE_RAMP_DRIFT_MAX_VEL);
         }
         _last_target_vel = target_vel;
         float vel_err = _filtered_wheel_vel - target_vel;
@@ -1104,6 +1169,8 @@ void BalanceController::dumpLog() {
     Serial.printf("# inner_kd=%.4f\n", (float)_kd);
     Serial.printf("# drift_vel_kp=%.4f\n", _drift_vel_kp);
     Serial.printf("# drift_max_vel=%.2f\n", BALANCE_DRIFT_MAX_VEL);
+    Serial.printf("# ramp_drift_kp=%.4f\n", BALANCE_RAMP_DRIFT_KP);
+    Serial.printf("# ramp_drift_max_vel=%.2f\n", BALANCE_RAMP_DRIFT_MAX_VEL);
     Serial.printf("# vel_sp_kp=%.4f\n", _vel_sp_kp);
     Serial.printf("# vel_sp_ki=%.4f\n", _vel_sp_ki);
     Serial.printf("# sp_offset_max=%.2f\n", BALANCE_SP_OFFSET_MAX_DEG);

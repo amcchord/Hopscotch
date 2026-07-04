@@ -1,24 +1,42 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v12: Speed-Mode Cascade + Arm Assist, July 2026)
+## Current Architecture (v13: Control-Core Split + Sim-Tuned Standup, July 2026)
 
-### Inner loop (200 Hz, Core 0)
-- Back wheels in **Robstride Speed mode**; PD (Kp=2.0, Kd=0.08 on
-  complementary-filter tilt) commands wheel velocity directly.
+### Task layout (control-core / comms-core split)
+- **Core 0 (comms)**: WiFi + lwIP (framework-pinned) + async_tcp (pinned by
+  build flag, priority 3).
+- **Core 1 (control)**: 200 Hz balance PD task (prio 18) > 50 Hz control
+  task (prio 12: serial cmds, IMU, CRSF, CAN, arming, balance state
+  machine, arm/drive) > loopTask (prio 1: display, WebSocket, debug burst).
+- Stall forensics: control-tick gaps >100ms recorded (section attribution +
+  priority-24 sentinel discriminator), dumped as `# stall_*` in `bal log`.
+
+### Inner loop (200 Hz)
+- Back wheels in **Robstride Speed mode** -- switched at the START of
+  tip-up (static robot, verified writes cost nothing there; 250ms 0-speed
+  keepalive feeds the motor CAN watchdog through the tip). PD (Kp=2.0,
+  Kd=0.08 on complementary-filter tilt) commands wheel velocity directly.
 - Yaw sync: differential correction holds the L/R wheel position
   difference at its engage value (+/-1.5 rad/s).
-- Two-stage dead-man on the Core 1 heartbeat: >300ms stale -> authority
-  clamped to 20 rad/s; >1.5s -> wheels stopped.
+- Two-stage dead-man on the control-task heartbeat: >300ms stale ->
+  authority clamped to 20 rad/s; >1.5s -> wheels stopped.
 
-### Outer cascade (50 Hz, Core 1)
+### Outer cascade (50 Hz)
 - Position P (drift -> target velocity, origin = engage position) ->
   velocity PI (dual-slope: 0.7 below 0.8 rad/s, 2.2 above) -> tilt
   setpoint offset, rate-limited 12 deg/s, clamped +/-8 deg.
+- **Position P runs through the standup ramp too** (gain 0.03, clamp 0.6
+  rad/s) so standup drift is opposed as it develops; integrator stays
+  ramp-gated.
+- Standup: refit curve shape (84.0/83.05/82.1, ~1.9 deg tip->fwd rise),
+  proportional arm return (both arms land together).
 - High-velocity shed: braking-by-lean authority fades 8->14 rad/s
   (leaning back needs forward acceleration; near the speed ceiling that
   self-defeats).
 - Single integrator = equilibrium learner: calm-gated, glide-boosted,
   seeded from persisted settings.balance_trim, saved back after >=8s runs.
+- Offline: `scripts/balance_sim.py` (firmware-faithful sim + stall
+  injection), `scripts/fit_balance_model.py --speed-only`.
 
 ### Setpoint schedule (self-calibrating)
 - effective_sp = curve(tip_frac) + center_frac*(CENTER-FWD) + stored trim
@@ -50,10 +68,12 @@
   analyze_balance_logs.py (--plot), scripts/fit_balance_model.py.
 
 ### Known open items
-- Standup tow: curve shape between tip and forward still approximate;
-  refit from accumulated capture data.
-- Sub-second Core 1 stalls (profiler points at preemption); dead-man
-  makes them survivable but the source is unfound.
+- Phase 15 fixes (standup + core split + pre-switched Speed mode) are
+  sim-validated and built but NOT yet bench-validated -- run the Phase 15
+  validation ladder next session.
+- If stall forensics still shows events after the core split, the `sec:` /
+  `sentinel_us:` fields in `# stall_*` name the remaining cause class
+  (own blocking code vs preemption vs whole-core flash stall).
 
 ## Previous Architecture (v10: Position PI with Leaky Origin)
 
@@ -853,6 +873,25 @@ loop afterward. Standup tow still present (noted, deferred).
   during sustained excitation; an explicit engagement lifecycle with a
   calm-based re-arm cannot.
 
+**Run 27** (`bal_20260703_222223.csv`, 23.4s, evening session):
+- **The lifecycle works end-to-end**: tap #1 -> arm throw +0.42, one recoil
+  handoff, then 3.5s later the STILLEST balance on record (roll pinned at
+  87.85 +/- 0.05, cmd 0.0 for 3+ seconds). Tap #2 recovery was mid-flight
+  and healthy when the run ended.
+- **The "tipped over" was a spurious safety abort, not a control failure**:
+  a 449ms Core 1 stall made the wheel-feedback timestamps (updated by
+  Core 1 itself) look stale; the CAN-death abort fired mid-recovery and
+  stopped the motors. Fix: 500ms grace on the stale check after the loop
+  wakes from a stall (real CAN death still aborts -- loop running, feedback
+  aging). Lesson 47: **a watchdog that shares a failure domain with what
+  it watches will false-positive** -- feedback age measured by a stalled
+  clock is not feedback age.
+- **Standup tow is physics**: displacement to tilt back delta-theta is
+  ~(B/A)*delta_theta regardless of speed -- predicted ~14 rad, measured
+  +11. Can't be tuned away; compressed instead: arm return 1.5 -> 2.5
+  rad/s, base sp rate 3 -> 4 deg/s (operator call). The position loop
+  walks it back afterward.
+
 **Run 26 feedback** (state machine validated on-robot): disturbance
 response confirmed good with settling restored. Operator tweaks applied:
 - Release tau 1.0 -> 0.65s (~50% quicker return to neutral).
@@ -865,6 +904,135 @@ response confirmed good with settling restored. Operator tweaks applied:
   double-counting concern because the primary actuator is pinned.
 - Standup weirdness still open (curve shape refit pending, needs a few
   more captures for data).
+
+### Phase 15: Sim-First Fixes -- Core 1 Stalls + Standup Roll-Away (Jul 3, design record)
+
+Both open items from Phase 14 attacked offline before the next robot
+session, per the sim-first plan.
+
+**Model refit from Speed-mode data only** (`fit_balance_model.py
+--speed-only`, 23 runs): A=8.8 1/s^2 (unstable pole 3.0 rad/s -- the CSP-era
+1.22 was closed-loop-bias garbage), B=5.9 deg per rad/s^2, true small-signal
+motor velocity-loop lag tau_m=60ms (trajectory fit with the 100 rad/s^2 acc
+limit modeled; the naive fit said 200+ms because large excursions conflate
+the acc limit and the 160ms round-robin feedback staleness). Quiet-window
+noise: roll std 0.15 deg, rate std 1.2 dps, wheel vel std 0.33 rad/s.
+`model_fit.json` refreshed.
+
+**Simulator built** (`scripts/balance_sim.py`): 200Hz inner PD + motor lag +
+acc limit + 50Hz outer tick ported line-for-line from balance_controller.cpp
+(ramp + vel gate, capture shift fade, capture self-cal, dual-slope PI,
+gates, shed, arm-assist lifecycle), with Core 1 stall injection (outer tick
+freezes, Core 0 keeps running the two-stage dead-man) and floor/body push
+injection. Validated against three logged failures before use:
+1. Standup tow: sim reproduces 5-10 rad of ramp-phase drift with current
+   constants (logs: 6-16).
+2. Run 23 mechanism: a -40 dps shove that is caught 5/5 without a stall
+   falls 3/5 when a 0.6s stall lands during the arm return.
+3. Run 13 dead-man: v1 (wheel stop at 300ms) falls where v2 (two-stage)
+   survives the same 740ms stall.
+Documented sim caveat: with the fitted A the quiet-stance limit cycle is
+~3 deg std vs 0.3-0.9 real -- absolute stability is pessimistic, so variants
+are compared relatively and "standup failure" is scored only through
+ramp-complete+3s.
+
+**Standup roll-away root cause confirmed in the traces**: during arm return
++ ramp the scheduled sp sits 1-4 deg above the actual roll continuously; in
+Speed mode that error IS commanded velocity (Kp=2 rad/s per deg), so the
+robot glides 2-5 rad/s for the whole ramp. Three contributors, three fixes
+(sim matrix, 54 cases each: 3 A-values x 3 eq-shift values x 3 capture
+offsets x 2 seeds):
+1. **Curve shape refit**: the true tip->fwd equilibrium rise is ~1.9 deg
+   (per-run measured +1.0..+3.3), not the 2.9 the anchors assumed. Anchors
+   now 84.0 / 83.05 / 82.1 (ARMS_TIP raised to 82.1).
+2. **Proportional arm return**: equal-rate return finished the short (right)
+   arm first; the axis decomposition read the imbalance as a center
+   excursion and the equilibrium dipped ~1 deg mid-return for nothing.
+   Per-arm speeds now scale with remaining distance so both arms land
+   together (also cut median ramp time 3.1 -> 2.3s).
+3. **Early position P**: the position loop now runs THROUGH the ramp
+   (origin at engage, gain 0.03 vs 0.05, clamp 0.6 vs 1.0 rad/s) so drift is
+   opposed as it develops. Integrator stays ramp-gated -- no wind-up.
+Combined: standup failures 5/54 -> 2/54, median |drift@ramp| 3.2 -> 2.4 rad,
+median peak tow 4.7 -> 3.8 rad in sim, push response unchanged.
+- **Rejected: velocity-gating the arm return** (pause while gliding): it cut
+  the tow further but TRIPLED standup failures. The return RAISES the
+  equilibrium toward the robot -- pausing it during a glide blocks the very
+  self-correction that ends the glide. Lesson 47: **the arm return is part
+  of the correction, not a disturbance; never gate it on the symptom it
+  cures.**
+- **Rejected: carrot ramp / eq-tracking standup**: capping the effective
+  setpoint to tilt +/- lead (or replacing the ramp with a velocity-zeroing
+  tracker) collapsed in the matrix -- both interact with the catch
+  transient, where velocity has glide semantics inverted (a braking
+  transient reads as "sp too high" and walks the sp the wrong way).
+
+**Core 1 stall, cause 1 (every run): the engage-time mode switch.** Every
+July log has a 0.4-7.3s gap at exactly the enterBalancing tick -- the
+blocking CSP->Speed switch (fixed delays + up to 4x30ms verified-write
+retries per param, all on the 50Hz loop). Fixed by **moving the switch to
+the START of tip-up**: the robot is static on all fours, blocking there
+costs nothing, and the verified current-limit writes complete before the
+robot ever lifts (a failed switch now refuses the standup instead of
+hard-aborting a robot already up on its arms). A 250ms 0-speed keepalive
+during the ~9s tip keeps the motor-side CAN watchdog fed. Force-engage
+(double-tap, no tip-up) keeps the blocking switch. enterBalancing is now
+essentially instant (setDriveRunMode no-ops when the mode already matches).
+
+**Core 1 stall, cause 2 (sporadic, 0.4-2.5s mid-balance): preemption.**
+The Async TCP library defaults to priority 10 on ANY core; the Arduino
+loopTask (the whole 50Hz loop) is priority 1. Fixed with a full
+**control-core / comms-core split**:
+- Core 0 (comms): WiFi + lwIP (already pinned there by the framework),
+  async_tcp pinned via `-DCONFIG_ASYNC_TCP_RUNNING_CORE=0`, priority
+  dropped to 3.
+- Core 1 (control): the 200Hz PD task moved here at priority 18; the 50Hz
+  control tick (serial commands, IMU, CRSF RX/TX, CAN, arming, balance
+  state machine, arm/drive) moved out of loopTask into a dedicated task at
+  priority 12; loopTask (priority 1) keeps display, WebSocket telemetry,
+  and the debug burst -- preemptable by control, never the reverse.
+Serial commands stay on the control task so CAN access remains
+single-threaded.
+
+**Stall forensics** (replaces guessing): any control-tick gap >100ms is
+recorded in a ring (dumped as `# stall_*` lines with `bal log`) with the
+profiler section that grew (own blocking code names itself), the balance
+state, and the **sentinel gap**: a priority-24 task on the control core
+stamps every 10ms. Sentinel gapped too = whole core dark (flash-cache stall
+from a LittleFS write, or interrupts off); sentinel kept ticking = control
+was blocked or preempted below 24. (Naming the preempting task directly via
+runtime stats is off the table -- this framework build ships without
+CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS.) New `# prof_ctlgap_max_us` is the
+headline stall metric; flash-write audit confirmed trim persist and log
+flush only happen on exit paths.
+
+**Stall-injection campaign** on the fixed controller: rides through stalls
+up to ~1.2s in any phase (capture / return / ramp / steady); >=2s stalls
+mostly fall -- dominated by the frozen outer loop and the 1.5s hard stop,
+which is correct behavior (no RC, no safety = give up). Dead-man params
+verified in sim: soft clamp value 12/20/30 indistinguishable (keep 20);
+extending the hard stop 1.5->3s only helps marginally and costs the safety
+argument (keep 1.5); **Core 0 ramp-continuation during stalls: no effect**
+with the fixed standup (the sp is no longer parked below equilibrium when
+stalls hit) -- rejected, no new Core 0 complexity.
+
+**Bench validation ladder for the next session** (minimal robot time):
+1. **Idle soak** (10+ min, WiFi client attached, dashboard open, drive
+   armed): `bal log` must show `# stall_events=0` and
+   `# prof_ctlgap_max_us` < ~30000. Also confirms 200Hz/50Hz co-existence
+   on core 1 (watch the `[Loop] avg/max` line).
+2. **Wheels-up tip-up + engage/disengage cycling**: verify the pre-switched
+   Speed mode -- wheels should hold still against a hand push during the
+   tip (velocity servo), and the telemetry gap at t~8.9s should drop from
+   0.4-7.3s to ~0. Then one wheels-down tip-up to confirm the wheels hold
+   against the arm push on the real floor.
+3. **Standup trials** (3+): expect standup drift < ~3 rad (vs +10-16),
+   both arms reaching forward together, no mid-return equilibrium dip.
+   Pull telemetry, re-run `fit_balance_model.py --speed-only` and
+   `balance_sim.py validate`; iterate constants only if sim and robot
+   disagree.
+4. **Push tests** unchanged from the Phase 14 ladder (arm assist and outer
+   cascade were not retuned).
 
 **Test ladder for the first Speed-mode session** (one variable at a time):
 1. **Wheels-up mode switch**: robot on a stand, drive armed. Serial:

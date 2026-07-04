@@ -29,11 +29,11 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 ### Self-Balance Mode
 
-An optional balancing mode activated via RC switch combinations. On engage, the rear wheels are switched from CSP position mode to Robstride Speed mode: a 200 Hz complementary-filter + PD control loop on Core 0 commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin.
+An optional balancing mode activated via RC switch combinations. At the start of the tip-up sequence the rear wheels are switched from CSP position mode to Robstride Speed mode (while the robot is still static on all fours): a 200 Hz complementary-filter + PD control loop commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin; the position loop also runs at reduced gain during the standup ramp so the robot stands up without rolling away.
 
 The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals across runs. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) that makes them decisive on disturbances but structurally unable to sustain an oscillation, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
 
-The full design record -- 26 instrumented runs, 46 lessons -- lives in `telemetry_logs/TUNING_HISTORY.md`.
+The full design record -- 26+ instrumented runs, 47 lessons -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is a firmware-faithful simulator (standup scenarios, push response, Core 1 stall injection) used to validate controller changes before robot time.
 
 ### Web Dashboard
 
@@ -117,10 +117,12 @@ Or:
 
 ## Software Architecture
 
-The firmware runs two cores of the ESP32-S3:
+The firmware splits the two ESP32-S3 cores into a **control core** and a **comms core**:
 
-- **Core 1** — Main 50 Hz control loop: CRSF parsing, arming logic, drive controller, arm controller, balance state machine, failsafe, display, WebSocket telemetry
-- **Core 0** — 200 Hz balance tick: IMU read, complementary filter, PD loop, wheel speed commands (only active during balance mode)
+- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, IMU read, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
+- **Core 0 (comms)** — WiFi and lwIP (pinned there by the framework) plus `async_tcp` (pinned by build flag). Networking can no longer preempt the control loops.
+
+Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator) and dumped with `bal log` as `# stall_*` lines.
 
 ### Module Map
 
@@ -142,11 +144,12 @@ The firmware runs two cores of the ESP32-S3:
 
 | Task | Rate |
 |------|------|
-| Control loop | 50 Hz |
+| Control loop | 50 Hz (5 ms task cadence) |
 | Balance loop | 200 Hz |
-| Display refresh | 25 fps |
-| WebSocket telemetry | 10 Hz |
+| Display refresh | 25 fps (5 fps while balancing) |
+| WebSocket telemetry | 10 Hz (1 Hz while balancing) |
 | CRSF telemetry uplink | 5 Hz |
+| Stall sentinel | 100 Hz |
 
 ## Configuration
 
