@@ -220,8 +220,10 @@ static constexpr float    BALANCE_SPEED_CURRENT_LIMIT_A = 14.0f;   // near motor
 static constexpr uint32_t BALANCE_TIPUP_SPEED_REFRESH_MS = 250;    // re-send 0-speed during tip-up so the motor-side CAN
                                                                    // watchdog (0x200C, ~1s) never fires mid-tip
 
-static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 120000;  // telemetry recording window (flush deferred, safe to be long)
-static const char*        BALANCE_LOG_PATH              = "/bal_log.csv";
+static constexpr uint32_t BALANCE_LOG_DURATION_MS       = 120000;  // full 120s at 50Hz (6000 samples); binary persistence
+                                                                   // keeps the expanded schema inside the LittleFS partition
+static const char*        BALANCE_LOG_PATH              = "/bal_log.bin";
+static const char*        BALANCE_LEGACY_LOG_PATH       = "/bal_log.csv";
 
 // Safety abort thresholds
 static constexpr float    BALANCE_SAFE_TILT_MIN         = 30.0f;    // hard abort below this (fallen forward)
@@ -249,7 +251,10 @@ static constexpr uint32_t BALANCE_DEADMAN_HARD_MS       = 1500;     // stop whee
 // (linearized model, robust across A x0.5-2, B x0.7-1.4, motor lag 30-80ms).
 // Margins are structurally thin: start conservative, retune from Speed-mode
 // telemetry.
-static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.05f;    // rad/s of return velocity per rad of drift
+static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.08f;    // rad/s of return velocity per rad of drift. 0.05 took 33s
+                                                                    // to walk home from the +9.6 rad standup tow (run 233710,
+                                                                    // "very slowly got back to 0"); 0.08 is still inside the
+                                                                    // stable region of the fitted-model gain grid.
 static constexpr float    BALANCE_DRIFT_MAX_VEL         = 1.0f;     // max return velocity (rad/s)
 // Early position P: the position loop also runs DURING the standup ramp
 // (origin at engage) at reduced gain, so standup drift is opposed as it
@@ -269,6 +274,13 @@ static constexpr float    BALANCE_VEL_SP_KNEE           = 0.8f;     // rad/s bou
 static constexpr float    BALANCE_VEL_SP_KI             = 0.35f;    // deg/s per rad/s of velocity error (single integrator)
 static constexpr float    BALANCE_SP_OFFSET_MAX_DEG     = 8.0f;     // setpoint offset clamp (6 railed for 6.6s during the
                                                                     // escalating-tap run -- it was the binding constraint)
+static constexpr float    BALANCE_RAMP_SP_OFFSET_MAX_DEG = 1.5f;    // tighter clamp DURING the standup ramp. The damper is
+                                                                    // positive feedback while the robot chases the rising
+                                                                    // equilibrium from below (raising the sp commands MORE
+                                                                    // velocity, not braking): it contributed +4.6 of the 4.9
+                                                                    // deg peak setpoint error in runs 231458/233710 (+8..+10
+                                                                    // rad tow) while base+trim tracked within 0.7 deg. 1.5 deg
+                                                                    // keeps ~3 rad/s of genuine surge-damping authority.
 static constexpr float    BALANCE_SP_OFFSET_RATE        = 12.0f;    // deg/s rate limit -- still step-free; 16 allowed a
                                                                     // +6.6 -> -2.0 whipsaw in 0.5s (run 232626 overcorrection)
 static constexpr float    BALANCE_VEL_FILTER_ALPHA      = 0.35f;    // wheel velocity LPF (~55ms) -- earlier lean-in on taps
@@ -332,9 +344,11 @@ static constexpr float    BALANCE_ARM_CALM_MS           = 300.0f;   // sustained
 // Emergency arm throw: wheels far into their authority while still carrying
 // velocity error means a roll-away in progress -- any arm authority is pure
 // gain. Bypasses the engagement lifecycle and throws the arms to their full
-// stop in the braking direction. 60% of max (=18 rad/s) is well above any
-// observed oscillation command (+/-8) and fires ~0.5s earlier than 90% did.
-static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.60f;
+// stop in the braking direction. 45% of max (=13.5 rad/s) still sits well
+// above the observed oscillation band (+/-8) -- the run-231458 forward
+// runaway held cmd at 13-15 rad/s for 1.5s and PEAKED at 17.3, just under
+// the old 18 rad/s trigger; the robot needed a hand stop.
+static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.45f;
 static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm motor speed limit
 
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium

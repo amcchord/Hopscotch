@@ -1,6 +1,6 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v13: Control-Core Split + Sim-Tuned Standup, July 2026)
+## Current Architecture (v14: Control-Core Split + Forensic Flight Recorder, July 2026)
 
 ### Task layout (control-core / comms-core split)
 - **Core 0 (comms)**: WiFi + lwIP (framework-pinned) + async_tcp (pinned by
@@ -51,7 +51,7 @@
   +0.45 (arms back, brakes forward motion) / -0.30 (arms forward of
   vertical, brakes backward motion) of the calibrated center axis.
 - **Engagement lifecycle**: READY -> ACTIVE -> (one recoil HANDOFF) ->
-  COOLDOWN; re-arms only after 400ms of genuine calm. External bumps
+  COOLDOWN; re-arms only after 300ms of genuine calm. External bumps
   arrive out of calm; self-oscillation never re-establishes it -- the
   arms structurally cannot sustain a limit cycle.
 - Fast attack (80ms tau, 12 rad/s motors, ~raw velocity input), 0.65s
@@ -64,16 +64,42 @@
   verified (read-back) writes for symmetry-critical motor params;
   stale-wheel-feedback abort (400ms); level-based drive-disarm stop
   enforcement; non-blocking USB CDC; loop profiler dumped with `bal log`.
-- Telemetry: 50Hz PSRAM log with config header; scripts/
-  analyze_balance_logs.py (--plot), scripts/fit_balance_model.py.
+- Telemetry v2: complete 120s/6000-sample 50Hz PSRAM capture with 200Hz
+  window diagnostics, raw/filter IMU comparison, full inner/outer command
+  construction, motor/arm torque and feedback age, arm lifecycle, power,
+  run note/markers, terminal reason, and checksum. Binary persistence and
+  learned-trim writes are deferred until fully idle. The profiler is reset
+  at run entry and frozen at exit, so `bal log` no longer records its own
+  idle download stalls. `scripts/save_telemetry.sh` rejects corrupt or
+  truncated transfers; `scripts/analyze_balance_logs.py --details` reports
+  timing, authority, sensors, power, lifecycle, and safety evidence.
 
 ### Known open items
-- Phase 15 fixes (standup + core split + pre-switched Speed mode) are
-  sim-validated and built but NOT yet bench-validated -- run the Phase 15
-  validation ladder next session.
-- If stall forensics still shows events after the core split, the `sec:` /
-  `sentinel_us:` fields in `# stall_*` name the remaining cause class
-  (own blocking code vs preemption vs whole-core flash stall).
+- The run-33 follow-up changes -- ramp-phase offset clamp +/-1.5 deg and
+  drift return Kp 0.05 -> 0.08 -- are sim-validated and built but not yet
+  robot-validated. Start with the stand-up baseline in
+  `docs/BALANCE_TESTING.md`, then advance through its disturbance ladder.
+- Runs 32/33 showed zero balance-time control stalls after the CRSF byte
+  budget. If a new run records one, the run-scoped `sec:` / `sentinel_us:`
+  fields distinguish own blocking code, preemption, and whole-core stalls.
+
+### Test-round telemetry preparation (after Run 33)
+- Replaced the misleading 120s/3000-sample configuration (which silently
+  filled at ~60s) with a real 6000-sample capture covering the full 120s.
+- On-flash format is a versioned binary record (1.32MB of samples) with an
+  FNV-1a checksum. `bal log` validates it before CSV export; the host also
+  requires the checksum and exact row count before accepting a file.
+- Added capture-time gain/config snapshot, build ID, operator `bal note`,
+  CH12/`bal mark` event alignment, end reason, and a final row immediately
+  before every controller-detected safety exit.
+- Added direct observability for the remaining tuning questions: raw vs
+  filtered IMU, 200Hz cadence and clipping, command before/after clamps,
+  every setpoint component, feedback age, arm lifecycle/demand/tracking,
+  yaw saturation, motor torque, and bus voltage/current.
+- Flash I/O and trim persistence now execute only after the robot and arms
+  are idle. A new balance attempt is refused during the short save window,
+  guaranteeing that every permitted test is instrumented and no flash
+  cache stall can interrupt balance or arm return.
 
 ## Previous Architecture (v10: Position PI with Leaky Origin)
 
@@ -960,6 +986,62 @@ crsf section.
 - Lesson 51: **every `while (peripheral has data)` loop is unbounded by
   contract.** Drain loops in control firmware need byte/time budgets --
   the peripheral, not the code, decides when an unbounded loop exits.
+
+**Run 32** (`bal_20260703_231458.csv`, 51.2s -- first run on the CRSF byte
+budget; stood up, needed a hand to stop the tow, then very stable through
+7 taps, ran away on the recoil of the final big push):
+- **ZERO control stalls during the run** -- no timestamp gaps in standup or
+  balance. The 33 forensics events are all state:0 post-run: the `bal log`
+  serial dump itself occupying the control task at idle (benign there; do
+  not run `bal log` while balancing).
+- **Standup**: capture 0.01 deg / arms returned together in 0.5s -- but
+  towed +8.3 rad. Cause measured: tip eq 80.8 -> true fwd eq 85.3, a +4.5
+  deg rise vs the curve's 1.9. The integrator carried +2.7 all run and the
+  >8s persist blended it into stored trim, so the next standup starts
+  pre-corrected. Curve shape left alone -- rise measurements now span
+  +1.0..+4.5 across runs; the trim learner is the mechanism for that
+  variance (lesson 27), the shape only needs to be roughly right.
+- **Final runaway dissected**: backward push handled (full -0.30 arm
+  throw, motion killed). The forward RECOIL got wheels-only: while the
+  arms relaxed through the neutral band, one noisy sample dipped demand
+  below 0.05 at the same tick |dev| crossed 0.10 -- ACTIVE exited to
+  COOLDOWN mid-event, so the handoff never fired; re-arm needs 300ms of
+  calm that a runaway never provides. Meanwhile sp_offset railed +8, vel
+  hit 11, and the emergency throw missed by a hair: cmd held 13-15 rad/s
+  for 1.5s, PEAKING at 17.3 vs the 18.0 (60%) trigger. Hand stop.
+- Fixes: (1) ACTIVE -> COOLDOWN now also requires 150ms of accumulated
+  calm -- a one-tick blip can no longer end the event while the recoil is
+  still building; (2) emergency throw threshold 0.60 -> 0.45 (13.5 rad/s),
+  still well above the +/-8 oscillation band.
+- Lesson 52: **event-over must be judged by the robot's state, not the
+  actuator's position.** The arms passing through neutral says nothing
+  about whether the disturbance is finished -- only calm does.
+
+**Run 33** (`bal_20260703_233710.csv`, 51.2s): the run-32 fixes VALIDATED
+on tape -- the final big tap (t=38.3) was the textbook lifecycle: full arm
+throw in 150ms, motion killed in 1.4s, smooth relax through neutral, wheels
+absorbed the recoil (cmd peak 7.6, sp_offset never railed), settled in
+3.5s. No cooldown trap, no runaway. Operator: "basically the ideal
+recovery."
+- **Standup tow smoking gun found** (+9.6 rad again, hand stop): the base
+  setpoint (curve + learned trim) tracked the robot within 0.7 deg through
+  the whole ramp -- but the RAMP-PHASE VELOCITY DAMPER contributed +4.6 of
+  the +4.9 deg peak setpoint error. During standup the robot chases the
+  rising equilibrium from BELOW: velocity is the robot keeping up, and
+  "braking" it by raising the setpoint commands MORE velocity. Positive
+  feedback, same signature both runs (spoff +4.5..+5.2 at the tow peak).
+  Trim learning (0.62 -> 0.97 between runs) couldn't help because trim was
+  never the driver.
+- Fix 1: sp_offset clamped to +/-1.5 deg while the ramp is incomplete
+  (full +/-8 after). Keeps ~3 rad/s of genuine surge damping, kills the
+  spiral. Sim regression: standup matrix unchanged, pushes unchanged.
+- Fix 2: "very slowly got back to 0" -- 9.6 rad at drift_kp=0.05 meant a
+  0.48 rad/s return target, 33s to get home. DRIFT_VEL_KP 0.05 -> 0.08
+  (still inside the fitted-model stable grid).
+- Lesson 53: **a velocity damper assumes the velocity is the error.**
+  During transitions the velocity IS the tracking -- damp it and you fight
+  the maneuver. Phase-dependent authority (tight clamp during the ramp)
+  separates the two regimes.
 
 **Run 26 feedback** (state machine validated on-robot): disturbance
 response confirmed good with settling restored. Operator tweaks applied:

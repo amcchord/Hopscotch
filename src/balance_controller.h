@@ -22,24 +22,133 @@ struct RawImuData {
 
 struct BalanceSample {
     uint32_t t_ms;
+    uint16_t sample_dt_ms;
+    uint16_t inner_dt_max_us;
+    uint16_t feedback_age_l_ms;
+    uint16_t feedback_age_r_ms;
+    uint16_t update_age_ms;
+    uint16_t marker;
+    uint16_t diag_flags;
     uint8_t  state;
+    uint8_t  flags;
+    uint8_t  arm_stage;
+    uint8_t  inner_ticks;
+    uint8_t  inner_sat_ticks;
+    uint8_t  reserved;
     float    roll;
     float    roll_rate;
+    float    accel_angle;
+    float    gyro_raw;
+    float    accel_norm;
     float    setpoint;
     float    angle_err;
+    float    base_sp;
+    float    raw_base_sp;
+    float    capture_shift;
+    float    run_curve_shift;
+    float    motor_vel_raw;
     float    motor_vel;
+    float    cmd_left;
+    float    cmd_right;
     float    sp_offset;
+    float    sp_offset_target;
     float    target_vel;
+    float    filtered_vel;
+    float    vel_err;
+    float    vel_integral;
+    float    vel_p_term;
+    float    pos_gate;
+    float    shed;
     float    bl_pos, br_pos;
     float    bl_vel, br_vel;
+    float    bl_torque, br_torque;
     float    arm_l, arm_r;
     float    arm_l_tgt, arm_r_tgt;
+    float    arm_l_vel, arm_r_vel;
+    float    arm_l_torque, arm_r_torque;
     float    meas_drift;
     float    meas_vel;
-    uint8_t  flags;
+    float    arm_tip_frac;
+    float    arm_assist_frac;
+    float    arm_assist_vel;
+    float    arm_demand;
+    float    arm_calm_ms;
+    float    yaw_diff;
+    float    yaw_corr;
+    float    bus_voltage;
+    float    total_current;
 };
 
-static constexpr int BALANCE_LOG_MAX_SAMPLES = 3000;
+// One 50 Hz sample for the complete 120-second capture. The in-memory and
+// on-flash representations are binary so this expanded forensic schema fits
+// comfortably in PSRAM and the 1.5 MB LittleFS partition.
+static constexpr int BALANCE_LOG_MAX_SAMPLES = 6000;
+
+enum BalanceDiagFlag : uint16_t {
+    BAL_DIAG_INNER_SATURATED = 0x0001,
+    BAL_DIAG_DEADMAN_SOFT    = 0x0002,
+    BAL_DIAG_DEADMAN_HARD    = 0x0004,
+    BAL_DIAG_FEEDBACK_GRACE  = 0x0008,
+    BAL_DIAG_GLIDE_BOOST     = 0x0010,
+    BAL_DIAG_RAMP_CRISIS     = 0x0020,
+    BAL_DIAG_ARM_EMERGENCY   = 0x0040,
+    BAL_DIAG_SP_CLAMPED      = 0x0080,
+    BAL_DIAG_YAW_CLAMPED     = 0x0100,
+    BAL_DIAG_SAFETY_EXIT     = 0x0200,
+};
+
+static constexpr int BALANCE_LOG_MAX_CURVE_POINTS = 6;
+
+struct BalanceLogConfigSnapshot {
+    float inner_kp;
+    float inner_kd;
+    float drift_vel_kp;
+    float drift_max_vel;
+    float ramp_drift_kp;
+    float ramp_drift_max_vel;
+    float vel_sp_kp;
+    float vel_sp_kp_low;
+    float vel_sp_knee;
+    float vel_sp_ki;
+    float sp_offset_max;
+    float ramp_sp_offset_max;
+    float sp_offset_rate;
+    float vel_filter_alpha;
+    float pos_gate_err;
+    float shed_vel_start;
+    float shed_vel_full;
+    float stored_trim;
+    float glide_vel_err;
+    float glide_ki_boost;
+    float speed_acc_rad;
+    float speed_current_limit;
+    float base_sp_fwd;
+    float base_sp_tip;
+    float base_sp_center;
+    float base_sp_rate_max;
+    float ramp_vel_slow;
+    float comp_alpha;
+    float max_drive_speed;
+    float arm_return_speed;
+    float arm_assist_thresh;
+    float arm_assist_gain;
+    float arm_range_pos;
+    float arm_range_neg;
+    float arm_tau_in;
+    float arm_tau_out;
+    float arm_emergency_cmd_frac;
+    float yaw_sync_kp;
+    float yaw_sync_max;
+    uint32_t capture_settle_ms;
+    uint32_t arm_hold_max_ms;
+    uint32_t log_duration_ms;
+    uint16_t balance_loop_hz;
+    uint16_t control_loop_hz;
+    uint8_t curve_len;
+    uint8_t reserved[3];
+    float curve_frac[BALANCE_LOG_MAX_CURVE_POINTS];
+    float curve_sp[BALANCE_LOG_MAX_CURVE_POINTS];
+};
 
 class BalanceController {
 public:
@@ -78,11 +187,21 @@ public:
     float getKd() const { return _kd; }
     float getEffectiveSetpoint() const { return _effective_setpoint; }
 
-    // Telemetry log
+    // Telemetry log. serviceLog() is called only from the low-priority loop
+    // after balance mode is fully idle; it is the only path that writes flash.
     void dumpLog();
     void clearLog();
+    void serviceLog();
+    void setLogNote(const char* note);
+    void markEvent();
     bool hasLog() const;
     size_t logSize() const;
+    bool isLogging() const { return _logging; }
+    bool isLogPendingFlush() const {
+        return _log_pending_flush || _log_flush_in_progress || _trim_save_pending;
+    }
+    uint32_t getLogStartMs() const { return _log_start_ms; }
+    uint32_t getLogEndMs() const { return _log_end_ms; }
 
     void printStatus();
 
@@ -96,6 +215,9 @@ private:
     // --- Complementary filter (Core 0) ---
     volatile float _tilt_angle = 0.0f;
     volatile float _gyro_rate  = 0.0f;
+    volatile float _last_accel_angle = 0.0f;
+    volatile float _last_gyro_raw    = 0.0f;
+    volatile float _last_accel_norm  = 0.0f;
     bool _filter_initialized = false;
 
     // --- PD gains (read by Core 0, written by Core 1 for tuning) ---
@@ -161,9 +283,30 @@ private:
 
     // --- Last values for telemetry (volatile: written by Core 0, read by Core 1) ---
     volatile float _last_angle_err = 0.0f;
+    volatile float _last_motor_vel_raw = 0.0f;
     volatile float _last_motor_vel = 0.0f;
+    volatile float _last_cmd_left  = 0.0f;
+    volatile float _last_cmd_right = 0.0f;
+    volatile uint16_t _last_inner_diag = 0;
+    volatile uint16_t _inner_dt_max_us = 0;
+    volatile uint8_t  _inner_ticks = 0;
+    volatile uint8_t  _inner_sat_ticks = 0;
+    portMUX_TYPE _telemetry_mux = portMUX_INITIALIZER_UNLOCKED;
+    volatile uint16_t _last_update_age_ms = 0;
     float _last_meas_drift = 0.0f;
     float _last_meas_vel   = 0.0f;
+    float _last_base_sp = 0.0f;
+    float _last_raw_base_sp = 0.0f;
+    float _last_capture_shift = 0.0f;
+    float _last_sp_offset_target = 0.0f;
+    float _last_vel_err = 0.0f;
+    float _last_vel_p_term = 0.0f;
+    float _last_pos_gate = 0.0f;
+    float _last_shed = 0.0f;
+    float _last_arm_tip_frac = 0.0f;
+    float _last_arm_demand = 0.0f;
+    float _last_yaw_diff = 0.0f;
+    uint16_t _last_outer_diag = 0;
     uint8_t _last_flags    = 0;
 
     // Arm ramp state (Core 1 only)
@@ -187,7 +330,21 @@ private:
     int            _log_count  = 0;
     bool           _logging    = false;
     uint32_t       _log_start_ms = 0;
+    uint32_t       _log_end_ms = 0;
+    uint32_t       _last_log_sample_ms = 0;
+    uint32_t       _last_log_flush_attempt_ms = 0;
     bool           _log_saved  = false;
+    volatile bool  _log_pending_flush = false;
+    volatile bool  _log_flush_in_progress = false;
+    uint16_t       _marker_count = 0;
+    char           _next_log_note[64] = {};
+    char           _log_note[64] = {};
+    char           _log_end_reason[48] = {};
+    BalanceLogConfigSnapshot _log_config = {};
+    bool           _trim_save_pending = false;
+    float          _pending_trim_old = 0.0f;
+    float          _pending_trim_value = 0.0f;
+    float          _pending_trim_learned = 0.0f;
 
     static float clampf(float value, float min_value, float max_value);
     static float moveToward(float current, float target, float rate, float dt);
@@ -196,13 +353,13 @@ private:
     float computeScheduledSetpoint() const;
     void enterTippingUp();
     void enterBalancing(float current_roll);
-    void enterReturningArms();
-    void disengage();
+    void enterReturningArms(const char* reason);
+    void disengage(const char* reason);
     void exitSpeedMode();
     void persistLearnedTrim();
     void resetSafetyTimers();
-    void startLog();
+    bool startLog();
     void logSample(float roll_deg, float roll_rate_dps);
-    void stopLog();
+    void stopLog(const char* reason);
     void flushLogToFile();
 };

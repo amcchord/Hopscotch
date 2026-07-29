@@ -91,6 +91,18 @@ static StallEvent stallRing[STALL_RING_LEN];
 static uint32_t   stallCount = 0;
 static uint32_t   profMaxAtLastEvent[PROF_COUNT] = {};
 static volatile uint32_t sentinelGapMaxUs = 0;
+static bool profileRunActive = false;
+
+struct LoopProfileSnapshot {
+    bool valid;
+    uint32_t run_start_ms;
+    uint32_t max_us[PROF_COUNT];
+    uint32_t loop_gap_max_us;
+    uint32_t ctl_gap_max_us;
+    uint32_t stall_count;
+    StallEvent stalls[STALL_RING_LEN];
+};
+static LoopProfileSnapshot frozenProfile = {};
 
 // NOTE: naming the preempting task directly via uxTaskGetSystemState runtime
 // deltas is not possible on this framework build (espressif32@6.7.0 ships
@@ -123,25 +135,37 @@ static void recordStallEvent(uint32_t now_ms, uint32_t gap_us, uint8_t bal_state
 }
 
 static void printLoopProfile() {
+    const uint32_t* max_us = frozenProfile.valid ? frozenProfile.max_us : profMaxUs;
+    uint32_t loop_gap = frozenProfile.valid ? frozenProfile.loop_gap_max_us : profLoopGapMaxUs;
+    uint32_t ctl_gap = frozenProfile.valid ? frozenProfile.ctl_gap_max_us : profCtlGapMaxUs;
+    uint32_t count = frozenProfile.valid ? frozenProfile.stall_count : stallCount;
+    const StallEvent* ring = frozenProfile.valid ? frozenProfile.stalls : stallRing;
+    uint32_t run_start_ms = frozenProfile.valid ? frozenProfile.run_start_ms : 0;
+
+    Serial.printf("# profile_scope=%s\n", frozenProfile.valid ? "balance_run" : "live");
+    Serial.printf("# profile_run_start_uptime_ms=%lu\n", (unsigned long)run_start_ms);
     for (int i = 0; i < PROF_COUNT; i++) {
-        Serial.printf("# prof_%s_max_us=%lu\n", profNames[i], (unsigned long)profMaxUs[i]);
+        Serial.printf("# prof_%s_max_us=%lu\n", profNames[i], (unsigned long)max_us[i]);
     }
-    Serial.printf("# prof_loopgap_max_us=%lu\n", (unsigned long)profLoopGapMaxUs);
-    Serial.printf("# prof_ctlgap_max_us=%lu\n", (unsigned long)profCtlGapMaxUs);
-    Serial.printf("# stall_events=%lu\n", (unsigned long)stallCount);
-    uint32_t shown = (stallCount < STALL_RING_LEN) ? stallCount : STALL_RING_LEN;
+    Serial.printf("# prof_loopgap_max_us=%lu\n", (unsigned long)loop_gap);
+    Serial.printf("# prof_ctlgap_max_us=%lu\n", (unsigned long)ctl_gap);
+    Serial.printf("# stall_events=%lu\n", (unsigned long)count);
+    uint32_t shown = (count < STALL_RING_LEN) ? count : STALL_RING_LEN;
+    uint32_t first = (count > STALL_RING_LEN) ? count - STALL_RING_LEN : 0;
     for (uint32_t i = 0; i < shown; i++) {
-        const StallEvent& e = stallRing[i];
+        const StallEvent& e = ring[(first + i) % STALL_RING_LEN];
         const char* sec = "none";
         if (e.section >= 0 && e.section < PROF_COUNT) sec = profNames[e.section];
-        Serial.printf("# stall_%lu=t:%lu,gap_us:%lu,sentinel_us:%lu,sec:%s,state:%u\n",
-                      (unsigned long)i, (unsigned long)e.t_ms,
+        uint32_t run_t_ms = run_start_ms ? e.t_ms - run_start_ms : e.t_ms;
+        Serial.printf("# stall_%lu=t:%lu,uptime_ms:%lu,gap_us:%lu,sentinel_us:%lu,sec:%s,state:%u\n",
+                      (unsigned long)i, (unsigned long)run_t_ms,
+                      (unsigned long)e.t_ms,
                       (unsigned long)e.gap_us, (unsigned long)e.sentinel_gap_us,
                       sec, e.bal_state);
     }
 }
 
-static void resetLoopProfile() {
+static void resetLoopProfile(uint32_t run_start_ms = 0) {
     for (int i = 0; i < PROF_COUNT; i++) {
         profMaxUs[i] = 0;
         profMaxAtLastEvent[i] = 0;
@@ -150,6 +174,22 @@ static void resetLoopProfile() {
     profCtlGapMaxUs = 0;
     stallCount = 0;
     sentinelGapMaxUs = 0;
+    ctlLastTickUs = micros();
+    profLastLoopUs = ctlLastTickUs;
+    profileRunActive = run_start_ms != 0;
+    if (profileRunActive) frozenProfile.valid = false;
+}
+
+static void freezeLoopProfile() {
+    if (!profileRunActive) return;
+    frozenProfile.valid = true;
+    frozenProfile.run_start_ms = balanceCtrl.getLogStartMs();
+    for (int i = 0; i < PROF_COUNT; i++) frozenProfile.max_us[i] = profMaxUs[i];
+    frozenProfile.loop_gap_max_us = profLoopGapMaxUs;
+    frozenProfile.ctl_gap_max_us = profCtlGapMaxUs;
+    frozenProfile.stall_count = stallCount;
+    for (int i = 0; i < STALL_RING_LEN; i++) frozenProfile.stalls[i] = stallRing[i];
+    profileRunActive = false;
 }
 
 // WiFi state
@@ -169,6 +209,7 @@ static constexpr uint32_t CAL_ENTRY_HOLD_MS = 3000;
 
 // Balance mode state tracking
 static bool  prevBalanceWasActive = false;
+static bool  prevBalanceTelemetryActive = false;
 
 // Double-tap detection for force-engage
 static uint32_t lastCalEdgeTime = 0;
@@ -240,6 +281,8 @@ static void printSerialHelp() {
     Serial.println("  bal vkp/vki <val>           Set velocity PI gains (setpoint offset)");
     Serial.println("  bal log                     Dump telemetry log to serial");
     Serial.println("  bal log clear               Delete telemetry log file");
+    Serial.println("  bal note <text>             Tag the next/current test run");
+    Serial.println("  bal mark                    Add a numbered event marker");
     Serial.println("  help                        Show this help");
     Serial.println("-----------------------------");
 }
@@ -458,12 +501,29 @@ static void processBalCommand(const char* sub) {
         balanceCtrl.forceEngage();
 
     } else if (strcmp(sub, "log") == 0) {
+        if (balanceCtrl.isActive()) {
+            Serial.println("[Balance] Log dump REFUSED while balance mode is active");
+            return;
+        }
         printLoopProfile();
         balanceCtrl.dumpLog();
-        resetLoopProfile();
 
     } else if (strcmp(sub, "log clear") == 0) {
         balanceCtrl.clearLog();
+        if (!balanceCtrl.isActive()) {
+            frozenProfile = {};
+            resetLoopProfile();
+        }
+
+    } else if (strncmp(sub, "note ", 5) == 0) {
+        balanceCtrl.setLogNote(sub + 5);
+
+    } else if (strcmp(sub, "note") == 0) {
+        balanceCtrl.setLogNote("");
+
+    } else if (strcmp(sub, "mark") == 0) {
+        balanceCtrl.markEvent();
+        Serial.println("[Balance] Event marker added");
 
     } else if (strncmp(sub, "kp ", 3) == 0) {
         float val = atof(sub + 3);
@@ -491,6 +551,10 @@ static void processBalCommand(const char* sub) {
         Serial.printf("[Balance] Vel-sp Ki = %.4f\n", val);
 
     } else if (strncmp(sub, "trim ", 5) == 0) {
+        if (balanceCtrl.isActive()) {
+            Serial.println("[Balance] Stored trim write REFUSED while balance mode is active");
+            return;
+        }
         float val = atof(sub + 5);
         settingsMgr.settings.balance_trim = val;
         settingsMgr.save();
@@ -506,6 +570,7 @@ static void processBalCommand(const char* sub) {
         Serial.println("         bal dkp <val>     drift -> target vel gain");
         Serial.println("         bal vkp/vki <val> velocity PI -> setpoint offset");
         Serial.println("         bal trim [<val>]  show/set stored equilibrium trim");
+        Serial.println("         bal note <text> | bal mark");
         Serial.println("         bal log | bal log clear");
     }
 }
@@ -823,7 +888,7 @@ static void balanceTaskFunc(void* param) {
         uint32_t nowUs = micros();
         float dt = (float)(nowUs - prevUs) / 1000000.0f;
         prevUs = nowUs;
-        if (dt <= 0.0f || dt > 0.05f) dt = 0.005f;
+        if (dt <= 0.0f) dt = 0.005f;
 
         RawImuData imu;
         portENTER_CRITICAL(&imuMux);
@@ -991,7 +1056,7 @@ static void controlTick() {
     if (ctlLastTickUs != 0) {
         uint32_t gap = nowUs - ctlLastTickUs;
         if (gap > profCtlGapMaxUs) profCtlGapMaxUs = gap;
-        if (gap > STALL_EVENT_MIN_US) {
+        if (gap > STALL_EVENT_MIN_US && profileRunActive) {
             recordStallEvent(now, gap, (uint8_t)balanceCtrl.getState());
         }
     }
@@ -1154,6 +1219,11 @@ static void controlTick() {
         } else {
             waitingForDoubleTap = false;
         }
+        // CH12 is a harmless, precisely timestamped test marker while
+        // balance owns the arms. Press it immediately before a push/tap.
+        if (ch7Active && balanceCtrl.isActive() && moveEdge) {
+            balanceCtrl.markEvent();
+        }
         uint32_t prof_bal = micros();
         balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
         profRecord(PROF_BAL, prof_bal);
@@ -1169,12 +1239,12 @@ static void controlTick() {
 
         ArmInput armInput = {};
         armInput.cal_trigger = calEdge;
-        armInput.move_trigger = moveEdge;
+        armInput.move_trigger = balanceActive ? false : moveEdge;
         armInput.jump_trigger = balanceActive ? false : calEdge;
         armInput.speed_channel = arm_speed_raw;
         armInput.nudge_channel = applyDeadband(arm_nudge_raw, deadband_norm);
 
-        if (calEdge || moveEdge) {
+        if (!balanceActive && (calEdge || moveEdge)) {
             Serial.printf("[ArmInput] cal=%d move=%d jump=%d\n", calEdge, moveEdge, calEdge);
         }
 
@@ -1266,6 +1336,16 @@ static void controlTick() {
             armCtrl.update(armInput, dt);
             profRecord(PROF_ADRV, prof_adrv);
         }
+
+        // Scope timing forensics to the physical balance run. Freeze the
+        // snapshot at the end so an idle `bal log` download cannot pollute it.
+        bool telemetryActiveNow = balanceCtrl.isActive();
+        if (telemetryActiveNow && !prevBalanceTelemetryActive) {
+            resetLoopProfile(balanceCtrl.getLogStartMs());
+        } else if (!telemetryActiveNow && prevBalanceTelemetryActive) {
+            freezeLoopProfile();
+        }
+        prevBalanceTelemetryActive = telemetryActiveNow;
 
         // (calibration streaming removed -- now via TX triggers)
 
@@ -1364,6 +1444,7 @@ void loop() {
     // While balancing, display and WebSocket work is throttled hard: they
     // share the core (at low priority) and neither matters mid-run.
     bool balancing = balanceCtrl.isActive();
+    if (!balancing) balanceCtrl.serviceLog();
 
     // -----------------------------------------------------------------------
     // ~25 fps display update (5 fps while balancing)

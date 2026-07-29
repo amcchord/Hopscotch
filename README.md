@@ -33,7 +33,7 @@ An optional balancing mode activated via RC switch combinations. At the start of
 
 The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals across runs. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) that makes them decisive on disturbances but structurally unable to sustain an oscillation, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
 
-The full design record -- 26+ instrumented runs, 47 lessons -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is a firmware-faithful simulator (standup scenarios, push response, Core 1 stall injection) used to validate controller changes before robot time.
+The full design record -- 30+ instrumented runs and 50+ lessons in the current Speed-mode campaign -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is a firmware-faithful simulator (standup scenarios, push response, Core 1 stall injection) used to validate controller changes before robot time. The repeatable flash, safety, test, marker, download, and analysis workflow is in [`docs/BALANCE_TESTING.md`](docs/BALANCE_TESTING.md).
 
 ### Web Dashboard
 
@@ -103,6 +103,8 @@ The web dashboard files in `data/` must be uploaded separately to LittleFS:
 pio run --target uploadfs
 ```
 
+For a balance-test firmware update, do not run `uploadfs` unless the web assets actually changed: it can replace the LittleFS volume that holds settings, arm calibration, and the saved balance log.
+
 ### Serial Monitor
 
 ```bash
@@ -122,7 +124,9 @@ The firmware splits the two ESP32-S3 cores into a **control core** and a **comms
 - **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, IMU read, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
 - **Core 0 (comms)** — WiFi and lwIP (pinned there by the framework) plus `async_tcp` (pinned by build flag). Networking can no longer preempt the control loops.
 
-Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator) and dumped with `bal log` as `# stall_*` lines.
+Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
+
+Balance telemetry schema v2 records a full 120 seconds at 50 Hz in PSRAM, including 200 Hz inner-loop timing/saturation aggregates, raw and filtered IMU signals, all setpoint components, unclamped/applied commands, CAN feedback latency, wheel and arm torque/motion, arm-assist lifecycle, yaw correction, power, safety-exit reason, and operator event markers. It is persisted as a checksummed binary file only after the robot is idle and exported to validated CSV by `./scripts/save_telemetry.sh`.
 
 ### Module Map
 
@@ -160,9 +164,11 @@ Balance gains can also be tuned live over serial without reflashing:
 ```
 bal kp 2.0      # inner PD: rad/s wheel speed per deg of angle error
 bal kd 0.08     # inner PD: rad/s per deg/s of roll rate
-bal dkp 0.05    # outer: target return velocity per rad of drift
-bal vkp 0.8     # outer: deg of setpoint offset per rad/s of velocity error
-bal vki 0.05    # outer: integral gain (the single integrator)
+bal dkp 0.08    # outer: target return velocity per rad of drift
+bal vkp 2.2     # outer: high-slope setpoint response per rad/s of velocity error
+bal vki 0.35    # outer: integral gain (the single equilibrium learner)
+bal note test-name  # tag the next/current telemetry capture
+bal mark        # add a numbered event marker (CH12 does this while balancing)
 ```
 
 See `docs/PROJECT.md` for the full Robstride CAN protocol reference and detailed documentation.
