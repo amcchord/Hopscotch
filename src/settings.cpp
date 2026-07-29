@@ -39,6 +39,8 @@ void SettingsManager::applyDefaults() {
     settings.arm_cal.backward_left  = 3.54f;
     settings.arm_cal.backward_right = -3.54f;
     settings.arm_cal.calibrated     = false;
+
+    settings.balance_trim = 0.0f;
 }
 
 bool SettingsManager::begin() {
@@ -128,6 +130,8 @@ String SettingsManager::toJson() const {
     ac["backward_right"] = settings.arm_cal.backward_right;
     ac["calibrated"]     = settings.arm_cal.calibrated;
 
+    doc["balance_trim"] = settings.balance_trim;
+
     String output;
     serializeJsonPretty(doc, output);
     return output;
@@ -182,6 +186,7 @@ bool SettingsManager::fromJson(const String& json) {
     if (doc["position_horizon_sec"].is<float>())  settings.position_horizon_sec = doc["position_horizon_sec"];
     if (doc["max_arm_speed"].is<float>())         settings.max_arm_speed = doc["max_arm_speed"];
     if (doc["arm_range"].is<float>())             settings.arm_range = doc["arm_range"];
+    if (doc["balance_trim"].is<float>())          settings.balance_trim = doc["balance_trim"];
 
     JsonObject ac = doc["arm_cal"];
     if (!ac.isNull()) {

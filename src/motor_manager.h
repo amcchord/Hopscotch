@@ -72,6 +72,12 @@ struct ArmingContext {
     bool pos_received = false;
 };
 
+// Motor-side CAN watchdog: motor stops itself if no CAN command arrives
+// within the window (per RS00 manual, 20000 = 1 s). The firmware pings every
+// motor every ~160 ms, so this only fires when the bus is truly dead --
+// the last line of defense against runaway Speed-mode wheels.
+static constexpr uint32_t MOTOR_CAN_TIMEOUT_VALUE = 20000;
+
 // Timing for non-blocking arming steps (ms)
 static constexpr uint32_t ARMING_STOP_DELAY_MS       = 50;
 static constexpr uint32_t ARMING_MODE_DELAY_MS        = 5;
@@ -107,6 +113,11 @@ public:
     void disarmArmMotors();
     void disarmAll();
 
+    // Safety net: while drive is disarmed, re-send stop to any drive motor
+    // still reporting motion (covers stop frames lost during CAN bus-off).
+    // Rate-limited internally; call every control tick.
+    void enforceDriveStopped(uint32_t now);
+
     bool isDriveArmed() const { return _drive_armed; }
     bool isArmArmed() const { return _arm_armed; }
 
@@ -115,6 +126,18 @@ public:
 
     // Send only the speed limit to a drive motor (for braking, no target position write)
     bool sendDriveSpeedLimit(MotorRole role, float speed_limit_rad_s);
+
+    // Switch a drive motor's run mode (stop -> mode write -> enable). Blocking
+    // (~40 ms per motor). Idempotent: returns immediately if already in mode.
+    // Speed mode is configured with the given acceleration and current limits
+    // and a zero speed target; CSP mode re-holds the current position.
+    bool setDriveRunMode(MotorRole role, RobstrideRunMode mode,
+                         float acc_rad_s2 = 0.0f, float current_limit_a = 0.0f);
+
+    // Send velocity command to a drive motor in Speed mode (handles reversal).
+    // Single TARGET_SPEED param write -- current/accel limits are set once by
+    // setDriveRunMode.
+    bool sendDriveSpeed(MotorRole role, float speed_rad_s);
 
     // Send position command to an arm motor
     bool sendArmPosition(MotorRole role, float position_rad, float speed_limit_rad_s);
@@ -156,9 +179,12 @@ private:
 
     int findMotorByCanId(uint8_t can_id);
     void configureMotorAfterEnable(int idx, float motor_pos);
+    bool writeFloatParamVerified(uint8_t can_id, uint16_t addr,
+                                 float value, const char* name);
     int _scan_index = 0;
 
     float _bus_voltage = 0.0f;
     float _motor_current[NUM_MOTORS] = {};
     int   _iq_scan_index = 0;
+    uint32_t _last_enforce_stop_ms = 0;
 };

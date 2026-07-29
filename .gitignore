@@ -5,3 +5,6 @@
 *.swo
 *~
 .DS_Store
+.venv/
+.venv-pio/
+__pycache__/

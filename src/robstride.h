@@ -44,6 +44,11 @@ namespace RobstrideParam {
     static constexpr uint16_t VEL_MAX         = 0x7024;  // float: PP mode speed, default 10 rad/s
     static constexpr uint16_t ACC_SET         = 0x7025;  // float: PP mode acceleration, default 10 rad/s^2
 
+    // Config-region parameters (0x2xxx table)
+    static constexpr uint16_t CAN_TIMEOUT     = 0x200C;  // uint32: motor stops itself if no CAN command
+                                                         // arrives within this window. 0 = disabled.
+                                                         // Per RS00 manual: 20000 = 1 s.
+
     // Read-only feedback parameters
     static constexpr uint16_t MECH_POS        = 0x7019;  // float: load mechanical angle (rad) R/O
     static constexpr uint16_t IQ_FILT         = 0x701A;  // float: iq filter value (A) R/O
@@ -101,6 +106,7 @@ public:
     // Parameter read/write (for position mode, speed mode, etc.)
     bool writeFloatParam(uint8_t motor_id, uint8_t host_id, uint16_t param_addr, float value);
     bool writeU8Param(uint8_t motor_id, uint8_t host_id, uint16_t param_addr, uint8_t value);
+    bool writeU32Param(uint8_t motor_id, uint8_t host_id, uint16_t param_addr, uint32_t value);
 
     // Set motor run mode (0=MIT, 1=Position, 2=Speed, 3=Current)
     bool setRunMode(uint8_t motor_id, uint8_t host_id, RobstrideRunMode mode);
@@ -133,6 +139,11 @@ public:
     // Print TWAI bus status and error counters for diagnostics
     void printBusStatus();
 
+    // Bus health watchdog: call periodically (e.g. every 50Hz tick). Detects
+    // TWAI bus-off, initiates recovery, and restarts the driver when the
+    // recovery completes. Returns true when the bus is running normally.
+    bool maintainBus();
+
     uint32_t tx_ok_count = 0;
     uint32_t tx_fail_count = 0;
     uint32_t rx_count = 0;
@@ -153,4 +164,5 @@ public:
 private:
     bool sendFrame(uint32_t ext_id, const uint8_t* data, uint8_t len);
     bool _initialized = false;
+    uint32_t _last_recovery_ms = 0;
 };

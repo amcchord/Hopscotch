@@ -47,6 +47,10 @@ struct Settings {
     float    max_arm_speed;
     float    arm_range;
     ArmCalibration arm_cal;
+    // Learned balance equilibrium offset (deg, added to the arm-curve
+    // setpoint). Written by the balance controller after good runs; absorbs
+    // battery placement, payload, surface, and IMU mounting bias.
+    float    balance_trim;
 };
 
 class SettingsManager {

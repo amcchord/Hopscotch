@@ -226,6 +226,8 @@ void MotorManager::updateArming() {
                                   RobstrideParam::SPEED_LIMIT, 0.0f);
             _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
                                   RobstrideParam::TARGET_POSITION, motor_pos);
+            _can->writeU32Param(_motors[idx].can_id, CAN_HOST_ID,
+                                RobstrideParam::CAN_TIMEOUT, MOTOR_CAN_TIMEOUT_VALUE);
 
             _arming.step = ArmingStep::WaitConfigure;
             _arming.step_start_ms = now;
@@ -238,6 +240,8 @@ void MotorManager::updateArming() {
                                   RobstrideParam::SPEED_LIMIT, 0.0f);
             _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
                                   RobstrideParam::TARGET_POSITION, 0.0f);
+            _can->writeU32Param(_motors[idx].can_id, CAN_HOST_ID,
+                                RobstrideParam::CAN_TIMEOUT, MOTOR_CAN_TIMEOUT_VALUE);
 
             _arming.step = ArmingStep::WaitConfigure;
             _arming.step_start_ms = now;
@@ -310,6 +314,22 @@ void MotorManager::disarmAll() {
     disarmArmMotors();
 }
 
+void MotorManager::enforceDriveStopped(uint32_t now) {
+    if (!_can || _drive_armed || isArming()) return;
+    if (now - _last_enforce_stop_ms < 250) return;
+
+    for (int i = 0; i < NUM_DRIVE_MOTORS; i++) {
+        MotorState& m = _motors[i];
+        if (m.online && fabsf(m.velocity) > 0.5f) {
+            _last_enforce_stop_ms = now;
+            Serial.printf("[Motors] SAFETY: disarmed motor ID=%d still moving "
+                          "(%.1f rad/s) -- re-sending stop\n", m.can_id, m.velocity);
+            _can->stopMotor(m.can_id, CAN_HOST_ID, false);
+            m.enabled = false;
+        }
+    }
+}
+
 bool MotorManager::sendDrivePosition(MotorRole role, float position_rad, float speed_limit_rad_s) {
     int idx = static_cast<int>(role);
     if (idx >= NUM_DRIVE_MOTORS || !_can || !_drive_armed) return false;
@@ -328,6 +348,91 @@ bool MotorManager::sendDriveSpeedLimit(MotorRole role, float speed_limit_rad_s) 
     float spd = fabsf(speed_limit_rad_s);
     return _can->writeFloatParam(_motors[idx].can_id, CAN_HOST_ID,
                                  RobstrideParam::SPEED_LIMIT, spd);
+}
+
+// Write a float param, read it back, retry until it matches. Engage-time CAN
+// frames get lost under load (observed: back-left CURRENT_LIMIT stuck at the
+// old value while back-right took the new one -> asymmetric torque -> yaw).
+bool MotorManager::writeFloatParamVerified(uint8_t can_id, uint16_t addr,
+                                           float value, const char* name) {
+    for (int attempt = 0; attempt < 4; attempt++) {
+        _can->writeFloatParam(can_id, CAN_HOST_ID, addr, value);
+        delay(2);
+        float readback = 0.0f;
+        if (_can->readParamSync(can_id, CAN_HOST_ID, addr, readback, 30)
+            && fabsf(readback - value) < 0.01f) {
+            return true;
+        }
+        Serial.printf("[Motors] Param %s write to ID=%d not verified "
+                      "(attempt %d, read %.2f, want %.2f)\n",
+                      name, can_id, attempt + 1, readback, value);
+    }
+    return false;
+}
+
+bool MotorManager::setDriveRunMode(MotorRole role, RobstrideRunMode mode,
+                                   float acc_rad_s2, float current_limit_a) {
+    int idx = static_cast<int>(role);
+    if (idx >= NUM_DRIVE_MOTORS || !_can || !_drive_armed) return false;
+
+    MotorState& m = _motors[idx];
+    if (m.run_mode == mode && m.enabled) return true;
+
+    // Stop -> write RUN_MODE -> re-enable (same sequence as arming)
+    _can->stopMotor(m.can_id, CAN_HOST_ID, false);
+    delay(20);
+    _can->setRunMode(m.can_id, CAN_HOST_ID, mode);
+    delay(5);
+    bool ok = _can->enableMotor(m.can_id, CAN_HOST_ID);
+    delay(10);
+    if (!ok) {
+        Serial.printf("[Motors] Run mode switch FAILED for ID=%d (enable)\n", m.can_id);
+        m.enabled = false;
+        return false;
+    }
+
+    if (mode == RobstrideRunMode::Speed) {
+        // Both limits are safety/symmetry critical: verified writes only.
+        if (acc_rad_s2 > 0.0f) {
+            writeFloatParamVerified(m.can_id, RobstrideParam::ACC_RAD,
+                                    acc_rad_s2, "ACC_RAD");
+        }
+        if (current_limit_a > 0.0f) {
+            if (!writeFloatParamVerified(m.can_id, RobstrideParam::CURRENT_LIMIT,
+                                         current_limit_a, "CURRENT_LIMIT")) {
+                Serial.printf("[Motors] Current limit NOT confirmed on ID=%d\n", m.can_id);
+                m.enabled = false;
+                return false;
+            }
+        }
+        _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                              RobstrideParam::TARGET_SPEED, 0.0f);
+    } else if (mode == RobstrideRunMode::CSP) {
+        // Hold the current position (speed limit 0 = motor default max is NOT
+        // wanted here; 0 keeps it parked until the next real command)
+        float pos = m.reversed ? -m.position : m.position;
+        _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                              RobstrideParam::SPEED_LIMIT, 0.0f);
+        delayMicroseconds(200);
+        _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                              RobstrideParam::TARGET_POSITION, pos);
+    }
+
+    m.run_mode = mode;
+    m.enabled = true;
+    Serial.printf("[Motors] Motor ID=%d run mode -> %d\n",
+                  m.can_id, static_cast<int>(mode));
+    return true;
+}
+
+bool MotorManager::sendDriveSpeed(MotorRole role, float speed_rad_s) {
+    int idx = static_cast<int>(role);
+    if (idx >= NUM_DRIVE_MOTORS || !_can || !_drive_armed) return false;
+
+    MotorState& m = _motors[idx];
+    float spd = m.reversed ? -speed_rad_s : speed_rad_s;
+    return _can->writeFloatParam(m.can_id, CAN_HOST_ID,
+                                 RobstrideParam::TARGET_SPEED, spd);
 }
 
 bool MotorManager::sendArmPosition(MotorRole role, float position_rad, float speed_limit_rad_s) {

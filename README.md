@@ -29,7 +29,11 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 ### Self-Balance Mode
 
-An optional balancing mode activated via RC switch combinations. A 200 Hz complementary-filter + PD control loop runs on Core 0 and commands the rear drive wheels while the front wheels hold position. The arms tip the body up, then the controller takes over to maintain balance. Safety monitors (tilt limits, sustained error, excessive roll rate, motor saturation, stuck detection) automatically disengage the balance mode if the robot is falling.
+An optional balancing mode activated via RC switch combinations. At the start of the tip-up sequence the rear wheels are switched from CSP position mode to Robstride Speed mode (while the robot is still static on all fours): a 200 Hz complementary-filter + PD control loop commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin; the position loop also runs at reduced gain during the standup ramp so the robot stands up without rolling away.
+
+The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals across runs. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) that makes them decisive on disturbances but structurally unable to sustain an oscillation, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
+
+The full design record -- 30+ instrumented runs and 50+ lessons in the current Speed-mode campaign -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is a firmware-faithful simulator (standup scenarios, push response, Core 1 stall injection) used to validate controller changes before robot time. The repeatable flash, safety, test, marker, download, and analysis workflow is in [`docs/BALANCE_TESTING.md`](docs/BALANCE_TESTING.md).
 
 ### Web Dashboard
 
@@ -99,6 +103,8 @@ The web dashboard files in `data/` must be uploaded separately to LittleFS:
 pio run --target uploadfs
 ```
 
+For a balance-test firmware update, do not run `uploadfs` unless the web assets actually changed: it can replace the LittleFS volume that holds settings, arm calibration, and the saved balance log.
+
 ### Serial Monitor
 
 ```bash
@@ -113,10 +119,14 @@ Or:
 
 ## Software Architecture
 
-The firmware runs two cores of the ESP32-S3:
+The firmware splits the two ESP32-S3 cores into a **control core** and a **comms core**:
 
-- **Core 1** — Main 50 Hz control loop: CRSF parsing, arming logic, drive controller, arm controller, balance state machine, failsafe, display, WebSocket telemetry
-- **Core 0** — 200 Hz balance tick: IMU read, complementary filter, PD loop, wheel position commands (only active during balance mode)
+- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, IMU read, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
+- **Core 0 (comms)** — WiFi and lwIP (pinned there by the framework) plus `async_tcp` (pinned by build flag). Networking can no longer preempt the control loops.
+
+Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
+
+Balance telemetry schema v2 records a full 120 seconds at 50 Hz in PSRAM, including 200 Hz inner-loop timing/saturation aggregates, raw and filtered IMU signals, all setpoint components, unclamped/applied commands, CAN feedback latency, wheel and arm torque/motion, arm-assist lifecycle, yaw correction, power, safety-exit reason, and operator event markers. It is persisted as a checksummed binary file only after the robot is idle and exported to validated CSV by `./scripts/save_telemetry.sh`.
 
 ### Module Map
 
@@ -138,11 +148,12 @@ The firmware runs two cores of the ESP32-S3:
 
 | Task | Rate |
 |------|------|
-| Control loop | 50 Hz |
+| Control loop | 50 Hz (5 ms task cadence) |
 | Balance loop | 200 Hz |
-| Display refresh | 25 fps |
-| WebSocket telemetry | 10 Hz |
+| Display refresh | 25 fps (5 fps while balancing) |
+| WebSocket telemetry | 10 Hz (1 Hz while balancing) |
 | CRSF telemetry uplink | 5 Hz |
+| Stall sentinel | 100 Hz |
 
 ## Configuration
 
@@ -151,10 +162,13 @@ Compile-time defaults live in `src/config.h`. Most parameters can be overridden 
 Balance gains can also be tuned live over serial without reflashing:
 
 ```
-bal kp 1.2
-bal kd 0.15
-bal base 89.0
-bal pkp 0.2
+bal kp 2.0      # inner PD: rad/s wheel speed per deg of angle error
+bal kd 0.08     # inner PD: rad/s per deg/s of roll rate
+bal dkp 0.08    # outer: target return velocity per rad of drift
+bal vkp 2.2     # outer: high-slope setpoint response per rad/s of velocity error
+bal vki 0.35    # outer: integral gain (the single equilibrium learner)
+bal note test-name  # tag the next/current telemetry capture
+bal mark        # add a numbered event marker (CH12 does this while balancing)
 ```
 
 See `docs/PROJECT.md` for the full Robstride CAN protocol reference and detailed documentation.

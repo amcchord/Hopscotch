@@ -181,6 +181,16 @@ The CRSF protocol provides 16 channels of 11-bit data (raw range 172–1811, cen
 
 Signal loss is detected if no valid CRSF frame arrives within 500 ms.
 
+## Balance Telemetry and Test Capture
+
+Balance mode automatically records one 120-second run at 50 Hz. The PSRAM sample contains the state-machine and outer-loop values plus windowed evidence from all 200 Hz PD ticks, including maximum inner-loop interval, tick count, saturation count, raw accelerometer angle/gyro/acceleration norm, unclamped and applied wheel commands, every setpoint component, CAN feedback age, rear-wheel torque, arm-assist state and torque, yaw correction, and cached power data.
+
+The run also captures its actual live-tuned gains, stored trim at entry, compile-time control constants, firmware build time, operator note, numbered event markers, end reason, sample count, and checksum. The file is written to `/bal_log.bin` only after balance mode and arm return are fully idle. Learned-trim persistence is deferred to the same idle service; neither flash operation can stall a live balance loop.
+
+`bal log` is refused while balance mode is active. While idle it validates the binary file and exports CSV. `scripts/save_telemetry.sh` accepts that download only when the schema-v2 checksum and received row count are valid. The loop/stall profiler is run-scoped and frozen at balance exit, so serial download activity is excluded from its results.
+
+Use `bal note <text>` before a run to record physical conditions. While balancing, CH12 is repurposed as a non-actuating event marker and its normal arm-home trigger is suppressed. The full safety, flashing, test-ladder, capture, schema, flag, and analysis procedure is in [`BALANCE_TESTING.md`](BALANCE_TESTING.md).
+
 ## Software Architecture
 
 ### Timing
@@ -188,6 +198,7 @@ Signal loss is detected if no valid CRSF frame arrives within 500 ms.
 | Task | Rate | Period |
 |------|------|--------|
 | Control loop | 50 Hz | 20 ms |
+| Balance PD loop | 200 Hz | 5 ms |
 | Display refresh | 25 fps | 40 ms |
 | WebSocket telemetry | 10 Hz | 100 ms |
 

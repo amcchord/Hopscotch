@@ -47,7 +47,13 @@ void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_
 void CrsfReceiver::update() {
     if (!_serial) return;
 
-    while (_serial->available()) {
+    // HARD BYTE BUDGET per call. The unbounded drain loop froze Core 1 for
+    // up to 31 SECONDS during RX byte storms (bal_20260703_224824 profiler)
+    // -- if bytes arrive as fast as they are drained, available() never
+    // goes false. 1024 bytes covers ~3x the legitimate per-tick traffic at
+    // 420kbaud/50Hz and bounds the worst case to ~1-2ms.
+    int budget = 1024;
+    while (budget-- > 0 && _serial->available()) {
         uint8_t b = _serial->read();
 
         if (_buf_pos == 0) {
