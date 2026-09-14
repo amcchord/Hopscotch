@@ -394,13 +394,18 @@ bool MotorManager::setDriveRunMode(MotorRole role, RobstrideRunMode mode,
     if (mode == RobstrideRunMode::Speed) {
         // Both limits are safety/symmetry critical: verified writes only.
         if (acc_rad_s2 > 0.0f) {
-            writeFloatParamVerified(m.can_id, RobstrideParam::ACC_RAD,
-                                    acc_rad_s2, "ACC_RAD");
+            if (!writeFloatParamVerified(m.can_id, RobstrideParam::ACC_RAD,
+                                         acc_rad_s2, "ACC_RAD")) {
+                _can->stopMotor(m.can_id, CAN_HOST_ID, false);
+                m.enabled = false;
+                return false;
+            }
         }
         if (current_limit_a > 0.0f) {
             if (!writeFloatParamVerified(m.can_id, RobstrideParam::CURRENT_LIMIT,
                                          current_limit_a, "CURRENT_LIMIT")) {
                 Serial.printf("[Motors] Current limit NOT confirmed on ID=%d\n", m.can_id);
+                _can->stopMotor(m.can_id, CAN_HOST_ID, false);
                 m.enabled = false;
                 return false;
             }

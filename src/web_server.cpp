@@ -38,6 +38,10 @@ void WebUI::setupRoutes() {
         [](AsyncWebServerRequest* request) {},
         nullptr,
         [this](AsyncWebServerRequest* request, uint8_t* data, size_t len, size_t index, size_t total) {
+            if (!_maintenance_cb || !_maintenance_cb()) {
+                if (index == 0) request->send(409, "application/json", "{\"error\":\"disarm drive and arms; wait for log save\"}");
+                return;
+            }
             String body;
             body.reserve(total);
             body += String(reinterpret_cast<const char*>(data), len);
@@ -57,7 +61,7 @@ void WebUI::setupRoutes() {
     // POST disarm all
     _server.on("/api/disarm", HTTP_POST, [this](AsyncWebServerRequest* request) {
         if (_disarm_cb) _disarm_cb();
-        request->send(200, "application/json", "{\"status\":\"disarmed\"}");
+        request->send(202, "application/json", "{\"status\":\"disarm requested\"}");
     });
 
     // POST change CAN ID
@@ -65,6 +69,10 @@ void WebUI::setupRoutes() {
         [](AsyncWebServerRequest* request) {},
         nullptr,
         [this](AsyncWebServerRequest* request, uint8_t* data, size_t len, size_t index, size_t total) {
+            if (!_maintenance_cb || !_maintenance_cb()) {
+                if (index == 0) request->send(409, "application/json", "{\"error\":\"disarm drive and arms; wait for log save\"}");
+                return;
+            }
             String body;
             body.reserve(total);
             body += String(reinterpret_cast<const char*>(data), len);
@@ -101,6 +109,10 @@ void WebUI::setupRoutes() {
 
     // POST reset settings
     _server.on("/api/reset-settings", HTTP_POST, [this](AsyncWebServerRequest* request) {
+        if (!_maintenance_cb || !_maintenance_cb()) {
+            request->send(409, "application/json", "{\"error\":\"disarm drive and arms; wait for log save\"}");
+            return;
+        }
         _settings->resetDefaults();
         if (_settings_cb) _settings_cb();
         request->send(200, "application/json", "{\"status\":\"reset\"}");

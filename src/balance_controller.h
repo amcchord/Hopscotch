@@ -18,6 +18,8 @@ enum class BalanceState : uint8_t {
 struct RawImuData {
     float accel_x, accel_y, accel_z;
     float gyro_x, gyro_y, gyro_z;
+    uint32_t sample_us = 0;  // successful accel + gyro read, never a polling timestamp
+    bool valid = false;
 };
 
 struct BalanceSample {
@@ -34,7 +36,7 @@ struct BalanceSample {
     uint8_t  arm_stage;
     uint8_t  inner_ticks;
     uint8_t  inner_sat_ticks;
-    uint8_t  reserved;
+    uint8_t  imu_age_ms;  // window maximum, saturated at 255; header feature bit 0
     float    roll;
     float    roll_rate;
     float    accel_angle;
@@ -95,6 +97,8 @@ enum BalanceDiagFlag : uint16_t {
     BAL_DIAG_SP_CLAMPED      = 0x0080,
     BAL_DIAG_YAW_CLAMPED     = 0x0100,
     BAL_DIAG_SAFETY_EXIT     = 0x0200,
+    BAL_DIAG_IMU_STALE       = 0x0400,
+    BAL_DIAG_CAN_TX_FAILED   = 0x0800,
 };
 
 static constexpr int BALANCE_LOG_MAX_CURVE_POINTS = 6;
@@ -155,10 +159,10 @@ public:
     void begin(MotorManager* motors, ArmController* arms);
     void setSettingsManager(SettingsManager* mgr) { _settings = mgr; }
 
-    // Called from Core 0 at 200Hz -- fast PD balance loop
+    // Called from fast task at 200Hz -- fast PD balance loop
     void balanceTick(const RawImuData& imu, float dt);
 
-    // Called from Core 1 at 50Hz -- state machine, arms, velocity-integrating setpoint
+    // Called from control task at 50Hz -- state machine, arms, velocity-integrating setpoint
     void update(float roll_deg, float roll_rate_dps,
                 bool ch7_active, bool ch11_edge, float dt);
 
@@ -212,42 +216,47 @@ private:
 
     volatile BalanceState _state = BalanceState::Idle;
 
-    // --- Complementary filter (Core 0) ---
+    // --- Complementary filter (fast task) ---
     volatile float _tilt_angle = 0.0f;
     volatile float _gyro_rate  = 0.0f;
     volatile float _last_accel_angle = 0.0f;
     volatile float _last_gyro_raw    = 0.0f;
     volatile float _last_accel_norm  = 0.0f;
     bool _filter_initialized = false;
+    volatile uint32_t _last_imu_sample_us = 0;
+    volatile uint32_t _imu_healthy_since_ms = 0;
+    volatile uint16_t _inner_fault = 0;  // cleared only for a deliberate new attempt
+    uint8_t _imu_age_max_ms = 0;
+    uint16_t _inner_diag_window = 0;
 
-    // --- PD gains (read by Core 0, written by Core 1 for tuning) ---
+    // --- PD gains (read by fast task, written by control task for tuning) ---
     volatile float _kp = BALANCE_KP;
     volatile float _kd = BALANCE_KD;
 
-    // --- Effective setpoint (written by Core 1, read by Core 0) ---
+    // --- Effective setpoint (written by control task, read by fast task) ---
     volatile float _effective_setpoint = BALANCE_SETPOINT_ARMS_TIP;
 
-    // --- Yaw sync: differential wheel correction (Core 1 writes, Core 0 reads) ---
+    // --- Yaw sync: differential wheel correction (control task writes, fast task reads) ---
     // Half-difference applied as left = cmd - corr, right = cmd + corr.
     volatile float _yaw_corr = 0.0f;
     float _yaw_lock_diff = 0.0f;   // left-right wheel position diff at engage (rad)
 
-    // --- Speed-mode gate (Core 1 writes, Core 0 reads) ---
+    // --- Speed-mode gate (control task writes, fast task reads) ---
     volatile bool  _targets_initialized = false;
     bool _speed_mode_active = false;
     uint32_t _last_speed_refresh_ms = 0;   // 0-speed keepalive during tip-up
 
-    // Dead-man: Core 1 stamps this every update(); if it goes stale while
-    // balancing, Core 0 stops the wheels instead of driving blind on a
-    // frozen setpoint (a stalled Core 1 also cannot process the RC switch).
+    // Dead-man: control task stamps this every update(); if it goes stale while
+    // balancing, fast task stops the wheels instead of driving blind on a
+    // frozen setpoint (a stalled control task also cannot process the RC switch).
     volatile uint32_t _last_update_ms = 0;
-    uint32_t _loop_wake_ms = 0;   // when Core 1 last woke from a stall
+    uint32_t _loop_wake_ms = 0;   // when control task last woke from a stall
 
     // Front wheel hold positions
     float _front_left_hold  = 0.0f;
     float _front_right_hold = 0.0f;
 
-    // --- Setpoint handoff state (Core 1 only) ---
+    // --- Setpoint handoff state (control task only) ---
     float _wheel_start_pos    = 0.0f;
     float _engage_capture_shift = 0.0f;
     float _smoothed_base_sp = 0.0f;
@@ -255,7 +264,7 @@ private:
     float _engage_trim = 0.0f;   // stored trim captured at engage, part of base sp
     float _run_curve_shift = 0.0f;  // per-run curve re-zero measured at capture
 
-    // --- Outer cascade: position P -> velocity PI (Core 1 only) ---
+    // --- Outer cascade: position P -> velocity PI (control task only) ---
     float _drift_vel_kp       = BALANCE_DRIFT_VEL_KP;
     float _vel_sp_kp          = BALANCE_VEL_SP_KP;
     float _vel_sp_ki          = BALANCE_VEL_SP_KI;
@@ -273,7 +282,7 @@ private:
     float _last_target_vel    = 0.0f;   // rad/s, for telemetry
     uint32_t _ramp_complete_ms = 0;     // when the outer cascade activated
 
-    // --- Safety abort timers (Core 1 only) ---
+    // --- Safety abort timers (control task only) ---
     uint32_t _safe_err_start_ms  = 0;
     bool     _safe_err_timing    = false;
     uint32_t _safe_rate_start_ms = 0;
@@ -281,7 +290,7 @@ private:
     uint32_t _safe_sat_start_ms  = 0;
     bool     _safe_sat_timing    = false;
 
-    // --- Last values for telemetry (volatile: written by Core 0, read by Core 1) ---
+    // --- Last values for telemetry (volatile: written by fast task, read by control task) ---
     volatile float _last_angle_err = 0.0f;
     volatile float _last_motor_vel_raw = 0.0f;
     volatile float _last_motor_vel = 0.0f;
@@ -309,7 +318,7 @@ private:
     uint16_t _last_outer_diag = 0;
     uint8_t _last_flags    = 0;
 
-    // Arm ramp state (Core 1 only)
+    // Arm ramp state (control task only)
     float _arm_left_target  = 0.0f;
     float _arm_right_target = 0.0f;
     float _arm_left_goal    = 0.0f;
@@ -345,6 +354,10 @@ private:
     float          _pending_trim_old = 0.0f;
     float          _pending_trim_value = 0.0f;
     float          _pending_trim_learned = 0.0f;
+    float          _qualified_trim = 0.0f;
+    uint32_t       _trim_calm_since_ms = 0;
+    uint32_t       _qualified_trim_ms = 0;
+    uint32_t       _arm_return_start_ms = 0;
 
     static float clampf(float value, float min_value, float max_value);
     static float moveToward(float current, float target, float rate, float dt);
@@ -358,6 +371,8 @@ private:
     void exitSpeedMode();
     void persistLearnedTrim();
     void resetSafetyTimers();
+    bool readyToStart() const;
+    bool armsAtGoal(float left, float right) const;
     bool startLog();
     void logSample(float roll_deg, float roll_rate_dps);
     void stopLog(const char* reason);

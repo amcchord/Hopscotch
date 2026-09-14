@@ -1,20 +1,24 @@
 # Balance Mode Test Guide
 
-This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode. The firmware keeps one complete 120-second run in PSRAM, saves it to LittleFS only after the robot is fully idle, and exports a checksummed CSV over USB.
+This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode. The firmware captures up to 120 seconds, including tip-up, in PSRAM, saves it to LittleFS after balance ends and **both drive and arms are disarmed**, and exports a checksummed CSV over USB. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
+
+The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. This candidate is built but has not yet been flashed or tested physically.
 
 ## Safety and Test Area
 
 - Use a clear, level area with several meters of travel in both directions.
 - Keep a spotter at the robot and keep the drive-disarm control immediately reachable.
 - Start with light taps. Run one genuinely large disturbance per test so the cause and recovery remain unambiguous.
-- Do not request `bal log`, erase a log, or start another run until balance mode is idle and the console reports that the log was saved.
+- Before requesting `bal log` or starting another run, end balance, lower both drive and arm switches, and wait for the saved-log message. Keep power on until the save and download finish.
 - Do not intentionally create CAN, power, or control-task failures with an upright robot. The firmware records naturally occurring failures without requiring destructive fault injection.
 
 Record any mechanical variables that changed: floor surface, tire condition, battery position/state of charge, payload, arm calibration, or chassis work. Those variables move the physical equilibrium and matter as much as software gains.
 
 ## Flashing This Test Build
 
-Build and flash firmware:
+Connect USB with both motor groups disarmed. Before flashing, download the previous run and retain `cal status`, `bal status`, and the settings export from the web dashboard/API. Take a device flash backup where the interface permits; the packaged rollback is a rebuild of source baseline `e8b1280`, not a readback of the current device.
+
+The prepared files and hashes are in `artifacts/balance-candidate/`; its `FLASHING.md` describes the frozen image. For a source rebuild, use:
 
 ```bash
 ./scripts/build.sh
@@ -27,7 +31,9 @@ This test round does **not** require `uploadfs`. Avoiding `uploadfs` preserves t
 ./scripts/monitor.sh
 ```
 
-At boot, confirm that the console reports a 1,320,000-byte balance log buffer in PSRAM and that all six motors come online without faults. Then run `bal status` and verify the stored trim and gains are plausible before arming.
+At boot, confirm that the console reports a 1,320,000-byte balance log buffer in PSRAM and that all six motors come online without faults. While disarmed, run `cal status` and `bal status`; verify retained calibration, plausible tilt/rate, fresh IMU age (normally a few milliseconds), no latched fault, and at least 200 ms of continuous healthy samples. Check the disarm/rearm behavior while supported on the floor. Do not force-engage a flat robot.
+
+Hardware and calibration are unchanged from July. Do not recalibrate or reset trim merely to install this firmware. Keep the sensor mounting consistent; record any movement.
 
 ## Commands and RC Markers
 
@@ -38,7 +44,9 @@ At boot, confirm that the console reports a 1,320,000-byte balance log buffer in
 | Mark a disturbance | Press CH12 while balance is active | Increments the `marker` column on the same 50 Hz control tick; CH12 arm-home behavior is suppressed while balancing |
 | Serial marker | `bal mark` | Equivalent marker for bench tests |
 | Download latest run | `./scripts/save_telemetry.sh --label baseline` | Requests `bal log`, validates schema/checksum/row count, saves CSV, and prints analysis |
-| Delete latest run | `bal log clear` | Allowed only while balance is inactive |
+| Delete latest run | `bal log clear` | Requires inactive balance and both motor groups disarmed; download first |
+
+Set gains between attempts. While balance is active the serial console accepts only `disarm`, `disarm arms`, `bal status`, `bal note` and `bal mark`. After serial/web disarm, lower both RC arm switches before attempting to rearm. A web response means the disarm was requested; the control task executes it.
 
 Press CH12 immediately before each intentional push. Wait for the robot to settle and for the arm-assist lifecycle to return to READY before the next push. The `marker` value is cumulative, so each transition identifies a new test event without adding serial traffic to the live control path.
 
@@ -57,14 +65,14 @@ For every run, also note the observed peak floor travel and whether intervention
 
 ## Saving a Run
 
-1. Lower CH7/end balance mode and wait until the arms return and the console prints `Log saved and checksummed`.
+1. End balance/return the robot to support. Lower **both CH10 drive and CH9 arm switches** (or their configured equivalents) and wait for `Log saved and checksummed`. Lowering CH7 alone does not disarm the motors and is insufficient for saving. If an abort occurred, support the robot and disarm both groups directly.
 2. Run:
 
    ```bash
    ./scripts/save_telemetry.sh --label small-taps
    ```
 
-3. Keep the resulting `telemetry_logs/bal_YYYYMMDD_HHMMSS_label.csv` file. A schema-v2 download is accepted only if the device checksum is valid and the received row count matches the stored sample count.
+3. Keep the resulting `telemetry_logs/bal_YYYYMMDD_HHMMSS_label.csv` and matching `.serial` file. The candidate's transfer checksum covers the exact exported bytes, including metadata. The host additionally verifies device-file checksum status, row count, column structure, finite values and timestamps. Interrupted or rejected transfers are retained as `.failed.serial` for diagnosis.
 4. If the script reports a timeout or truncated transfer, do not run another balance test. Retry the download; the binary file remains on the robot.
 
 The full v2 export can be around 2 MB, so the default download timeout is four minutes. Override the serial device or timeout only when needed:
@@ -81,7 +89,7 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 |---|---|
 | Run identity/integrity | build date/time, test note, start/end uptime, end reason, schema, sample count, checksum |
 | Timing | `sample_dt_ms`, `inner_dt_max_us`, `inner_ticks`, control profiler maxima, run-scoped stall ring |
-| IMU/filter | filtered `roll`/`roll_rate`, raw accelerometer angle, raw gyro X, acceleration norm |
+| IMU/filter | filtered `roll`/`roll_rate`, raw accelerometer angle, raw gyro X, acceleration norm, maximum successful-sample age `imu_age_ms` |
 | Inner PD | angle error, unclamped command, applied common command, left/right command after yaw correction, saturation ticks, dead-man age/state |
 | Setpoint construction | scheduled/raw/smoothed base, capture shift, run curve shift, effective setpoint, offset target/applied offset |
 | Outer cascade | target and filtered velocity, velocity error, P term, integral, position gate, high-speed shed, drift |
@@ -105,6 +113,12 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 | `0x0080` | Setpoint offset target clamped |
 | `0x0100` | Yaw correction clamped |
 | `0x0200` | Row captured immediately before a safety exit |
+| `0x0400` | IMU stale/invalid or sample deadline missed; latched until a deliberate new attempt |
+| `0x0800` | At least one rear-wheel speed command failed to enter the CAN transmit path |
+
+`imu_age_ms` occupies the former reserved byte, preserving the 220-byte v2 sample size. `telemetry_features=1` identifies the extension; age saturates at 255 ms. Older v2 files export an empty age field because their age is unknown. Successful host download validates a `transport_fnv1a` trailer; old firmware exports retain their weaker legacy checks. FNV-1a detects accidental corruption, not deliberate tampering.
+
+The file checksum covers stored sample bytes, not all binary-header metadata. The transport checksum protects the complete exported payload in transit. Captures marked `duration_limit` or `buffer_full` stop recording without establishing a fall time. Power loss before idle save loses the PSRAM run; keep power on after an attempt.
 
 The profiler is reset when a balance run starts and frozen when it ends. `bal log` therefore reports only that run; the download itself no longer creates misleading idle stall events.
 

@@ -1,0 +1,76 @@
+[
+  {
+    "file": "IMG_2718.MOV",
+    "bytes": 23323977,
+    "sha256": "47891dd0f328cab1e564e88e1613508e537851414298ac1eb4064456540053cb",
+    "duration_s": 7.4,
+    "original_creation": "2026-04-10T22:40:37-0400"
+  },
+  {
+    "file": "IMG_2721.MOV",
+    "bytes": 55339645,
+    "sha256": "56324ab33da19f76d7eb65d9776e78042f76862342379b998e55ebcd42966cdd",
+    "duration_s": 17.333333,
+    "original_creation": "2026-04-12T16:47:02-0400"
+  },
+  {
+    "file": "IMG_2722.MOV",
+    "bytes": 76413255,
+    "sha256": "b4c22b474d09d731b92dae5ba9bfbf3e45f5e6a9e72a10a1aa8b03c76b7269b6",
+    "duration_s": 23.9,
+    "original_creation": "2026-04-12T17:45:15-0400"
+  },
+  {
+    "file": "IMG_4097.MOV",
+    "bytes": 55609784,
+    "sha256": "034f417919adb0a2b2632be5e563f11316d5a05cb4a89e18f33354817bcdffa4",
+    "duration_s": 17.266667,
+    "original_creation": "2026-07-02T17:49:51-0400"
+  },
+  {
+    "file": "IMG_4098.MOV",
+    "bytes": 46143655,
+    "sha256": "df077289779f171d8520a786c59cce3b84885576461bcecbd445c84377e6ea39",
+    "duration_s": 14.233333,
+    "original_creation": "2026-07-03T09:49:27-0400"
+  },
+  {
+    "file": "IMG_4099.MOV",
+    "bytes": 78268742,
+    "sha256": "568fbbda41b0c71fae0b38c72fcad96c560883104486279c49960d3c08fe5562",
+    "duration_s": 24.433333,
+    "original_creation": "2026-07-03T09:57:37-0400"
+  },
+  {
+    "file": "IMG_4100.MOV",
+    "bytes": 111096775,
+    "sha256": "1b62fcfebfbe0ee8448953a54b2dc51f1e8ef6521cea3952952d55aee819a685",
+    "duration_s": 34.633333,
+    "original_creation": "2026-07-03T10:05:44-0400"
+  },
+  {
+    "file": "IMG_5188.jpeg",
+    "bytes": 4489824,
+    "sha256": "7d0ab9e7777129d6b789ca972a2ba9073a906d3b713b301ef4f274045e86be0d"
+  },
+  {
+    "file": "IMG_5189.jpeg",
+    "bytes": 4159909,
+    "sha256": "89bee22929b0134f4741e0817745144ac1baf723132376fddcce5852d8187bc3"
+  },
+  {
+    "file": "IMG_5190.jpeg",
+    "bytes": 4003232,
+    "sha256": "0eef95830de93eb2f449a7d614699999f36ff36a426a88d7579fb48e0a3a07b9"
+  },
+  {
+    "file": "IMG_5191.jpeg",
+    "bytes": 3965666,
+    "sha256": "9be9d39f6935729f09055696be73acef2c6d1741e1f27ef1c32a940b8c35b5fc"
+  },
+  {
+    "file": "IMG_5192.jpeg",
+    "bytes": 3456912,
+    "sha256": "492ad4548822b4c2de1e8abba9c48903875de8ccbc241f2b0e51a82830c0dd21"
+  }
+]

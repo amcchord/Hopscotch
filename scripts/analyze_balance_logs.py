@@ -56,8 +56,10 @@ def parse_config(path: Path) -> dict[str, str]:
     config: dict[str, str] = {}
     for line in path.read_text(errors="replace").splitlines():
         line = line.strip()
-        if not line.startswith("#"):
+        if line.startswith("t_ms,"):
             break
+        if not line.startswith("#"):
+            continue  # several old USB captures begin with a partial debug line
         if "=" in line:
             key, _, value = line.lstrip("# ").partition("=")
             config[key.strip()] = value.strip()
@@ -215,7 +217,12 @@ def summarize(path: Path) -> dict[str, object] | None:
     diag["sample_dt_p99_ms"] = percentile(
         (as_float(row, "sample_dt_ms") for row in rows), 0.99
     )
-    diag["sample_dt_max_ms"] = max_value(as_float(row, "sample_dt_ms") for row in rows)
+    gaps = [as_float(b, "t_ms") - as_float(a, "t_ms") for a, b in zip(rows, rows[1:])]
+    diag["sample_dt_max_ms"] = max_value(gaps)
+    diag["sample_dt_p99_ms"] = percentile(gaps, 0.99)
+    diag["imu_age_max_ms"] = max_value(as_float(row, "imu_age_ms") for row in rows)
+    diag["imu_fault_rows"] = sum(bool(as_int(row, "diag_flags") & 0x0400) for row in rows)
+    diag["can_tx_failed_rows"] = sum(bool(as_int(row, "diag_flags") & 0x0800) for row in rows)
     diag["inner_dt_max_us"] = max_value(as_float(row, "inner_dt_max_us") for row in rows)
     diag["inner_tick_low_rows"] = sum(
         1 for row in rows if "inner_ticks" in row and as_int(row, "inner_ticks") < 3
@@ -260,6 +267,12 @@ def summarize(path: Path) -> dict[str, object] | None:
     )
     diag["markers"] = max((as_int(row, "marker") for row in rows), default=0)
 
+    if len(rows) >= 2999 and not config.get("end_reason"):
+        notes.append("possible log cutoff; end cause unknown")
+    if diag["imu_fault_rows"]:
+        notes.append("IMU freshness fault")
+    if diag["can_tx_failed_rows"]:
+        notes.append("CAN transmit failure")
     if config.get("checksum_valid") == "0":
         notes.append("BAD CHECKSUM")
     if config.get("end_reason") not in (None, "balance_switch_off", "duration_limit"):
@@ -408,6 +421,10 @@ def main() -> int:
                 continue
 
             print(summary["file"])
+            if summary['diag'] and 'imu_age_max_ms' in summary['diag']:
+                diag = summary['diag']
+                print(f"  IMU max age={fmt(diag['imu_age_max_ms'], 0, 0)} ms, "
+                      f"freshness-fault rows={diag['imu_fault_rows']}, CAN TX-failure rows={diag['can_tx_failed_rows']}")
             if config:
                 gains = []
                 for key in ("inner_kp", "inner_kd", "drift_vel_kp", "vel_sp_kp", "vel_sp_kp_low", "vel_sp_ki"):

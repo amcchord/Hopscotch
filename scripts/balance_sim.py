@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Firmware-faithful simulator for the Hopscotch Speed-mode balance stack.
+"""Approximate planar simulator for the Hopscotch Speed-mode balance stack.
 
 Plant (fitted from Speed-mode telemetry by fit_balance_model.py --speed-only):
     roll_accel = A * (roll - eq(arms)) + B * wheel_accel        [deg/s^2]
@@ -13,7 +13,7 @@ Control (ported line-for-line from src/balance_controller.cpp):
 
 The simulated "Core 1" can be stalled for arbitrary windows: the outer tick
 freezes (setpoint, arm targets, safety) while the inner PD keeps running
-against the stale setpoint, exactly as on the robot.
+against the stale setpoint, with fresh idealized IMU input (the candidate reads IMU in the fast task).
 
 Scenarios:
     validate        reproduce three logged failures (sim trustworthiness)
@@ -34,6 +34,7 @@ import argparse
 import json
 import math
 import random
+import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -110,6 +111,7 @@ class FirmwareConfig:
     vel_sp_knee: float = 0.8
     vel_sp_ki: float = 0.35
     sp_offset_max: float = 8.0
+    outer_handoff_ms: float = 0.0
     sp_offset_rate: float = 12.0
     vel_filter_alpha: float = 0.35
     pos_gate_err: float = 8.0
@@ -131,6 +133,13 @@ class FirmwareConfig:
     arm_assist_tau_out: float = 0.65
     arm_emergency_cmd_frac: float = 0.90
 
+    arm_calm_vel: float = 1.0
+    arm_calm_rate: float = 15.0
+    arm_calm_ms: float = 400.0
+    arm_event_end_calm_ms: float = -1.0
+    measured_arm_arrival: bool = False
+    hard_stop_latches: bool = False
+
     # Safety
     safe_tilt_min: float = 30.0
     safe_tilt_max: float = 150.0
@@ -141,7 +150,7 @@ class FirmwareConfig:
     safe_sat_ms: int = 3000
     bailout_deg: float = 45.0
 
-    # --- Candidate-fix switches (all off = current firmware) ---
+    # Historical experiment switches; current_firmware_config reads today's source.
     # Carrot ramp: the base setpoint may lead the measured tilt by at most
     # carrot_lead_deg during the standup ramp -- the sp follows the robot
     # instead of towing it.
@@ -499,7 +508,10 @@ class OuterController:
                                                 speed_r, dt)
             if not self.arms_returned:
                 if (abs(self.arm_l_target - self.arm_l_goal) < 0.08
-                        and abs(self.arm_r_target - self.arm_r_goal) < 0.08):
+                        and abs(self.arm_r_target - self.arm_r_goal) < 0.08
+                        and (not c.measured_arm_arrival or
+                             (abs(arm_l_meas - self.arm_l_goal) <= 0.15
+                              and abs(arm_r_meas - self.arm_r_goal) <= 0.15))):
                     self.arms_returned = True
 
         # --- outer cascade ---
@@ -529,6 +541,9 @@ class OuterController:
             self.vel_sp_integral = clampf(self.vel_sp_integral,
                                           -c.sp_offset_max, c.sp_offset_max)
 
+        authority = (clampf((now_ms - self.ramp_complete_ms) / c.outer_handoff_ms, 0.0, 1.0)
+                     if self.ramp_complete and c.outer_handoff_ms > 0 else float(self.ramp_complete))
+        high_kp = c.vel_sp_kp_low + authority * (c.vel_sp_kp - c.vel_sp_kp_low)
         abs_err = abs(vel_err)
         if (c.no_ramp_damper or c.eq_track) and not self.ramp_complete:
             # eq_track: the base tracker IS the standup velocity response;
@@ -539,7 +554,7 @@ class OuterController:
         else:
             sign = 1.0 if vel_err >= 0.0 else -1.0
             p_term = sign * (c.vel_sp_kp_low * c.vel_sp_knee
-                             + c.vel_sp_kp * (abs_err - c.vel_sp_knee))
+                             + high_kp * (abs_err - c.vel_sp_knee))
 
         arm_dev = abs(self.arm_assist_frac - c.arm_assist_bias)
         arm_share = clampf(arm_dev / c.arm_assist_range_pos, 0.0, 1.0)
@@ -551,6 +566,8 @@ class OuterController:
         off_max = c.sp_offset_max
         if c.ramp_off_clamp > 0.0 and not self.ramp_complete:
             off_max = c.ramp_off_clamp
+        if self.ramp_complete and c.outer_handoff_ms > 0 and c.ramp_off_clamp > 0:
+            off_max = c.ramp_off_clamp + authority * (c.sp_offset_max - c.ramp_off_clamp)
         sp_offset_target = clampf(p_term * pos_gate * shed + self.vel_sp_integral,
                                   -off_max, off_max)
         self.sp_offset = move_toward(self.sp_offset, sp_offset_target,
@@ -568,7 +585,7 @@ class OuterController:
             demand = clampf(c.arm_assist_gain * excess,
                             -c.arm_assist_range_neg, c.arm_assist_range_pos)
 
-            calm_now = abs(vel_err) < 1.0 and abs(rate) < 15.0
+            calm_now = abs(vel_err) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
             if calm_now:
                 self.arm_calm_ms += dt * 1000.0
             else:
@@ -600,11 +617,11 @@ class OuterController:
                         tau = c.arm_assist_tau_in
                     else:
                         tau = c.arm_assist_tau_in * 2.0
-                if near_neutral and abs(demand) < 0.05:
+                if near_neutral and abs(demand) < 0.05 and self.arm_calm_ms > c.arm_event_end_calm_ms:
                     self.arm_stage = 3
                     self.arm_calm_ms = 0.0
             else:
-                if self.arm_calm_ms > 400.0:
+                if self.arm_calm_ms > c.arm_calm_ms:
                     self.arm_stage = 0
 
             wheels_railed = abs(last_cmd) >= c.max_drive_speed * c.arm_emergency_cmd_frac
@@ -726,6 +743,7 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
     def in_stall(t_s: float) -> bool:
         return any(s.start_s <= t_s < s.start_s + s.duration_s for s in stalls)
 
+    hard_stop_latched = False
     for step in range(n_steps):
         t = step * INNER_DT
         now_ms = t * 1000.0
@@ -769,6 +787,9 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
             elif update_age > c.deadman_soft_ms:
                 cmd_max = c.deadman_soft_cmd_max
 
+        if stopped and c.hard_stop_latches:
+            hard_stop_latched = True
+        stopped = stopped or hard_stop_latched
         if stopped:
             cmd = 0.0
             # wheels commanded to 0 speed; the motor tracks it
@@ -806,7 +827,7 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
                 held_vel = wheel_vel + rng.gauss(0.0, plant.vel_meas_noise)
                 held_pos = wheel_pos
             outer.tick(now_ms, tilt_est, gyro_filt, last_cmd, held_pos,
-                       held_vel, arm_l, arm_r, min(dt, 0.1))
+                       held_vel, arm_l, arm_r, 0.02 if c.hard_stop_latches else min(dt, 0.1))
             last_outer_ms = now_ms
             if outer.ramp_complete and res.ramp_complete_s is None:
                 res.ramp_complete_s = t
@@ -853,7 +874,63 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
 CURVE_REFIT = ((0.00, 84.0), (0.50, 83.05), (1.00, 82.1))
 
 
+def current_firmware_config() -> FirmwareConfig:
+    """Read controller constants from the source used to build this candidate.
+
+    Historical variants remain frozen for comparisons. This is an approximate
+    planar plant: no tire slip, mounting flex, power faults or CAN arbitration.
+    It cannot certify hardware reliability or self-righting contact mechanics.
+    """
+    source = (REPO_ROOT / 'src/config.h').read_text()
+    def number(name):
+        match = re.search(r'\b' + name + r'\s*=\s*([-+0-9.eE]+)f?\s*;', source)
+        if not match:
+            raise ValueError(f'Cannot read firmware constant {name}')
+        return float(match[1])
+    mapping = {
+        'kp': 'BALANCE_KP', 'kd': 'BALANCE_KD', 'comp_alpha': 'COMPLEMENTARY_ALPHA',
+        'drift_vel_kp': 'BALANCE_DRIFT_VEL_KP', 'drift_max_vel': 'BALANCE_DRIFT_MAX_VEL',
+        'vel_sp_kp': 'BALANCE_VEL_SP_KP', 'vel_sp_kp_low': 'BALANCE_VEL_SP_KP_LOW',
+        'vel_sp_ki': 'BALANCE_VEL_SP_KI', 'vel_sp_knee': 'BALANCE_VEL_SP_KNEE',
+        'sp_offset_max': 'BALANCE_SP_OFFSET_MAX_DEG', 'sp_offset_rate': 'BALANCE_SP_OFFSET_RATE',
+        'vel_filter_alpha': 'BALANCE_VEL_FILTER_ALPHA', 'pos_gate_err': 'BALANCE_POS_GATE_ERR_DEG',
+        'ramp_off_clamp': 'BALANCE_RAMP_SP_OFFSET_MAX_DEG', 'base_sp_rate_max': 'BALANCE_BASE_SP_RATE_MAX',
+        'ramp_vel_slow': 'BALANCE_RAMP_VEL_SLOW', 'arm_return_speed': 'BALANCE_ARM_RETURN_SPEED',
+        'arm_emergency_cmd_frac': 'BALANCE_ARM_EMERGENCY_CMD_FRAC',
+        'arm_calm_vel': 'BALANCE_ARM_CALM_VEL', 'arm_calm_rate': 'BALANCE_ARM_CALM_RATE',
+        'arm_calm_ms': 'BALANCE_ARM_CALM_MS', 'arm_assist_thresh': 'BALANCE_ARM_ASSIST_THRESH',
+        'arm_assist_gain': 'BALANCE_ARM_ASSIST_GAIN', 'arm_assist_bias': 'BALANCE_ARM_ASSIST_BIAS_FRAC',
+        'arm_assist_range_pos': 'BALANCE_ARM_ASSIST_RANGE_POS', 'arm_assist_range_neg': 'BALANCE_ARM_ASSIST_RANGE_NEG',
+        'arm_assist_vel_tau': 'BALANCE_ARM_ASSIST_VEL_TAU', 'arm_assist_tau_in': 'BALANCE_ARM_ASSIST_TAU_IN',
+        'arm_assist_tau_out': 'BALANCE_ARM_ASSIST_TAU_OUT', 'max_drive_speed': 'BALANCE_MAX_DRIVE_SPEED',
+        'setpoint_min': 'BALANCE_SETPOINT_MIN', 'setpoint_max': 'BALANCE_SETPOINT_MAX',
+        'setpoint_arms_fwd': 'BALANCE_SETPOINT_ARMS_FWD', 'setpoint_arms_center': 'BALANCE_SETPOINT_ARMS_CENTER',
+        'capture_shift_max': 'BALANCE_CAPTURE_SHIFT_MAX_DEG',
+        'capture_err_max': 'BALANCE_CAPTURE_ERR_MAX_DEG', 'capture_rate_max': 'BALANCE_CAPTURE_RATE_MAX_DPS',
+        'capture_cmd_max': 'BALANCE_CAPTURE_CMD_MAX', 'capture_settle_ms': 'BALANCE_CAPTURE_SETTLE_MS',
+        'arm_hold_max_ms': 'BALANCE_ARM_HOLD_MAX_MS', 'arm_tip_left': 'BALANCE_ARM_TIP_LEFT',
+        'arm_tip_right': 'BALANCE_ARM_TIP_RIGHT', 'early_drift_kp': 'BALANCE_RAMP_DRIFT_KP',
+        'early_drift_max_vel': 'BALANCE_RAMP_DRIFT_MAX_VEL',
+        'deadman_soft_ms': 'BALANCE_DEADMAN_SOFT_MS', 'deadman_soft_cmd_max': 'BALANCE_DEADMAN_SOFT_CMD_MAX',
+        'deadman_hard_ms': 'BALANCE_DEADMAN_HARD_MS', 'shed_vel_start': 'BALANCE_SHED_VEL_START',
+        'shed_vel_full': 'BALANCE_SHED_VEL_FULL', 'glide_vel_err': 'BALANCE_GLIDE_VEL_ERR',
+        'glide_ki_boost': 'BALANCE_GLIDE_KI_BOOST', 'glide_rate_max': 'BALANCE_GLIDE_RATE_MAX_DPS',
+        'glide_cmd_max': 'BALANCE_GLIDE_CMD_MAX',
+    }
+    kwargs = {field: number(const) for field, const in mapping.items()}
+    curve = source.split('BALANCE_SP_CURVE[] = {', 1)[1].split('};', 1)[0]
+    kwargs['sp_curve'] = tuple((float(a), float(b)) for a, b in
+                               re.findall(r'\{\s*([0-9.]+)f,\s*([0-9.]+)f\s*\}', curve))
+    return replace(FirmwareConfig(), **kwargs, proportional_return=True, early_pos_p=True,
+                   arm_event_end_calm_ms=150.0, measured_arm_arrival=True, hard_stop_latches=True)
+
+
 def make_variant(name: str, base: FirmwareConfig | None = None) -> FirmwareConfig:
+    if name == "current":
+        return current_firmware_config()
+    if name == "july33":
+        return replace(current_firmware_config(), ramp_off_clamp=0.0, drift_vel_kp=0.05,
+                       measured_arm_arrival=False, hard_stop_latches=False)
     cfg = base if base is not None else FirmwareConfig()
     for part in name.split("+"):
         if part == "baseline":
@@ -899,6 +976,8 @@ def make_variant(name: str, base: FirmwareConfig | None = None) -> FirmwareConfi
 
 
 VARIANTS = [
+    "july33",
+    "current",
     "baseline",
     "curve",
     "earlypos",
@@ -1129,7 +1208,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("scenario", choices=["validate", "standup", "standup-matrix",
                                              "push", "stall-campaign"])
-    parser.add_argument("--variant", default="baseline",
+    parser.add_argument("--variant", default="current",
                         help="+-joined parts: baseline curve carrot earlypos rampcont")
     parser.add_argument("--plot", action="store_true")
     parser.add_argument("--seed", type=int, default=1)

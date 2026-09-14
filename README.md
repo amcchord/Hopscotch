@@ -2,6 +2,8 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
+**Prepared balance candidate:** [September findings and firmware changes](docs/BALANCE_REVIEW_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Built and checked offline; physical validation is pending.
+
 ![Robot Diagram](docs/RobotDiagram.png)
 
 ## Hardware
@@ -31,9 +33,9 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 An optional balancing mode activated via RC switch combinations. At the start of the tip-up sequence the rear wheels are switched from CSP position mode to Robstride Speed mode (while the robot is still static on all fours): a 200 Hz complementary-filter + PD control loop commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin; the position loop also runs at reduced gain during the standup ramp so the robot stands up without rolling away.
 
-The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals across runs. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) that makes them decisive on disturbances but structurally unable to sustain an oscillation, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
+The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals from recent calm intervals across runs. Movement of the sensor relative to the chassis during a run remains an unresolved physical uncertainty. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) intended to limit repeated self-triggering during disturbances, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
 
-The full design record -- 30+ instrumented runs and 50+ lessons in the current Speed-mode campaign -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is a firmware-faithful simulator (standup scenarios, push response, Core 1 stall injection) used to validate controller changes before robot time. The repeatable flash, safety, test, marker, download, and analysis workflow is in [`docs/BALANCE_TESTING.md`](docs/BALANCE_TESTING.md).
+The full design record -- 30+ instrumented runs and 50+ lessons in the current Speed-mode campaign -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is an approximate planar simulator (capture/arm-return scenarios, push response, control-task stall injection) used to screen controller changes before robot time. It reads current firmware constants but does not simulate full self-righting, contacts, slip, sensor mounting movement, or the actual task scheduler. The repeatable flash, safety, test, marker, download, and analysis workflow is in [`docs/BALANCE_TESTING.md`](docs/BALANCE_TESTING.md).
 
 ### Web Dashboard
 
@@ -45,7 +47,7 @@ The robot creates a WiFi access point (default SSID: `Hopscotch`) and serves a w
 
 ### Serial Console
 
-A serial CLI at 115200 baud provides debug output every 2 seconds (loop timing, per-motor feedback, drive states, CAN health) and supports real-time tuning of balance gains.
+A serial CLI at 115200 baud provides debug output every 2 seconds (loop timing, per-motor feedback, drive states, CAN health) and supports balance-gain tuning between attempts. Active runs accept only disarm, status, notes and markers, so the saved gain snapshot remains meaningful.
 
 ## Transmitter Setup
 
@@ -121,12 +123,12 @@ Or:
 
 The firmware splits the two ESP32-S3 cores into a **control core** and a **comms core**:
 
-- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, IMU read, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
+- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: direct IMU acquisition, complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
 - **Core 0 (comms)** — WiFi and lwIP (pinned there by the framework) plus `async_tcp` (pinned by build flag). Networking can no longer preempt the control loops.
 
 Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
 
-Balance telemetry schema v2 records a full 120 seconds at 50 Hz in PSRAM, including 200 Hz inner-loop timing/saturation aggregates, raw and filtered IMU signals, all setpoint components, unclamped/applied commands, CAN feedback latency, wheel and arm torque/motion, arm-assist lifecycle, yaw correction, power, safety-exit reason, and operator event markers. It is persisted as a checksummed binary file only after the robot is idle and exported to validated CSV by `./scripts/save_telemetry.sh`.
+Balance telemetry schema v2 records up to 120 seconds at 50 Hz, including tip-up, in PSRAM, including 200 Hz inner-loop timing/saturation aggregates, raw and filtered IMU signals, all setpoint components, unclamped/applied commands, CAN feedback latency, wheel and arm torque/motion, arm-assist lifecycle, yaw correction, power, safety-exit reason, and operator event markers. It is persisted as a checksummed binary file only after balance ends and drive and arms are both disarmed, and exported to validated CSV by `./scripts/save_telemetry.sh`.
 
 ### Module Map
 
@@ -159,12 +161,12 @@ Balance telemetry schema v2 records a full 120 seconds at 50 Hz in PSRAM, includ
 
 Compile-time defaults live in `src/config.h`. Most parameters can be overridden at runtime through `settings.json` (persisted to LittleFS) via the web dashboard or REST API.
 
-Balance gains can also be tuned live over serial without reflashing:
+Balance gains can also be tuned over serial between attempts without reflashing:
 
 ```
 bal kp 2.0      # inner PD: rad/s wheel speed per deg of angle error
 bal kd 0.08     # inner PD: rad/s per deg/s of roll rate
-bal dkp 0.08    # outer: target return velocity per rad of drift
+bal dkp 0.05    # outer: target return velocity per rad of drift
 bal vkp 2.2     # outer: high-slope setpoint response per rad/s of velocity error
 bal vki 0.35    # outer: integral gain (the single equilibrium learner)
 bal note test-name  # tag the next/current telemetry capture

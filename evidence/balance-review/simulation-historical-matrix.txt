@@ -1,0 +1,14 @@
+plant: A=8.02 B=5.862 tau_m=60ms eq_fwd=84.0 eq_tip_delta=-1.9
+
+variant                         standup  late  drift@ramp  peak_drift  peak_vel  ramp_s
+july33                            0/54     11        2.39        3.79      4.41     2.2
+current                           1/54     10        2.17        3.57      4.30     2.2
+baseline                          2/54     10        3.53        4.74      4.60     3.1
+curve                             4/54     10        3.47        4.87      4.59     3.1
+earlypos                          2/54      6        3.40        4.29      3.71     3.1
+propreturn                        2/54      4        3.08        4.31      5.00     2.8
+rampgate                         16/54      5        2.64        4.87      4.70     3.1
+armgate                          20/54      3        1.97        3.37      3.95     2.8
+propreturn+curve                  1/54      7        2.20        3.89      4.24     2.2
+propreturn+curve+armgate         19/54      4        1.58        2.85      3.81     2.2
+fixed                             1/54      7        2.17        3.75      4.18     2.2

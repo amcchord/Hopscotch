@@ -1,0 +1,53 @@
+Speed-mode filter: 32 of 112 files have # motor_mode=speed
+Loaded 30 runs with >=2s of balance data (from 32 files)
+
+=== Pendulum dynamics:  roll_accel = A*(roll - eq) + B*wheel_accel ===
+  A       =    8.019  1/s^2   (gravity destabilization)
+  omega0  =    2.832  rad/s   (unstable pole, time-to-double 245 ms)
+  B       =   5.8620  deg per rad/s^2 of wheel accel
+  fits: 17 runs, 17 with r2>0.1; best:
+    bal_20260702_170714.csv      A=   8.06 B=  7.201 eq= 88.06 r2=0.84 n=1223
+    bal_20260702_173619.csv      A=  10.25 B=  7.245 eq= 88.21 r2=0.82 n=991
+    bal_20260702_175240.csv      A=  14.65 B=  6.449 eq= 87.69 r2=0.72 n=2041
+    bal_20260702_172527.csv      A=  37.50 B=  6.934 eq= 87.18 r2=0.71 n=286
+    bal_20260703_233710.csv      A=   2.08 B=  5.994 eq= 85.16 r2=0.66 n=2559
+
+=== Motor velocity tracking (Speed-mode data, trajectory fit) ===
+  tau_m   =   60.0  ms  (real velocity-loop lag)
+
+=== Quiet-window noise (simulator injection levels) ===
+  roll std      = 0.148 deg
+  roll rate std = 1.162 dps
+  wheel vel std = 0.308 rad/s
+
+=== Arm tip-fraction -> balance point (stable windows) ===
+  tip_frac balance_deg windows  seconds
+    -0.005       86.76      52    307.1
+     0.270       85.81       1      1.0
+     0.431       81.83       1      1.5
+     0.622       82.53       1      1.6
+     0.960       83.49      15      7.7
+  -> use as BALANCE_SP_CURVE anchors in src/config.h
+
+=== Recommended outer gains (position P -> velocity PI, Speed mode) ===
+  fitted model A=8.02, B=5.862; gains must stabilize A x0.5-2,
+  B x0.7-1.4, motor lag 36-96 ms (fitted). Inner Kp=2.0, Kd=0.08, vel filter 100 ms.
+      kx     kv     ki  wrst_re wrst_dmp slow_pole
+    0.02   0.60   0.02  -0.0129    0.209   -0.0130
+    0.05   0.60   0.02  -0.0206    0.147   -0.0207
+    0.02   0.60   0.05  -0.0165    0.134   -0.0165
+    0.08   0.60   0.02  -0.0241    0.117   -0.0242
+    0.12   0.60   0.02  -0.0259    0.095   -0.0267
+    0.02   0.60   0.10  -0.0181    0.088   -0.0181
+    0.05   0.60   0.05  -0.0220    0.086   -0.0322
+    0.20   0.60   0.02  -0.0242    0.071   -0.0290
+    0.08   0.60   0.05  -0.0169    0.060   -0.0420
+    0.02   0.60   0.20  -0.0190    0.049   -0.0190
+
+  -> suggest BALANCE_DRIFT_VEL_KP=0.02 (rad/s per rad drift),
+             BALANCE_VEL_SP_KP=0.60 (deg per rad/s vel err),
+             BALANCE_VEL_SP_KI=0.02 (deg/s per rad/s vel err)
+  Margins are structurally thin for this plant; treat these as starting
+  points and re-fit from Speed-mode telemetry after the first sessions.
+
+Wrote evidence/balance-review/model-fit-speed.json

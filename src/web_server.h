@@ -23,6 +23,8 @@ public:
     // Callback for CAN ID change
     using CanIdChangeCallback = bool(*)(uint8_t old_id, uint8_t new_id);
     void onCanIdChange(CanIdChangeCallback cb) { _canid_cb = cb; }
+    using MaintenanceAllowedCallback = bool(*)();
+    void onMaintenanceAllowed(MaintenanceAllowedCallback cb) { _maintenance_cb = cb; }
 
     // WiFi state for telemetry
     void setWifiState(bool connected, const char* ip);
@@ -38,6 +40,7 @@ private:
     SettingsChangedCallback _settings_cb = nullptr;
     DisarmCallback          _disarm_cb = nullptr;
     CanIdChangeCallback     _canid_cb = nullptr;
+    MaintenanceAllowedCallback _maintenance_cb = nullptr;
 
     bool _wifi_connected = false;
     char _ip_address[32] = "0.0.0.0";

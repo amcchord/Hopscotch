@@ -1,0 +1,75 @@
+{
+  "files": 112,
+  "unique_sha256": 112,
+  "total_rows": 193071,
+  "speed_mode_files": 32,
+  "possible_capacity_cutoffs": 17
+}
+{
+  "file": "bal_20260409_220324.csv",
+  "sha256": "eaee00f8df5c1113b5e8724cc9997d8672b07b7877da6119f631c164c6e9fba5",
+  "rows": 580,
+  "balance_rows": 146,
+  "motor_mode": "legacy/unspecified",
+  "end_reason": "unknown",
+  "possible_capacity_cutoff": false,
+  "balance_elapsed_s": 2.904,
+  "max_balance_gap_ms": 23.0,
+  "measured_drift_peak_rad": 26.97,
+  "tracking_within_2deg_percent": 50.0
+}
+{
+  "file": "bal_20260412_194229.csv",
+  "sha256": "afdee4b63feb4a3008a802f39249227fc1ec024318ef547f8e3dd02479cafebd",
+  "rows": 2225,
+  "balance_rows": 1791,
+  "motor_mode": "legacy/unspecified",
+  "end_reason": "unknown",
+  "possible_capacity_cutoff": false,
+  "balance_elapsed_s": 35.799,
+  "max_balance_gap_ms": 24.0,
+  "measured_drift_peak_rad": 60.39,
+  "tracking_within_2deg_percent": 88.7213847012842,
+  "ramp_complete_s_after_engage": 4.74,
+  "drift_at_ramp_rad": 0.0
+}
+{
+  "file": "bal_20260703_231458.csv",
+  "sha256": "5581a7e19d11e9b608c9b22e1d676cbbb554efe633e7974872cf4dedeb9c9083",
+  "rows": 3000,
+  "balance_rows": 2559,
+  "motor_mode": "speed",
+  "end_reason": "unknown",
+  "possible_capacity_cutoff": true,
+  "balance_elapsed_s": 51.161,
+  "max_balance_gap_ms": 25.0,
+  "measured_drift_peak_rad": 12.01,
+  "tracking_within_2deg_percent": 86.63540445486518,
+  "ramp_complete_s_after_engage": 2.162,
+  "drift_at_ramp_rad": 3.62,
+  "pre_ramp_peak_tracking_error_deg": 3.200000000000003,
+  "pre_ramp_offset_at_peak_error_deg": 1.6775,
+  "post_ramp_peak_tracking_error_deg": 4.679999999999993,
+  "post_ramp_offset_at_peak_error_deg": 3.8375,
+  "post_ramp_peak_s_after_engage": 2.32
+}
+{
+  "file": "bal_20260703_233710.csv",
+  "sha256": "76c75ef74db776410f75b6b5c475932ad56408ba99667b589b5abc6f97591943",
+  "rows": 3000,
+  "balance_rows": 2559,
+  "motor_mode": "speed",
+  "end_reason": "unknown",
+  "possible_capacity_cutoff": true,
+  "balance_elapsed_s": 51.161,
+  "max_balance_gap_ms": 27.0,
+  "measured_drift_peak_rad": 9.63,
+  "tracking_within_2deg_percent": 95.2715904650254,
+  "ramp_complete_s_after_engage": 2.181,
+  "drift_at_ramp_rad": 4.11,
+  "pre_ramp_peak_tracking_error_deg": 3.0600000000000023,
+  "pre_ramp_offset_at_peak_error_deg": 1.6651,
+  "post_ramp_peak_tracking_error_deg": 5.070000000000007,
+  "post_ramp_offset_at_peak_error_deg": 3.8251,
+  "post_ramp_peak_s_after_engage": 2.34
+}

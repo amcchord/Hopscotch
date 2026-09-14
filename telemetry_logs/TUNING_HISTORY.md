@@ -1,6 +1,8 @@
 # Balance Mode Tuning History
 
-## Current Architecture (v14: Control-Core Split + Forensic Flight Recorder, July 2026)
+**Current handoff:** [September 13 review](../docs/BALANCE_REVIEW_2026-09.md) and [current state](../docs/progress/CURRENT.md). The July architecture and earlier lessons below are historical, with corrections documented in the September entry at the end.
+
+## July Architecture (v14: Control-Core Split + Forensic Flight Recorder, July 2026)
 
 ### Task layout (control-core / comms-core split)
 - **Core 0 (comms)**: WiFi + lwIP (framework-pinned) + async_tcp (pinned by
@@ -1335,3 +1337,20 @@ stalls hit) -- rejected, no new Core 0 complexity.
 22. **Leaky origin ("drift acceptance") prevents PI saturation.** Instead of fighting large accumulated drift, slowly move the wheel origin toward the current position (0.15/s, ~7s time constant). The PI only sees recent drift (1-2 rad max), never saturates, and the robot accepts its current location as "home" over time. This is a pragmatic fix for CSP mode's fundamental limitation.
 
 23. **For true return-to-origin, switch to Speed mode.** In Speed mode, motor_vel directly commands wheel velocity (not integrated into position targets). The PD cannot cancel a velocity offset because there is no position target for the motor servo to hold. This is a larger architectural change for future work.
+
+
+---
+
+## September 13, 2026 — historical/media review and prepared firmware
+
+Scope: reviewed all 112 CSVs (193,071 rows), five photos and sampled frames across seven videos. Baseline `e8b1280`; local branch `codex/balance-review-ready` in the root checkout. Austin confirms unchanged hardware/calibration but possible sensor mounting movement by a few degrees.
+
+Findings: the largest final-July stand-up target surge occurs after ramp completion; the prepared 1.5-degree ramp clamp alone cannot address it. Seventeen logs are likely capacity-censored, not measured falls. The April 9 `220324` file does not substantiate its historical 30-second/98-percent description. July videos precede the final evening CRSF/controller changes. Angle tracking alone is insufficient evidence of station keeping. Full analysis, evidence links and corrected measurements: [September review](../docs/BALANCE_REVIEW_2026-09.md).
+
+Changes: fast task owns IMU reads; each successful sample is integrated once, with stale/invalid and hard-deadman faults latched. Measured arm arrival and timeouts gate transitions. Wheel yaw mixing respects per-wheel speed limits. Persistent trim uses a recent calm estimate. Motor acceleration-limit verification now propagates failure. Serial input is bounded; tuning is between runs; web disarm is queued to the control task, and serial/web disarm requires RC switches low before rearming. Log operations require both motor groups disarmed. Telemetry retains v2 layout with an IMU-age extension and window diagnostic aggregation, adds end-to-end USB checksums/partial-write handling, and preserves raw successful/failed transfers on the host.
+
+Defaults: retain inner PD 2.0/0.08, velocity PI and arm lifecycle. Restore unflashed drift return gain 0.08 to July's tested 0.05. Keep the already-prepared 1.5-degree ramp clamp. A simulation-only gradual post-ramp transition regressed early and push failures and was not ported. The refreshed approximate model's 72 cases show 3 early/11 later candidate failures versus 2/11 for July; 18 signed push cases had no failures for either. These are screening results, not evidence of a physical reliability improvement.
+
+Verification: native C++ checks (100,000 randomized mixes, freshness/rollover, actual USB writer under partial writes/stall/disconnect), twelve Python tests including full 6,000-row transfer and corruption cases, syntax/whitespace checks, and successful PlatformIO 6.7.0 build. Build output and simulation evidence are retained under `evidence/balance-review/`. The exact source/binaries and rebuilt baseline rollback are identified in `artifacts/balance-candidate/manifest.json`.
+
+Physical state: no upload, calibration reset, live robot operation, or remote Git push. Next: attach USB with both motor groups disarmed, back up device data/settings, flash firmware only, verify IMU/calibration/disarm on the floor, then capture one normal stand-up and 30-second untouched attempt. See [test guide](../docs/BALANCE_TESTING.md).

@@ -1,0 +1,1454 @@
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp  vel_off    drift  note
+----------------------------------------------------------------------------------------------------------------------------
+200hz_balanced_16s.csv     8.66  16.32    87.44     5.50   1.26     0.38      5.82     0.85    87.25       --       --  legacy schema, arm return before settle
+200hz_base87_close_run.csv   8.66  20.70    86.39     2.54   1.14     0.08      0.35     0.06    88.00       --       --  legacy schema
+200hz_feedforward_test.csv     --  10.06    87.90     1.72   1.08     4.56      2.21     1.23    67.29       --       --  legacy schema, high cmd at return, sample gap
+bal_20260409_220324.csv    8.66   2.90    84.95     3.64   1.14     0.50      1.78     0.53    85.66       --     7.55  legacy schema
+bal_20260409_221043.csv    8.66   2.78    84.01     3.84   1.14     1.41      4.45     1.59    88.31       --     6.94  legacy schema, arm return before settle, high cmd at return
+bal_20260409_221845.csv    8.66   2.96    85.37     2.46   1.12     0.14      1.18     0.21    84.58    84.63     9.22  clean capture
+bal_20260409_222714.csv    8.66   2.66    84.88     2.10   1.12     0.24      2.06     0.38    85.33    85.35     5.34  clean capture
+bal_20260409_223214.csv    8.66  21.30    85.02     2.35   1.30     0.22      4.16     0.49    89.09    92.20     6.13  arm return before settle
+bal_20260409_224632.csv    8.66  21.30    85.24     2.23   1.34     0.24      5.10     0.80    85.46    88.59     2.61  arm return before settle
+bal_20260409_225509.csv    8.66  21.28    85.99     2.40   1.34     0.26      4.39     0.70    89.89    89.89     2.19  arm return before settle
+bal_20260409_225753.csv    8.66  10.50    85.71     2.30   1.06     0.29      0.85     0.28    95.64    95.64     7.44  clean capture
+bal_20260409_230538.csv    8.66  17.84    88.19     2.12   1.06     0.27      0.63     0.25    91.84    91.84     5.23  clean capture
+bal_20260409_230938.csv    8.66  34.00    87.88     1.45   1.06     0.18      0.65     0.10    85.30    85.30     1.50  clean capture
+bal_20260409_231344.csv    8.66  48.93    88.10     2.22   1.06     0.15      0.78     0.21    92.55    92.55     3.69  sample gap
+bal_20260409_232108.csv    8.66   1.12    88.08     2.33   0.10     3.42     33.27     7.74    90.24    90.24   -12.95  arm return before settle, high cmd at return
+bal_20260409_232735.csv    8.66  21.08    87.69     2.68   1.06     0.31      4.05     0.59    96.51     4.01     3.72  arm return before settle, sample gap
+bal_20260409_233040.csv    8.66  12.02    87.62     1.68   1.06     0.59      8.19     1.74    93.84     1.35     1.97  arm return before settle, high cmd at return
+bal_20260410_200016.csv    8.66  15.50    79.88     2.04   2.56     0.30      3.88     0.85    90.23    -1.77    -0.40  clean capture
+bal_20260410_200622.csv    8.66   9.44    84.57     2.27   0.48     0.14      0.94     0.29    88.31    -2.01     4.94  clean capture
+bal_20260410_201026.csv    8.66  22.94    83.41     2.40   0.50     0.11      0.80     0.23    91.14    -2.86   -11.20  clean capture
+bal_20260410_201448.csv    8.66   5.66    80.66     2.34   1.54     7.05     79.63    17.29    88.37    -3.35    -4.38  arm return before settle, high cmd at return
+bal_20260410_204824.csv    8.66  23.70    80.33     2.05   2.56     1.25     16.49     3.83    93.42     1.16    -1.68  arm return before settle, high cmd at return
+bal_20260410_205347.csv    8.66  23.72    80.54     1.98   0.48     0.12      1.01     0.23    98.56     3.70   -16.62  clean capture
+bal_20260410_210127.csv   10.03   7.42    76.29     2.05   1.76     7.40     99.85    18.71    92.00     0.00    -2.42  arm return before settle, high cmd at return, sample gap
+bal_20260410_210747.csv    8.66  20.04    82.58     3.78   0.48     0.21      2.23     0.50    97.90     2.03   -20.21  clean capture
+bal_20260410_211316.csv    8.66  33.15    80.68     1.62   0.48     0.21      1.74     0.46    93.45     0.00    -5.94  sample gap
+bal_20260410_222145.csv    8.66  38.91    79.76     2.05   0.48     0.20      1.03     0.37    96.71     0.00    -4.09  sample gap
+bal_20260410_223145.csv    8.66  34.66    80.18     2.34   2.58     0.73     10.66     2.33    97.07     0.00    -5.02  arm return before settle, high cmd at return, sample gap
+bal_20260410_223740.csv    8.66  41.52    79.96     2.19   0.48     0.11      0.60     0.16    88.04     0.00     3.26  clean capture
+bal_20260410_224228.csv    8.66  50.44    79.62     2.04   0.50     0.19      1.40     0.49    84.00     0.00    -3.84  clean capture
+bal_20260411_091031.csv    8.66   7.70    78.87     1.92   0.50     0.21      0.96     0.36    91.77     0.00     6.14  clean capture
+bal_20260411_092019.csv    8.66  11.54    83.70     2.43   0.50     0.10      0.34     0.20    88.02     0.00    -4.53  clean capture
+bal_20260411_092847.csv    8.66  20.60    78.43     2.28   0.48     0.14      1.74     0.33    86.00     0.00    -9.59  clean capture
+bal_20260411_093625.csv    8.66   7.20    82.78     1.84   0.50     0.09      0.56     0.19    89.45     0.00    -8.56  clean capture
+bal_20260411_093847.csv    8.66  25.26    82.36     2.43   0.48     0.18      1.92     0.53    88.35     0.00     1.48  sample gap
+bal_20260411_094120.csv    8.66  22.18    82.01     3.03   0.48     0.13      1.43     0.36    86.00     0.00    -9.69  sample gap
+bal_20260411_221653.csv    8.66  38.22    84.18     2.54   0.48     0.13      1.07     0.29    89.00     3.08    -5.09  clean capture
+bal_20260411_223410.csv    8.66  51.30    84.14     2.93   2.42     2.44     39.85     7.68    89.41       --     0.13  legacy schema, arm return before settle, high cmd at return, possible log cutoff; end cause unknown
+bal_20260411_224627.csv    8.66  28.64    85.17     2.67   0.48     0.10      1.10     0.25    90.08       --    -5.37  legacy schema
+bal_20260411_225322.csv    8.66  27.52    84.83     3.83   2.56     1.95     27.63     6.05    88.25       --    -9.01  legacy schema, arm return before settle, high cmd at return
+bal_20260411_225612.csv    8.66  11.10    85.07     3.55   0.48     0.23      1.82     0.49    90.88       --     2.68  legacy schema
+bal_20260412_163928.csv    8.66  36.02    85.75     2.31   0.48     0.12      0.69     0.26    92.00       --    -6.57  legacy schema
+bal_20260412_164317.csv    8.66  29.44    85.04     2.14   0.50     0.27      1.85     0.64    92.00       --     7.03  legacy schema
+bal_20260412_164912.csv    8.66  52.57    85.96     3.19   2.08     1.59     26.54     5.31    92.00       --    -6.06  legacy schema, arm return before settle, high cmd at return, possible log cutoff; end cause unknown, sample gap
+bal_20260412_170823.csv    8.66   4.54    83.78     2.47   2.26     1.67     26.02     5.18    86.83       --     5.50  legacy schema, arm return before settle, high cmd at return
+bal_20260412_171517.csv    8.66  26.90    85.31     2.04   0.48     0.12      0.64     0.24    93.35       --   -11.26  legacy schema
+bal_20260412_172103.csv    8.66  50.20    86.01     2.70   0.48     0.18      1.40     0.44    92.00       --    -0.78  legacy schema
+bal_20260412_173405.csv    8.66   2.82    87.22     2.85   2.52     4.42      5.31     9.22    87.54       --     2.84  legacy schema, arm return before settle, high cmd at return, sample gap
+bal_20260412_174731.csv    8.66  51.58    86.28     2.22   0.48     0.13      1.15     0.26    92.28       --    -3.66  legacy schema, possible log cutoff; end cause unknown, sample gap
+bal_20260412_175422.csv    8.66  51.30    83.02     2.41   0.50     0.16      1.41     0.36    92.44       --   -10.63  legacy schema, possible log cutoff; end cause unknown
+bal_20260412_180129.csv    8.66  11.36    85.71     2.48   0.48     0.09      0.63     0.19    90.95       --    -2.59  legacy schema
+bal_20260412_180748.csv    8.66  51.30    85.71     1.93   0.48     0.24      1.81     0.58    90.91       --    -0.54  legacy schema, possible log cutoff; end cause unknown
+bal_20260412_183346.csv    8.66  17.81    83.35     3.04   2.56     1.59     23.51     4.96    91.24       --    -6.20  legacy schema, arm return before settle, high cmd at return, sample gap
+bal_20260412_183812.csv    8.66  44.04    84.71     2.40   0.48     0.13      0.87     0.29    91.46       --   -27.06  legacy schema, sample gap
+bal_20260412_184543.csv    8.66  36.56    85.22     2.34   0.48     0.12      0.44     0.25    91.61       --    -8.94  legacy schema
+bal_20260412_184913.csv    8.66  26.94    85.01     2.68   0.48     0.21      1.09     0.50    92.18       --    -6.73  legacy schema
+bal_20260412_185218.csv    8.66  34.78    85.32     2.53   0.48     0.06      0.50     0.11    92.14       --    -5.01  legacy schema
+bal_20260412_185728.csv    8.66  47.51    86.46     3.79   0.82     0.16      0.92     0.34    93.27       --    -4.47  legacy schema, sample gap
+bal_20260412_190131.csv    8.66  33.42    81.88     2.56   0.50     0.21      1.87     0.51    92.43       --    -6.80  legacy schema
+bal_20260412_191828.csv    8.66  51.30    81.84     3.17   0.48     0.13      0.81     0.30    92.21       --    -0.21  legacy schema, possible log cutoff; end cause unknown
+bal_20260412_193312.csv    8.66  18.90    81.82     2.61   0.48     0.14      1.44     0.35    91.22       --    -7.42  legacy schema
+bal_20260412_193809.csv    8.66  48.98    83.04     2.28   0.48     0.15      1.61     0.38    91.57       --    -7.86  legacy schema
+bal_20260412_194229.csv    8.66  35.80    78.10     2.60   0.48     0.24      1.12     0.52    91.44       --   -37.82  legacy schema
+bal_20260412_194831.csv    8.66  23.32    82.99     1.97   0.48     0.22      0.65     0.44    92.15       --   -10.89  legacy schema
+bal_20260412_200050.csv    8.66  19.44    83.09     2.07   0.50     0.22      1.16     0.47    91.35       --    -2.25  legacy schema
+bal_20260412_202206.csv    8.66  20.04    88.24     2.51   2.56     1.94     28.31     5.79    92.15       --    -4.21  legacy schema, arm return before settle, high cmd at return
+bal_20260412_202543.csv    8.66  18.67    81.26     1.97   0.48     0.20      0.96     0.43    92.29       --    -2.45  legacy schema, sample gap
+bal_20260412_215957.csv    8.66  20.44    88.80     2.29   0.48     0.18      0.55     0.40    89.35       --    11.66  legacy schema
+bal_20260412_220427.csv    8.66  49.78    80.20     2.01   0.48     0.07      0.70     0.17    90.85       --    -5.61  legacy schema, sample gap
+bal_20260412_220940.csv    8.66   4.02    79.56     2.56   1.06     1.20      8.97     2.84    88.93       --     9.62  legacy schema, arm return before settle, high cmd at return
+bal_20260412_221620.csv    8.84  17.56    83.83    -0.06   0.50     0.03      0.16     0.02    92.40       --    -4.57  legacy schema
+bal_20260412_222511.csv    8.84  24.32    81.97    -0.31   0.50     0.02      0.20     0.01    91.18       --    -4.27  legacy schema, sample gap
+bal_20260412_224607.csv    8.66  18.36    82.53     2.50   0.48     0.16      1.23     0.34    93.95       --    -3.16  legacy schema
+bal_20260412_224949.csv    8.80  19.69    85.86    -0.02   0.48     0.02      0.15     0.03    94.97       --    -8.13  legacy schema, sample gap
+bal_20260412_225413.csv    8.80  13.90    85.59    -0.23   0.50     0.01      0.16     0.03    95.00       --    -2.91  legacy schema
+bal_20260412_225745.csv    8.80  19.86    86.38    -0.12   0.50     0.01      0.23     0.02    92.30       --    -1.27  legacy schema
+bal_20260412_230134.csv    8.80  31.98    84.48    -0.25   0.48     0.01      0.11     0.02    87.07       --     4.39  legacy schema
+bal_20260412_230544.csv    8.80  14.11    84.33     0.10   0.48     0.01      0.15     0.03    91.00       --    -0.16  legacy schema, sample gap
+bal_20260412_230929.csv    8.80  22.80    88.92     0.02   0.52     0.05      0.76     0.15    92.21       --    -6.95  legacy schema
+bal_20260702_151416.csv    8.80  46.76    84.21    -0.08   2.90     0.16      0.13     0.33    89.03    -2.47   -16.64  sample gap
+bal_20260702_152107.csv    8.80  12.78    83.07    -0.01   1.90     0.53      0.94     1.13    88.72    -1.47   -10.05  high cmd at return, sample gap
+bal_20260702_154158.csv    8.80     --       --       --     --       --        --       --       --       --       --  no balance state
+bal_20260702_154823.csv    8.80   4.52    85.39     0.02   0.68     0.12      0.32     0.23    87.64    -1.33     0.91  sample gap
+bal_20260702_155640.csv    8.80  19.71    84.82    -0.27   1.09     1.88      2.58     3.97    89.06     1.52     9.56  high cmd at return, sample gap
+bal_20260702_161437.csv    8.80  52.14    85.34     0.02   1.04     0.08      0.14     0.16    87.17    -0.81   -10.81  possible log cutoff; end cause unknown, sample gap
+bal_20260702_164034.csv    8.80  21.98    85.71    -0.28   2.30     0.12      0.42     0.26    90.43     2.31     2.11  sample gap
+bal_20260702_164837.csv    8.80  40.85    84.79    -0.05   1.55     0.10      0.11     0.21    89.50     1.23    -0.04  sample gap
+bal_20260702_170714.csv    8.80  24.80    85.54    -0.45   0.90     0.05      0.48     0.11    87.78     0.49     3.99  sample gap
+bal_20260702_171838.csv    8.80  52.47    84.76    -0.23   1.37     0.17      0.75     0.38    87.94    -0.66     0.55  possible log cutoff; end cause unknown, sample gap
+bal_20260702_172527.csv    8.80  14.45    86.16    -0.24   6.87     0.27      0.30     0.47    85.83    -1.31     2.24  sample gap
+bal_20260702_173132.csv    8.80   9.31    86.88     1.18   1.00     0.12      1.04     0.26    88.00     0.93     9.03  sample gap
+bal_20260702_173619.csv    8.80  21.22    86.72     0.05   0.61     0.39      0.40     0.65    88.50     1.05     1.39  sample gap
+bal_20260702_174401.csv    8.80  55.97    85.48     0.08   4.87     0.02      0.24     0.04    88.35     1.95    -0.76  possible log cutoff; end cause unknown, sample gap
+bal_20260702_175240.csv    8.80  41.77    86.15     0.09   0.69     0.11      0.31     0.19    88.71     2.95     9.84  sample gap
+bal_20260702_222841.csv    8.80  52.47    82.20    -0.09   1.37     0.24      0.61     0.50    81.89    -4.98    -0.52  possible log cutoff; end cause unknown, sample gap
+bal_20260702_223919.csv    8.80  58.40    81.88     0.03   7.30     1.01      0.58     1.65    79.04    -1.05    -1.32  high cmd at return, possible log cutoff; end cause unknown, sample gap
+bal_20260702_224649.csv    8.80  53.99    83.62    -0.14   2.90     1.49      3.85     3.04    84.01    -3.51     1.73  high cmd at return, possible log cutoff; end cause unknown, sample gap
+bal_20260702_225359.csv    8.80  38.79    84.17    -0.20   2.23     0.31      0.26     0.58    85.43     3.23     7.06  sample gap
+bal_20260702_225944.csv    8.80  17.42    77.69    -0.15   1.39     0.45      1.16     0.92    84.56    -0.35     3.28  sample gap
+bal_20260702_231038.csv    8.80  52.50    85.29    -0.00   1.40     3.36      3.49     6.21    88.66     5.05     5.60  high cmd at return, possible log cutoff; end cause unknown, sample gap
+bal_20260702_232626.csv    8.80  42.57    84.99     0.07   2.22     0.77      0.95     1.46    87.65     1.74     1.99  high cmd at return, sample gap
+bal_20260703_093643.csv    8.80   2.29    82.88    -0.09   1.01     0.34      1.58     0.80    83.12     0.36     1.05  sample gap
+bal_20260703_094448.csv    8.80  52.48    82.22     0.01   1.38     1.39      1.50     2.78    83.21    -0.80    -3.52  high cmd at return, possible log cutoff; end cause unknown, sample gap
+bal_20260703_095326.csv    8.80  54.63    85.13     0.03   3.53     0.18      0.14     0.31    85.64     1.45     2.02  possible log cutoff; end cause unknown, sample gap
+bal_20260703_222223.csv    8.79  23.40    84.02     0.23   0.52     0.02      0.38     0.05    87.07     1.45     3.50  sample gap
+bal_20260703_222915.csv   41.94  23.12    81.96    -0.08   0.50     0.04      0.61     0.10    85.41     1.71     6.77  sample gap
+bal_20260703_223630.csv   11.94   2.36    84.22    -0.53   0.52     0.01      0.16     0.03    85.88     0.75     4.89  sample gap
+bal_20260703_224227.csv   11.09   9.55    81.73     0.07   0.52     0.01      0.21     0.04    83.37     0.03     9.24  sample gap
+bal_20260703_224824.csv   31.87   4.94    81.01    -0.01   0.52     0.01      0.13     0.02    83.52     1.18     5.68  sample gap
+bal_20260703_231458.csv    8.79  51.16    80.81     0.09   0.52     0.01      0.16     0.03    85.27     2.72     1.78  possible log cutoff; end cause unknown
+bal_20260703_233710.csv    8.79  51.16    80.66     0.15   0.54     0.01      0.16     0.03    84.86     2.40     0.26  possible log cutoff; end cause unknown
+latest_run.csv             8.66  21.30    91.83     2.91   1.10     0.10      1.31     0.22    91.00       --       --  legacy schema, sample gap
+
+200hz_balanced_16s.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=87.44 deg, rate=5.50 dps
+  arm return: 1.26 s, pre-return |err|=0.38 deg, |rate|=5.82 dps, |cmd|=0.85 rad/s
+  final window: sp=87.25 deg, vel_off=-- rad/s, drift=-- rad
+  note: legacy schema, arm return before settle
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=19.69 deg, |raw cmd|max=24.89 rad/s, |wheel vel|max=16.15 rad/s, |drift|max=-- rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+200hz_base87_close_run.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=86.39 deg, rate=2.54 dps
+  arm return: 1.14 s, pre-return |err|=0.08 deg, |rate|=0.35 dps, |cmd|=0.06 rad/s
+  final window: sp=88.00 deg, vel_off=-- rad/s, drift=-- rad
+  note: legacy schema
+  timing: sample p99/max=23.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=36.28 deg, |raw cmd|max=9.58 rad/s, |wheel vel|max=6.12 rad/s, |drift|max=-- rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+200hz_feedforward_test.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=87.90 deg, rate=1.72 dps
+  arm return: 1.08 s, pre-return |err|=4.56 deg, |rate|=2.21 dps, |cmd|=1.23 rad/s
+  final window: sp=67.29 deg, vel_off=-- rad/s, drift=-- rad
+  note: legacy schema, high cmd at return, sample gap
+  timing: sample p99/max=22.0/852.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.37 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.37 rad/s, |drift|max=-- rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_220324.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=84.95 deg, rate=3.64 dps
+  arm return: 1.14 s, pre-return |err|=0.50 deg, |rate|=1.78 dps, |cmd|=0.53 rad/s
+  final window: sp=85.66 deg, vel_off=-- rad/s, drift=7.55 rad
+  note: legacy schema
+  timing: sample p99/max=23.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.77 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.00 rad/s, |drift|max=26.97 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_221043.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=84.01 deg, rate=3.84 dps
+  arm return: 1.14 s, pre-return |err|=1.41 deg, |rate|=4.45 dps, |cmd|=1.59 rad/s
+  final window: sp=88.31 deg, vel_off=-- rad/s, drift=6.94 rad
+  note: legacy schema, arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/22.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.82 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.63 rad/s, |drift|max=23.48 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_221845.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=85.37 deg, rate=2.46 dps
+  arm return: 1.12 s, pre-return |err|=0.14 deg, |rate|=1.18 dps, |cmd|=0.21 rad/s
+  final window: sp=84.58 deg, vel_off=84.63 rad/s, drift=9.22 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.09 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.90 rad/s, |drift|max=29.64 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_222714.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=84.88 deg, rate=2.10 dps
+  arm return: 1.12 s, pre-return |err|=0.24 deg, |rate|=2.06 dps, |cmd|=0.38 rad/s
+  final window: sp=85.33 deg, vel_off=85.35 rad/s, drift=5.34 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.93 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.90 rad/s, |drift|max=22.38 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_223214.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=85.02 deg, rate=2.35 dps
+  arm return: 1.30 s, pre-return |err|=0.22 deg, |rate|=4.16 dps, |cmd|=0.49 rad/s
+  final window: sp=89.09 deg, vel_off=92.20 rad/s, drift=6.13 rad
+  note: arm return before settle
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=6.32 deg, |raw cmd|max=8.79 rad/s, |wheel vel|max=5.76 rad/s, |drift|max=7.92 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_224632.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=85.24 deg, rate=2.23 dps
+  arm return: 1.34 s, pre-return |err|=0.24 deg, |rate|=5.10 dps, |cmd|=0.80 rad/s
+  final window: sp=85.46 deg, vel_off=88.59 rad/s, drift=2.61 rad
+  note: arm return before settle
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=9.87 deg, |raw cmd|max=13.24 rad/s, |wheel vel|max=8.45 rad/s, |drift|max=5.68 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_225509.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=85.99 deg, rate=2.40 dps
+  arm return: 1.34 s, pre-return |err|=0.26 deg, |rate|=4.39 dps, |cmd|=0.70 rad/s
+  final window: sp=89.89 deg, vel_off=89.89 rad/s, drift=2.19 rad
+  note: arm return before settle
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.52 deg, |raw cmd|max=7.54 rad/s, |wheel vel|max=4.95 rad/s, |drift|max=2.74 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_225753.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=85.71 deg, rate=2.30 dps
+  arm return: 1.06 s, pre-return |err|=0.29 deg, |rate|=0.85 dps, |cmd|=0.28 rad/s
+  final window: sp=95.64 deg, vel_off=95.64 rad/s, drift=7.44 rad
+  note: clean capture
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.02 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.22 rad/s, |drift|max=12.19 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_230538.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=88.19 deg, rate=2.12 dps
+  arm return: 1.06 s, pre-return |err|=0.27 deg, |rate|=0.63 dps, |cmd|=0.25 rad/s
+  final window: sp=91.84 deg, vel_off=91.84 rad/s, drift=5.23 rad
+  note: clean capture
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=10.37 deg, |raw cmd|max=12.89 rad/s, |wheel vel|max=8.48 rad/s, |drift|max=6.97 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_230938.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=87.88 deg, rate=1.45 dps
+  arm return: 1.06 s, pre-return |err|=0.18 deg, |rate|=0.65 dps, |cmd|=0.10 rad/s
+  final window: sp=85.30 deg, vel_off=85.30 rad/s, drift=1.50 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=15.77 deg, |raw cmd|max=21.54 rad/s, |wheel vel|max=14.11 rad/s, |drift|max=8.50 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_231344.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=88.10 deg, rate=2.22 dps
+  arm return: 1.06 s, pre-return |err|=0.15 deg, |rate|=0.78 dps, |cmd|=0.21 rad/s
+  final window: sp=92.55 deg, vel_off=92.55 rad/s, drift=3.69 rad
+  note: sample gap
+  timing: sample p99/max=23.0/203.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.88 deg, |raw cmd|max=7.73 rad/s, |wheel vel|max=5.19 rad/s, |drift|max=5.79 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_232108.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=88.08 deg, rate=2.33 dps
+  arm return: 0.10 s, pre-return |err|=3.42 deg, |rate|=33.27 dps, |cmd|=7.74 rad/s
+  final window: sp=90.24 deg, vel_off=90.24 rad/s, drift=-12.95 rad
+  note: arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/22.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=36.60 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.81 rad/s, |drift|max=27.05 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_232735.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=87.69 deg, rate=2.68 dps
+  arm return: 1.06 s, pre-return |err|=0.31 deg, |rate|=4.05 dps, |cmd|=0.59 rad/s
+  final window: sp=96.51 deg, vel_off=4.01 rad/s, drift=3.72 rad
+  note: arm return before settle, sample gap
+  timing: sample p99/max=23.0/614.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=10.16 deg, |raw cmd|max=16.85 rad/s, |wheel vel|max=11.13 rad/s, |drift|max=5.66 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260409_233040.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=87.62 deg, rate=1.68 dps
+  arm return: 1.06 s, pre-return |err|=0.59 deg, |rate|=8.19 dps, |cmd|=1.74 rad/s
+  final window: sp=93.84 deg, vel_off=1.35 rad/s, drift=1.97 rad
+  note: arm return before settle, high cmd at return
+  timing: sample p99/max=21.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=13.11 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.19 rad/s, |drift|max=9.30 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_200016.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=79.88 deg, rate=2.04 dps
+  arm return: 2.56 s, pre-return |err|=0.30 deg, |rate|=3.88 dps, |cmd|=0.85 rad/s
+  final window: sp=90.23 deg, vel_off=-1.77 rad/s, drift=-0.40 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=17.19 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.84 rad/s, |drift|max=12.27 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_200622.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=84.57 deg, rate=2.27 dps
+  arm return: 0.48 s, pre-return |err|=0.14 deg, |rate|=0.94 dps, |cmd|=0.29 rad/s
+  final window: sp=88.31 deg, vel_off=-2.01 rad/s, drift=4.94 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.66 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.14 rad/s, |drift|max=13.96 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_201026.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=83.41 deg, rate=2.40 dps
+  arm return: 0.50 s, pre-return |err|=0.11 deg, |rate|=0.80 dps, |cmd|=0.23 rad/s
+  final window: sp=91.14 deg, vel_off=-2.86 rad/s, drift=-11.20 rad
+  note: clean capture
+  timing: sample p99/max=22.0/22.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=28.28 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.32 rad/s, |drift|max=15.03 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_201448.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=80.66 deg, rate=2.34 dps
+  arm return: 1.54 s, pre-return |err|=7.05 deg, |rate|=79.63 dps, |cmd|=17.29 rad/s
+  final window: sp=88.37 deg, vel_off=-3.35 rad/s, drift=-4.38 rad
+  note: arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.05 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.48 rad/s, |drift|max=8.09 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_204824.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=80.33 deg, rate=2.05 dps
+  arm return: 2.56 s, pre-return |err|=1.25 deg, |rate|=16.49 dps, |cmd|=3.83 rad/s
+  final window: sp=93.42 deg, vel_off=1.16 rad/s, drift=-1.68 rad
+  note: arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=13.95 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.93 rad/s, |drift|max=8.74 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_205347.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=80.54 deg, rate=1.98 dps
+  arm return: 0.48 s, pre-return |err|=0.12 deg, |rate|=1.01 dps, |cmd|=0.23 rad/s
+  final window: sp=98.56 deg, vel_off=3.70 rad/s, drift=-16.62 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=24.39 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.82 rad/s, |drift|max=27.55 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_210127.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=76.29 deg, rate=2.05 dps
+  arm return: 1.76 s, pre-return |err|=7.40 deg, |rate|=99.85 dps, |cmd|=18.71 rad/s
+  final window: sp=92.00 deg, vel_off=0.00 rad/s, drift=-2.42 rad
+  note: arm return before settle, high cmd at return, sample gap
+  timing: sample p99/max=22.0/1401.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=28.28 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.71 rad/s, |drift|max=9.24 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_210747.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=82.58 deg, rate=3.78 dps
+  arm return: 0.48 s, pre-return |err|=0.21 deg, |rate|=2.23 dps, |cmd|=0.50 rad/s
+  final window: sp=97.90 deg, vel_off=2.03 rad/s, drift=-20.21 rad
+  note: clean capture
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=8.87 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=12.77 rad/s, |drift|max=20.61 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_211316.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=80.68 deg, rate=1.62 dps
+  arm return: 0.48 s, pre-return |err|=0.21 deg, |rate|=1.74 dps, |cmd|=0.46 rad/s
+  final window: sp=93.45 deg, vel_off=0.00 rad/s, drift=-5.94 rad
+  note: sample gap
+  timing: sample p99/max=23.0/866.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=16.64 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.04 rad/s, |drift|max=17.98 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_222145.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=79.76 deg, rate=2.05 dps
+  arm return: 0.48 s, pre-return |err|=0.20 deg, |rate|=1.03 dps, |cmd|=0.37 rad/s
+  final window: sp=96.71 deg, vel_off=0.00 rad/s, drift=-4.09 rad
+  note: sample gap
+  timing: sample p99/max=22.0/82.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.63 deg, |raw cmd|max=12.30 rad/s, |wheel vel|max=8.24 rad/s, |drift|max=4.37 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_223145.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=80.18 deg, rate=2.34 dps
+  arm return: 2.58 s, pre-return |err|=0.73 deg, |rate|=10.66 dps, |cmd|=2.33 rad/s
+  final window: sp=97.07 deg, vel_off=0.00 rad/s, drift=-5.02 rad
+  note: arm return before settle, high cmd at return, sample gap
+  timing: sample p99/max=22.0/313.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=6.70 deg, |raw cmd|max=15.44 rad/s, |wheel vel|max=10.03 rad/s, |drift|max=5.11 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_223740.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=79.96 deg, rate=2.19 dps
+  arm return: 0.48 s, pre-return |err|=0.11 deg, |rate|=0.60 dps, |cmd|=0.16 rad/s
+  final window: sp=88.04 deg, vel_off=0.00 rad/s, drift=3.26 rad
+  note: clean capture
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=9.94 deg, |raw cmd|max=21.70 rad/s, |wheel vel|max=14.17 rad/s, |drift|max=10.36 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260410_224228.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=79.62 deg, rate=2.04 dps
+  arm return: 0.50 s, pre-return |err|=0.19 deg, |rate|=1.40 dps, |cmd|=0.49 rad/s
+  final window: sp=84.00 deg, vel_off=0.00 rad/s, drift=-3.84 rad
+  note: clean capture
+  timing: sample p99/max=23.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=16.30 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.93 rad/s, |drift|max=11.62 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_091031.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=78.87 deg, rate=1.92 dps
+  arm return: 0.50 s, pre-return |err|=0.21 deg, |rate|=0.96 dps, |cmd|=0.36 rad/s
+  final window: sp=91.77 deg, vel_off=0.00 rad/s, drift=6.14 rad
+  note: clean capture
+  timing: sample p99/max=23.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=9.28 deg, |raw cmd|max=21.47 rad/s, |wheel vel|max=11.78 rad/s, |drift|max=11.72 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_092019.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=83.70 deg, rate=2.43 dps
+  arm return: 0.50 s, pre-return |err|=0.10 deg, |rate|=0.34 dps, |cmd|=0.20 rad/s
+  final window: sp=88.02 deg, vel_off=0.00 rad/s, drift=-4.53 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=33.61 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.69 rad/s, |drift|max=11.04 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_092847.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=78.43 deg, rate=2.28 dps
+  arm return: 0.48 s, pre-return |err|=0.14 deg, |rate|=1.74 dps, |cmd|=0.33 rad/s
+  final window: sp=86.00 deg, vel_off=0.00 rad/s, drift=-9.59 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=23.76 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.07 rad/s, |drift|max=12.36 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_093625.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=82.78 deg, rate=1.84 dps
+  arm return: 0.50 s, pre-return |err|=0.09 deg, |rate|=0.56 dps, |cmd|=0.19 rad/s
+  final window: sp=89.45 deg, vel_off=0.00 rad/s, drift=-8.56 rad
+  note: clean capture
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=16.24 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.36 rad/s, |drift|max=10.28 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_093847.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=82.36 deg, rate=2.43 dps
+  arm return: 0.48 s, pre-return |err|=0.18 deg, |rate|=1.92 dps, |cmd|=0.53 rad/s
+  final window: sp=88.35 deg, vel_off=0.00 rad/s, drift=1.48 rad
+  note: sample gap
+  timing: sample p99/max=22.0/357.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.48 deg, |raw cmd|max=11.90 rad/s, |wheel vel|max=7.72 rad/s, |drift|max=7.47 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_094120.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=82.01 deg, rate=3.03 dps
+  arm return: 0.48 s, pre-return |err|=0.13 deg, |rate|=1.43 dps, |cmd|=0.36 rad/s
+  final window: sp=86.00 deg, vel_off=0.00 rad/s, drift=-9.69 rad
+  note: sample gap
+  timing: sample p99/max=23.0/1749.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=29.52 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.97 rad/s, |drift|max=10.88 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+bal_20260411_221653.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=84.18 deg, rate=2.54 dps
+  arm return: 0.48 s, pre-return |err|=0.13 deg, |rate|=1.07 dps, |cmd|=0.29 rad/s
+  final window: sp=89.00 deg, vel_off=3.08 rad/s, drift=-5.09 rad
+  note: clean capture
+  timing: sample p99/max=23.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=17.27 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.75 rad/s, |drift|max=12.20 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260411_223410.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=84.14 deg, rate=2.93 dps
+  arm return: 2.42 s, pre-return |err|=2.44 deg, |rate|=39.85 dps, |cmd|=7.68 rad/s
+  final window: sp=89.41 deg, vel_off=-- rad/s, drift=0.13 rad
+  note: legacy schema, arm return before settle, high cmd at return, possible log cutoff; end cause unknown
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=15.63 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.77 rad/s, |drift|max=7.33 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260411_224627.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=85.17 deg, rate=2.67 dps
+  arm return: 0.48 s, pre-return |err|=0.10 deg, |rate|=1.10 dps, |cmd|=0.25 rad/s
+  final window: sp=90.08 deg, vel_off=-- rad/s, drift=-5.37 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=12.66 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.71 rad/s, |drift|max=11.39 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260411_225322.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=84.83 deg, rate=3.83 dps
+  arm return: 2.56 s, pre-return |err|=1.95 deg, |rate|=27.63 dps, |cmd|=6.05 rad/s
+  final window: sp=88.25 deg, vel_off=-- rad/s, drift=-9.01 rad
+  note: legacy schema, arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/22.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.85 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.48 rad/s, |drift|max=9.60 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260411_225612.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=89.50, base_sp_tip=84.00
+  engage: roll=85.07 deg, rate=3.55 dps
+  arm return: 0.48 s, pre-return |err|=0.23 deg, |rate|=1.82 dps, |cmd|=0.49 rad/s
+  final window: sp=90.88 deg, vel_off=-- rad/s, drift=2.68 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=15.46 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.65 rad/s, |drift|max=8.84 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_163928.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=85.75 deg, rate=2.31 dps
+  arm return: 0.48 s, pre-return |err|=0.12 deg, |rate|=0.69 dps, |cmd|=0.26 rad/s
+  final window: sp=92.00 deg, vel_off=-- rad/s, drift=-6.57 rad
+  note: legacy schema
+  timing: sample p99/max=23.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.84 deg, |raw cmd|max=10.39 rad/s, |wheel vel|max=6.99 rad/s, |drift|max=7.11 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_164317.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=85.04 deg, rate=2.14 dps
+  arm return: 0.50 s, pre-return |err|=0.27 deg, |rate|=1.85 dps, |cmd|=0.64 rad/s
+  final window: sp=92.00 deg, vel_off=-- rad/s, drift=7.03 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=43.01 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.45 rad/s, |drift|max=12.93 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_164912.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=85.96 deg, rate=3.19 dps
+  arm return: 2.08 s, pre-return |err|=1.59 deg, |rate|=26.54 dps, |cmd|=5.31 rad/s
+  final window: sp=92.00 deg, vel_off=-- rad/s, drift=-6.06 rad
+  note: legacy schema, arm return before settle, high cmd at return, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=23.0/1301.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=17.25 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.12 rad/s, |drift|max=10.98 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_170823.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=83.78 deg, rate=2.47 dps
+  arm return: 2.26 s, pre-return |err|=1.67 deg, |rate|=26.02 dps, |cmd|=5.18 rad/s
+  final window: sp=86.83 deg, vel_off=-- rad/s, drift=5.50 rad
+  note: legacy schema, arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=32.27 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=12.38 rad/s, |drift|max=8.88 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_171517.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=85.31 deg, rate=2.04 dps
+  arm return: 0.48 s, pre-return |err|=0.12 deg, |rate|=0.64 dps, |cmd|=0.24 rad/s
+  final window: sp=93.35 deg, vel_off=-- rad/s, drift=-11.26 rad
+  note: legacy schema
+  timing: sample p99/max=23.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=3.91 deg, |raw cmd|max=9.15 rad/s, |wheel vel|max=6.02 rad/s, |drift|max=12.43 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_172103.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=86.01 deg, rate=2.70 dps
+  arm return: 0.48 s, pre-return |err|=0.18 deg, |rate|=1.40 dps, |cmd|=0.44 rad/s
+  final window: sp=92.00 deg, vel_off=-- rad/s, drift=-0.78 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.69 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.96 rad/s, |drift|max=11.12 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_173405.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=87.22 deg, rate=2.85 dps
+  arm return: 2.52 s, pre-return |err|=4.42 deg, |rate|=5.31 dps, |cmd|=9.22 rad/s
+  final window: sp=87.54 deg, vel_off=-- rad/s, drift=2.84 rad
+  note: legacy schema, arm return before settle, high cmd at return, sample gap
+  timing: sample p99/max=22.0/2483.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.09 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=8.32 rad/s, |drift|max=5.06 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_174731.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=86.28 deg, rate=2.22 dps
+  arm return: 0.48 s, pre-return |err|=0.13 deg, |rate|=1.15 dps, |cmd|=0.26 rad/s
+  final window: sp=92.28 deg, vel_off=-- rad/s, drift=-3.66 rad
+  note: legacy schema, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/296.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.33 deg, |raw cmd|max=16.75 rad/s, |wheel vel|max=11.02 rad/s, |drift|max=11.84 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_175422.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=83.02 deg, rate=2.41 dps
+  arm return: 0.50 s, pre-return |err|=0.16 deg, |rate|=1.41 dps, |cmd|=0.36 rad/s
+  final window: sp=92.44 deg, vel_off=-- rad/s, drift=-10.63 rad
+  note: legacy schema, possible log cutoff; end cause unknown
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.16 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.12 rad/s, |drift|max=12.94 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_180129.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=90.80, base_sp_tip=86.50
+  engage: roll=85.71 deg, rate=2.48 dps
+  arm return: 0.48 s, pre-return |err|=0.09 deg, |rate|=0.63 dps, |cmd|=0.19 rad/s
+  final window: sp=90.95 deg, vel_off=-- rad/s, drift=-2.59 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.68 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.58 rad/s, |drift|max=8.13 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_180748.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=85.71 deg, rate=1.93 dps
+  arm return: 0.48 s, pre-return |err|=0.24 deg, |rate|=1.81 dps, |cmd|=0.58 rad/s
+  final window: sp=90.91 deg, vel_off=-- rad/s, drift=-0.54 rad
+  note: legacy schema, possible log cutoff; end cause unknown
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=10.43 deg, |raw cmd|max=22.11 rad/s, |wheel vel|max=15.08 rad/s, |drift|max=8.12 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_183346.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=83.35 deg, rate=3.04 dps
+  arm return: 2.56 s, pre-return |err|=1.59 deg, |rate|=23.51 dps, |cmd|=4.96 rad/s
+  final window: sp=91.24 deg, vel_off=-- rad/s, drift=-6.20 rad
+  note: legacy schema, arm return before settle, high cmd at return, sample gap
+  timing: sample p99/max=22.0/1501.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=20.03 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.59 rad/s, |drift|max=7.83 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_183812.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=84.71 deg, rate=2.40 dps
+  arm return: 0.48 s, pre-return |err|=0.13 deg, |rate|=0.87 dps, |cmd|=0.29 rad/s
+  final window: sp=91.46 deg, vel_off=-- rad/s, drift=-27.06 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/2895.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=22.81 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.88 rad/s, |drift|max=28.32 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_184543.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=85.22 deg, rate=2.34 dps
+  arm return: 0.48 s, pre-return |err|=0.12 deg, |rate|=0.44 dps, |cmd|=0.25 rad/s
+  final window: sp=91.61 deg, vel_off=-- rad/s, drift=-8.94 rad
+  note: legacy schema
+  timing: sample p99/max=23.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=2.57 deg, |raw cmd|max=5.91 rad/s, |wheel vel|max=3.89 rad/s, |drift|max=8.98 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_184913.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.50, base_sp_tip=86.50
+  engage: roll=85.01 deg, rate=2.68 dps
+  arm return: 0.48 s, pre-return |err|=0.21 deg, |rate|=1.09 dps, |cmd|=0.50 rad/s
+  final window: sp=92.18 deg, vel_off=-- rad/s, drift=-6.73 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.35 deg, |raw cmd|max=9.61 rad/s, |wheel vel|max=6.32 rad/s, |drift|max=6.90 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_185218.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.50, base_sp_tip=86.50
+  engage: roll=85.32 deg, rate=2.53 dps
+  arm return: 0.48 s, pre-return |err|=0.06 deg, |rate|=0.50 dps, |cmd|=0.11 rad/s
+  final window: sp=92.14 deg, vel_off=-- rad/s, drift=-5.01 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=1.96 deg, |raw cmd|max=4.38 rad/s, |wheel vel|max=2.91 rad/s, |drift|max=5.03 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_185728.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.50, base_sp_tip=86.50
+  engage: roll=86.46 deg, rate=3.79 dps
+  arm return: 0.82 s, pre-return |err|=0.16 deg, |rate|=0.92 dps, |cmd|=0.34 rad/s
+  final window: sp=93.27 deg, vel_off=-- rad/s, drift=-4.47 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/124.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.81 deg, |raw cmd|max=13.53 rad/s, |wheel vel|max=8.57 rad/s, |drift|max=5.84 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_190131.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.50, base_sp_tip=86.50
+  engage: roll=81.88 deg, rate=2.56 dps
+  arm return: 0.50 s, pre-return |err|=0.21 deg, |rate|=1.87 dps, |cmd|=0.51 rad/s
+  final window: sp=92.43 deg, vel_off=-- rad/s, drift=-6.80 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.50 deg, |raw cmd|max=12.62 rad/s, |wheel vel|max=8.28 rad/s, |drift|max=6.84 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_191828.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=92.00, base_sp_tip=86.50
+  engage: roll=81.84 deg, rate=3.17 dps
+  arm return: 0.48 s, pre-return |err|=0.13 deg, |rate|=0.81 dps, |cmd|=0.30 rad/s
+  final window: sp=92.21 deg, vel_off=-- rad/s, drift=-0.21 rad
+  note: legacy schema, possible log cutoff; end cause unknown
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.60 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.90 rad/s, |drift|max=9.78 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_193312.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=81.82 deg, rate=2.61 dps
+  arm return: 0.48 s, pre-return |err|=0.14 deg, |rate|=1.44 dps, |cmd|=0.35 rad/s
+  final window: sp=91.22 deg, vel_off=-- rad/s, drift=-7.42 rad
+  note: legacy schema
+  timing: sample p99/max=21.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.97 deg, |raw cmd|max=13.42 rad/s, |wheel vel|max=8.88 rad/s, |drift|max=8.29 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_193809.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=83.04 deg, rate=2.28 dps
+  arm return: 0.48 s, pre-return |err|=0.15 deg, |rate|=1.61 dps, |cmd|=0.38 rad/s
+  final window: sp=91.57 deg, vel_off=-- rad/s, drift=-7.86 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.04 deg, |raw cmd|max=9.66 rad/s, |wheel vel|max=6.27 rad/s, |drift|max=7.90 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_194229.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=78.10 deg, rate=2.60 dps
+  arm return: 0.48 s, pre-return |err|=0.24 deg, |rate|=1.12 dps, |cmd|=0.52 rad/s
+  final window: sp=91.44 deg, vel_off=-- rad/s, drift=-37.82 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.74 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.60 rad/s, |drift|max=60.39 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_194831.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=82.99 deg, rate=1.97 dps
+  arm return: 0.48 s, pre-return |err|=0.22 deg, |rate|=0.65 dps, |cmd|=0.44 rad/s
+  final window: sp=92.15 deg, vel_off=-- rad/s, drift=-10.89 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=30.44 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=19.44 rad/s, |drift|max=12.42 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_200050.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=83.09 deg, rate=2.07 dps
+  arm return: 0.50 s, pre-return |err|=0.22 deg, |rate|=1.16 dps, |cmd|=0.47 rad/s
+  final window: sp=91.35 deg, vel_off=-- rad/s, drift=-2.25 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=28.13 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.84 rad/s, |drift|max=13.47 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_202206.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=88.24 deg, rate=2.51 dps
+  arm return: 2.56 s, pre-return |err|=1.94 deg, |rate|=28.31 dps, |cmd|=5.79 rad/s
+  final window: sp=92.15 deg, vel_off=-- rad/s, drift=-4.21 rad
+  note: legacy schema, arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=25.18 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.22 rad/s, |drift|max=11.97 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_202543.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=81.26 deg, rate=1.97 dps
+  arm return: 0.48 s, pre-return |err|=0.20 deg, |rate|=0.96 dps, |cmd|=0.43 rad/s
+  final window: sp=92.29 deg, vel_off=-- rad/s, drift=-2.45 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/389.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=11.16 deg, |raw cmd|max=23.96 rad/s, |wheel vel|max=15.40 rad/s, |drift|max=10.46 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_215957.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=88.80 deg, rate=2.29 dps
+  arm return: 0.48 s, pre-return |err|=0.18 deg, |rate|=0.55 dps, |cmd|=0.40 rad/s
+  final window: sp=89.35 deg, vel_off=-- rad/s, drift=11.66 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=12.30 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.20 rad/s, |drift|max=11.90 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_220427.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=80.20 deg, rate=2.01 dps
+  arm return: 0.48 s, pre-return |err|=0.07 deg, |rate|=0.70 dps, |cmd|=0.17 rad/s
+  final window: sp=90.85 deg, vel_off=-- rad/s, drift=-5.61 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/1231.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.47 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.62 rad/s, |drift|max=11.38 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_220940.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=79.56 deg, rate=2.56 dps
+  arm return: 1.06 s, pre-return |err|=1.20 deg, |rate|=8.97 dps, |cmd|=2.84 rad/s
+  final window: sp=88.93 deg, vel_off=-- rad/s, drift=9.62 rad
+  note: legacy schema, arm return before settle, high cmd at return
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=41.82 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.93 rad/s, |drift|max=12.01 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_221620.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=83.83 deg, rate=-0.06 dps
+  arm return: 0.50 s, pre-return |err|=0.03 deg, |rate|=0.16 dps, |cmd|=0.02 rad/s
+  final window: sp=92.40 deg, vel_off=-- rad/s, drift=-4.57 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.39 deg, |raw cmd|max=12.21 rad/s, |wheel vel|max=8.15 rad/s, |drift|max=4.75 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_222511.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=81.97 deg, rate=-0.31 dps
+  arm return: 0.50 s, pre-return |err|=0.02 deg, |rate|=0.20 dps, |cmd|=0.01 rad/s
+  final window: sp=91.18 deg, vel_off=-- rad/s, drift=-4.27 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=23.0/3216.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.53 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.23 rad/s, |drift|max=12.24 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_224607.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=82.53 deg, rate=2.50 dps
+  arm return: 0.48 s, pre-return |err|=0.16 deg, |rate|=1.23 dps, |cmd|=0.34 rad/s
+  final window: sp=93.95 deg, vel_off=-- rad/s, drift=-3.16 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.98 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.90 rad/s, |drift|max=11.89 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_224949.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=85.86 deg, rate=-0.02 dps
+  arm return: 0.48 s, pre-return |err|=0.02 deg, |rate|=0.15 dps, |cmd|=0.03 rad/s
+  final window: sp=94.97 deg, vel_off=-- rad/s, drift=-8.13 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=23.0/4284.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.66 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.02 rad/s, |drift|max=26.45 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_225413.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=85.59 deg, rate=-0.23 dps
+  arm return: 0.50 s, pre-return |err|=0.01 deg, |rate|=0.16 dps, |cmd|=0.03 rad/s
+  final window: sp=95.00 deg, vel_off=-- rad/s, drift=-2.91 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=20.49 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.27 rad/s, |drift|max=11.78 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_225745.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=86.38 deg, rate=-0.12 dps
+  arm return: 0.50 s, pre-return |err|=0.01 deg, |rate|=0.23 dps, |cmd|=0.02 rad/s
+  final window: sp=92.30 deg, vel_off=-- rad/s, drift=-1.27 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/24.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=23.71 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=18.43 rad/s, |drift|max=10.82 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_230134.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=84.48 deg, rate=-0.25 dps
+  arm return: 0.48 s, pre-return |err|=0.01 deg, |rate|=0.11 dps, |cmd|=0.02 rad/s
+  final window: sp=87.07 deg, vel_off=-- rad/s, drift=4.39 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=17.04 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.71 rad/s, |drift|max=10.33 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_230544.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=84.33 deg, rate=0.10 dps
+  arm return: 0.48 s, pre-return |err|=0.01 deg, |rate|=0.15 dps, |cmd|=0.03 rad/s
+  final window: sp=91.00 deg, vel_off=-- rad/s, drift=-0.16 rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/1749.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=38.50 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.97 rad/s, |drift|max=11.35 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260412_230929.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800
+          max_drive_speed=25.00, base_sp_fwd=91.00, base_sp_tip=86.50
+  engage: roll=88.92 deg, rate=0.02 dps
+  arm return: 0.52 s, pre-return |err|=0.05 deg, |rate|=0.76 dps, |cmd|=0.15 rad/s
+  final window: sp=92.21 deg, vel_off=-- rad/s, drift=-6.95 rad
+  note: legacy schema
+  timing: sample p99/max=22.0/23.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=12.73 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.70 rad/s, |drift|max=10.28 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_151416.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=0.8000, vel_sp_ki=0.0500
+          sp_offset_max=4.00, max_drive_speed=25.00, base_sp_fwd=91.50, base_sp_tip=86.40
+  engage: roll=84.21 deg, rate=-0.08 dps
+  arm return: 2.90 s, pre-return |err|=0.16 deg, |rate|=0.13 dps, |cmd|=0.33 rad/s
+  final window: sp=89.03 deg, vel_off=-2.47 rad/s, drift=-16.64 rad
+  note: sample gap
+  timing: sample p99/max=22.0/2866.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.56 deg, |raw cmd|max=12.66 rad/s, |wheel vel|max=8.14 rad/s, |drift|max=17.90 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_152107.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=0.8000, vel_sp_ki=0.1200
+          sp_offset_max=4.00, max_drive_speed=25.00, base_sp_fwd=90.20, base_sp_tip=86.40
+  engage: roll=83.07 deg, rate=-0.01 dps
+  arm return: 1.90 s, pre-return |err|=0.53 deg, |rate|=0.94 dps, |cmd|=1.13 rad/s
+  final window: sp=88.72 deg, vel_off=-1.47 rad/s, drift=-10.05 rad
+  note: high cmd at return, sample gap
+  timing: sample p99/max=23.0/1805.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=43.11 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.43 rad/s, |drift|max=10.29 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_154158.csv
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=0.8000, vel_sp_ki=0.1200
+          sp_offset_max=4.00, max_drive_speed=25.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=-- deg, rate=-- dps
+  arm return: -- s, pre-return |err|=-- deg, |rate|=-- dps, |cmd|=-- rad/s
+  final window: sp=-- deg, vel_off=-- rad/s, drift=-- rad
+  note: no balance state
+bal_20260702_154823.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=0.8000, vel_sp_ki=0.1200
+          sp_offset_max=4.00, max_drive_speed=25.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=85.39 deg, rate=0.02 dps
+  arm return: 0.68 s, pre-return |err|=0.12 deg, |rate|=0.32 dps, |cmd|=0.23 rad/s
+  final window: sp=87.64 deg, vel_off=-1.33 rad/s, drift=0.91 rad
+  note: sample gap
+  timing: sample p99/max=23.0/650.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.36 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=16.05 rad/s, |drift|max=6.76 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_155640.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=0.8000, vel_sp_ki=0.1200
+          sp_offset_max=4.00, max_drive_speed=25.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=84.82 deg, rate=-0.27 dps
+  arm return: 1.09 s, pre-return |err|=1.88 deg, |rate|=2.58 dps, |cmd|=3.97 rad/s
+  final window: sp=89.06 deg, vel_off=1.52 rad/s, drift=9.56 rad
+  note: high cmd at return, sample gap
+  timing: sample p99/max=22.0/1060.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.26 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.41 rad/s, |drift|max=11.62 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_161437.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=1.6000, vel_sp_ki=0.2500
+          sp_offset_max=6.00, max_drive_speed=25.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=85.34 deg, rate=0.02 dps
+  arm return: 1.04 s, pre-return |err|=0.08 deg, |rate|=0.14 dps, |cmd|=0.16 rad/s
+  final window: sp=87.17 deg, vel_off=-0.81 rad/s, drift=-10.81 rad
+  note: possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/1007.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=14.92 deg, |raw cmd|max=25.00 rad/s, |wheel vel|max=17.58 rad/s, |drift|max=13.37 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_164034.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=85.71 deg, rate=-0.28 dps
+  arm return: 2.30 s, pre-return |err|=0.12 deg, |rate|=0.42 dps, |cmd|=0.26 rad/s
+  final window: sp=90.43 deg, vel_off=2.31 rad/s, drift=2.11 rad
+  note: sample gap
+  timing: sample p99/max=22.0/2263.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=39.46 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=18.62 rad/s, |drift|max=13.81 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_164837.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=84.79 deg, rate=-0.05 dps
+  arm return: 1.55 s, pre-return |err|=0.10 deg, |rate|=0.11 dps, |cmd|=0.21 rad/s
+  final window: sp=89.50 deg, vel_off=1.23 rad/s, drift=-0.04 rad
+  note: sample gap
+  timing: sample p99/max=22.0/1519.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.22 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=18.74 rad/s, |drift|max=19.25 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_170714.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=85.54 deg, rate=-0.45 dps
+  arm return: 0.90 s, pre-return |err|=0.05 deg, |rate|=0.48 dps, |cmd|=0.11 rad/s
+  final window: sp=87.78 deg, vel_off=0.49 rad/s, drift=3.99 rad
+  note: sample gap
+  timing: sample p99/max=22.0/385.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=3.53 deg, |raw cmd|max=8.38 rad/s, |wheel vel|max=5.01 rad/s, |drift|max=5.38 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_171838.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=84.76 deg, rate=-0.23 dps
+  arm return: 1.37 s, pre-return |err|=0.17 deg, |rate|=0.75 dps, |cmd|=0.38 rad/s
+  final window: sp=87.94 deg, vel_off=-0.66 rad/s, drift=0.55 rad
+  note: possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/1338.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.67 deg, |raw cmd|max=9.82 rad/s, |wheel vel|max=6.06 rad/s, |drift|max=10.01 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_172527.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=86.16 deg, rate=-0.24 dps
+  arm return: 6.87 s, pre-return |err|=0.27 deg, |rate|=0.30 dps, |cmd|=0.47 rad/s
+  final window: sp=85.83 deg, vel_off=-1.31 rad/s, drift=2.24 rad
+  note: sample gap
+  timing: sample p99/max=24.0/6831.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.68 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=17.36 rad/s, |drift|max=18.22 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_173132.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=86.88 deg, rate=1.18 dps
+  arm return: 1.00 s, pre-return |err|=0.12 deg, |rate|=1.04 dps, |cmd|=0.26 rad/s
+  final window: sp=88.00 deg, vel_off=0.93 rad/s, drift=9.03 rad
+  note: sample gap
+  timing: sample p99/max=23.0/2022.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.72 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=17.22 rad/s, |drift|max=25.18 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_173619.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=86.72 deg, rate=0.05 dps
+  arm return: 0.61 s, pre-return |err|=0.39 deg, |rate|=0.40 dps, |cmd|=0.65 rad/s
+  final window: sp=88.50 deg, vel_off=1.05 rad/s, drift=1.39 rad
+  note: sample gap
+  timing: sample p99/max=23.0/739.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.34 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=9.50 rad/s, |drift|max=8.13 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_174401.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=85.48 deg, rate=0.08 dps
+  arm return: 4.87 s, pre-return |err|=0.02 deg, |rate|=0.24 dps, |cmd|=0.04 rad/s
+  final window: sp=88.35 deg, vel_off=1.95 rad/s, drift=-0.76 rad
+  note: possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=23.0/4840.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.28 deg, |raw cmd|max=10.28 rad/s, |wheel vel|max=7.06 rad/s, |drift|max=9.84 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_175240.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=86.15 deg, rate=0.09 dps
+  arm return: 0.69 s, pre-return |err|=0.11 deg, |rate|=0.31 dps, |cmd|=0.19 rad/s
+  final window: sp=88.71 deg, vel_off=2.95 rad/s, drift=9.84 rad
+  note: sample gap
+  timing: sample p99/max=23.0/658.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.14 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=16.98 rad/s, |drift|max=26.71 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_222841.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=82.20 deg, rate=-0.09 dps
+  arm return: 1.37 s, pre-return |err|=0.24 deg, |rate|=0.61 dps, |cmd|=0.50 rad/s
+  final window: sp=81.89 deg, vel_off=-4.98 rad/s, drift=-0.52 rad
+  note: possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/1347.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=5.45 deg, |raw cmd|max=12.31 rad/s, |wheel vel|max=8.18 rad/s, |drift|max=14.44 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_223919.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=81.88 deg, rate=0.03 dps
+  arm return: 7.30 s, pre-return |err|=1.01 deg, |rate|=0.58 dps, |cmd|=1.65 rad/s
+  final window: sp=79.04 deg, vel_off=-1.05 rad/s, drift=-1.32 rad
+  note: high cmd at return, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/7276.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.00 deg, |raw cmd|max=7.92 rad/s, |wheel vel|max=5.50 rad/s, |drift|max=5.98 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_224649.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=89.30, base_sp_tip=86.40
+  engage: roll=83.62 deg, rate=-0.14 dps
+  arm return: 2.90 s, pre-return |err|=1.49 deg, |rate|=3.85 dps, |cmd|=3.04 rad/s
+  final window: sp=84.01 deg, vel_off=-3.51 rad/s, drift=1.73 rad
+  note: high cmd at return, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/2464.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=6.65 deg, |raw cmd|max=14.26 rad/s, |wheel vel|max=9.46 rad/s, |drift|max=15.45 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_225359.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=84.17 deg, rate=-0.20 dps
+  arm return: 2.23 s, pre-return |err|=0.31 deg, |rate|=0.26 dps, |cmd|=0.58 rad/s
+  final window: sp=85.43 deg, vel_off=3.23 rad/s, drift=7.06 rad
+  note: sample gap
+  timing: sample p99/max=22.0/2207.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.50 deg, |raw cmd|max=17.97 rad/s, |wheel vel|max=10.11 rad/s, |drift|max=16.24 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_225944.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=77.69 deg, rate=-0.15 dps
+  arm return: 1.39 s, pre-return |err|=0.45 deg, |rate|=1.16 dps, |cmd|=0.92 rad/s
+  final window: sp=84.56 deg, vel_off=-0.35 rad/s, drift=3.28 rad
+  note: sample gap
+  timing: sample p99/max=23.0/1362.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=42.02 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=7.97 rad/s, |drift|max=8.41 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_231038.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=85.29 deg, rate=-0.00 dps
+  arm return: 1.40 s, pre-return |err|=3.36 deg, |rate|=3.49 dps, |cmd|=6.21 rad/s
+  final window: sp=88.66 deg, vel_off=5.05 rad/s, drift=5.60 rad
+  note: high cmd at return, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=21.0/1369.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.10 deg, |raw cmd|max=16.34 rad/s, |wheel vel|max=9.77 rad/s, |drift|max=8.96 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260702_232626.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=84.99 deg, rate=0.07 dps
+  arm return: 2.22 s, pre-return |err|=0.77 deg, |rate|=0.95 dps, |cmd|=1.46 rad/s
+  final window: sp=87.65 deg, vel_off=1.74 rad/s, drift=1.99 rad
+  note: high cmd at return, sample gap
+  timing: sample p99/max=23.0/2182.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.64 deg, |raw cmd|max=17.03 rad/s, |wheel vel|max=11.91 rad/s, |drift|max=13.34 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_093643.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=82.88 deg, rate=-0.09 dps
+  arm return: 1.01 s, pre-return |err|=0.34 deg, |rate|=1.58 dps, |cmd|=0.80 rad/s
+  final window: sp=83.12 deg, vel_off=0.36 rad/s, drift=1.05 rad
+  note: sample gap
+  timing: sample p99/max=22.0/431.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=44.22 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=16.73 rad/s, |drift|max=4.19 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_094448.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=82.22 deg, rate=0.01 dps
+  arm return: 1.38 s, pre-return |err|=1.39 deg, |rate|=1.50 dps, |cmd|=2.78 rad/s
+  final window: sp=83.21 deg, vel_off=-0.80 rad/s, drift=-3.52 rad
+  note: high cmd at return, possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/1356.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.03 deg, |raw cmd|max=8.40 rad/s, |wheel vel|max=5.74 rad/s, |drift|max=15.71 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_095326.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=81.10
+  engage: roll=85.13 deg, rate=0.03 dps
+  arm return: 3.53 s, pre-return |err|=0.18 deg, |rate|=0.14 dps, |cmd|=0.31 rad/s
+  final window: sp=85.64 deg, vel_off=1.45 rad/s, drift=2.02 rad
+  note: possible log cutoff; end cause unknown, sample gap
+  timing: sample p99/max=22.0/3506.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.71 deg, |raw cmd|max=16.73 rad/s, |wheel vel|max=11.20 rad/s, |drift|max=16.02 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_222223.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=84.02 deg, rate=0.23 dps
+  arm return: 0.52 s, pre-return |err|=0.02 deg, |rate|=0.38 dps, |cmd|=0.05 rad/s
+  final window: sp=87.07 deg, vel_off=1.45 rad/s, drift=3.50 rad
+  note: sample gap
+  timing: sample p99/max=24.0/449.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.60 deg, |raw cmd|max=9.52 rad/s, |wheel vel|max=6.48 rad/s, |drift|max=11.34 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_222915.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=81.96 deg, rate=-0.08 dps
+  arm return: 0.50 s, pre-return |err|=0.04 deg, |rate|=0.61 dps, |cmd|=0.10 rad/s
+  final window: sp=85.41 deg, vel_off=1.71 rad/s, drift=6.77 rad
+  note: sample gap
+  timing: sample p99/max=354.0/7492.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=39.89 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=18.88 rad/s, |drift|max=23.62 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_223630.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=84.22 deg, rate=-0.53 dps
+  arm return: 0.52 s, pre-return |err|=0.01 deg, |rate|=0.16 dps, |cmd|=0.03 rad/s
+  final window: sp=85.88 deg, vel_off=0.75 rad/s, drift=4.89 rad
+  note: sample gap
+  timing: sample p99/max=24.0/2047.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=41.90 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=18.67 rad/s, |drift|max=19.90 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_224227.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=81.73 deg, rate=0.07 dps
+  arm return: 0.52 s, pre-return |err|=0.01 deg, |rate|=0.21 dps, |cmd|=0.04 rad/s
+  final window: sp=83.37 deg, vel_off=0.03 rad/s, drift=9.24 rad
+  note: sample gap
+  timing: sample p99/max=26.0/5113.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=10.01 deg, |raw cmd|max=22.84 rad/s, |wheel vel|max=14.97 rad/s, |drift|max=10.13 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_224824.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=81.01 deg, rate=-0.01 dps
+  arm return: 0.52 s, pre-return |err|=0.01 deg, |rate|=0.13 dps, |cmd|=0.02 rad/s
+  final window: sp=83.52 deg, vel_off=1.18 rad/s, drift=5.68 rad
+  note: sample gap
+  timing: sample p99/max=232.0/11411.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=28.38 deg, |raw cmd|max=30.00 rad/s, |wheel vel|max=13.62 rad/s, |drift|max=18.03 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_231458.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=80.81 deg, rate=0.09 dps
+  arm return: 0.52 s, pre-return |err|=0.01 deg, |rate|=0.16 dps, |cmd|=0.03 rad/s
+  final window: sp=85.27 deg, vel_off=2.72 rad/s, drift=1.78 rad
+  note: possible log cutoff; end cause unknown
+  timing: sample p99/max=22.0/26.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=7.74 deg, |raw cmd|max=17.31 rad/s, |wheel vel|max=11.29 rad/s, |drift|max=12.01 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+bal_20260703_233710.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=80.66 deg, rate=0.15 dps
+  arm return: 0.54 s, pre-return |err|=0.01 deg, |rate|=0.16 dps, |cmd|=0.03 rad/s
+  final window: sp=84.86 deg, vel_off=2.40 rad/s, drift=0.26 rad
+  note: possible log cutoff; end cause unknown
+  timing: sample p99/max=23.0/27.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=4.83 deg, |raw cmd|max=9.45 rad/s, |wheel vel|max=6.67 rad/s, |drift|max=9.63 rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=legacy, checksum=n/a, end=unknown, test_note=none
+latest_run.csv
+  IMU max age=-- ms, freshness-fault rows=0, CAN TX-failure rows=0
+  engage: roll=91.83 deg, rate=2.91 dps
+  arm return: 1.10 s, pre-return |err|=0.10 deg, |rate|=1.31 dps, |cmd|=0.22 rad/s
+  final window: sp=91.00 deg, vel_off=-- rad/s, drift=-- rad
+  note: legacy schema, sample gap
+  timing: sample p99/max=22.0/3153.0 ms, inner max=-- us, low-tick rows=0, feedback max=-- ms
+  authority: |angle err|max=2.24 deg, |raw cmd|max=2.96 rad/s, |wheel vel|max=1.93 rad/s, |drift|max=-- rad
+  sensors/power: IMU disagree max=-- deg, accel norm=--..-- g, bus min=-- V, current max=-- A, rear torque max=-- Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0

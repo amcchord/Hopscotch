@@ -1,0 +1,47 @@
+[
+  {
+    "handoff_ms": 0,
+    "cases": 72,
+    "early": 3,
+    "late": 11,
+    "drift": 2.2483981517749054,
+    "peak": 3.8854705283750426,
+    "pushfails": 0
+  },
+  {
+    "handoff_ms": 1000,
+    "cases": 72,
+    "early": 5,
+    "late": 4,
+    "drift": 2.217302057176475,
+    "peak": 3.9741516925263034,
+    "pushfails": 2
+  },
+  {
+    "handoff_ms": 1500,
+    "cases": 72,
+    "early": 6,
+    "late": 10,
+    "drift": 2.194162081486663,
+    "peak": 3.9958744734436316,
+    "pushfails": 3
+  },
+  {
+    "handoff_ms": 2000,
+    "cases": 72,
+    "early": 7,
+    "late": 10,
+    "drift": 2.1710221057968515,
+    "peak": 4.004026857756052,
+    "pushfails": 1
+  },
+  {
+    "handoff_ms": 3000,
+    "cases": 72,
+    "early": 8,
+    "late": 15,
+    "drift": 2.1287585474943076,
+    "peak": 4.14596368620448,
+    "pushfails": 2
+  }
+]

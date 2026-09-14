@@ -1,0 +1,18 @@
+[
+  {
+    "variant": "july33",
+    "cases": 72,
+    "standup_failures": 2,
+    "late_failures": 11,
+    "median_abs_drift_at_ramp": 2.32024232228309,
+    "median_peak_drift": 3.9522972133073067
+  },
+  {
+    "variant": "current",
+    "cases": 72,
+    "standup_failures": 3,
+    "late_failures": 18,
+    "median_abs_drift_at_ramp": 2.2483981517749054,
+    "median_peak_drift": 3.9326165054831494
+  }
+]

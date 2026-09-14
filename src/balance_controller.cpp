@@ -1,4 +1,6 @@
 #include "balance_controller.h"
+#include "balance_math.h"
+#include "telemetry_transport.h"
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <cmath>
@@ -191,34 +193,56 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
 }
 
 // ---------------------------------------------------------------------------
-// Complementary filter + PD balance (Core 0, 200Hz)
+// Complementary filter + PD balance (fast task, 200Hz)
 // ---------------------------------------------------------------------------
 
 void BalanceController::balanceTick(const RawImuData& imu, float dt) {
-    float filter_dt = (dt > 0.0f && dt <= 0.05f) ? dt : 0.005f;
-    float accel_angle = atan2f(imu.accel_y, imu.accel_z) * 57.2957795f;
-    float gyro_raw = imu.gyro_x;
-    _last_accel_angle = accel_angle;
-    _last_gyro_raw = gyro_raw;
-    _last_accel_norm = sqrtf(imu.accel_x * imu.accel_x
-                           + imu.accel_y * imu.accel_y
-                           + imu.accel_z * imu.accel_z);
+    const uint32_t now_us = micros();
+    const uint32_t age_us = imu.valid ? now_us - imu.sample_us : UINT32_MAX;
+    const bool healthy = imu.valid
+        && balance_math::fresh(now_us, imu.sample_us, BALANCE_IMU_STALE_US)
+        && balance_math::finiteImu(imu.accel_x, imu.accel_y, imu.accel_z,
+                                   imu.gyro_x, imu.gyro_y, imu.gyro_z);
+    const bool missed_deadline = _filter_initialized
+        && uint32_t(now_us - _last_imu_sample_us) > BALANCE_IMU_STALE_US;
+    if (!healthy || missed_deadline) {
+        _imu_healthy_since_ms = 0;
+        if (isControllingDrive()) _inner_fault |= BAL_DIAG_IMU_STALE;
+    }
+    if (healthy && !_imu_healthy_since_ms) _imu_healthy_since_ms = millis();
 
-    uint32_t dt_us_32 = static_cast<uint32_t>(dt * 1000000.0f + 0.5f);
-    uint16_t dt_us = clampU16(dt_us_32);
+    const uint32_t dt_us_32 = (std::isfinite(dt) && dt > 0.0f)
+                           ? static_cast<uint32_t>(fminf(dt * 1000000.0f, 65535.0f)) : 65535;
     portENTER_CRITICAL(&_telemetry_mux);
-    if (dt_us > _inner_dt_max_us) _inner_dt_max_us = dt_us;
+    if (dt_us_32 > _inner_dt_max_us) _inner_dt_max_us = dt_us_32;
     if (_inner_ticks < 0xFF) _inner_ticks++;
+    const uint8_t age_ms = age_us / 1000 > 255 ? 255 : age_us / 1000;
+    if (age_ms > _imu_age_max_ms) _imu_age_max_ms = age_ms;
+    _inner_diag_window |= _inner_fault;
     portEXIT_CRITICAL(&_telemetry_mux);
 
-    if (!_filter_initialized) {
-        _tilt_angle = accel_angle;
-        _gyro_rate = gyro_raw;
-        _filter_initialized = true;
-    } else {
-        _tilt_angle = COMPLEMENTARY_ALPHA * (_tilt_angle + gyro_raw * filter_dt)
-                    + (1.0f - COMPLEMENTARY_ALPHA) * accel_angle;
-        _gyro_rate = 0.08f * gyro_raw + 0.92f * _gyro_rate;
+    // Integrate each sensor sample ONCE. Reusing a frozen gyro at 200Hz
+    // fabricates rotation when the sensor or its producer stops updating.
+    if (healthy && (!_filter_initialized || imu.sample_us != _last_imu_sample_us)) {
+        const float accel_angle = atan2f(imu.accel_y, imu.accel_z) * 57.2957795f;
+        const float gyro_raw = imu.gyro_x;
+        _last_accel_angle = accel_angle;
+        _last_gyro_raw = gyro_raw;
+        _last_accel_norm = sqrtf(imu.accel_x * imu.accel_x
+                             + imu.accel_y * imu.accel_y + imu.accel_z * imu.accel_z);
+        if (!_filter_initialized || missed_deadline) {
+            _tilt_angle = accel_angle;
+            _gyro_rate = gyro_raw;
+            _filter_initialized = true;
+        } else {
+            const float sensor_dt = uint32_t(imu.sample_us - _last_imu_sample_us) * 1e-6f;
+            const float alpha = powf(COMPLEMENTARY_ALPHA, sensor_dt * BALANCE_LOOP_HZ);
+            const float gyro_alpha = powf(0.92f, sensor_dt * BALANCE_LOOP_HZ);
+            _tilt_angle = alpha * (_tilt_angle + gyro_raw * sensor_dt)
+                        + (1.0f - alpha) * accel_angle;
+            _gyro_rate = (1.0f - gyro_alpha) * gyro_raw + gyro_alpha * _gyro_rate;
+        }
+        _last_imu_sample_us = imu.sample_us;
     }
 
     if (_state != BalanceState::Balancing || !_targets_initialized) {
@@ -227,15 +251,19 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         return;
     }
 
-    // Two-stage dead-man for Core 1 stalls. Stage 1: the inner PD keeps
+    // Two-stage dead-man for control task stalls. Stage 1: the inner PD keeps
     // balancing on the stale setpoint but with clamped wheel authority (no
     // runaway possible, balance survives sub-second stalls -- run 173619
     // fell because v1 stopped the wheels outright). Stage 2: a long stall
     // means no safety monitors and no RC control; stop the wheels.
     uint32_t update_age = millis() - _last_update_ms;
     _last_update_age_ms = clampU16(update_age);
-    if (update_age > BALANCE_DEADMAN_HARD_MS) {
-        _last_inner_diag = BAL_DIAG_DEADMAN_HARD;
+    if (update_age > BALANCE_DEADMAN_HARD_MS) _inner_fault |= BAL_DIAG_DEADMAN_HARD;
+    if (_inner_fault) {
+        _last_inner_diag = _inner_fault;
+        portENTER_CRITICAL(&_telemetry_mux);
+        _inner_diag_window |= _inner_fault;
+        portEXIT_CRITICAL(&_telemetry_mux);
         _last_motor_vel_raw = 0.0f;
         _last_motor_vel = 0.0f;
         _last_cmd_left = 0.0f;
@@ -266,16 +294,18 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         portEXIT_CRITICAL(&_telemetry_mux);
     }
 
-    float yaw_corr = _yaw_corr;
-    float cmd_left = motor_vel - yaw_corr;
-    float cmd_right = motor_vel + yaw_corr;
+    const auto commands = balance_math::mix(motor_vel, _yaw_corr, cmd_max);
+    float cmd_left = commands.left;
+    float cmd_right = commands.right;
+    if (commands.yaw != (float)_yaw_corr) inner_diag |= BAL_DIAG_YAW_CLAMPED;
 
     if (_motors->isDriveArmed()) {
         // Back wheels in Speed mode: motor_vel IS the wheel velocity command.
-        // Yaw sync (computed at 50Hz on Core 1) keeps the independent speed
+        // Yaw sync (computed at 50Hz on control task) keeps the independent speed
         // loops from integrating into heading drift.
-        _motors->sendDriveSpeed(MotorRole::BackLeft,  cmd_left);
-        _motors->sendDriveSpeed(MotorRole::BackRight, cmd_right);
+        bool sent_l = _motors->sendDriveSpeed(MotorRole::BackLeft, cmd_left);
+        bool sent_r = _motors->sendDriveSpeed(MotorRole::BackRight, cmd_right);
+        if (!sent_l || !sent_r) inner_diag |= BAL_DIAG_CAN_TX_FAILED;
 
         // Front wheels stay in CSP holding their engage position.
         _motors->sendDrivePosition(MotorRole::FrontLeft,  _front_left_hold,  0.0f);
@@ -288,13 +318,51 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     _last_cmd_left = cmd_left;
     _last_cmd_right = cmd_right;
     _last_inner_diag = inner_diag;
+    portENTER_CRITICAL(&_telemetry_mux);
+    _inner_diag_window |= inner_diag;
+    portEXIT_CRITICAL(&_telemetry_mux);
 }
 
 // ---------------------------------------------------------------------------
-// State transitions (Core 1 only)
+// State transitions (control task only)
 // ---------------------------------------------------------------------------
 
+bool BalanceController::readyToStart() const {
+    if (!_motors || !_arms || !_settings || _state != BalanceState::Idle
+        || !_motors->isDriveArmed() || !_motors->isArmArmed()
+        || !_arms->getCalibration().calibrated || !_filter_initialized
+        || !std::isfinite(_settings->settings.balance_trim)
+        || !std::isfinite((float)_kp) || _kp <= 0 || _kp > 5
+        || !std::isfinite((float)_kd) || _kd < 0 || _kd > 1
+        || !std::isfinite(_drift_vel_kp) || _drift_vel_kp < 0 || _drift_vel_kp > 0.5f
+        || !std::isfinite(_vel_sp_kp) || _vel_sp_kp < 0 || _vel_sp_kp > 5
+        || !std::isfinite(_vel_sp_ki) || _vel_sp_ki < 0 || _vel_sp_ki > 2
+        || !_imu_healthy_since_ms
+        || millis() - _imu_healthy_since_ms < BALANCE_IMU_READY_MS
+        || !balance_math::fresh(micros(), _last_imu_sample_us, BALANCE_IMU_STALE_US)) return false;
+    for (int i = 0; i < _motors->motorCount(); ++i) {
+        const auto& m = _motors->getMotor(i);
+        if (!m.online || !m.enabled || m.has_fault || m.errors
+            || millis() - m.last_feedback_ms > BALANCE_FEEDBACK_STALE_MS) return false;
+    }
+    return true;
+}
+
+bool BalanceController::armsAtGoal(float left, float right) const {
+    const auto& l = _motors->getMotor(MotorRole::ArmLeft);
+    const auto& r = _motors->getMotor(MotorRole::ArmRight);
+    return l.online && r.online && !l.errors && !r.errors
+        && millis() - l.last_feedback_ms <= BALANCE_FEEDBACK_STALE_MS
+        && millis() - r.last_feedback_ms <= BALANCE_FEEDBACK_STALE_MS
+        && fabsf(l.position - left) <= BALANCE_ARM_REACHED_RAD
+        && fabsf(r.position - right) <= BALANCE_ARM_REACHED_RAD;
+}
+
 void BalanceController::enterTippingUp() {
+    if (!readyToStart()) {
+        Serial.println("[Balance] Tip-up REFUSED: check calibration, armed motors, faults and fresh IMU/feedback");
+        return;
+    }
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) {
         Serial.println("[Balance] Tip-up REFUSED: telemetry is not ready (wait for idle save)");
         return;
@@ -302,7 +370,7 @@ void BalanceController::enterTippingUp() {
 
     // Switch the back wheels CSP -> Speed BEFORE anything moves. The robot
     // is static on all fours, so the blocking delays and verified param
-    // writes (0.4-7.3s of Core 1 stall in every logged run when this
+    // writes (0.4-7.3s of control task stall in every logged run when this
     // happened at engage) cost nothing here -- and a failed switch aborts
     // a standup that never started instead of hard-aborting a robot that
     // is already up on its arms. At 0 rad/s the velocity servo holds the
@@ -351,7 +419,7 @@ void BalanceController::enterTippingUp() {
 
 void BalanceController::enterBalancing(float current_roll) {
     _state = BalanceState::Balancing;
-    _targets_initialized = false;   // gate Core 0 until Speed mode is ready
+    _targets_initialized = false;   // gate fast task until Speed mode is ready
 
     float scheduled_sp = computeScheduledSetpoint();
     _engage_arm_frac = computeArmFraction();
@@ -385,6 +453,8 @@ void BalanceController::enterBalancing(float current_roll) {
     _arms_returned    = false;
     _ramp_complete    = false;
     _balance_start_ms = millis();
+    _qualified_trim_ms = 0;
+    _trim_calm_since_ms = 0;
     _capture_stable   = false;
     _capture_stable_start_ms = 0;
 
@@ -424,7 +494,7 @@ void BalanceController::enterBalancing(float current_roll) {
         return;
     }
     _speed_mode_active = true;
-    _targets_initialized = true;    // Core 0 may now send speed commands
+    _targets_initialized = true;    // fast task may now send speed commands
 
     Serial.printf("[Balance] BALANCING @200Hz (Speed mode)  Kp=%.3f Kd=%.4f  tilt=%.1f  base=%.1f  capture=%.2f  eff=%.1f\n",
                   (float)_kp, (float)_kd, (float)_tilt_angle,
@@ -441,7 +511,9 @@ void BalanceController::persistLearnedTrim() {
 
     // The run's full equilibrium estimate = trim baked in at engage + the
     // capture-measured curve shift + the residual the integrator learned.
-    float learned = _engage_trim + _run_curve_shift + _vel_sp_integral;
+    // Save a recently qualified calm estimate, never the final shove/fall.
+    if (!_qualified_trim_ms || millis() - _qualified_trim_ms > 10000) return;
+    float learned = _qualified_trim;
     float old_trim = _settings->settings.balance_trim;
     float blended = old_trim + BALANCE_TRIM_BLEND * (learned - old_trim);
     if (fabsf(blended - old_trim) < BALANCE_TRIM_SAVE_DELTA_DEG) return;
@@ -457,8 +529,10 @@ void BalanceController::persistLearnedTrim() {
 
 void BalanceController::enterReturningArms(const char* reason) {
     persistLearnedTrim();
+    stopLog(reason);  // freeze run time before any blocking mode restoration
     _state = BalanceState::ReturningArms;
     _targets_initialized = false;
+    _arm_return_start_ms = millis();
     exitSpeedMode();
 
     _arm_left_goal  = _arms->getForwardLeft();
@@ -472,7 +546,7 @@ void BalanceController::enterReturningArms(const char* reason) {
 
 // Zero the wheels and restore CSP position mode. Idempotent -- safe to call
 // from any exit path, in any order, any number of times. Must be called with
-// _targets_initialized already false (or _state != Balancing) so Core 0 is no
+// _targets_initialized already false (or _state != Balancing) so fast task is no
 // longer sending speed commands.
 void BalanceController::exitSpeedMode() {
     if (!_speed_mode_active) return;
@@ -492,9 +566,8 @@ void BalanceController::exitSpeedMode() {
 }
 
 void BalanceController::forceEngage() {
-    if (!_motors || !_arms) return;
-    if (!_motors->isDriveArmed()) {
-        Serial.println("[Balance] Cannot engage -- drive not armed");
+    if (!readyToStart()) {
+        Serial.println("[Balance] Cannot engage -- require idle, calibration, armed healthy motors and fresh IMU");
         return;
     }
     float tilt = _filter_initialized ? (float)_tilt_angle : 0.0f;
@@ -516,11 +589,11 @@ void BalanceController::hardAbort(const char* reason) {
     // even if it ended in a fall -- keep the knowledge.
     persistLearnedTrim();
 
+    stopLog(reason);
     _state = BalanceState::Idle;
     _targets_initialized = false;
     exitSpeedMode();
     if (_arms) _arms->clearOverride();
-    stopLog(reason);
 
     const char* prev_str = (prev == BalanceState::Balancing) ? "BALANCE" :
                            (prev == BalanceState::TippingUp) ? "TIP_UP" : "RET_ARMS";
@@ -555,7 +628,7 @@ void BalanceController::resetSafetyTimers() {
 }
 
 // ---------------------------------------------------------------------------
-// State machine + outer loops (Core 1, 50Hz)
+// State machine + outer loops (control task, 50Hz)
 // ---------------------------------------------------------------------------
 
 void BalanceController::update(float roll_deg, float roll_rate_dps,
@@ -564,7 +637,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
     {
         uint32_t now0 = millis();
         if (_last_update_ms != 0 && now0 - _last_update_ms > 200) {
-            _loop_wake_ms = now0;   // just woke from a Core 1 stall
+            _loop_wake_ms = now0;   // just woke from a control task stall
         }
         _last_update_ms = now0;
     }
@@ -574,6 +647,19 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
     if (_logging && (millis() - _log_start_ms >= BALANCE_LOG_DURATION_MS)) {
         stopLog("duration_limit");
+    }
+
+    // This also runs if the fast task is blocked inside a sensor read.
+    // A stopped producer cannot diagnose itself until it wakes.
+    if (isControllingDrive()
+        && !balance_math::fresh(micros(), _last_imu_sample_us, BALANCE_IMU_STALE_US)) {
+        _inner_fault |= BAL_DIAG_IMU_STALE;
+    }
+    if (isControllingDrive() && _inner_fault) {
+        _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
+        logSample(tilt, rate);
+        hardAbort((_inner_fault & BAL_DIAG_IMU_STALE) ? "IMU stale or invalid" : "control deadman hard stop");
+        return;
     }
 
     if (!ch7_active) {
@@ -631,7 +717,14 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
         float arm_err_l = fabsf(_arm_left_target - _arm_tip_left_goal);
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
-        bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f);
+        bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f)
+                      && armsAtGoal(_arm_tip_left_goal, _arm_tip_right_goal);
+        if (now_tip - _log_start_ms > BALANCE_TIP_TIMEOUT_MS) {
+            _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
+            logSample(tilt, rate);
+            hardAbort("tip-up timeout / arm tracking");
+            return;
+        }
 
         float tip_expected = BALANCE_SETPOINT_ARMS_TIP;
         float tip_error = fabsf(tip_expected - tilt);
@@ -676,8 +769,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // Stale wheel feedback = CAN bus trouble. Balancing blind in Speed
         // mode is how wheels end up spinning into a fall -- abort instead.
         // (Healthy feedback cadence is ~160 ms per motor from the scan cycle.)
-        // Grace window after a Core 1 stall: feedback timestamps are updated
-        // by Core 1 itself, so a loop stall is indistinguishable from dead
+        // Grace window after a control task stall: feedback timestamps are updated
+        // by control task itself, so a loop stall is indistinguishable from dead
         // CAN until processFeedback has had a moment to refresh (a 449ms
         // stall triggered a spurious abort mid-recovery, run 222223).
         bool stale_grace = (now - _loop_wake_ms) < 500 && _loop_wake_ms != 0;
@@ -850,6 +943,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
         if (!_arms_returning && (capture_settled || hold_timed_out)) {
             _arms_returning = true;
+            _arm_return_start_ms = now;
             // The forward reference IS the standing top-dead-center pose --
             // the return delivers the assist's neutral stance directly.
             _arm_left_goal  = _arms->getForwardLeft();
@@ -909,12 +1003,21 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             if (!_arms_returned) {
                 float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
                 float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
-                if (arm_err_l < 0.08f && arm_err_r < 0.08f) {
+                if (arm_err_l < 0.08f && arm_err_r < 0.08f
+                    && armsAtGoal(_arm_left_goal, _arm_right_goal)) {
                     _arms_returned = true;
                     Serial.printf("[Balance] Arms returned (drift=%.2f, base_sp=%.1f)\n",
                                   meas_drift, _smoothed_base_sp);
                 }
             }
+        }
+
+        if (_arms_returning && !_arms_returned
+            && now - _arm_return_start_ms > BALANCE_RETURN_TIMEOUT_MS) {
+            _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
+            logSample(tilt, rate);
+            hardAbort("arm return timeout / tracking");
+            return;
         }
 
         // ---------------------------------------------------------------
@@ -1191,6 +1294,21 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         armAxisFractions(tip_frac, center_frac);
         _last_arm_tip_frac = tip_frac;
 
+        const bool trim_calm = _ramp_complete && _arm_stage == 0
+            && fabsf(meas_vel) < 0.8f && fabsf(rate) < 4.0f
+            && fabsf((float)_last_angle_err) < 1.0f && abs_cmd < 2.0f
+            && fabsf(_arm_assist_frac) < 0.05f && !_last_outer_diag && !_last_inner_diag;
+        if (trim_calm) {
+            if (!_trim_calm_since_ms) _trim_calm_since_ms = now;
+            if (now - _trim_calm_since_ms >= 1000) {
+                _qualified_trim = clampf(_engage_trim + _run_curve_shift + _vel_sp_integral,
+                                         -BALANCE_SP_OFFSET_MAX_DEG, BALANCE_SP_OFFSET_MAX_DEG);
+                _qualified_trim_ms = now;
+            }
+        } else {
+            _trim_calm_since_ms = 0;
+        }
+
         _last_flags = (_safe_err_timing ? 0x02 : 0)
                     | (_safe_rate_timing ? 0x04 : 0)
                     | (_safe_sat_timing ? 0x08 : 0)
@@ -1209,10 +1327,13 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
         float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
         float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
-        if (arm_err_l < 0.05f && arm_err_r < 0.05f) {
+        if (arm_err_l < 0.05f && arm_err_r < 0.05f
+            && armsAtGoal(_arm_left_goal, _arm_right_goal)) {
             _state = BalanceState::Idle;
             _arms->clearOverride();
             Serial.println("[Balance] Arms returned -> Idle");
+        } else if (millis() - _arm_return_start_ms > BALANCE_RETURN_TIMEOUT_MS) {
+            hardAbort("return to idle timeout");
         }
         break;
     }
@@ -1228,6 +1349,7 @@ bool BalanceController::startLog() {
     if (_logging) return true;
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) return false;
 
+    _inner_fault = 0;
     _log_count = 0;
     _log_saved = false;
     _log_start_ms = millis();
@@ -1277,6 +1399,8 @@ bool BalanceController::startLog() {
     _inner_dt_max_us = 0;
     _inner_ticks = 0;
     _inner_sat_ticks = 0;
+    _imu_age_max_ms = 0;
+    _inner_diag_window = 0;
     portEXIT_CRITICAL(&_telemetry_mux);
     _last_flags = 0;
 
@@ -1354,10 +1478,16 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     uint16_t inner_dt_max_us;
     uint8_t inner_ticks;
     uint8_t inner_sat_ticks;
+    uint8_t imu_age_ms;
+    uint16_t inner_diag;
     portENTER_CRITICAL(&_telemetry_mux);
     inner_dt_max_us = _inner_dt_max_us;
     inner_ticks = _inner_ticks;
     inner_sat_ticks = _inner_sat_ticks;
+    imu_age_ms = _imu_age_max_ms;
+    inner_diag = _inner_diag_window;
+    _imu_age_max_ms = 0;
+    _inner_diag_window = 0;
     _inner_dt_max_us = 0;
     _inner_ticks = 0;
     _inner_sat_ticks = 0;
@@ -1371,13 +1501,13 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.feedback_age_r_ms = clampU16(now - br.last_feedback_ms);
     s.update_age_ms  = _last_update_age_ms;
     s.marker         = _marker_count;
-    s.diag_flags     = _last_inner_diag | _last_outer_diag;
+    s.diag_flags     = inner_diag | _last_inner_diag | _last_outer_diag;
     s.state          = static_cast<uint8_t>(_state);
     s.flags          = _last_flags;
     s.arm_stage      = _arm_stage;
     s.inner_ticks    = inner_ticks;
     s.inner_sat_ticks = inner_sat_ticks;
-    s.reserved       = 0;
+    s.imu_age_ms     = imu_age_ms;
     s.roll           = roll_deg;
     s.roll_rate      = roll_rate_dps;
     s.accel_angle    = _last_accel_angle;
@@ -1453,6 +1583,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
+    header.reserved = 1;  // v2 extension: IMU age in formerly reserved sample byte
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1507,7 +1638,8 @@ void BalanceController::flushLogToFile() {
 
 void BalanceController::serviceLog() {
     if ((!_log_pending_flush && !_trim_save_pending)
-        || _log_flush_in_progress || _logging || isActive()) return;
+        || _log_flush_in_progress || _logging || isActive()
+        || _motors->isDriveArmed() || _motors->isArmArmed() || _motors->isArming()) return;
     uint32_t now = millis();
     if (_last_log_flush_attempt_ms != 0 && now - _last_log_flush_attempt_ms < 5000) return;
     _last_log_flush_attempt_ms = now;
@@ -1539,7 +1671,7 @@ void BalanceController::markEvent() {
 }
 
 void BalanceController::dumpLog() {
-    if (isActive() || _logging) {
+    if (isActive() || _logging || _motors->isDriveArmed() || _motors->isArmArmed() || _motors->isArming()) {
         Serial.println("[Balance] Log dump REFUSED while balance mode is active");
         return;
     }
@@ -1550,20 +1682,21 @@ void BalanceController::dumpLog() {
         return;
     }
 
+    TelemetryTransport out;
     File f = LittleFS.open(BALANCE_LOG_PATH, "r");
     if (!f) {
         // Preserve access to a pre-v2 CSV that survived a firmware-only flash.
         File legacy = LittleFS.open(BALANCE_LEGACY_LOG_PATH, "r");
         if (!legacy) {
-            Serial.println("[Balance] No log file found");
+            out.println("[Balance] No log file found");
             return;
         }
-        Serial.printf("[Balance] --- Log dump (%u bytes, legacy schema) ---\n", legacy.size());
-        Serial.println("# telemetry_schema=1");
-        Serial.println("# legacy_file=1");
-        while (legacy.available()) Serial.write(legacy.read());
+        out.printf("[Balance] --- Log dump (%u bytes, legacy schema) ---\n", legacy.size());
+        out.println("# telemetry_schema=1");
+        out.println("# legacy_file=1");
+        while (legacy.available()) out.write(legacy.read());
         legacy.close();
-        Serial.println("[Balance] --- End of log ---");
+        out.println("[Balance] --- End of log ---");
         return;
     }
 
@@ -1574,7 +1707,7 @@ void BalanceController::dumpLog() {
         || header.header_size != sizeof(BalanceLogFileHeader)
         || header.sample_size != sizeof(BalanceSample)
         || header.sample_count > BALANCE_LOG_MAX_SAMPLES) {
-        Serial.println("[Balance] Telemetry file is invalid or uses an unsupported schema");
+        out.println("[Balance] Telemetry file is invalid or uses an unsupported schema");
         f.close();
         return;
     }
@@ -1593,116 +1726,126 @@ void BalanceController::dumpLog() {
     bool checksum_valid = remaining == 0 && checksum == header.checksum
                        && f.size() == expected_size;
 
-    Serial.printf("[Balance] --- Log dump (%u bytes, %lu samples) ---\n",
+    out.printf("[Balance] --- Log dump (%u bytes, %lu samples) ---\n",
                   f.size(), (unsigned long)header.sample_count);
 
-    Serial.println("# === BALANCE CONFIG ===");
-    Serial.printf("# telemetry_schema=%u\n", header.schema_version);
-    Serial.printf("# sample_size_bytes=%u\n", header.sample_size);
-    Serial.printf("# sample_count=%lu\n", (unsigned long)header.sample_count);
-    Serial.printf("# checksum=0x%08lX\n", (unsigned long)header.checksum);
-    Serial.printf("# checksum_valid=%d\n", checksum_valid ? 1 : 0);
-    Serial.printf("# build_date=%s\n", header.build_date);
-    Serial.printf("# build_time=%s\n", header.build_time);
-    Serial.printf("# run_start_uptime_ms=%lu\n", (unsigned long)header.start_uptime_ms);
-    Serial.printf("# run_end_uptime_ms=%lu\n", (unsigned long)header.end_uptime_ms);
-    Serial.printf("# run_duration_ms=%lu\n",
+    out.resetChecksum();
+    out.println("# === BALANCE CONFIG ===");
+    out.println("# transport_checksum=fnv1a32");
+    out.printf("# telemetry_features=%u\n", header.reserved);
+    out.printf("# telemetry_schema=%u\n", header.schema_version);
+    out.printf("# sample_size_bytes=%u\n", header.sample_size);
+    out.printf("# sample_count=%lu\n", (unsigned long)header.sample_count);
+    out.printf("# checksum=0x%08lX\n", (unsigned long)header.checksum);
+    out.printf("# checksum_valid=%d\n", checksum_valid ? 1 : 0);
+    out.printf("# build_date=%s\n", header.build_date);
+    out.printf("# build_time=%s\n", header.build_time);
+    out.printf("# run_start_uptime_ms=%lu\n", (unsigned long)header.start_uptime_ms);
+    out.printf("# run_end_uptime_ms=%lu\n", (unsigned long)header.end_uptime_ms);
+    out.printf("# run_duration_ms=%lu\n",
                   (unsigned long)(header.end_uptime_ms - header.start_uptime_ms));
-    Serial.printf("# end_reason=%s\n", header.end_reason[0] ? header.end_reason : "unknown");
-    Serial.printf("# test_note=%s\n", header.test_note[0] ? header.test_note : "none");
-    Serial.println("# motor_mode=speed");
+    out.printf("# end_reason=%s\n", header.end_reason[0] ? header.end_reason : "unknown");
+    out.printf("# test_note=%s\n", header.test_note[0] ? header.test_note : "none");
+    out.println("# motor_mode=speed");
     const BalanceLogConfigSnapshot& c = header.config;
-    Serial.printf("# inner_kp=%.4f\n", c.inner_kp);
-    Serial.printf("# inner_kd=%.4f\n", c.inner_kd);
-    Serial.printf("# drift_vel_kp=%.4f\n", c.drift_vel_kp);
-    Serial.printf("# drift_max_vel=%.2f\n", c.drift_max_vel);
-    Serial.printf("# ramp_drift_kp=%.4f\n", c.ramp_drift_kp);
-    Serial.printf("# ramp_drift_max_vel=%.2f\n", c.ramp_drift_max_vel);
-    Serial.printf("# vel_sp_kp=%.4f\n", c.vel_sp_kp);
-    Serial.printf("# vel_sp_kp_low=%.4f\n", c.vel_sp_kp_low);
-    Serial.printf("# vel_sp_knee=%.4f\n", c.vel_sp_knee);
-    Serial.printf("# vel_sp_ki=%.4f\n", c.vel_sp_ki);
-    Serial.printf("# sp_offset_max=%.2f\n", c.sp_offset_max);
-    Serial.printf("# ramp_sp_offset_max=%.2f\n", c.ramp_sp_offset_max);
-    Serial.printf("# sp_offset_rate=%.2f\n", c.sp_offset_rate);
-    Serial.printf("# vel_filter_alpha=%.4f\n", c.vel_filter_alpha);
-    Serial.printf("# stored_trim=%.4f\n", c.stored_trim);
-    Serial.printf("# glide_vel_err=%.2f\n", c.glide_vel_err);
-    Serial.printf("# glide_ki_boost=%.2f\n", c.glide_ki_boost);
-    Serial.printf("# speed_acc_rad=%.2f\n", c.speed_acc_rad);
-    Serial.printf("# speed_current_limit=%.2f\n", c.speed_current_limit);
+    out.printf("# inner_kp=%.4f\n", c.inner_kp);
+    out.printf("# inner_kd=%.4f\n", c.inner_kd);
+    out.printf("# drift_vel_kp=%.4f\n", c.drift_vel_kp);
+    out.printf("# drift_max_vel=%.2f\n", c.drift_max_vel);
+    out.printf("# ramp_drift_kp=%.4f\n", c.ramp_drift_kp);
+    out.printf("# ramp_drift_max_vel=%.2f\n", c.ramp_drift_max_vel);
+    out.printf("# vel_sp_kp=%.4f\n", c.vel_sp_kp);
+    out.printf("# vel_sp_kp_low=%.4f\n", c.vel_sp_kp_low);
+    out.printf("# vel_sp_knee=%.4f\n", c.vel_sp_knee);
+    out.printf("# vel_sp_ki=%.4f\n", c.vel_sp_ki);
+    out.printf("# sp_offset_max=%.2f\n", c.sp_offset_max);
+    out.printf("# ramp_sp_offset_max=%.2f\n", c.ramp_sp_offset_max);
+    out.printf("# sp_offset_rate=%.2f\n", c.sp_offset_rate);
+    out.printf("# vel_filter_alpha=%.4f\n", c.vel_filter_alpha);
+    out.printf("# stored_trim=%.4f\n", c.stored_trim);
+    out.printf("# glide_vel_err=%.2f\n", c.glide_vel_err);
+    out.printf("# glide_ki_boost=%.2f\n", c.glide_ki_boost);
+    out.printf("# speed_acc_rad=%.2f\n", c.speed_acc_rad);
+    out.printf("# speed_current_limit=%.2f\n", c.speed_current_limit);
     for (int i = 0; i < c.curve_len; i++) {
-        Serial.printf("# sp_curve_%d=%.2f:%.2f\n", i,
+        out.printf("# sp_curve_%d=%.2f:%.2f\n", i,
                       c.curve_frac[i], c.curve_sp[i]);
     }
-    Serial.printf("# base_sp_fwd=%.2f\n", c.base_sp_fwd);
-    Serial.printf("# base_sp_tip=%.2f\n", c.base_sp_tip);
-    Serial.printf("# base_sp_center=%.2f\n", c.base_sp_center);
-    Serial.printf("# base_sp_rate_max=%.2f\n", c.base_sp_rate_max);
-    Serial.printf("# ramp_vel_slow=%.2f\n", c.ramp_vel_slow);
-    Serial.printf("# comp_alpha=%.4f\n", c.comp_alpha);
-    Serial.printf("# max_drive_speed=%.2f\n", c.max_drive_speed);
-    Serial.printf("# capture_settle_ms=%lu\n", (unsigned long)c.capture_settle_ms);
-    Serial.printf("# arm_hold_max_ms=%lu\n", (unsigned long)c.arm_hold_max_ms);
-    Serial.printf("# arm_return_speed=%.2f\n", c.arm_return_speed);
-    Serial.printf("# arm_assist_thresh=%.2f\n", c.arm_assist_thresh);
-    Serial.printf("# arm_assist_gain=%.2f\n", c.arm_assist_gain);
-    Serial.printf("# arm_range_pos=%.2f\n", c.arm_range_pos);
-    Serial.printf("# arm_range_neg=%.2f\n", c.arm_range_neg);
-    Serial.printf("# arm_tau_in=%.3f\n", c.arm_tau_in);
-    Serial.printf("# arm_tau_out=%.3f\n", c.arm_tau_out);
-    Serial.printf("# arm_emergency_cmd_frac=%.2f\n", c.arm_emergency_cmd_frac);
-    Serial.printf("# yaw_sync_kp=%.2f\n", c.yaw_sync_kp);
-    Serial.printf("# yaw_sync_max=%.2f\n", c.yaw_sync_max);
-    Serial.printf("# log_duration_ms=%lu\n", (unsigned long)c.log_duration_ms);
-    Serial.printf("# balance_loop_hz=%u\n", c.balance_loop_hz);
-    Serial.printf("# control_loop_hz=%u\n", c.control_loop_hz);
-    Serial.printf("# pos_gate_err=%.2f\n", c.pos_gate_err);
-    Serial.printf("# shed_vel_start=%.2f\n", c.shed_vel_start);
-    Serial.printf("# shed_vel_full=%.2f\n", c.shed_vel_full);
+    out.printf("# base_sp_fwd=%.2f\n", c.base_sp_fwd);
+    out.printf("# base_sp_tip=%.2f\n", c.base_sp_tip);
+    out.printf("# base_sp_center=%.2f\n", c.base_sp_center);
+    out.printf("# base_sp_rate_max=%.2f\n", c.base_sp_rate_max);
+    out.printf("# ramp_vel_slow=%.2f\n", c.ramp_vel_slow);
+    out.printf("# comp_alpha=%.4f\n", c.comp_alpha);
+    out.printf("# max_drive_speed=%.2f\n", c.max_drive_speed);
+    out.printf("# capture_settle_ms=%lu\n", (unsigned long)c.capture_settle_ms);
+    out.printf("# arm_hold_max_ms=%lu\n", (unsigned long)c.arm_hold_max_ms);
+    out.printf("# arm_return_speed=%.2f\n", c.arm_return_speed);
+    out.printf("# arm_assist_thresh=%.2f\n", c.arm_assist_thresh);
+    out.printf("# arm_assist_gain=%.2f\n", c.arm_assist_gain);
+    out.printf("# arm_range_pos=%.2f\n", c.arm_range_pos);
+    out.printf("# arm_range_neg=%.2f\n", c.arm_range_neg);
+    out.printf("# arm_tau_in=%.3f\n", c.arm_tau_in);
+    out.printf("# arm_tau_out=%.3f\n", c.arm_tau_out);
+    out.printf("# arm_emergency_cmd_frac=%.2f\n", c.arm_emergency_cmd_frac);
+    out.printf("# yaw_sync_kp=%.2f\n", c.yaw_sync_kp);
+    out.printf("# yaw_sync_max=%.2f\n", c.yaw_sync_max);
+    out.printf("# log_duration_ms=%lu\n", (unsigned long)c.log_duration_ms);
+    out.printf("# balance_loop_hz=%u\n", c.balance_loop_hz);
+    out.printf("# control_loop_hz=%u\n", c.control_loop_hz);
+    out.printf("# pos_gate_err=%.2f\n", c.pos_gate_err);
+    out.printf("# shed_vel_start=%.2f\n", c.shed_vel_start);
+    out.printf("# shed_vel_full=%.2f\n", c.shed_vel_full);
 
+    if (!checksum_valid) { f.close(); return; }
     f.seek(sizeof(header));
-    Serial.println("t_ms,sample_dt_ms,inner_dt_max_us,inner_ticks,inner_sat_ticks,state,flags,diag_flags,marker,"
+    out.println("t_ms,sample_dt_ms,inner_dt_max_us,inner_ticks,inner_sat_ticks,state,flags,diag_flags,marker,"
                    "roll,roll_rate,accel_angle,gyro_raw,accel_norm,setpoint,angle_err,base_sp,raw_base_sp,"
                    "capture_shift,run_curve_shift,motor_vel_raw,motor_vel,cmd_left,cmd_right,sp_offset,"
                    "sp_offset_target,target_vel,filtered_vel,vel_err,vel_integral,vel_p_term,pos_gate,shed,"
                    "bl_pos,br_pos,bl_vel,br_vel,bl_torque,br_torque,feedback_age_l_ms,feedback_age_r_ms,"
                    "arm_l,arm_r,arm_l_tgt,arm_r_tgt,arm_l_vel,arm_r_vel,arm_l_torque,arm_r_torque,"
                    "arm_tip_frac,arm_assist_frac,arm_assist_vel,arm_demand,arm_calm_ms,arm_stage,"
-                   "meas_drift,meas_vel,yaw_diff,yaw_corr,update_age_ms,bus_voltage,total_current");
-    for (uint32_t i = 0; i < header.sample_count; i++) {
+                   "meas_drift,meas_vel,yaw_diff,yaw_corr,update_age_ms,bus_voltage,total_current,imu_age_ms");
+    for (uint32_t i = 0; i < header.sample_count && !out.failed(); i++) {
         BalanceSample s;
         if (f.read(reinterpret_cast<uint8_t*>(&s), sizeof(s)) != sizeof(s)) break;
-        Serial.printf("%lu,%u,%u,%u,%u,%u,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.4f,",
+        out.printf("%lu,%u,%u,%u,%u,%u,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.4f,",
                       (unsigned long)s.t_ms, s.sample_dt_ms, s.inner_dt_max_us,
                       s.inner_ticks, s.inner_sat_ticks, s.state, s.flags,
                       s.diag_flags, s.marker, s.roll, s.roll_rate,
                       s.accel_angle, s.gyro_raw, s.accel_norm);
-        Serial.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,",
+        out.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,",
                       s.setpoint, s.angle_err, s.base_sp, s.raw_base_sp,
                       s.capture_shift, s.run_curve_shift, s.motor_vel_raw,
                       s.motor_vel, s.cmd_left, s.cmd_right, s.sp_offset,
                       s.sp_offset_target, s.target_vel, s.filtered_vel,
                       s.vel_err, s.vel_integral, s.vel_p_term, s.pos_gate, s.shed);
-        Serial.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,",
+        out.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,",
                       s.bl_pos, s.br_pos, s.bl_vel, s.br_vel,
                       s.bl_torque, s.br_torque,
                       s.feedback_age_l_ms, s.feedback_age_r_ms);
-        Serial.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.4f,%.1f,%u,%.3f,%.3f,%.3f,%.3f,%u,%.2f,%.2f\n",
+        out.printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.4f,%.1f,%u,%.3f,%.3f,%.3f,%.3f,%u,%.2f,%.2f,",
                       s.arm_l, s.arm_r, s.arm_l_tgt, s.arm_r_tgt,
                       s.arm_l_vel, s.arm_r_vel, s.arm_l_torque, s.arm_r_torque,
                       s.arm_tip_frac, s.arm_assist_frac, s.arm_assist_vel,
                       s.arm_demand, s.arm_calm_ms, s.arm_stage,
                       s.meas_drift, s.meas_vel, s.yaw_diff, s.yaw_corr,
                       s.update_age_ms, s.bus_voltage, s.total_current);
+        if (header.reserved & 1) out.printf("%u", s.imu_age_ms);
+        out.println();
     }
     f.close();
-    Serial.println("[Balance] --- End of log ---");
+    if (out.failed()) return;
+    const uint32_t transfer_checksum = out.checksum();
+    out.printf("# transport_fnv1a=0x%08lX\n", (unsigned long)transfer_checksum);
+    out.println("[Balance] --- End of log ---");
 }
 
 void BalanceController::clearLog() {
-    if (isActive() || _logging || _log_flush_in_progress) {
-        Serial.println("[Balance] Log clear REFUSED while balance telemetry is active");
+    if (isActive() || _logging || _log_flush_in_progress
+        || _motors->isDriveArmed() || _motors->isArmArmed() || _motors->isArming()) {
+        Serial.println("[Balance] Log clear REFUSED: end balance and disarm drive AND arms first");
         return;
     }
     _log_count = 0;
@@ -1761,7 +1904,10 @@ void BalanceController::printStatus() {
                   _sp_offset, _vel_sp_integral, _last_target_vel, _filtered_wheel_vel);
     Serial.printf("  Stored trim: %.2f deg (persisted equilibrium estimate)\n",
                   _settings ? _settings->settings.balance_trim : 0.0f);
-    Serial.printf("  Balance loop: %d Hz (Core 0)\n", BALANCE_LOOP_HZ);
+    Serial.printf("  Balance loop: %d Hz (control core, direct IMU)\n", BALANCE_LOOP_HZ);
+    Serial.printf("  IMU age: %lu us, healthy since: %lu ms, latched fault: 0x%04X\n",
+                  (unsigned long)(micros() - _last_imu_sample_us),
+                  (unsigned long)_imu_healthy_since_ms, (unsigned)_inner_fault);
     Serial.printf("  Complementary filter: tilt=%.1f  gyro_rate=%.1f\n",
                   (float)_tilt_angle, (float)_gyro_rate);
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);

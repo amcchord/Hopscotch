@@ -7,6 +7,14 @@ LOG_DIR="$PROJECT_DIR/telemetry_logs"
 
 mkdir -p "$LOG_DIR"
 
+PYTHON_BIN=python3
+for candidate in "$PROJECT_DIR/.venv/bin/python" "$PROJECT_DIR/.venv-pio/bin/python"; do
+    if [ -x "$candidate" ] && "$candidate" -c 'import serial' 2>/dev/null; then
+        PYTHON_BIN="$candidate"
+        break
+    fi
+done
+
 PORT=""
 LABEL=""
 TIMEOUT_SEC=240
@@ -62,7 +70,7 @@ OUT_TMP=$(mktemp "$LOG_DIR/.bal_download.XXXXXX")
 trap 'rm -f "$RAW_TMP" "$OUT_TMP"' EXIT
 
 echo "Downloading telemetry from $PORT..."
-python3 - "$PORT" "$RAW_TMP" "$TIMEOUT_SEC" <<'PY'
+if ! "$PYTHON_BIN" - "$PORT" "$RAW_TMP" "$TIMEOUT_SEC" <<'PY'
 import serial, time, sys
 
 device, output, timeout_text = sys.argv[1:4]
@@ -82,22 +90,29 @@ while time.time() < deadline:
     if not raw:
         continue
     line = raw.decode('utf-8', errors='replace').rstrip()
-    lines.append(line)
+    lines.append(raw)
+    if 'REFUSED' in line or 'No log file' in line or 'unsupported schema' in line:
+        print(line, file=sys.stderr)
+        break
     if 'End of log' in line:
         complete = True
         break
 
 port.close()
 
-with open(output, 'w') as f:
-    for l in lines:
-        f.write(l + '\n')
+with open(output, 'wb') as f:
+    f.write(b''.join(lines))
 
 print(f'Received {len(lines)} raw lines')
 if not complete:
     print(f'ERROR: log transfer did not complete within {timeout:g}s', file=sys.stderr)
     raise SystemExit(3)
 PY
+then
+    mv "$RAW_TMP" "${OUTFILE%.csv}.failed.serial"
+    echo "Raw interrupted transfer retained: ${OUTFILE%.csv}.failed.serial"
+    exit 1
+fi
 
 if [ ! -s "$RAW_TMP" ]; then
     echo "ERROR: No data received from device"
@@ -109,29 +124,17 @@ if grep -q 'REFUSED while balance mode is active' "$RAW_TMP"; then
     exit 1
 fi
 
-grep -E '^(#|t_ms,|[0-9]+,)' "$RAW_TMP" > "$OUT_TMP" || true
-
+if ! "$PYTHON_BIN" "$SCRIPT_DIR/validate_telemetry.py" "$RAW_TMP" "$OUT_TMP"; then
+    mv "$RAW_TMP" "${OUTFILE%.csv}.failed.serial"
+    echo "Raw failed transfer retained: ${OUTFILE%.csv}.failed.serial"
+    exit 1
+fi
 SAMPLE_COUNT=$(grep -cE '^[0-9]+,' "$OUT_TMP" || true)
-EXPECTED_COUNT=$(sed -n 's/^# sample_count=//p' "$OUT_TMP" | tail -n 1)
 SCHEMA=$(sed -n 's/^# telemetry_schema=//p' "$OUT_TMP" | tail -n 1)
 CHECKSUM_VALID=$(sed -n 's/^# checksum_valid=//p' "$OUT_TMP" | tail -n 1)
 
-if [ "$SAMPLE_COUNT" -eq 0 ] || ! grep -q '^t_ms,' "$OUT_TMP"; then
-    echo "ERROR: Download contained no parseable telemetry samples"
-    exit 1
-fi
-
-if [ -n "$EXPECTED_COUNT" ] && [ "$SAMPLE_COUNT" -ne "$EXPECTED_COUNT" ]; then
-    echo "ERROR: Truncated transfer: expected $EXPECTED_COUNT samples, received $SAMPLE_COUNT"
-    exit 1
-fi
-
-if [ "${SCHEMA:-1}" -ge 2 ] && [ "$CHECKSUM_VALID" != "1" ]; then
-    echo "ERROR: Device reported an invalid telemetry checksum"
-    exit 1
-fi
-
 mv "$OUT_TMP" "$OUTFILE"
+mv "$RAW_TMP" "${OUTFILE%.csv}.serial"
 
 echo ""
 echo "Saved: $OUTFILE"
@@ -155,7 +158,7 @@ ANALYZE="$SCRIPT_DIR/analyze_balance_logs.py"
 if [ -x "$ANALYZE" ] || [ -f "$ANALYZE" ]; then
     echo ""
     echo "--- Analysis ---"
-    python3 "$ANALYZE" "$OUTFILE" --details || true
+    "$PYTHON_BIN" "$ANALYZE" "$OUTFILE" --details || true
 fi
 
 echo ""

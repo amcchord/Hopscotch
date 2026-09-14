@@ -234,6 +234,11 @@ static constexpr float    BALANCE_SAFE_RATE_MAX_DPS     = 200.0f;   // extreme r
 static constexpr uint32_t BALANCE_SAFE_RATE_DURATION_MS = 500;      // must persist this long
 static constexpr uint32_t BALANCE_SAFE_SAT_DURATION_MS  = 3000;     // speed command saturated this long -> disengage
 static constexpr uint32_t BALANCE_FEEDBACK_STALE_MS     = 400;      // abort if wheel feedback older than this (CAN failure)
+static constexpr uint32_t BALANCE_IMU_STALE_US           = 50000;    // ten missing 200Hz samples
+static constexpr uint32_t BALANCE_IMU_READY_MS           = 200;      // healthy stream before a new attempt
+static constexpr float    BALANCE_ARM_REACHED_RAD       = 0.15f;    // measured arrival as well as target completion
+static constexpr uint32_t BALANCE_TIP_TIMEOUT_MS         = 15000;
+static constexpr uint32_t BALANCE_RETURN_TIMEOUT_MS      = 8000;
 
 // Two-stage dead-man for Core 1 stalls (run 173619: a 740ms stall with an
 // instant wheel-stop dead-man dropped a perfectly balanced robot). The
@@ -251,10 +256,9 @@ static constexpr uint32_t BALANCE_DEADMAN_HARD_MS       = 1500;     // stop whee
 // (linearized model, robust across A x0.5-2, B x0.7-1.4, motor lag 30-80ms).
 // Margins are structurally thin: start conservative, retune from Speed-mode
 // telemetry.
-static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.08f;    // rad/s of return velocity per rad of drift. 0.05 took 33s
-                                                                    // to walk home from the +9.6 rad standup tow (run 233710,
-                                                                    // "very slowly got back to 0"); 0.08 is still inside the
-                                                                    // stable region of the fitted-model gain grid.
+static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.05f;    // retain July's tested return gain. The prepared 0.08
+                                                                    // regressed recovery in the refreshed simulation; validate
+                                                                    // reduced standup tow before speeding up return-to-origin.
 static constexpr float    BALANCE_DRIFT_MAX_VEL         = 1.0f;     // max return velocity (rad/s)
 // Early position P: the position loop also runs DURING the standup ramp
 // (origin at engage) at reduced gain, so standup drift is opposed as it
@@ -274,13 +278,10 @@ static constexpr float    BALANCE_VEL_SP_KNEE           = 0.8f;     // rad/s bou
 static constexpr float    BALANCE_VEL_SP_KI             = 0.35f;    // deg/s per rad/s of velocity error (single integrator)
 static constexpr float    BALANCE_SP_OFFSET_MAX_DEG     = 8.0f;     // setpoint offset clamp (6 railed for 6.6s during the
                                                                     // escalating-tap run -- it was the binding constraint)
-static constexpr float    BALANCE_RAMP_SP_OFFSET_MAX_DEG = 1.5f;    // tighter clamp DURING the standup ramp. The damper is
-                                                                    // positive feedback while the robot chases the rising
-                                                                    // equilibrium from below (raising the sp commands MORE
-                                                                    // velocity, not braking): it contributed +4.6 of the 4.9
-                                                                    // deg peak setpoint error in runs 231458/233710 (+8..+10
-                                                                    // rad tow) while base+trim tracked within 0.7 deg. 1.5 deg
-                                                                    // keeps ~3 rad/s of genuine surge-damping authority.
+static constexpr float    BALANCE_RAMP_SP_OFFSET_MAX_DEG = 1.5f;    // retained pre-ramp authority limit; still untested on hardware.
+                                                                    // July's largest surge came AFTER ramp_complete released
+                                                                    // this limit. This clamp alone does not address that surge;
+                                                                    // see docs/BALANCE_REVIEW_2026-09.md.
 static constexpr float    BALANCE_SP_OFFSET_RATE        = 12.0f;    // deg/s rate limit -- still step-free; 16 allowed a
                                                                     // +6.6 -> -2.0 whipsaw in 0.5s (run 232626 overcorrection)
 static constexpr float    BALANCE_VEL_FILTER_ALPHA      = 0.35f;    // wheel velocity LPF (~55ms) -- earlier lean-in on taps

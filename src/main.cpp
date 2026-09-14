@@ -14,6 +14,7 @@
 #include "drive_controller.h"
 #include "arm_controller.h"
 #include "balance_controller.h"
+#include "balance_math.h"
 #include "display.h"
 #include "web_server.h"
 
@@ -215,11 +216,13 @@ static bool  prevBalanceTelemetryActive = false;
 static uint32_t lastCalEdgeTime = 0;
 static bool     waitingForDoubleTap = false;
 
-// Shared IMU data for balance task on Core 0
-static volatile RawImuData sharedImu = {};
+// Fast task publishes the latest IMU sample for display attitude
+static RawImuData sharedImu = {};
 static volatile bool       sharedImuReady = false;
 static portMUX_TYPE        imuMux = portMUX_INITIALIZER_UNLOCKED;
-static uint32_t            lastBalanceImuTick = 0;
+static volatile bool logDownloadActive = false;
+static volatile bool webDisarmPending = false;
+static bool rcRearmRequired = false;
 
 // Task handles (control core split)
 static TaskHandle_t balanceTaskHandle  = nullptr;
@@ -505,8 +508,14 @@ static void processBalCommand(const char* sub) {
             Serial.println("[Balance] Log dump REFUSED while balance mode is active");
             return;
         }
+        if (motorMgr.isDriveArmed() || motorMgr.isArmArmed() || motorMgr.isArming()) {
+            Serial.println("[Balance] Log dump REFUSED: disarm drive AND arms first");
+            return;
+        }
+        logDownloadActive = true;
         printLoopProfile();
         balanceCtrl.dumpLog();
+        logDownloadActive = false;
 
     } else if (strcmp(sub, "log clear") == 0) {
         balanceCtrl.clearLog();
@@ -580,6 +589,16 @@ static void processSerialCommand(const char* cmd) {
     while (*cmd == ' ') cmd++;
     if (*cmd == '\0') return;
 
+    // A capture snapshots its gains once. Keep the control task free of
+    // bench diagnostics, flash writes and tuning changes during that run.
+    if (balanceCtrl.isActive()
+        && strcmp(cmd, "disarm") && strcmp(cmd, "disarm arms")
+        && strcmp(cmd, "bal status") && strcmp(cmd, "bal mark")
+        && strncmp(cmd, "bal note", 8)) {
+        Serial.println("[Cmd] REFUSED during balance: disarm, bal status/note/mark only");
+        return;
+    }
+
     if (strcmp(cmd, "help") == 0) {
         printSerialHelp();
 
@@ -622,6 +641,8 @@ static void processSerialCommand(const char* cmd) {
 
     } else if (strcmp(cmd, "disarm") == 0) {
         Serial.println("[Sim] Disarming drive motors...");
+        if (balanceCtrl.isActive()) balanceCtrl.hardAbort("serial disarm");
+        rcRearmRequired = true;
         motorMgr.cancelArming();
         driveCtrl.emergencyStop();
         motorMgr.disarmDriveMotors();
@@ -632,6 +653,8 @@ static void processSerialCommand(const char* cmd) {
 
     } else if (strcmp(cmd, "disarm arms") == 0) {
         Serial.println("[Sim] Disarming arm motors...");
+        if (balanceCtrl.isActive()) balanceCtrl.hardAbort("serial arms disarm");
+        rcRearmRequired = true;
         motorMgr.cancelArming();
         armCtrl.holdPosition();
         motorMgr.disarmArmMotors();
@@ -778,16 +801,28 @@ static void processSerialCommand(const char* cmd) {
 }
 
 static void pollSerialCommands() {
-    while (Serial.available()) {
+    // Bounded input, one command per tick; discard overlong commands whole.
+    static bool overflow = false;
+    unsigned budget = 128;
+    while (budget-- && Serial.available()) {
         char c = Serial.read();
         if (c == '\n' || c == '\r') {
+            if (overflow) {
+                overflow = false;
+                serialBufLen = 0;
+                Serial.println("[Cmd] Overlong command discarded");
+                return;
+            }
             if (serialBufLen > 0) {
                 serialBuf[serialBufLen] = '\0';
                 processSerialCommand(serialBuf);
                 serialBufLen = 0;
+                return;
             }
-        } else if (serialBufLen < (int)sizeof(serialBuf) - 1) {
+        } else if (!overflow && serialBufLen < (int)sizeof(serialBuf) - 1) {
             serialBuf[serialBufLen++] = c;
+        } else {
+            overflow = true;
         }
     }
 }
@@ -826,6 +861,15 @@ static void onSettingsChanged() {
 }
 
 static void onDisarmRequested() {
+    // Async TCP runs on the other core: enqueue intent, never mutate motor
+    // modes or balance state concurrently with the control task.
+    webDisarmPending = true;
+}
+
+static void serviceWebDisarm() {
+    if (!webDisarmPending) return;
+    webDisarmPending = false;
+    rcRearmRequired = true;
     Serial.println("[Main] Emergency disarm requested via web");
     if (balanceCtrl.isActive()) {
         balanceCtrl.hardAbort("web disarm");
@@ -875,7 +919,7 @@ static bool isSwitchActive(float norm_value) {
 }
 
 // ---------------------------------------------------------------------------
-// Balance task (Core 0, 200Hz)
+// Balance task (control core, 200Hz, direct IMU acquisition)
 // ---------------------------------------------------------------------------
 static void balanceTaskFunc(void* param) {
     (void)param;
@@ -890,15 +934,28 @@ static void balanceTaskFunc(void* param) {
         prevUs = nowUs;
         if (dt <= 0.0f) dt = 0.005f;
 
-        RawImuData imu;
-        portENTER_CRITICAL(&imuMux);
-        imu = *(const RawImuData*)&sharedImu;
-        bool ready = sharedImuReady;
-        portEXIT_CRITICAL(&imuMux);
-
-        if (ready) {
-            balanceCtrl.balanceTick(imu, dt);
+        // This task owns sensor acquisition as well as PD. A control-task
+        // stall can freeze the outer reference but cannot freeze the IMU.
+        static RawImuData sample = {};
+        const uint32_t imu_start_us = micros();
+        const auto mask = M5.Imu.update();
+        constexpr unsigned required = m5::IMU_Class::sensor_mask_accel
+                                    | m5::IMU_Class::sensor_mask_gyro;
+        if ((static_cast<unsigned>(mask) & required) == required) {
+            const auto imu = M5.Imu.getImuData();
+            sample.accel_x = imu.accel.x; sample.accel_y = imu.accel.y; sample.accel_z = imu.accel.z;
+            sample.gyro_x = imu.gyro.x; sample.gyro_y = imu.gyro.y; sample.gyro_z = imu.gyro.z;
+            sample.sample_us = micros();
+            sample.valid = balance_math::finiteImu(sample.accel_x, sample.accel_y, sample.accel_z,
+                                                   sample.gyro_x, sample.gyro_y, sample.gyro_z);
+            portENTER_CRITICAL(&imuMux);
+            sharedImu = sample;
+            sharedImuReady = sample.valid;
+            portEXIT_CRITICAL(&imuMux);
         }
+        profRecord(PROF_IMU, imu_start_us);
+        // Call even on read failure: the freshness watchdog must still run.
+        balanceCtrl.balanceTick(sample, dt);
 
         vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(1000 / BALANCE_LOOP_HZ));
     }
@@ -982,6 +1039,10 @@ void setup() {
     webUI.onSettingsChanged(onSettingsChanged);
     webUI.onDisarmRequested(onDisarmRequested);
     webUI.onCanIdChange(onCanIdChange);
+    webUI.onMaintenanceAllowed([]() {
+        return !balanceCtrl.isActive() && !balanceCtrl.isLogPendingFlush()
+            && !motorMgr.isDriveArmed() && !motorMgr.isArmArmed() && !motorMgr.isArming();
+    });
 
     Serial.println("[Main] Initialization complete, entering control loop");
     Serial.printf("[Main] Control loop: %d Hz, Display: 25 fps, WS: 10 Hz\n", CONTROL_LOOP_HZ);
@@ -1063,35 +1124,8 @@ static void controlTick() {
     ctlLastTickUs = nowUs;
 
     // Process serial debug commands (non-blocking)
+    serviceWebDisarm();
     pollSerialCommands();
-
-    // -----------------------------------------------------------------------
-    // 200 Hz IMU read -- feeds both Madgwick (for display) and Core 0 balance
-    // -----------------------------------------------------------------------
-    if (nowUs - lastBalanceImuTick >= BALANCE_LOOP_PERIOD_US) {
-        lastBalanceImuTick = nowUs;
-        uint32_t prof_start = micros();
-
-        M5.Imu.update();
-        auto imu = M5.Imu.getImuData();
-
-        portENTER_CRITICAL(&imuMux);
-        sharedImu.accel_x = imu.accel.x;
-        sharedImu.accel_y = imu.accel.y;
-        sharedImu.accel_z = imu.accel.z;
-        sharedImu.gyro_x  = imu.gyro.x;
-        sharedImu.gyro_y  = imu.gyro.y;
-        sharedImu.gyro_z  = imu.gyro.z;
-        sharedImuReady = true;
-        portEXIT_CRITICAL(&imuMux);
-
-        ahrsFilter.update(
-            imu.gyro.x,  imu.gyro.y,  imu.gyro.z,
-            imu.accel.x, imu.accel.y, imu.accel.z,
-            imu.mag.x,   imu.mag.y,   imu.mag.z);
-
-        profRecord(PROF_IMU, prof_start);
-    }
 
     // -----------------------------------------------------------------------
     // 50 Hz control loop
@@ -1102,7 +1136,15 @@ static void controlTick() {
         controlTickCount++;
         float dt = static_cast<float>(CONTROL_LOOP_PERIOD_MS) / 1000.0f;
 
-        // 0. M5 hardware update (buttons, etc -- IMU handled above at 200Hz)
+        // Display attitude runs at its configured 50Hz; only the fast task
+        // accesses the IMU hardware. The balance controller uses its own filter.
+        RawImuData displayImu;
+        portENTER_CRITICAL(&imuMux);
+        displayImu = sharedImu;
+        bool ready = sharedImuReady;
+        portEXIT_CRITICAL(&imuMux);
+        if (ready) ahrsFilter.updateIMU(displayImu.gyro_x, displayImu.gyro_y, displayImu.gyro_z,
+                                       displayImu.accel_x, displayImu.accel_y, displayImu.accel_z);
         M5.update();
 
         // 1. Read CRSF data
@@ -1190,7 +1232,7 @@ static void controlTick() {
         float ch7_raw = crsfRx.getChannelNormalized(s.channel_map.arm_select_var);
         bool ch7Active = isSwitchActive(ch7_raw);
 
-        // Use complementary filter output from Core 0 (or Madgwick fallback)
+        // Use complementary filter output from the fast balance task
         float rollDeg = balanceCtrl.getTiltAngle();
         float rollRateDps = balanceCtrl.getGyroRate();
 
@@ -1257,8 +1299,9 @@ static void controlTick() {
         bool armSwNow   = isSwitchActive(arm_arm_sw);
 
         if (crsfRx.isLinkUp() && !simEnabled) {
+            if (!driveSwNow && !armSwNow) rcRearmRequired = false;
             // Drive: level-based arm
-            if (driveSwNow) {
+            if (driveSwNow && !rcRearmRequired && !balanceCtrl.isLogPendingFlush()) {
                 if (!motorMgr.isDriveArmed() && !motorMgr.isArmingDrive()) {
                     Serial.printf("[Main] t=%lu DRIVE ARM requested via RC switch\n", now);
                     motorMgr.requestArmDrive();
@@ -1282,7 +1325,7 @@ static void controlTick() {
             }
 
             // Arms: level-based arm
-            if (armSwNow) {
+            if (armSwNow && !rcRearmRequired && !balanceCtrl.isLogPendingFlush()) {
                 if (!motorMgr.isArmArmed() && !motorMgr.isArmingArms()) {
                     Serial.printf("[Main] t=%lu ARMS ARM requested via RC switch (ensure arms at FORWARD)\n", now);
                     motorMgr.requestArmArms();
@@ -1430,6 +1473,7 @@ static void sentinelTaskFunc(void* param) {
 // late. Display, WebSocket telemetry, and the periodic debug burst.
 // ---------------------------------------------------------------------------
 void loop() {
+    if (logDownloadActive) { delay(5); return; }
     uint32_t now = millis();
     uint32_t nowUs = micros();
 
