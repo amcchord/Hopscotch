@@ -1,2 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Raw USB captures must retain byte-exact newlines for transport checksums.
+*.serial -text
+evidence/balance-review/device/recovered-undated-log.csv -text
