@@ -23,8 +23,16 @@ struct FakeSerial {
     bool connected = true;
     bool blocked = false;
     size_t chunk = 7;
+    size_t writable = 64;
+    uint32_t resume_at_ms = 0;
+    uint32_t tx_timeout_ms = 1;
+    size_t overflow_writes = 0;
     std::string bytes;
     explicit operator bool() const { return connected; }
+    void setTxTimeoutMs(uint32_t value) { tx_timeout_ms = value; }
+    int availableForWrite() const {
+        return !connected || blocked || fake_ms < resume_at_ms ? 0 : writable;
+    }
     void println(const char* s) { bytes += s; bytes += '\n'; }
     void printf(const char* format, ...) {
         char buffer[512];
@@ -36,6 +44,7 @@ struct FakeSerial {
     }
     size_t write(const uint8_t* p, size_t n) {
         if (blocked || !connected) return 0;
+        if (n > writable) { ++overflow_writes; connected = false; return 0; }
         n = std::min(chunk, n);
         bytes.append(reinterpret_cast<const char*>(p), n);
         return n;

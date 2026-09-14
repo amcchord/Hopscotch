@@ -65,49 +65,12 @@ if [ -n "$LABEL" ]; then
 else
     OUTFILE="$LOG_DIR/bal_${TIMESTAMP}.csv"
 fi
-RAW_TMP=$(mktemp)
+RAW_TMP=$(mktemp "$LOG_DIR/.bal_raw.XXXXXX")
 OUT_TMP=$(mktemp "$LOG_DIR/.bal_download.XXXXXX")
 trap 'rm -f "$RAW_TMP" "$OUT_TMP"' EXIT
 
 echo "Downloading telemetry from $PORT..."
-if ! "$PYTHON_BIN" - "$PORT" "$RAW_TMP" "$TIMEOUT_SEC" <<'PY'
-import serial, time, sys
-
-device, output, timeout_text = sys.argv[1:4]
-timeout = float(timeout_text)
-port = serial.Serial(device, 115200, timeout=2)
-time.sleep(0.5)
-port.reset_input_buffer()
-
-port.write(b'bal log\r\n')
-time.sleep(0.5)
-
-lines = []
-deadline = time.time() + timeout
-complete = False
-while time.time() < deadline:
-    raw = port.readline()
-    if not raw:
-        continue
-    line = raw.decode('utf-8', errors='replace').rstrip()
-    lines.append(raw)
-    if 'REFUSED' in line or 'No log file' in line or 'unsupported schema' in line:
-        print(line, file=sys.stderr)
-        break
-    if 'End of log' in line:
-        complete = True
-        break
-
-port.close()
-
-with open(output, 'wb') as f:
-    f.write(b''.join(lines))
-
-print(f'Received {len(lines)} raw lines')
-if not complete:
-    print(f'ERROR: log transfer did not complete within {timeout:g}s', file=sys.stderr)
-    raise SystemExit(3)
-PY
+if ! "$PYTHON_BIN" "$SCRIPT_DIR/receive_telemetry.py" "$PORT" "$RAW_TMP" "$TIMEOUT_SEC"
 then
     mv "$RAW_TMP" "${OUTFILE%.csv}.failed.serial"
     echo "Raw interrupted transfer retained: ${OUTFILE%.csv}.failed.serial"

@@ -27,8 +27,10 @@ int main() {
     }
     const auto saturated = balance_math::mix(30, 1.5, 30);
     assert(saturated.left == 30 && saturated.right == 30 && saturated.yaw == 0);
+    {
     const std::string payload = "hello";
     TelemetryTransport transport;
+    assert(Serial.tx_timeout_ms == 50);
     Serial.chunk = 2;  // forced partial writes through the production writer
     assert(transport.write(reinterpret_cast<const uint8_t*>(payload.data()), payload.size()) == payload.size());
     assert(Serial.bytes == payload);
@@ -44,5 +46,20 @@ int main() {
     const auto before = fake_ms;
     assert(disconnected.write(uint8_t('x')) == 0);
     assert(fake_ms == before && disconnected.failed());
+    }
+    assert(Serial.tx_timeout_ms == 1);
+    Serial.connected = true;
+    Serial.bytes.clear();
+    Serial.writable = 16;
+    Serial.chunk = 7;
+    Serial.resume_at_ms = fake_ms + 20; // connected host temporarily not draining
+    {
+        TelemetryTransport large;
+        const std::string header(1024, 'h'); // larger than the real 256-byte TX ring
+        assert(large.write(reinterpret_cast<const uint8_t*>(header.data()), header.size()) == header.size());
+        assert(Serial.bytes == header && !large.failed());
+        assert(Serial.overflow_writes == 0 && Serial.connected);
+    }
+    assert(Serial.tx_timeout_ms == 1);
     std::cout << "Native checks passed: 100000 wheel mixes, sensor validity/rollover, USB partial writes/stall/disconnect\n";
 }
