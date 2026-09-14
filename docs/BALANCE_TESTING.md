@@ -41,6 +41,21 @@ At boot, confirm that the console reports a 1,320,000-byte balance log buffer in
 
 Hardware and calibration are unchanged from July. Do not recalibrate or reset trim merely to install this firmware. Keep the sensor mounting consistent; record any movement.
 
+## Normal Start on Austin's Transmitter
+
+With drive and arms disarmed, put the arms at their usual forward starting position. The firmware establishes that forward reference when the arms finish arming.
+
+| Channel | Setting for a normal stand-up |
+|---|---|
+| CH1, CH2, CH4 | Neutral |
+| CH7 | HIGH: balance selected |
+| CH9 | HIGH: arms armed |
+| CH10 | HIGH: drive armed |
+| CH11 | Start LOW; after arming completes, one HIGH pulse, then LOW |
+| CH12 | Leave LOW for this first test |
+
+Allow at least two seconds after raising the arm switches and confirm both groups finish arming. Hold CH11 high for about one second, then lower it. A normal single pulse begins tip-up after the double-tap detection window; a double-tap requests force-engage instead. End the initial capture by 30 seconds if controlled, or earlier if intervention is needed. Support the robot, lower CH9 and CH10, and keep power on for the saved-log message and download.
+
 ## Commands and RC Markers
 
 | Action | Command/control | Behavior |

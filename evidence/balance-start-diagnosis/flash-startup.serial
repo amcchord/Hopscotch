@@ -1,0 +1,104 @@
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x3b (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037d876
+pro cpu reset by JTAG
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce3808,len:0x4bc
+load:0x403c9700,len:0xbd8
+load:0x403cc700,len:0x2a0c
+entry 0x403c98d0
+[   392][I][esp32-hal-psram.c:96] psramInit(): PSRAM enabled
+[   412][I][M5GFX.cpp:634] init_impl(): [M5GFX] [Autodetect] load from NVS : board:18
+[   434][I][M5GFX.cpp:1904] autodetect(): [M5GFX] [Autodetect] board_M5AtomS3R (GC9107)
+[   442][I][esp32-hal-i2c.c:75] i2cInit(): Initialising I2C Master: sda=45 scl=0 freq=100000
+auto detect board:18
+[   589][I][esp32-hal-i2c.c:75] i2cInit(): Initialising I2C Master: sda=45 scl=0 freq=100000
+[   606][I][esp32-hal-i2c.c:75] i2cInit(): Initialising I2C Master: sda=45 scl=0 freq=100000
+[   615][I][esp32-hal-i2c.c:75] i2cInit(): Initialising I2C Master: sda=45 scl=0 freq=100000
+
+
+========================================
+  Hopscotch Robot Controller
+========================================
+[Settings] WiFi SSID: Hopscotch
+[Display] Sprite initialized 128x128
+[CAN] TWAI initialized at 1Mbps
+[Motors] Manager initialized with 6 motors
+[Main] Settings applied to subsystems
+[CRSF] Initialized on RX=1 TX=2 @ 420000 baud
+[Balance] Log buffer allocated in PSRAM (1320000 bytes)
+[WiFi] AP started: SSID=Hopscotch IP=192.168.4.1
+[Web] Server started on port 80
+[Main] Initialization complete, entering control loop
+[Main] Control loop: 50 Hz, Display: 25 fps, WS: 10 Hz
+[Main] Max drive speed: 33.0 rad/s (315 RPM), Horizon: 3.0 s
+
+--- Serial Debug Commands ---
+  d                 Toggle periodic debug output on/off
+  sim on / sim off  Enable/disable simulated RC input
+  t <val>           Set sim throttle (-1.0 to 1.0)
+  s <val>           Set sim steering (-1.0 to 1.0)
+  arm / disarm      Arm/disarm drive motors
+  arm arms          Arm robot arm motors
+  disarm arms       Disarm robot arm motors
+  status            Print full status
+--- Arm Calibration (disarmed only) ---
+  cal start         Enter guided calibration mode (3 steps)
+  cal stop          Exit calibration mode
+  cal status        Print current calibration values
+--- Low-Level Motor Debug ---
+  ping <id>                   Ping motor, print feedback
+  stop <id>                   Stop motor [  1951][W][HWCDC.cpp:425] write(): write failed due to waiting USB Host - timeout
+
+  enable <id>                 Enable motor
+  zero <id>                   Set zero position
+  mode <id> <0-3>             Set run mode (0=MIT 1=Pos 2=Spd 3=Cur)
+  rp <id> <paramHex>          Read param (e.g. rp 10 7017)
+  wp <id> <paramHex> <float>  Write float param
+  wpu <id> <paramHex> <u8>    Write u8 param
+  pos <id> <pos> <spdLim>     Send position + speed_limit
+  spd <id> <speed> <curLim>   Send speed + current_limit
+  test <id>                   Run automated motor test
+--- Balance Mode ---
+  bal status                  Print balance state and gains
+[  1960][W][HWCDC.cpp:425] write(): write failed due to waiting USB Host - timeout
+
+  bal dkp <val>               Set drift -> target velocity gain
+  bal vkp/vki <val>           Set velocity PI gains (setpoint offset)
+  bal log                     Dump telemetry log to serial
+  bal log clear               Delete telemetry log file
+  bal note <text>             Tag the next/current test run
+  bal mark                    Add a numbered event marker
+  help                        Show this help
+-----------------------------
+[Main] Arm calibration loaded from settings (delta format)
+=== ARM CALIBRATION (deltas from Forward) ===
+  Position    Left (rad)  Right (rad)
+  Forward          0.000       0.000
+  Center           1.768      -1.767
+  Backward         3.661      -3.670
+  Calibrated: YES
+  Forward ref: left=0.000 right=0.000
+=============================================
+[Balance] 200Hz PD task started on core 1
+[Main] Control task started on core 1
+[Main] Control core split: balance 200Hz prio 18, control prio 12, sentinel prio 24 on core 1
+==================================================
+[Loop] t=4536 tick=4 | avg=634284us max=1091183us overruns=3 ctlgap=1091233us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +0.1 roll=  -0.9 yaw=+180.0  [CF] tilt=  -4.8 rate=  -0.0
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,1305
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: 0.00 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw=  0.20 off= -0.20) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  2.51 off= -2.51) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  5.07 off= -5.07) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 OFF | pos=   0.00 (raw=  0.00 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=0.0C | err=0x00
+[Motor] ID= 1 OFF | pos=   0.00 (raw=  0.00 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=0.0C | err=0x00
+[Motor] ID= 2 OFF | pos=   0.00 (raw=  0.00 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=0.0C | err=0x00
+[VBUS] 0.0V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=4 our_tx_fail=0 our_rx=3
+==================================================

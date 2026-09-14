@@ -36,4 +36,10 @@ The new native test runs the actual production `MotorManager` against a simulate
 
 The consolidated check also runs existing native control/USB checks, twelve Python tests, syntax/whitespace checks and the ESP32-S3 firmware build. [Validation output](../evidence/balance-start-diagnosis/validation.txt). The corrected application is packaged separately under `artifacts/balance-start-fix/`; the previous package and full original device backup remain available.
 
-Release and live verification results are recorded in [current state](progress/CURRENT.md). A successful upload or disarmed check does not demonstrate physical balance reliability.
+The correction from source `b5be4ef` was programmed at `0x10000` and verified by OpenOCD. Its application SHA-256 is `46e77224ad774204625c8878574f8581b40fe0547fb4cb6e53d1a7cabe6b9608`. After upload, all six motors were online without errors, both groups were disarmed, calibration and 0.97° trim were retained, and IMU age was 7.093 ms with no latched fault. [Upload evidence](../evidence/balance-start-diagnosis/flash.txt), [device checks](../evidence/balance-start-diagnosis/postflash-checks.json).
+
+## First physical trial
+
+The corrected firmware passed motor setup and reached TIPPING UP, BALANCING and completed arm return. Austin reports that it stood up, began running away, required a hand intervention, then stabilized vertically. That confirms the CH11 startup regression is fixed; it does not demonstrate an unaided stand-up.
+
+The recorder retained 5,648 samples over its 120-second window, then stopped with `duration_limit` while BALANCE continued. The exact intervention time is unmarked. The raw [serial observation](../evidence/balance-start-diagnosis/corrected-attempt.serial) and [operator report](../evidence/balance-start-diagnosis/operator-observation.md) are retained. Saving/downloading the full v2 data awaits both motor groups being disarmed; the user has been asked to keep power and USB connected. No tuning was performed after this observation. [Current state](progress/CURRENT.md) records the next action.

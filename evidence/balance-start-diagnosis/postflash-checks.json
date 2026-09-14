@@ -1,0 +1,12 @@
+{
+  "source_commit": "b5be4ef982aa861264b44659a6929f326b893b4c",
+  "application_sha256": "46e77224ad774204625c8878574f8581b40fe0547fb4cb6e53d1a7cabe6b9608",
+  "openocd_verify_passed": true,
+  "both_groups_disarmed": true,
+  "all_six_motors_online_no_errors": true,
+  "calibration_retained": true,
+  "stored_trim_degrees": 0.97,
+  "imu_age_us": 7093,
+  "imu_latched_fault": 0,
+  "physical_balance_tested": false
+}
