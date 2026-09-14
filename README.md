@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Prepared balance candidate:** [September findings and firmware changes](docs/BALANCE_REVIEW_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Built and checked offline; physical validation is pending.
+**Prepared balance candidate:** [September findings and firmware changes](docs/BALANCE_REVIEW_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Built and checked offline; device flashing/checks are recorded in the review. Physical balance validation is pending.
 
 ![Robot Diagram](docs/RobotDiagram.png)
 

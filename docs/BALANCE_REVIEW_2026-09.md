@@ -1,6 +1,6 @@
 # Balance firmware review — September 13, 2026
 
-**Ready for a supervised first hardware test; not yet flashed or demonstrated to balance.** This candidate strengthens sensor handling, verifies arm arrival, bounds wheel commands, and makes the next run's data substantially more trustworthy. It preserves the established Speed-mode controller and avoids aggressive gain changes. Offline simulation does **not** establish improved stand-up reliability.
+**Flashing authorized after preparation; physical balance still untested.** See the device-check addendum below for the live connection outcome. This candidate strengthens sensor handling, verifies arm arrival, bounds wheel commands, and makes the next run's data substantially more trustworthy. It preserves the established Speed-mode controller and avoids aggressive gain changes. Offline simulation does **not** establish improved stand-up reliability.
 
 Source baseline: `e8b1280`, originally on `agent/balance-telemetry-sync`. Candidate branch: `codex/balance-review-ready`. The exact committed source, build versions, binary hashes, and rollback files are identified in `artifacts/balance-candidate/manifest.json`. [Current state](progress/CURRENT.md) and [test procedure](BALANCE_TESTING.md) are the handoff for the next session.
 
@@ -113,7 +113,7 @@ Early failure means before ramp completion or within three seconds afterward. Th
 
 The candidate shows small displacement reductions but slightly more early failures in this approximation. This is **not evidence of improved stand-up success**. The prepared 0.08 return gain regressed recovery and was dropped. Simulation-only handoff blends of 1–3 seconds produced 5–8 early failures versus 3 without blending, and introduced push failures; none was ported to firmware. [Rejected handoff results](../evidence/balance-review/handoff-comparison.json).
 
-Simulation omits floor/arm contact, tire slip, cable forces, mounting motion, full CAN scheduling, actual arm dynamics, and battery/current limits. No physical closed-loop, sensor-failure, motor-failure, power-loss, or full LittleFS/USB throughput test has been performed. A stop command cannot guarantee a stop if motor communication has failed. Existing same-core task sharing and asynchronous maintenance paths are not a formally verified concurrent system.
+Simulation omits floor/arm contact, tire slip, cable forces, mounting motion, full CAN scheduling, actual arm dynamics, and battery/current limits. No physical closed-loop, sensor-failure, motor-failure, power-loss, or full v2 LittleFS/USB throughput test has been performed. The later device check verified startup and legacy USB download. A stop command cannot guarantee a stop if motor communication has failed. Existing same-core task sharing and asynchronous maintenance paths are not a formally verified concurrent system.
 
 ## Next connection and acceptance evidence
 
@@ -138,4 +138,15 @@ From the project root, using the existing Python environment:
 .venv/bin/python scripts/plot_balance_handoff.py
 ```
 
-The package manifest identifies the prebuilt artifacts; rebuilding later may select newer libraries under the existing version ranges. No firmware has been uploaded, no calibration reset, and no branch pushed by this preparation.
+The package manifest identifies the prebuilt artifacts; rebuilding later may select newer libraries under the existing version ranges. The initial preparation performed no upload. Austin then attached the robot and authorized flashing; the device-check addendum records that continuation. No calibration reset or Git push was performed.
+
+
+## Device-check addendum — September 13, 2026
+
+Austin attached the robot and explicitly authorized flashing. Before upload, both motor groups reported disarmed and all six motors were online with no reported faults. A complete 8,388,608-byte flash readback was saved under `artifacts/device-backup-2026-09-13/`. SHA-256: `656315c60093be1869d023ae8d8f9073e82c02cad14fcfe17582ef3938edece8`. Its partition table exactly matches the candidate. The settings JSON and original log were extracted successfully using littlefs-python 0.15.0; the older installed mklittlefs extractor was incompatible with this filesystem. The full original readback remained unchanged. Backups contain device settings and remain local/ignored.
+
+The recovered, undated log adds **673 rows** beyond the original 112-file review. All are tip-up state, spanning 26.170 seconds, with a maximum sample gap of 1.033 seconds and tilt staying approximately -5°. There is no balance engagement, configuration header, or terminal reason. Its exact firmware/date and reason for ending are unknown; it is not evidence of the new candidate's behavior. [Recovered data](../evidence/balance-review/device/recovered-undated-log.csv) and [analysis](../evidence/balance-review/device/recovered-log-analysis.txt).
+
+The first application-only upload verified successfully. Startup confirmed the 1,320,000-byte PSRAM buffer, retained arm calibration (center deltas 1.768/-1.767 rad; backward 3.661/-3.670), retained 0.97° trim, the intended 0.05 return gain, and a continuously healthy IMU stream. Motors initially had no battery power; Austin connected the battery, after which all six responded and CAN transmit-error count returned to zero. No motor arming or balance attempt was commanded. The existing 673-row log downloaded successfully through the new firmware; this exercises legacy export, not the new full-size v2 recorder.
+
+A live serial check and inspection of the installed Arduino 2.0.16 HWCDC implementation exposed a zero-timeout retry-counter underflow path. The final candidate sets the live timeout to **1 ms** instead of zero, avoiding the unsigned decrement-underflow path. This is a short bounded no-progress wait, not a claim that every serial call is wait-free. Explicit idle downloads retain their separate retry/checksum handling. Active-run `bal status` now reports buffered counts without opening/statting LittleFS. These follow-up changes were rebuilt and included in the final flashed artifact identified by the package manifest. Final verification is recorded in the device evidence and current-state document.

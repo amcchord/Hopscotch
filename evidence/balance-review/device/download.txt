@@ -1,0 +1,21 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+Received 693 raw lines
+Validated 673 samples (file integrity, row structure, USB checksum when available)
+
+Saved: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260913_220535_recovered-undated-preflash.csv
+Samples: 673 (schema 1, checksum n/a)
+Duration: 26170ms (26.1s)
+Config: 16 parameters recorded
+
+--- Analysis ---
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp  vel_off    drift  note
+----------------------------------------------------------------------------------------------------------------------------
+bal_20260913_220535_recovered-undated-preflash.csv  26.17     --       --       --     --       --        --       --       --       --       --  no balance state
+
+bal_20260913_220535_recovered-undated-preflash.csv
+  engage: roll=-- deg, rate=-- dps
+  arm return: -- s, pre-return |err|=-- deg, |rate|=-- dps, |cmd|=-- rad/s
+  final window: sp=-- deg, vel_off=-- rad/s, drift=-- rad
+  note: no balance state
+
+Done.

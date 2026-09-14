@@ -1,0 +1,9 @@
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp  vel_off    drift  note
+----------------------------------------------------------------------------------------------------------------------------
+bal_log.csv               26.17     --       --       --     --       --        --       --       --       --       --  no balance state
+
+bal_log.csv
+  engage: roll=-- deg, rate=-- dps
+  arm return: -- s, pre-return |err|=-- deg, |rate|=-- dps, |cmd|=-- rad/s
+  final window: sp=-- deg, vel_off=-- rad/s, drift=-- rad
+  note: no balance state

@@ -252,9 +252,9 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     }
 
     // Two-stage dead-man for control task stalls. Stage 1: the inner PD keeps
-    // balancing on the stale setpoint but with clamped wheel authority (no
-    // runaway possible, balance survives sub-second stalls -- run 173619
-    // fell because v1 stopped the wheels outright). Stage 2: a long stall
+    // balancing on the stale setpoint with reduced wheel authority. Fresh
+    // sensor data is still required; reduced authority does not guarantee
+    // stability. Stage 2: a long stall
     // means no safety monitors and no RC control; stop the wheels.
     uint32_t update_age = millis() - _last_update_ms;
     _last_update_age_ms = clampU16(update_age);
@@ -1925,7 +1925,12 @@ void BalanceController::printStatus() {
         Serial.printf("  Last motor vel: %.2f rad/s\n", (float)_last_motor_vel);
     }
 
-    if (hasLog()) {
+    // Status is allowed during a run: never open/stat LittleFS from that
+    // path (including missing-file error logging in the VFS implementation).
+    if (isActive() || _logging || _log_pending_flush) {
+        Serial.printf("  Log buffer: %d samples, schema v%u (file inspection deferred)\n",
+                      _log_count, BALANCE_LOG_SCHEMA_VERSION);
+    } else if (hasLog()) {
         Serial.printf("  Log: %u bytes, %d buffered samples, schema v%u\n",
                       logSize(), _log_count, BALANCE_LOG_SCHEMA_VERSION);
     } else {

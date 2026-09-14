@@ -2,7 +2,7 @@
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode. The firmware captures up to 120 seconds, including tip-up, in PSRAM, saves it to LittleFS after balance ends and **both drive and arms are disarmed**, and exports a checksummed CSV over USB. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. This candidate is built but has not yet been flashed or tested physically.
+The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. The candidate has a documented device-flash/check session; physical balancing is still pending. Read the review addendum/current state before repeating any upload.
 
 ## Safety and Test Area
 

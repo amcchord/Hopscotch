@@ -2,7 +2,8 @@
 #include <Arduino.h>
 
 // Used only for an explicitly requested, disarmed log download. Live control
-// keeps Serial's zero timeout. Partial USB writes are retried with a bounded
+// keeps Serial's 1ms timeout (zero underflows in the pinned HWCDC library).
+// Partial USB writes are retried with a bounded
 // timeout here, and the host verifies the exact bytes of the CSV payload.
 class TelemetryTransport : public Print {
 public:

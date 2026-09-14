@@ -970,10 +970,11 @@ void setup() {
     ahrsFilter.begin(CONTROL_LOOP_HZ);
 
     Serial.begin(115200);
-    // Native USB CDC: NEVER block on writes. With the cable unplugged the
-    // default 100ms-per-write timeout froze the control loop for seconds
-    // during print bursts (untethered runaways, runs 172527/173132).
-    Serial.setTxTimeoutMs(0);
+    // Arduino ESP32 2.0.16 HWCDC decrements its unsigned retry counter
+    // before testing zero. A zero timeout can underflow when the host
+    // stops consuming data. One millisecond avoids that path and bounds
+    // a stalled write; never restore the default 100ms live timeout.
+    Serial.setTxTimeoutMs(1);
     delay(1000);
     Serial.println();
     Serial.println();
