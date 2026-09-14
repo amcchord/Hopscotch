@@ -2,7 +2,7 @@
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode. The firmware captures up to 120 seconds, including tip-up, in PSRAM, saves it to LittleFS after balance ends and **both drive and arms are disarmed**, and exports a checksummed CSV over USB. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. The candidate has a documented device-flash/check session; physical balancing is still pending. Read the review addendum/current state before repeating any upload.
+The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. A later trigger test exposed an RS05 write-only register check that prevented startup; use the [corrected firmware](BALANCE_START_FIX_2026-09.md). Successful physical balancing is still pending. Read the [current state](progress/CURRENT.md) before repeating any upload.
 
 ## Safety and Test Area
 
@@ -18,7 +18,13 @@ Record any mechanical variables that changed: floor surface, tire condition, bat
 
 Connect USB with both motor groups disarmed. Before flashing, download the previous run and retain `cal status`, `bal status`, and the settings export from the web dashboard/API. Take a device flash backup where the interface permits; the packaged rollback is a rebuild of source baseline `e8b1280`, not a readback of the current device.
 
-The prepared files and hashes are in `artifacts/balance-candidate/`; its `FLASHING.md` describes the frozen image. For a source rebuild, use:
+The corrected prepared files and hashes are in `artifacts/balance-start-fix/`; its `FLASHING.md` describes the frozen image. The earlier `balance-candidate` package is retained for history and contains the startup regression. To flash the corrected frozen application:
+
+```bash
+.venv/bin/python scripts/flash_prepared_balance.py --package artifacts/balance-start-fix --flash
+```
+
+For a source rebuild, use:
 
 ```bash
 ./scripts/build.sh

@@ -350,22 +350,35 @@ bool MotorManager::sendDriveSpeedLimit(MotorRole role, float speed_limit_rad_s) 
                                  RobstrideParam::SPEED_LIMIT, spd);
 }
 
-// Write a float param, read it back, retry until it matches. Engage-time CAN
-// frames get lost under load (observed: back-left CURRENT_LIMIT stuck at the
-// old value while back-right took the new one -> asymmetric torque -> yaw).
-bool MotorManager::writeFloatParamVerified(uint8_t can_id, uint16_t addr,
-                                           float value, const char* name) {
+// Check transmission and, for readable limits, retry until readback matches.
+// CURRENT_LIMIT readback prevents the asymmetric torque observed under load.
+// RS05 ACC_RAD is write-only (RS05 manual 260713, printed p52). A successful
+// CAN enqueue is all we can check for that register, not motor-side acceptance.
+bool MotorManager::writeFloatParamChecked(uint8_t can_id, uint16_t addr,
+                                          float value, const char* name) {
     for (int attempt = 0; attempt < 4; attempt++) {
-        _can->writeFloatParam(can_id, CAN_HOST_ID, addr, value);
+        const bool sent = _can->writeFloatParam(can_id, CAN_HOST_ID, addr, value);
         delay(2);
+        if (!sent) {
+            Serial.printf("[Motors] Param %s transmit failed for ID=%d (attempt %d)\n",
+                          name, can_id, attempt + 1);
+            continue;
+        }
+        if (addr == RobstrideParam::ACC_RAD) return true;
+
         float readback = 0.0f;
-        if (_can->readParamSync(can_id, CAN_HOST_ID, addr, readback, 30)
-            && fabsf(readback - value) < 0.01f) {
+        const bool received = _can->readParamSync(can_id, CAN_HOST_ID, addr, readback, 30);
+        if (received && fabsf(readback - value) < 0.01f) {
             return true;
         }
-        Serial.printf("[Motors] Param %s write to ID=%d not verified "
-                      "(attempt %d, read %.2f, want %.2f)\n",
-                      name, can_id, attempt + 1, readback, value);
+        if (!received) {
+            Serial.printf("[Motors] Param %s readback missing for ID=%d (attempt %d)\n",
+                          name, can_id, attempt + 1);
+        } else {
+            Serial.printf("[Motors] Param %s write to ID=%d not verified "
+                          "(attempt %d, read %.2f, want %.2f)\n",
+                          name, can_id, attempt + 1, readback, value);
+        }
     }
     return false;
 }
@@ -392,9 +405,9 @@ bool MotorManager::setDriveRunMode(MotorRole role, RobstrideRunMode mode,
     }
 
     if (mode == RobstrideRunMode::Speed) {
-        // Both limits are safety/symmetry critical: verified writes only.
+        // RS05 acceleration is write-only; current limit supports readback.
         if (acc_rad_s2 > 0.0f) {
-            if (!writeFloatParamVerified(m.can_id, RobstrideParam::ACC_RAD,
+            if (!writeFloatParamChecked(m.can_id, RobstrideParam::ACC_RAD,
                                          acc_rad_s2, "ACC_RAD")) {
                 _can->stopMotor(m.can_id, CAN_HOST_ID, false);
                 m.enabled = false;
@@ -402,7 +415,7 @@ bool MotorManager::setDriveRunMode(MotorRole role, RobstrideRunMode mode,
             }
         }
         if (current_limit_a > 0.0f) {
-            if (!writeFloatParamVerified(m.can_id, RobstrideParam::CURRENT_LIMIT,
+            if (!writeFloatParamChecked(m.can_id, RobstrideParam::CURRENT_LIMIT,
                                          current_limit_a, "CURRENT_LIMIT")) {
                 Serial.printf("[Motors] Current limit NOT confirmed on ID=%d\n", m.can_id);
                 _can->stopMotor(m.can_id, CAN_HOST_ID, false);

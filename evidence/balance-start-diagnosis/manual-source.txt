@@ -1,0 +1,5 @@
+Official manufacturer source:
+https://github.com/RobStride/Product_Information/blob/main/Product%20Literature/RS05/RS05User%20Manual260713.pdf
+PDF SHA-256: 1b2c61a6daa8331b9a348455005d10d6e425165c22e6f64c39cbca33f6360e82
+Reviewed printed page 52 / PDF page 54: ACC_RAD 0x7022 is W (write-only).
+Downloaded reference retained locally at output/RS05User-Manual260713.pdf.

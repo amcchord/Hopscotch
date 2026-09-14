@@ -179,8 +179,8 @@ private:
 
     int findMotorByCanId(uint8_t can_id);
     void configureMotorAfterEnable(int idx, float motor_pos);
-    bool writeFloatParamVerified(uint8_t can_id, uint16_t addr,
-                                 float value, const char* name);
+    bool writeFloatParamChecked(uint8_t can_id, uint16_t addr,
+                                float value, const char* name);
     int _scan_index = 0;
 
     float _bus_voltage = 0.0f;

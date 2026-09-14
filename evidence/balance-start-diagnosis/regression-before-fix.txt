@@ -1,0 +1,3 @@
+Test compiled against fcfc8aa production MotorManager; expected failure reproduced.
+Exit code: -6
+Assertion failed: (motors.setDriveRunMode(role, RobstrideRunMode::Speed, 100, 10)), function main, file test_motor_setup.cpp, line 106.

@@ -40,7 +40,7 @@ namespace RobstrideParam {
     static constexpr uint16_t SPEED_KP        = 0x701F;  // float: spd_kp, default 6
     static constexpr uint16_t SPEED_KI        = 0x7020;  // float: spd_ki, default 0.02
     static constexpr uint16_t SPEED_FILT_GAIN = 0x7021;  // float: spd_filt_gain, default 0.1
-    static constexpr uint16_t ACC_RAD         = 0x7022;  // float: velocity mode acceleration, default 20 rad/s^2
+    static constexpr uint16_t ACC_RAD         = 0x7022;  // float: velocity acceleration, default 20 rad/s^2; RS05 WRITE-ONLY
     static constexpr uint16_t VEL_MAX         = 0x7024;  // float: PP mode speed, default 10 rad/s
     static constexpr uint16_t ACC_SET         = 0x7025;  // float: PP mode acceleration, default 10 rad/s^2
 

@@ -1,0 +1,87 @@
+==================================================
+[Status] t=307946 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Motor] ID=10 ON  | pos=   0.20 (raw=  0.20 unwrap_off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.26 (raw=  2.51 unwrap_off= -0.25) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -1.48 (raw=  5.06 unwrap_off= -3.59) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -1.01 (raw=  3.57 unwrap_off= -2.55) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.70 (raw=  4.24 unwrap_off= -3.53) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   3.53 (raw=  3.53 unwrap_off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=2217 bus_err=25720
+[CAN] our_tx_ok=21732 our_tx_fail=32 our_rx=21493
+==================================================
+=== BALANCE STATUS ===
+  State: IDLE  (Speed mode off)
+  PD: Kp=2.0000  Kd=0.0800
+  Outer: drift_kp=0.0500  vel_kp=2.2000  vel_ki=0.3500
+  Cascade: sp_offset=0.000  integral=0.000  target_vel=0.000  filt_vel=0.000
+  Stored trim: 0.97 deg (persisted equilibrium estimate)
+  Balance loop: 200 Hz (control core, direct IMU)
+  IMU age: 5983 us, healthy since: 1786 ms, latched fault: 0x0000
+  Complementary filter: tilt=-4.3  gyro_rate=0.4
+  Max drive speed: 30.0 rad/s
+[309512][E][vfs_api.cpp:105] open(): /littlefs/bal_log.bin does not exist, no permits for creation
+[309540][E][vfs_api.cpp:105] open(): /littlefs/bal_log.bin does not exist, no permits for creation
+  Log: 72821 bytes, 0 buffered samples, schema v2
+  Logging: off  pending save: no  note: none
+======================
+[Dbg] Reading param 0x7018 from motor 30...
+[Dbg] Param 0x7018 = 10.000000 (hex: 00002041)
+==================================================
+[Loop] t=311952 tick=13093 | avg=34207us max=1188047us overruns=2 ctlgap=1267200us
+[Loop] link=1 rssi=-66 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +0.5 roll=  -4.9 yaw=+139.2  [CF] tilt=  -4.3 rate=  +0.3
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,1483
+[Arm] pos=FWD cal_mode=no | L: 0.70 (cal 0.00) R: 3.53 (cal -0.00)
+
+[Motor] ID=10 OFF | pos=   0.20 (raw=  0.20 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 OFF | pos=   2.26 (raw=  2.51 off= -0.25) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -1.48 (raw=  5.06 off= -3.59) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 OFF | pos=  -1.01 (raw=  3.57 off= -2.55) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 OFF | pos=   0.70 (raw=  4.24 off= -3.53) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 OFF | pos=   3.53 (raw=  3.53 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=2217 bus_err=25720
+[CAN] our_tx_ok=21813 our_tx_fail=32 our_rx=21575
+==================================================
+[Dbg] Reading param 0x7022 from motor 30...
+[Dbg] Param 0x7022 = 0.000000 (hex: 00000000)
+[Dbg] Reading param 0x7018 from motor 20...
+[Dbg] Param 0x7018 = 10.000000 (hex: 00002041)
+==================================================
+[Loop] t=314342 tick=13095 | avg=1193648us max=1218659us overruns=2 ctlgap=1267200us
+[Loop] link=1 rssi=-66 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +0.3 roll=  -4.9 yaw=+139.2  [CF] tilt=  -4.3 rate=  +0.4
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,1334
+[Arm] pos=FWD cal_mode=no | L: 0.70 (cal 0.00) R: 3.53 (cal -0.00)
+
+[Motor] ID=10 OFF | pos=   0.20 (raw=  0.20 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 OFF | pos=   2.26 (raw=  2.51 off= -0.25) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 OFF | pos=  -1.48 (raw=  5.06 off= -3.59) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 OFF | pos=  -1.01 (raw=  3.57 off= -2.55) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 OFF | pos=   0.70 (raw=  4.24 off= -3.53) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 OFF | pos=   3.53 (raw=  3.53 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=2217 bus_err=25720
+[CAN] our_tx_ok=21817 our_tx_fail=32 our_rx=21579
+==================================================
+[Dbg] Reading param 0x7022 from motor 20...
+[Dbg] Param 0x7022 = 0.000000 (hex: 00000000)
+==================================================
+[Loop] t=316387 tick=13099 | avg=515243us max=1129809us overruns=2 ctlgap=1267200us
+[Loop] link=1 rssi=-60 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +0.3 roll=  -4.7 yaw=+139.2  [CF] tilt=  -4.3 rate=  +0.4
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,1274
+[Arm] pos=FWD cal_mode=no | L: 0.70 (cal 0.00) R: 3.53 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=   0.20 (raw=  0.20 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.26 (raw=  2.51 off= -0.25) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 OFF | pos=  -1.48 (raw=  5.06 off= -3.59) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 OFF | pos=  -1.01 (raw=  3.57 off= -2.55) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 OFF | pos=   0.70 (raw=  4.24 off= -3.53) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 OFF | pos=   3.53 (raw=  3.53 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=2217 bus_err=25720
+[CAN] our_tx_ok=21821 our_tx_fail=32 our_rx=21582
+==================================================

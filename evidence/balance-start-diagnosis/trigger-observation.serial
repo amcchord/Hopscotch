@@ -1,0 +1,1333 @@
+==================================================
+[Loop] t=197897 tick=7605 | avg=8352us max=10699us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -6.9 yaw=+189.6  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1036
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.07 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.29 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.21 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.4V  [Current] 0.38A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=23684 bus_err=15847
+[CAN] our_tx_ok=96326 our_tx_fail=0 our_rx=96319
+==================================================
+==================================================
+[Loop] t=199900 tick=7705 | avg=8402us max=10637us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-76 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -7.0 yaw=+189.7  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.32 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.4V  [Current] 0.45A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=24006 bus_err=15847
+[CAN] our_tx_ok=97613 our_tx_fail=0 our_rx=97606
+==================================================
+==================================================
+[Loop] t=201907 tick=7805 | avg=8338us max=10419us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-74 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.2 roll=  -7.1 yaw=+189.8  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1066
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.38 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.04 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.22 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq=-0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.4V  [Current] 0.46A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=24325 bus_err=15847
+[CAN] our_tx_ok=98926 our_tx_fail=0 our_rx=98919
+==================================================
+==================================================
+[Loop] t=203907 tick=7905 | avg=8383us max=10709us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-77 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -7.1 yaw=+190.0  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,976
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.33 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.25 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.10 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.55A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=24637 bus_err=15847
+[CAN] our_tx_ok=100226 our_tx_fail=0 our_rx=100219
+==================================================
+==================================================
+[Loop] t=205912 tick=8005 | avg=8334us max=11046us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-76 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+190.1  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1036
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.35 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.22 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.4V  [Current] 0.51A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=-0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=24958 bus_err=15847
+[CAN] our_tx_ok=101526 our_tx_fail=0 our_rx=101519
+==================================================
+==================================================
+[Loop] t=207912 tick=8105 | avg=8288us max=11272us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-73 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.2 roll=  -6.8 yaw=+190.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1125
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.25 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.53A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=-0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=25287 bus_err=15847
+[CAN] our_tx_ok=102826 our_tx_fail=0 our_rx=102819
+==================================================
+==================================================
+[Loop] t=209912 tick=8205 | avg=8295us max=10039us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-83 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+190.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,827
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.07 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.01 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.55A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=-0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=25621 bus_err=15847
+[CAN] our_tx_ok=104126 our_tx_fail=0 our_rx=104119
+==================================================
+==================================================
+[Loop] t=211921 tick=8305 | avg=8330us max=10847us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-78 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+190.5  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1066
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.31 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.29 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.11 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.4V  [Current] 0.63A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=-0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=25938 bus_err=15847
+[CAN] our_tx_ok=105413 our_tx_fail=0 our_rx=105406
+==================================================
+[ArmInput] cal=1 move=0 jump=1
+[Main] Single tap Ch11 -- normal tip-up
+[Motors] Param ACC_RAD write to ID=30 not verified (attempt 1, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=30 not verified (attempt 2, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=30 not verified (attempt 3, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=30 not verified (attempt 4, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=20 not verified (attempt 1, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=20 not verified (attempt 2, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=20 not verified (attempt 3, read 0.00, want 100.00)
+[Motors] Param ACC_RAD write to ID=20 not verified (attempt 4, read 0.00, want 100.00)
+[Motors] Motor ID=30 run mode -> 5
+[Motors] Motor ID=20 run mode -> 5
+[Balance] Tip-up REFUSED: speed mode switch failed
+==================================================
+[Loop] t=213931 tick=8360 | avg=25317us max=703286us overruns=3 ctlgap=1344919us
+[Loop] link=1 rssi=-68 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -6.9 yaw=+190.6  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,827
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.05 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.34 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.05 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.63A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=26121 bus_err=15847
+[CAN] our_tx_ok=106175 our_tx_fail=0 our_rx=106168
+==================================================
+==================================================
+[Loop] t=215933 tick=8460 | avg=8258us max=10866us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-88 lq=98 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+190.7  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,619
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.17 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.40A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=26439 bus_err=15847
+[CAN] our_tx_ok=107462 our_tx_fail=0 our_rx=107455
+==================================================
+==================================================
+[Loop] t=218283 tick=8516 | avg=29986us max=916792us overruns=3 ctlgap=1344919us
+[Loop] link=1 rssi=-86 lq=98 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -6.9 yaw=+190.8  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1779,798
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.01 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.45 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.2 rad/s (    2 RPM) | trq= 0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.43A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=26616 bus_err=15847
+[CAN] our_tx_ok=108203 our_tx_fail=0 our_rx=108196
+==================================================
+==================================================
+[Loop] t=220283 tick=8616 | avg=8361us max=10851us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-83 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.7 yaw=+190.9  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,768
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.07 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.41 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.15 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.65A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=26934 bus_err=15847
+[CAN] our_tx_ok=109490 our_tx_fail=0 our_rx=109483
+==================================================
+==================================================
+[Loop] t=222287 tick=8716 | avg=8398us max=10736us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-84 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.7 yaw=+191.0  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,768
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.04 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.43 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.07 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.49A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=27257 bus_err=15847
+[CAN] our_tx_ok=110790 our_tx_fail=0 our_rx=110783
+==================================================
+==================================================
+[Loop] t=224287 tick=8816 | avg=8218us max=10474us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-84 lq=88 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.1 yaw=+191.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1680,798
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.01 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.07 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.35 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.10 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.43A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=27575 bus_err=15847
+[CAN] our_tx_ok=112103 our_tx_fail=0 our_rx=112096
+==================================================
+==================================================
+[Loop] t=226287 tick=8916 | avg=8372us max=11112us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -6.8 yaw=+191.3  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.05 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.34 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.45A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=27891 bus_err=15847
+[CAN] our_tx_ok=113403 our_tx_fail=0 our_rx=113396
+==================================================
+==================================================
+[Loop] t=228287 tick=9016 | avg=8366us max=10688us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.1 yaw=+191.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.43 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.2 rad/s (    2 RPM) | trq=-0.13 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.57A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=28216 bus_err=15847
+[CAN] our_tx_ok=114703 our_tx_fail=0 our_rx=114696
+==================================================
+==================================================
+[Loop] t=230290 tick=9116 | avg=8278us max=10700us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.7 yaw=+191.6  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1245
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.06 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.49 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.54A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=28543 bus_err=15847
+[CAN] our_tx_ok=115990 our_tx_fail=0 our_rx=115983
+==================================================
+==================================================
+[Loop] t=232290 tick=9216 | avg=8268us max=10818us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.9 yaw=+191.7  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.09 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.49 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.73A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=28875 bus_err=15847
+[CAN] our_tx_ok=117290 our_tx_fail=0 our_rx=117283
+==================================================
+==================================================
+[Loop] t=234292 tick=9316 | avg=8276us max=10040us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-69 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.2 roll=  -6.9 yaw=+191.8  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1334
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.40 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.05 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.69A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=29197 bus_err=15847
+[CAN] our_tx_ok=118603 our_tx_fail=0 our_rx=118596
+==================================================
+==================================================
+[Loop] t=236292 tick=9416 | avg=8268us max=10893us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=98 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -7.1 yaw=+192.0  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1779,1096
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.1 rad/s (   -0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.12 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.41 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.04 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.60A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -0 RPM) | spd_err=+0.1 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=29524 bus_err=15847
+[CAN] our_tx_ok=119903 our_tx_fail=0 our_rx=119896
+==================================================
+==================================================
+[Loop] t=238300 tick=9516 | avg=8307us max=10856us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-74 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.7 yaw=+192.1  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1215
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.12 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.37 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.23 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.56A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=29857 bus_err=15847
+[CAN] our_tx_ok=121190 our_tx_fail=0 our_rx=121183
+==================================================
+==================================================
+[Loop] t=240302 tick=9616 | avg=8252us max=10210us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.1 yaw=+192.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1185
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.40 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.61A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=30190 bus_err=15847
+[CAN] our_tx_ok=122503 our_tx_fail=0 our_rx=122496
+==================================================
+==================================================
+[Loop] t=242302 tick=9716 | avg=8294us max=10235us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.7 yaw=+192.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1125
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.12 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.62A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=30515 bus_err=15847
+[CAN] our_tx_ok=123790 our_tx_fail=0 our_rx=123783
+==================================================
+==================================================
+[Loop] t=244302 tick=9816 | avg=8244us max=10241us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-73 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+192.5  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1096
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.17 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.13 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.17 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.51A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=30846 bus_err=15847
+[CAN] our_tx_ok=125103 our_tx_fail=0 our_rx=125096
+==================================================
+==================================================
+[Loop] t=246302 tick=9916 | avg=8297us max=10665us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.8 yaw=+192.6  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1245
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.25 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.2 rad/s (   -2 RPM) | trq= 0.19 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.54A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.00
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=31179 bus_err=15847
+[CAN] our_tx_ok=126403 our_tx_fail=0 our_rx=126396
+==================================================
+==================================================
+[Loop] t=248305 tick=10016 | avg=8285us max=10557us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.2 roll=  -6.9 yaw=+192.8  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1185
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.55A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=31503 bus_err=15847
+[CAN] our_tx_ok=127690 our_tx_fail=0 our_rx=127683
+==================================================
+==================================================
+[Loop] t=250305 tick=10116 | avg=8337us max=10374us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+192.9  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1274
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.04 (raw=  0.04 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq=-0.08 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.59A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.04 | pos_err=+0.00
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=31821 bus_err=15847
+[CAN] our_tx_ok=128990 our_tx_fail=0 our_rx=128983
+==================================================
+==================================================
+[Loop] t=252305 tick=10216 | avg=8339us max=10672us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -6.9 yaw=+193.1  [CF] tilt=  -7.1 rate=  -0.0
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1334
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.31 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.04 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.69A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=32134 bus_err=15847
+[CAN] our_tx_ok=130290 our_tx_fail=0 our_rx=130283
+==================================================
+==================================================
+[Loop] t=254316 tick=10316 | avg=8311us max=10879us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.6 yaw=+193.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1125
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.19 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.07 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.53A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=32457 bus_err=15847
+[CAN] our_tx_ok=131590 our_tx_fail=0 our_rx=131583
+==================================================
+==================================================
+[Loop] t=256317 tick=10416 | avg=8397us max=10696us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-73 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.2 roll=  -7.1 yaw=+193.3  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1185
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.35 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.07 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.62A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=32772 bus_err=15847
+[CAN] our_tx_ok=132903 our_tx_fail=0 our_rx=132896
+==================================================
+==================================================
+[Loop] t=258317 tick=10516 | avg=8393us max=10717us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-69 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+193.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1245
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.35 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.2 rad/s (    2 RPM) | trq= 0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.53A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=33087 bus_err=15847
+[CAN] our_tx_ok=134203 our_tx_fail=0 our_rx=134196
+==================================================
+==================================================
+[Loop] t=260324 tick=10567 | avg=27813us max=1001455us overruns=1 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+193.5  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.09 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.54A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=33243 bus_err=15847
+[CAN] our_tx_ok=134853 our_tx_fail=0 our_rx=134846
+==================================================
+==================================================
+[Loop] t=262325 tick=10667 | avg=8291us max=10658us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.1 roll=  -6.9 yaw=+193.6  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.1 rad/s (    1 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.04 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.48A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=33559 bus_err=15847
+[CAN] our_tx_ok=136153 our_tx_fail=0 our_rx=136146
+==================================================
+==================================================
+[Loop] t=264330 tick=10767 | avg=8344us max=11194us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.8 yaw=+193.7  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.16 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.46A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=33872 bus_err=15847
+[CAN] our_tx_ok=137453 our_tx_fail=0 our_rx=137446
+==================================================
+==================================================
+[Loop] t=266330 tick=10867 | avg=8285us max=10224us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-68 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.9 yaw=+193.9  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1394
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.10 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.18 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.74A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=34191 bus_err=15847
+[CAN] our_tx_ok=138753 our_tx_fail=0 our_rx=138746
+==================================================
+==================================================
+[Loop] t=268332 tick=10967 | avg=8323us max=11324us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-67 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.2 yaw=+194.0  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1394
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.25 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.26 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.07 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.62A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=34521 bus_err=15847
+[CAN] our_tx_ok=140066 our_tx_fail=0 our_rx=140059
+==================================================
+==================================================
+[Loop] t=270332 tick=11067 | avg=8279us max=10039us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.9 yaw=+194.1  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1364
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.08 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.56A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=34840 bus_err=15847
+[CAN] our_tx_ok=141366 our_tx_fail=0 our_rx=141359
+==================================================
+==================================================
+[Loop] t=272332 tick=11167 | avg=8272us max=10277us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-66 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.9 yaw=+194.3  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1274
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.34 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.06 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.81A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=35164 bus_err=15847
+[CAN] our_tx_ok=142666 our_tx_fail=0 our_rx=142659
+==================================================
+==================================================
+[Loop] t=274342 tick=11267 | avg=8392us max=11362us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-69 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.1 yaw=+194.4  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1334
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.13 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.27 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.01 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.52A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=35471 bus_err=15847
+[CAN] our_tx_ok=143966 our_tx_fail=0 our_rx=143959
+==================================================
+==================================================
+[Loop] t=276342 tick=11367 | avg=8287us max=10216us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+194.5  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1305
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.21 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.06 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.01 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.60A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=35810 bus_err=15847
+[CAN] our_tx_ok=145266 our_tx_fail=0 our_rx=145259
+==================================================
+==================================================
+[Loop] t=278342 tick=11467 | avg=8265us max=10238us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-66 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.8 yaw=+194.7  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1274
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.53A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=36137 bus_err=15847
+[CAN] our_tx_ok=146566 our_tx_fail=0 our_rx=146559
+==================================================
+==================================================
+[Loop] t=280345 tick=11567 | avg=8348us max=10636us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.8 yaw=+194.8  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1305
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.29 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.27 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.08 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.73A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=36454 bus_err=15847
+[CAN] our_tx_ok=147853 our_tx_fail=0 our_rx=147847
+==================================================
+==================================================
+[Loop] t=282347 tick=11667 | avg=8372us max=10458us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -7.0 yaw=+194.9  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.33 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.2 rad/s (   -1 RPM) | trq= 0.22 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.11 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.73A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=36769 bus_err=15847
+[CAN] our_tx_ok=149166 our_tx_fail=0 our_rx=149159
+==================================================
+==================================================
+[Loop] t=284347 tick=11767 | avg=8254us max=10326us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+195.1  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1423
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.34 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.04 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.68A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=37097 bus_err=15847
+[CAN] our_tx_ok=150466 our_tx_fail=0 our_rx=150459
+==================================================
+==================================================
+[Loop] t=286347 tick=11867 | avg=8338us max=10424us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-68 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -7.0 yaw=+195.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.36 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.32 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.77A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=37416 bus_err=15847
+[CAN] our_tx_ok=151766 our_tx_fail=0 our_rx=151759
+==================================================
+==================================================
+[Loop] t=288347 tick=11967 | avg=8339us max=10287us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+195.3  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1215
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.36 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.33 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.38 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.98A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=37730 bus_err=15847
+[CAN] our_tx_ok=153066 our_tx_fail=0 our_rx=153059
+==================================================
+==================================================
+[Loop] t=290347 tick=12067 | avg=8278us max=10728us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.6 roll=  -7.0 yaw=+195.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1215
+[Arm] pos=FWD cal_mode=no | L: 7.59 (cal -0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.36 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.58 (raw=  4.58 off=  0.00) | vel=   0.1 rad/s (    0 RPM) | trq=-0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.59 (raw=  7.63 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.05 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.09 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.76A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    0 RPM) | spd_err=-0.1 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=38048 bus_err=15847
+[CAN] our_tx_ok=154366 our_tx_fail=0 our_rx=154359
+==================================================
+==================================================
+[Loop] t=292347 tick=12167 | avg=8295us max=10650us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-67 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.9 yaw=+195.6  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1305
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.38 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.35 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.11 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -0 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.70A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=38371 bus_err=15847
+[CAN] our_tx_ok=155666 our_tx_fail=0 our_rx=155659
+==================================================
+==================================================
+[Loop] t=294347 tick=12267 | avg=8355us max=10651us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-67 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.0 yaw=+195.6  [CF] tilt=  -7.1 rate=  -0.0
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1215
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.03 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.46 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.41 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.71A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=38690 bus_err=15847
+[CAN] our_tx_ok=156966 our_tx_fail=0 our_rx=156959
+==================================================
+==================================================
+[Loop] t=296652 tick=12318 | avg=33838us max=812763us overruns=2 ctlgap=1344919us
+[Loop] link=1 rssi=-64 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.8 yaw=+195.7  [CF] tilt=  -7.1 rate=  -0.0
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1245
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.24 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.41 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.18 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.31 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.2 rad/s (   -2 RPM) | trq=-0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.18 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.71A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.01
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.58 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=38851 bus_err=15847
+[CAN] our_tx_ok=157629 our_tx_fail=0 our_rx=157622
+==================================================
+==================================================
+[Loop] t=298652 tick=12418 | avg=8275us max=10839us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-65 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+195.8  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1305
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.95 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.24 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.32 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.22 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.42 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.03 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq= 0.16 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.76A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.24 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=39159 bus_err=15847
+[CAN] our_tx_ok=158916 our_tx_fail=0 our_rx=158910
+==================================================
+==================================================
+[Loop] t=300656 tick=12518 | avg=8389us max=10705us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-72 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -7.1 yaw=+195.9  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1245
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq=-0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.30 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.23 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.44 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.04 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.05 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.75A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=39485 bus_err=15847
+[CAN] our_tx_ok=160216 our_tx_fail=0 our_rx=160209
+==================================================
+==================================================
+[Loop] t=302662 tick=12618 | avg=8394us max=10737us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-69 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.3 roll=  -6.7 yaw=+196.0  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1185
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq=-0.06 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.34 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.58 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.45 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.02 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.71A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=39803 bus_err=15847
+[CAN] our_tx_ok=161529 our_tx_fail=0 our_rx=161522
+==================================================
+==================================================
+[Loop] t=304662 tick=12718 | avg=8279us max=10248us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.9 yaw=+196.2  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.33 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.45 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq=-0.21 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.14 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.60A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=40119 bus_err=15847
+[CAN] our_tx_ok=162829 our_tx_fail=0 our_rx=162822
+==================================================
+==================================================
+[Loop] t=306662 tick=12818 | avg=8280us max=10187us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-67 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.7 yaw=+196.3  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1394
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq=-0.11 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.34 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.19 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.55 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.0 rad/s (    0 RPM) | trq= 0.02 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.12 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.84A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=40444 bus_err=15847
+[CAN] our_tx_ok=164129 our_tx_fail=0 our_rx=164122
+==================================================
+==================================================
+[Loop] t=308665 tick=12918 | avg=8316us max=10426us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-66 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.8 yaw=+196.4  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1364
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq=-0.07 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.28 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.20 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.47 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.09 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.65A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=40766 bus_err=15847
+[CAN] our_tx_ok=165416 our_tx_fail=0 our_rx=165409
+==================================================
+==================================================
+[Loop] t=310666 tick=13018 | avg=8338us max=10760us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-71 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -6.9 yaw=+196.6  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1364
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.32 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.52 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.06 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.60A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=41082 bus_err=15847
+[CAN] our_tx_ok=166716 our_tx_fail=0 our_rx=166709
+==================================================
+==================================================
+[Loop] t=312667 tick=13118 | avg=8287us max=10390us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -7.0 yaw=+196.7  [CF] tilt=  -7.1 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1156
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.1 rad/s (    1 RPM) | trq= 0.01 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.33 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.48 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.04 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.62A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.1 rad/s (    1 RPM) | spd_err=-0.1 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=41401 bus_err=15847
+[CAN] our_tx_ok=168029 our_tx_fail=0 our_rx=168022
+==================================================
+==================================================
+[Loop] t=314668 tick=13218 | avg=8286us max=10665us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-70 lq=99 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.5 roll=  -6.8 yaw=+196.8  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1795,1215
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.27 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.16 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.42 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.01 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.02 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.73A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.1 rad/s (   -1 RPM) | spd_err=+0.1 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=41725 bus_err=15847
+[CAN] our_tx_ok=169329 our_tx_fail=0 our_rx=169322
+==================================================
+==================================================
+[Loop] t=316671 tick=13318 | avg=8288us max=11047us overruns=0 ctlgap=1344919us
+[Loop] link=1 rssi=-69 lq=100 | drv_armed=1 arm_armed=1 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  -0.4 roll=  -7.2 yaw=+197.0  [CF] tilt=  -7.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,1792,1792,191,191,0,0,1811,1334
+[Arm] pos=FWD cal_mode=no | L: 7.60 (cal 0.00) R: -0.14 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=-131.62 (raw= -5.96 off=-125.67) | vel=   0.0 rad/s (    0 RPM) | trq= 0.08 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   2.23 (raw=  2.23 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.24 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.05 (raw=  0.05 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.15 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -4.59 (raw=  4.59 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.48 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   7.60 (raw=  7.64 off= -0.04) | vel=   0.1 rad/s (    1 RPM) | trq= 0.08 Nm | tmp=25.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.15 Nm | tmp=26.0C | err=0x00
+[VBUS] 23.3V  [Current] 0.62A
+[Drive] --- Per-Motor Status ---
+[Drive] M0 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=   0.0 rad/s (    0 RPM) | spd_err=-0.0 | tgt_pos=-131.62 | act_pos=-131.62 | pos_err=-0.00
+[Drive] M1 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=   2.23 | act_pos=   2.23 | pos_err=-0.01
+[Drive] M2 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -0.04 | act_pos=  -0.05 | pos_err=+0.01
+[Drive] M3 IDLE | cmd=   0.0 rad/s (    0 RPM) | act=  -0.0 rad/s (   -0 RPM) | spd_err=+0.0 | tgt_pos=  -4.58 | act_pos=  -4.59 | pos_err=+0.01
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=42059 bus_err=15847
+[CAN] our_tx_ok=170616 our_tx_fail=0 our_rx=170609
+==================================================
