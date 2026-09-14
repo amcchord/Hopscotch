@@ -1,0 +1,28 @@
+{
+  "disarmed": true,
+  "motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "imu_age_samples_us": [
+    2091,
+    8421,
+    7422
+  ],
+  "imu_faults": [
+    "0x0000",
+    "0x0000",
+    "0x0000"
+  ],
+  "calibration_retained": true,
+  "trim_retained": true,
+  "return_gain_correct": true,
+  "can_errors_zero": true,
+  "legacy_usb_rows": 673,
+  "legacy_usb_rows_exactly_match_backup": true,
+  "full_v2_hardware_capture_tested": false
+}
