@@ -1,0 +1,8 @@
+{'name': 'baseline', 'failures': 1, 'median_peak_drift': 4.759735198320452}
+{'name': 'gate15', 'failures': 4, 'median_peak_drift': 9.1392447238945}
+{'name': 'gate25', 'failures': 3, 'median_peak_drift': 6.317307806383802}
+{'name': 'gate4', 'failures': 2, 'median_peak_drift': 5.2925529417471395}
+{'name': 'smooth', 'failures': 3, 'median_peak_drift': 7.992996117004205}
+{'name': 'smooth_fast', 'failures': 1, 'median_peak_drift': 5.226172554958258}
+{'name': 'smooth_gate25', 'failures': 8, 'median_peak_drift': 14.808127997168338}
+{'name': 'smooth_fast_gate25', 'failures': 3, 'median_peak_drift': 7.611596285170266}

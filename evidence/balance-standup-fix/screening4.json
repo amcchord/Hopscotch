@@ -1,0 +1,891 @@
+[
+  {
+    "name": "legacy_decode",
+    "failures": 8,
+    "median_peak_drift": 10.285899061649747,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 11.4,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.401434724289075,
+        "peak_drift": 14.527936918729273
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": false,
+        "duration": 14.98,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -7.660308367500808,
+        "peak_drift": -14.81774938943638
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.1000000000000005,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.407790739484716,
+        "peak_drift": 29.888259358846934
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.72,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -8.88436050290936,
+        "peak_drift": -26.471157035948103
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.98,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.982347680492922,
+        "peak_drift": 41.60928498565534
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": false,
+        "duration": 14.98,
+        "ramp": 2.98,
+        "drift_at_ramp": -7.884501711358075,
+        "peak_drift": -12.920463595013398
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.42,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 34.263469968687446
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.4,
+        "ramp": 2.98,
+        "drift_at_ramp": -9.241589063429698,
+        "peak_drift": -19.73810573907344
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.36,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 34.838493733576755
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": false,
+        "duration": 14.98,
+        "ramp": 3.42,
+        "drift_at_ramp": -6.253884331365095,
+        "peak_drift": -6.653953150191518
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.12,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 31.328118858463448
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": false,
+        "duration": 14.98,
+        "ramp": 3.48,
+        "drift_at_ramp": -7.382443008607582,
+        "peak_drift": -7.651334528286097
+      }
+    ]
+  },
+  {
+    "name": "correct_decode",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 6.16,
+        "ramp": 2.16,
+        "drift_at_ramp": 3.8315755019558466,
+        "peak_drift": 7.240174729230354
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.8,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -5.144740940883014,
+        "peak_drift": -7.783966332505158
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.54,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.034762559078201,
+        "peak_drift": 12.408767560060918
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.48,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -5.870779369660929,
+        "peak_drift": -9.737203185838975
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.0,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.330449738500129,
+        "peak_drift": 28.98886144629807
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.640000000000001,
+        "ramp": 2.98,
+        "drift_at_ramp": -4.653161783817727,
+        "peak_drift": 7.068103537548434
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.8200000000000003,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.780826686080673,
+        "peak_drift": 37.31502492540046
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.18,
+        "ramp": 3.0,
+        "drift_at_ramp": -5.231510870260861,
+        "peak_drift": 6.874176182283224
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.66,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.744971955187182,
+        "peak_drift": 36.68437481958163
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 10.24,
+        "ramp": 2.96,
+        "drift_at_ramp": -2.6804195662857615,
+        "peak_drift": -4.532729557920979
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.24,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 31.563593672316394
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.24,
+        "ramp": 3.38,
+        "drift_at_ramp": -2.1014593009861824,
+        "peak_drift": -13.521732117337313
+      }
+    ]
+  },
+  {
+    "name": "kp24",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 8.1,
+        "ramp": 2.16,
+        "drift_at_ramp": 2.881008650764719,
+        "peak_drift": -7.212678928121559
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.92,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -4.120582916788231,
+        "peak_drift": 7.844768027304741
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.62,
+        "ramp": 2.16,
+        "drift_at_ramp": 3.8063636776184833,
+        "peak_drift": 7.134382280992236
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.68,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -4.496234028155012,
+        "peak_drift": 9.300669530665491
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 7.0600000000000005,
+        "ramp": 2.16,
+        "drift_at_ramp": 4.372307533190594,
+        "peak_drift": 11.28678693415356
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.120000000000001,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.3915789642718734,
+        "peak_drift": 7.348014977761847
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 7.96,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.39142248156039,
+        "peak_drift": 22.072560426999694
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.04,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.871348832520446,
+        "peak_drift": 6.829165034897534
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.54,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.595680388110347,
+        "peak_drift": 37.2116057003802
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 10.88,
+        "ramp": 2.92,
+        "drift_at_ramp": -2.425270881996567,
+        "peak_drift": -4.231140360689874
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.6,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 35.971325041860545
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 7.0200000000000005,
+        "ramp": 3.04,
+        "drift_at_ramp": -2.711482723135016,
+        "peak_drift": 7.8774775423170285
+      }
+    ]
+  },
+  {
+    "name": "kp28",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 7.58,
+        "ramp": 3.04,
+        "drift_at_ramp": 4.593353132089204,
+        "peak_drift": -8.06510200036609
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.74,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.8865527515784972,
+        "peak_drift": 8.338125980857864
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 6.26,
+        "ramp": 3.16,
+        "drift_at_ramp": 5.202439357599123,
+        "peak_drift": -10.200466801150142
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 7.18,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -4.085127335940496,
+        "peak_drift": 8.523217587421827
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 6.8,
+        "ramp": 4.28,
+        "drift_at_ramp": 18.72780062271472,
+        "peak_drift": 57.21546990560046
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.620000000000001,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.3356476646826394,
+        "peak_drift": 8.164181323314548
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.82,
+        "ramp": 4.34,
+        "drift_at_ramp": 22.10004527515595,
+        "peak_drift": 58.402708559988525
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.7,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.4700257484545793,
+        "peak_drift": 8.683434302983294
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.82,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 48.69065050581188
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.64,
+        "ramp": 2.86,
+        "drift_at_ramp": -2.489016319283757,
+        "peak_drift": 8.984451509879193
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.58,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 44.796638471742476
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.34,
+        "ramp": 2.86,
+        "drift_at_ramp": -2.745633028241083,
+        "peak_drift": 8.827365900478824
+      }
+    ]
+  },
+  {
+    "name": "smooth12",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.86,
+        "ramp": 2.22,
+        "drift_at_ramp": 3.980242673223465,
+        "peak_drift": 7.516877754010122
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.86,
+        "ramp": 2.82,
+        "drift_at_ramp": -5.409887441010489,
+        "peak_drift": -8.217893306966676
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.78,
+        "ramp": 2.22,
+        "drift_at_ramp": 5.283462731240777,
+        "peak_drift": 13.237851070926554
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.62,
+        "ramp": 2.82,
+        "drift_at_ramp": -6.196413711143646,
+        "peak_drift": -10.30260349897371
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.9,
+        "ramp": 2.22,
+        "drift_at_ramp": 5.51283037601937,
+        "peak_drift": 31.117238839834542
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.16,
+        "ramp": 3.04,
+        "drift_at_ramp": -4.864825046346061,
+        "peak_drift": -6.303940811620464
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.8200000000000003,
+        "ramp": 2.22,
+        "drift_at_ramp": 7.06674181478507,
+        "peak_drift": 36.69165575455428
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.18,
+        "ramp": 3.06,
+        "drift_at_ramp": -5.626888154299248,
+        "peak_drift": -7.172077892194076
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.7,
+        "ramp": 2.22,
+        "drift_at_ramp": 6.941069883056829,
+        "peak_drift": 36.59186053045566
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 14.22,
+        "ramp": 2.98,
+        "drift_at_ramp": -2.8927795813924053,
+        "peak_drift": -3.4758517647781133
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.2800000000000002,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 31.642566174606298
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.5200000000000005,
+        "ramp": 3.36,
+        "drift_at_ramp": -2.596343326585843,
+        "peak_drift": -12.581500534672514
+      }
+    ]
+  },
+  {
+    "name": "rampkp10",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 6.38,
+        "ramp": 3.04,
+        "drift_at_ramp": 3.9712441557687166,
+        "peak_drift": -7.757161659879661
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.72,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.7516596807554516,
+        "peak_drift": 7.578302792121753
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.74,
+        "ramp": 3.12,
+        "drift_at_ramp": 4.5883357985635085,
+        "peak_drift": -10.563808526751583
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 10.18,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.604377686364773,
+        "peak_drift": -4.299354966605895
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.16,
+        "ramp": 4.32,
+        "drift_at_ramp": 23.068523929062064,
+        "peak_drift": 46.50453388003606
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.36,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -2.823678275757724,
+        "peak_drift": 7.368606073057054
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.8,
+        "ramp": 4.3,
+        "drift_at_ramp": 26.922458774372313,
+        "peak_drift": 41.54386174646378
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.16,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -3.0637696150245772,
+        "peak_drift": -4.327639173197579
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.3,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 37.56503785381048
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.26,
+        "ramp": 3.1,
+        "drift_at_ramp": -2.527351245140601,
+        "peak_drift": -8.976783963256382
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.12,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 34.75413088444641
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 8.4,
+        "ramp": 2.98,
+        "drift_at_ramp": -3.1083230592636406,
+        "peak_drift": -6.0516189391206545
+      }
+    ]
+  },
+  {
+    "name": "off25",
+    "failures": 12,
+    "median_peak_drift": null,
+    "cases": [
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.98,
+        "ramp": 2.16,
+        "drift_at_ramp": 3.831674869736752,
+        "peak_drift": 7.155124827724599
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.0,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -5.064516507992011,
+        "peak_drift": -7.473732639553951
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 5.5,
+        "ramp": 2.16,
+        "drift_at_ramp": 4.911256360033549,
+        "peak_drift": 10.025114492336131
+      },
+      {
+        "delta": -1.9,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 5.34,
+        "ramp": 2.7600000000000002,
+        "drift_at_ramp": -5.745481766885112,
+        "peak_drift": -8.75925974791674
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 11.22,
+        "ramp": 2.16,
+        "drift_at_ramp": 5.417800716592358,
+        "peak_drift": 17.325077617971715
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.640000000000001,
+        "ramp": 2.98,
+        "drift_at_ramp": -4.628276737460306,
+        "peak_drift": 7.1300805264999765
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 4.22,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.619436952887295,
+        "peak_drift": 39.96246890545219
+      },
+      {
+        "delta": -3.3,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.0,
+        "ramp": 2.96,
+        "drift_at_ramp": -5.042342629436131,
+        "peak_drift": 7.148354954392268
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.92,
+        "ramp": 2.16,
+        "drift_at_ramp": 6.7229490826794445,
+        "peak_drift": 39.73649087240637
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.06,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 10.24,
+        "ramp": 2.96,
+        "drift_at_ramp": -2.6804195662857615,
+        "peak_drift": -4.532729557920979
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": -0.8,
+        "fell": true,
+        "duration": 3.36,
+        "ramp": null,
+        "drift_at_ramp": 0.0,
+        "peak_drift": 32.201232758570725
+      },
+      {
+        "delta": -4.5,
+        "lag": 0.15,
+        "offset": 0.8,
+        "fell": true,
+        "duration": 6.24,
+        "ramp": 3.38,
+        "drift_at_ramp": -2.1014593009861824,
+        "peak_drift": -13.521732117337313
+      }
+    ]
+  }
+]

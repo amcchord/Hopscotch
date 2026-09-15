@@ -27,6 +27,23 @@ int main() {
     }
     const auto saturated = balance_math::mix(30, 1.5, 30);
     assert(saturated.left == 30 && saturated.right == 30 && saturated.yaw == 0);
+    // Unit migration preserves the existing velocity feedback response.
+    const float scale = BALANCE_WHEEL_VELOCITY_SCALE;
+    for (int i=0; i<10000; ++i) {
+        const float old_vel = command(rng), drift = command(rng);
+        const float old_target = balance_math::clamp(-0.05f*drift, -1.0f, 1.0f);
+        const float new_target = balance_math::clamp(-BALANCE_DRIFT_VEL_KP*drift,
+            -BALANCE_DRIFT_MAX_VEL, BALANCE_DRIFT_MAX_VEL);
+        const float old_err=old_vel-old_target, new_err=old_vel*scale-new_target;
+        const auto p = [](float err,float knee,float low,float high) {
+            float v=std::fabs(err);
+            return std::copysign(v<=knee ? low*v : low*knee+high*(v-knee),err);
+        };
+        assert(std::fabs(p(old_err,.8f,.7f,2.2f)-p(new_err,BALANCE_VEL_SP_KNEE,
+            BALANCE_VEL_SP_KP_LOW,BALANCE_VEL_SP_KP))<.0001f);
+        assert(std::fabs(.35f*old_err-BALANCE_VEL_SP_KI*new_err)<.0001f);
+        assert(std::fabs(.4f*old_err-BALANCE_ARM_ASSIST_GAIN*new_err)<.0001f);
+    }
     {
     const std::string payload = "hello";
     TelemetryTransport transport;

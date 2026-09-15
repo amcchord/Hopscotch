@@ -52,10 +52,12 @@ class TelemetryTests(unittest.TestCase):
     def test_simulator_reads_candidate_settings(self):
         c = current_firmware_config()
         self.assertEqual(c.ramp_off_clamp, 1.5)
-        self.assertEqual(c.drift_vel_kp, 0.05)
+        self.assertAlmostEqual(c.drift_vel_kp, 0.05*50/33)
         self.assertEqual(c.arm_emergency_cmd_frac, 0.45)
         self.assertEqual(c.arm_calm_ms, 300)
         self.assertEqual(c.base_sp_rate_max, 4)
+        self.assertEqual(c.arm_return_acceleration, 0)
+        self.assertAlmostEqual(c.vel_sp_kp, 2.2*33/50)
         self.assertTrue(c.measured_arm_arrival and c.hard_stop_latches)
 
 if __name__ == '__main__':

@@ -64,6 +64,7 @@ bool Robstride::writeFloatParam(uint8_t id, uint8_t, uint16_t addr, float value)
 
 bool Robstride::readParam(uint8_t id, uint8_t, uint16_t addr) {
     RobstrideFeedback reply{};
+    reply.valid = true;
     reply.is_param_response = true;
     reply.motor_id = id;
     reply.param_addr = addr;

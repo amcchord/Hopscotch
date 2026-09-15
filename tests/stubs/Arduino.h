@@ -35,7 +35,7 @@ struct FakeSerial {
     int availableForWrite() const {
         return !connected || blocked || fake_ms < resume_at_ms ? 0 : writable;
     }
-    void println(const char* s) { bytes += s; bytes += '\n'; }
+    void println(const char* s = "") { bytes += s; bytes += '\n'; }
     void printf(const char* format, ...) {
         char buffer[512];
         va_list args;

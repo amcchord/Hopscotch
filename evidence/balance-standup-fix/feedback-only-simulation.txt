@@ -1,0 +1,2 @@
+{'name': 'flashed_before', 'cases': 108, 'early': 25, 'late': 10, 'median_peak': 6.653953150191519}
+{'name': 'candidate_no_arm_change', 'cases': 108, 'early': 25, 'late': 10, 'median_peak': 6.65395315019162}

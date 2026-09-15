@@ -33,6 +33,7 @@ void MotorManager::begin(Robstride* can_bus) {
     _motors[3] = makeMotor(DEFAULT_MOTOR_ID_FRONT_LEFT,  MotorRole::FrontLeft,  true);
     _motors[4] = makeMotor(DEFAULT_MOTOR_ID_ARM_LEFT,    MotorRole::ArmLeft,    false);
     _motors[5] = makeMotor(DEFAULT_MOTOR_ID_ARM_RIGHT,   MotorRole::ArmRight,   false);
+    for (int i = 0; _can && i < NUM_MOTORS; ++i) _can->setRs05(_motors[i].can_id, i < NUM_DRIVE_MOTORS);
 
     _drive_armed = false;
     _arm_armed = false;
@@ -47,6 +48,7 @@ void MotorManager::setMotorId(MotorRole role, uint8_t can_id) {
     int idx = static_cast<int>(role);
     if (idx < NUM_MOTORS) {
         _motors[idx].can_id = can_id;
+        if (_can) _can->setRs05(can_id, idx < NUM_DRIVE_MOTORS);
     }
 }
 
@@ -465,9 +467,12 @@ void MotorManager::processFeedback() {
     if (!_can) return;
 
     RobstrideFeedback fb;
-    // Drain up to 16 messages per call
-    for (int i = 0; i < 16; i++) {
+    // Called at 200 Hz. The old 16 x 50 Hz cap (800/s) could not keep up
+    // with balance replies. Bound both message count and elapsed time.
+    const uint32_t start = micros();
+    for (int i = 0; i < 64 && uint32_t(micros() - start) < 1500; i++) {
         if (!_can->receiveFeedback(fb, 0)) break;
+        if (!fb.valid) continue;
 
         // Handle param-read responses
         if (fb.is_param_response) {
@@ -494,6 +499,12 @@ void MotorManager::processFeedback() {
         if (idx < 0) continue;
 
         MotorState& m = _motors[idx];
+        if (!fb.has_motion) {
+            // A fault/ack is not a fresh motion sample. Preserve kinematics and
+            // last_feedback_ms, and do not let a generic ack clear a fault.
+            if (fb.has_fault) { m.has_fault = true; m.errors = fb.errors; }
+            continue;
+        }
         float sign = m.reversed ? -1.0f : 1.0f;
 
         // Unwrap position: the feedback encodes position in [-4pi, +4pi]

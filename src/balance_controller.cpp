@@ -307,9 +307,8 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         bool sent_r = _motors->sendDriveSpeed(MotorRole::BackRight, cmd_right);
         if (!sent_l || !sent_r) inner_diag |= BAL_DIAG_CAN_TX_FAILED;
 
-        // Front wheels stay in CSP holding their engage position.
-        _motors->sendDrivePosition(MotorRole::FrontLeft,  _front_left_hold,  0.0f);
-        _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
+        // Front CSP holds are refreshed at 50 Hz; only rear balancing wheels
+        // need new commands every 5 ms.
     }
 
     _last_angle_err = angle_err;
@@ -1295,7 +1294,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         _last_arm_tip_frac = tip_frac;
 
         const bool trim_calm = _ramp_complete && _arm_stage == 0
-            && fabsf(meas_vel) < 0.8f && fabsf(rate) < 4.0f
+            && fabsf(meas_vel) < 0.8f * BALANCE_WHEEL_VELOCITY_SCALE && fabsf(rate) < 4.0f
             && fabsf((float)_last_angle_err) < 1.0f && abs_cmd < 2.0f
             && fabsf(_arm_assist_frac) < 0.05f && !_last_outer_diag && !_last_inner_diag;
         if (trim_calm) {
@@ -1315,6 +1314,10 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                     | (_capture_stable ? 0x10 : 0)
                     | (_arms_returning ? 0x20 : 0)
                     | (_ramp_complete ? 0x40 : 0);
+
+        const bool front_l_ok = _motors->sendDrivePosition(MotorRole::FrontLeft, _front_left_hold, 0.0f);
+        const bool front_r_ok = _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
+        if (!front_l_ok || !front_r_ok) _last_outer_diag |= BAL_DIAG_CAN_TX_FAILED;
 
         logSample(tilt, rate);
         break;
@@ -1583,7 +1586,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 1;  // v2 extension: IMU age in formerly reserved sample byte
+    header.reserved = 7;  // v2 features: IMU age, RS05 units, fast CAN RX / 50 Hz front hold
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1733,6 +1736,14 @@ void BalanceController::dumpLog() {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
+    if (header.reserved & 2) {
+        out.println("# wheel_feedback_velocity_range_rad_s=50");
+        out.println("# wheel_feedback_torque_range_nm=5.5");
+    }
+    if (header.reserved & 4) {
+        out.println("# can_receive_hz=200");
+        out.println("# front_hold_hz=50");
+    }
     out.printf("# telemetry_schema=%u\n", header.schema_version);
     out.printf("# sample_size_bytes=%u\n", header.sample_size);
     out.printf("# sample_count=%lu\n", (unsigned long)header.sample_count);

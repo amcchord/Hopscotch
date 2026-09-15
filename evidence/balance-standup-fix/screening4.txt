@@ -1,0 +1,7 @@
+{'name': 'legacy_decode', 'failures': 8, 'median_peak_drift': 10.285899061649747}
+{'name': 'correct_decode', 'failures': 12, 'median_peak_drift': None}
+{'name': 'kp24', 'failures': 12, 'median_peak_drift': None}
+{'name': 'kp28', 'failures': 12, 'median_peak_drift': None}
+{'name': 'smooth12', 'failures': 12, 'median_peak_drift': None}
+{'name': 'rampkp10', 'failures': 12, 'median_peak_drift': None}
+{'name': 'off25', 'failures': 12, 'median_peak_drift': None}

@@ -65,6 +65,8 @@ namespace RobstrideParam {
 
 // Parsed feedback from a motor
 struct RobstrideFeedback {
+    bool    valid = false;       // known, complete response; unknown frames are still drained
+    bool    has_motion = false;  // only Type 2 carries position/velocity/torque
     uint8_t motor_id;
     float   position;     // radians
     float   velocity;     // rad/s
@@ -133,8 +135,11 @@ public:
     // Set current position as mechanical zero
     bool setZeroPosition(uint8_t motor_id, uint8_t host_id);
 
-    // Receive and parse feedback (non-blocking, returns false if no message)
+    // Returns true when a frame was consumed; inspect valid/has_motion before use.
     bool receiveFeedback(RobstrideFeedback& fb, uint32_t timeout_ms = 1);
+
+    // Four RS05 wheels and two RS00 arms; configured by role, including remapped IDs.
+    void setRs05(uint8_t id, bool enabled) { _rs05[id] = enabled; }
 
     // Print TWAI bus status and error counters for diagnostics
     void printBusStatus();
@@ -165,4 +170,5 @@ private:
     bool sendFrame(uint32_t ext_id, const uint8_t* data, uint8_t len);
     bool _initialized = false;
     uint32_t _last_recovery_ms = 0;
+    bool _rs05[256] = {};
 };

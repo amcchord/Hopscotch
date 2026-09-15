@@ -1,0 +1,9 @@
+{'name': 'baseline', 'failures': 1, 'median_peak_drift': -3.429806781025203}
+{'name': 'no_ramp_damper', 'failures': 5, 'median_peak_drift': -5.755152690062548}
+{'name': 'offset_05', 'failures': 3, 'median_peak_drift': -5.824248899869864}
+{'name': 'return_10', 'failures': 3, 'median_peak_drift': -5.657082435771044}
+{'name': 'return_08_no_damper', 'failures': 12, 'median_peak_drift': None}
+{'name': 'lead075', 'failures': 6, 'median_peak_drift': -4.140262777290587}
+{'name': 'lead15', 'failures': 2, 'median_peak_drift': -3.4792036925627983}
+{'name': 'eq_tracker', 'failures': 10, 'median_peak_drift': -1.9124928312170941}
+{'name': 'gate2', 'failures': 4, 'median_peak_drift': -3.9176382525672038}

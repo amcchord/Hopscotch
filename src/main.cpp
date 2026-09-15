@@ -1131,6 +1131,12 @@ static void controlTick() {
     serviceWebDisarm();
     pollSerialCommands();
 
+    if (!testModeActive) {
+        const uint32_t prof_can = micros();
+        motorMgr.processFeedback();
+        profRecord(PROF_CAN, prof_can);
+    }
+
     // -----------------------------------------------------------------------
     // 50 Hz control loop
     // -----------------------------------------------------------------------
@@ -1162,7 +1168,6 @@ static void controlTick() {
             uint32_t prof_can = micros();
             canBus.maintainBus();
             motorMgr.scanNextMotor();
-            motorMgr.processFeedback();
             motorMgr.checkTimeouts(500);
             motorMgr.updateArming();
 

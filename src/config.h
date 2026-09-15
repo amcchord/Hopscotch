@@ -132,6 +132,10 @@ static constexpr float    ARM_JUMP_DELTA_RIGHT   = 0.60f;   // delta from forwar
 //   effective_setpoint = arm_curve(arm_frac) + capture_shift + sp_offset
 //
 // ---------------------------------------------------------------------------
+// The old decoder reported RS05 wheel velocity at 33/50 of its physical value.
+// Convert feedback-based tuning to correct units without increasing loop gain.
+static constexpr float BALANCE_WHEEL_VELOCITY_SCALE = 50.0f / 33.0f;
+
 static constexpr float    BALANCE_SETPOINT_ARMS_FWD     = 84.0f;   // balance point arms-forward. Was 89.3; the battery ejection/
                                                                    // reinstall (run 164837 crash) moved the CG ~5 deg -- run
                                                                    // 224649 equilibrated at 82.9 with the integral railed at -8
@@ -148,7 +152,7 @@ static constexpr bool     BALANCE_USE_SCHEDULED_SP      = true;    // if false, 
 static constexpr bool     BALANCE_USE_CAPTURE_SHIFT     = true;    // if false, no capture shift -- engage directly at scheduled sp
 static constexpr float    BALANCE_BASE_SP_RATE_MAX      = 4.0f;    // must not bottleneck the 2.5 rad/s arm return (the curve
                                                                    // needs ~2.9 deg over ~1s of return)
-static constexpr float    BALANCE_RAMP_VEL_SLOW         = 2.0f;    // rad/s wheel speed at which the base ramp fully pauses --
+static constexpr float    BALANCE_RAMP_VEL_SLOW         = 2.0f * BALANCE_WHEEL_VELOCITY_SCALE;    // rad/s wheel speed at which the base ramp fully pauses --
                                                                    // the ramp waits for the robot instead of towing it
                                                                    // (standup surge, runs 164837/171838)
 static constexpr float    BALANCE_ENGAGE_THRESHOLD_DEG  = 15.0f;   // wide enough for tip position
@@ -171,7 +175,7 @@ static constexpr float    BALANCE_ARM_RETURN_SPEED      = 1.5f;    // rad/s. 2.5
                                                                    // acceleration.
 
 static constexpr float    BALANCE_MAX_DRIVE_SPEED       = 30.0f;   // rad/s speed limit (railed at 25 during the 17 rad/s
-                                                                   // tap recovery in bal_20260702_161437; RS05 max is 33)
+                                                                   // tap recovery in bal_20260702_161437; RS05 feedback range is 50; keep tested command cap)
 
 // Arm-position -> balance-point curve (piecewise linear on arm tip fraction,
 // 0 = arms at forward ref, 1 = arms at tip pose). Fitted from stable-balance
@@ -256,29 +260,29 @@ static constexpr uint32_t BALANCE_DEADMAN_HARD_MS       = 1500;     // stop whee
 // (linearized model, robust across A x0.5-2, B x0.7-1.4, motor lag 30-80ms).
 // Margins are structurally thin: start conservative, retune from Speed-mode
 // telemetry.
-static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.05f;    // retain July's tested return gain. The prepared 0.08
+static constexpr float    BALANCE_DRIFT_VEL_KP          = 0.05f * BALANCE_WHEEL_VELOCITY_SCALE;    // retain July's tested return gain. The prepared 0.08
                                                                     // regressed recovery in the refreshed simulation; validate
                                                                     // reduced standup tow before speeding up return-to-origin.
-static constexpr float    BALANCE_DRIFT_MAX_VEL         = 1.0f;     // max return velocity (rad/s)
+static constexpr float    BALANCE_DRIFT_MAX_VEL         = 1.0f * BALANCE_WHEEL_VELOCITY_SCALE;     // max return velocity (rad/s)
 // Early position P: the position loop also runs DURING the standup ramp
 // (origin at engage) at reduced gain, so standup drift is opposed as it
 // develops instead of repaid after ramp completion. Sim (balance_sim.py
 // standup-matrix): fewer standup falls and ~20% less peak tow, with no
 // interference with the ramp (the gain is low and the angle-error gate
 // still applies). The integrator stays ramp-gated (single-integrator rule).
-static constexpr float    BALANCE_RAMP_DRIFT_KP         = 0.03f;    // rad/s per rad of drift during the ramp
-static constexpr float    BALANCE_RAMP_DRIFT_MAX_VEL    = 0.6f;     // clamp during the ramp (rad/s)
-static constexpr float    BALANCE_VEL_SP_KP             = 2.2f;     // deg per rad/s of velocity error ABOVE the soft knee
+static constexpr float    BALANCE_RAMP_DRIFT_KP         = 0.03f * BALANCE_WHEEL_VELOCITY_SCALE;    // rad/s per rad of drift during the ramp
+static constexpr float    BALANCE_RAMP_DRIFT_MAX_VEL    = 0.6f * BALANCE_WHEEL_VELOCITY_SCALE;     // clamp during the ramp (rad/s)
+static constexpr float    BALANCE_VEL_SP_KP             = 2.2f / BALANCE_WHEEL_VELOCITY_SCALE;     // deg per rad/s of velocity error ABOVE the soft knee
                                                                     // (tap/disturbance regime -- keeps the athletic recovery)
-static constexpr float    BALANCE_VEL_SP_KP_LOW         = 0.7f;     // deg per rad/s BELOW the knee (station-keeping regime).
+static constexpr float    BALANCE_VEL_SP_KP_LOW         = 0.7f / BALANCE_WHEEL_VELOCITY_SCALE;     // deg per rad/s BELOW the knee (station-keeping regime).
                                                                     // A single 2.2 gain limit-cycled at ~0.3 Hz: the setpoint
                                                                     // chased idle velocity ripple and the robot swayed
                                                                     // (bal_20260702_164034: sp_offset std > roll std).
-static constexpr float    BALANCE_VEL_SP_KNEE           = 0.8f;     // rad/s boundary between the two slopes
-static constexpr float    BALANCE_VEL_SP_KI             = 0.35f;    // deg/s per rad/s of velocity error (single integrator)
+static constexpr float    BALANCE_VEL_SP_KNEE           = 0.8f * BALANCE_WHEEL_VELOCITY_SCALE;     // rad/s boundary between the two slopes
+static constexpr float    BALANCE_VEL_SP_KI             = 0.35f / BALANCE_WHEEL_VELOCITY_SCALE;    // deg/s per rad/s of velocity error (single integrator)
 static constexpr float    BALANCE_SP_OFFSET_MAX_DEG     = 8.0f;     // setpoint offset clamp (6 railed for 6.6s during the
                                                                     // escalating-tap run -- it was the binding constraint)
-static constexpr float    BALANCE_RAMP_SP_OFFSET_MAX_DEG = 1.5f;    // retained pre-ramp authority limit; still untested on hardware.
+static constexpr float    BALANCE_RAMP_SP_OFFSET_MAX_DEG = 1.5f;    // pre-ramp authority limit; Sept 14 assisted trial.
                                                                     // July's largest surge came AFTER ramp_complete released
                                                                     // this limit. This clamp alone does not address that surge;
                                                                     // see docs/BALANCE_REVIEW_2026-09.md.
@@ -292,8 +296,8 @@ static constexpr float    BALANCE_POS_GATE_ERR_DEG      = 8.0f;     // angle err
 // crashed runs 155640 and 164837). Above SHED_START the velocity-P authority
 // fades out; at SHED_FULL it is zero and the robot accepts displacement
 // instead of pumping itself into saturation.
-static constexpr float    BALANCE_SHED_VEL_START        = 8.0f;     // rad/s
-static constexpr float    BALANCE_SHED_VEL_FULL         = 14.0f;    // rad/s
+static constexpr float    BALANCE_SHED_VEL_START        = 8.0f * BALANCE_WHEEL_VELOCITY_SCALE;     // rad/s
+static constexpr float    BALANCE_SHED_VEL_FULL         = 14.0f * BALANCE_WHEEL_VELOCITY_SCALE;    // rad/s
 
 // Arm assist v2: arms swing toward the CENTER pose (the physically-symmetric
 // "both arms up" axis -- the tip pose is asymmetric per-arm and scaling it
@@ -314,10 +318,10 @@ static constexpr float    BALANCE_SETPOINT_ARMS_CENTER  = 77.7f;    // balance p
 // (run 225359: arm-vel correlation 0.88 at 240ms lag, roll +/-2.7 deg,
 // never settled). Below the threshold arm gain is zero and the wheel-only
 // cascade is proven stable -- the limit cycle cannot sustain itself.
-static constexpr float    BALANCE_ARM_ASSIST_THRESH     = 1.4f;     // rad/s vel error to engage arms. 2.0 + double filtering
+static constexpr float    BALANCE_ARM_ASSIST_THRESH     = 1.4f * BALANCE_WHEEL_VELOCITY_SCALE;     // rad/s vel error to engage arms. 2.0 + double filtering
                                                                     // meant a -3.1 rad/s push never triggered at all (225944);
                                                                     // 1.0 sat in the settle band (oscillator, 225359).
-static constexpr float    BALANCE_ARM_ASSIST_GAIN       = 0.40f;    // center-frac per rad/s beyond threshold: steep -- a real
+static constexpr float    BALANCE_ARM_ASSIST_GAIN       = 0.40f / BALANCE_WHEEL_VELOCITY_SCALE;    // center-frac per rad/s beyond threshold: steep -- a real
                                                                     // push gets a committed throw, not a proportional dribble
 static constexpr float    BALANCE_ARM_ASSIST_BIAS_FRAC  = 0.00f;    // neutral stance = the FORWARD reference pose. With the
                                                                     // robot standing (body rotated ~90 deg from driving), the
@@ -338,7 +342,7 @@ static constexpr float    BALANCE_ARM_ASSIST_TAU_OUT    = 0.65f;    // s, releas
 // normal breathing band (+/-1.5 rad/s -- calm<1.0 locked the arms in
 // COOLDOWN for an entire run and a tap got zero arm help, run 222915) but
 // INSIDE the oscillation band (the 0.56 Hz limit cycle ran +/-4.5 rad/s).
-static constexpr float    BALANCE_ARM_CALM_VEL          = 1.8f;     // rad/s
+static constexpr float    BALANCE_ARM_CALM_VEL          = 1.8f * BALANCE_WHEEL_VELOCITY_SCALE;     // rad/s
 static constexpr float    BALANCE_ARM_CALM_RATE         = 20.0f;    // dps
 static constexpr float    BALANCE_ARM_CALM_MS           = 300.0f;   // sustained before re-arm
 
@@ -360,7 +364,7 @@ static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm
 //      well but persistently moving = the equilibrium estimate is wrong).
 //   3. Its converged value is blended back into settings after a good run,
 //      absorbing battery placement, payload, surface, and IMU mounting bias.
-static constexpr float    BALANCE_GLIDE_VEL_ERR         = 0.8f;     // rad/s of filtered vel error = gliding (matches the knee;
+static constexpr float    BALANCE_GLIDE_VEL_ERR         = 0.8f * BALANCE_WHEEL_VELOCITY_SCALE;     // rad/s of filtered vel error = gliding (matches the knee;
                                                                     // 0.4 let station-keeping wobble pump the integral)
 static constexpr float    BALANCE_GLIDE_KI_BOOST        = 4.0f;     // Ki multiplier while gliding
 // A genuine glide is CALM (steady lean, low rate, small commands). A push /

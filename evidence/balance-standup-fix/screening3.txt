@@ -1,0 +1,6 @@
+{'name': 'baseline', 'failures': 1, 'median_peak_drift': 4.759735198320452}
+{'name': 'acc4.0', 'failures': 2, 'median_peak_drift': 5.091121002765492}
+{'name': 'acc6.0', 'failures': 2, 'median_peak_drift': 4.909168202956682}
+{'name': 'acc8.0', 'failures': 2, 'median_peak_drift': 4.860640587155874}
+{'name': 'acc12.0', 'failures': 1, 'median_peak_drift': 4.882941221178846}
+{'name': 'acc20.0', 'failures': 1, 'median_peak_drift': 4.832412784356353}

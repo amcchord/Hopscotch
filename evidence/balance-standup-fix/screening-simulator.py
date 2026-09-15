@@ -177,7 +177,7 @@ class FirmwareConfig:
     # decomposition reads as a center excursion -- the equilibrium dips
     # ~0.9 deg mid-return for no reason.
     proportional_return: bool = False
-    # Rejected September experiment; not enabled in firmware.
+    smooth_return: bool = False
     arm_return_acceleration: float = 0.0
     # Equilibrium-tracking standup: replaces the time-based ramp entirely.
     # base_sp starts at the engage tilt and (1) follows the scheduled-curve
@@ -282,7 +282,8 @@ class OuterController:
         self.capture_stable = False
         self.capture_stable_start_ms = 0.0
         self.arms_returning = False
-        self.return_elapsed = 0.0
+        self.return_progress = 0.0
+        self.return_velocity = 0.0
         self.return_start_l = self.arm_l_target
         self.return_start_r = self.arm_r_target
         self.arms_returned = False
@@ -501,41 +502,36 @@ class OuterController:
                 if lagging and not timed_out:
                     crisis = True  # pause the return; robot hasn't caught up
             if not crisis:
-                if c.arm_return_acceleration > 0:
-                    self.return_elapsed += dt
-                    longest = max(abs(self.return_start_l), abs(self.return_start_r), .0001)
-                    a = c.arm_return_acceleration
-                    ramp = min(c.arm_return_speed / a, math.sqrt(longest / a))
-                    speed = a * ramp
-                    cruise = max(0., longest / speed - ramp)
-                    duration = 2*ramp + cruise
-                    t = self.return_elapsed
-                    if t >= duration: traveled = longest
-                    elif t < ramp: traveled = .5*a*t*t
-                    elif t < ramp+cruise: traveled = .5*a*ramp*ramp + speed*(t-ramp)
-                    else: traveled = longest - .5*a*(duration-t)**2
-                    self.arm_l_target = self.return_start_l * (1-traveled/longest)
-                    self.arm_r_target = self.return_start_r * (1-traveled/longest)
+                if c.smooth_return:
+                    longest = max(abs(self.return_start_l), abs(self.return_start_r), .001)
+                    duration = 1.875 * longest / c.arm_return_speed
+                    self.return_progress = min(1., self.return_progress + dt / duration)
+                    u = self.return_progress
+                    q = u*u*u*(10. + u*(-15. + 6.*u))
+                    self.arm_l_target = self.return_start_l * (1.-q)
+                    self.arm_r_target = self.return_start_r * (1.-q)
                 else:
                     speed_l = c.arm_return_speed
                     speed_r = c.arm_return_speed
+                    if c.arm_return_acceleration > 0:
+                        remaining = max(abs(self.arm_l_target), abs(self.arm_r_target))
+                        wanted = min(c.arm_return_speed, math.sqrt(2*c.arm_return_acceleration*remaining))
+                        self.return_velocity = move_toward(self.return_velocity, wanted, c.arm_return_acceleration, dt)
+                        speed_l = speed_r = self.return_velocity
                     if c.proportional_return:
                         dist_l = abs(self.arm_l_goal - self.arm_l_target)
                         dist_r = abs(self.arm_r_goal - self.arm_r_target)
                         longest = max(dist_l, dist_r)
                         if longest > 1e-3:
-                            speed_l = c.arm_return_speed * dist_l / longest
-                            speed_r = c.arm_return_speed * dist_r / longest
+                            speed_l *= dist_l / longest
+                            speed_r *= dist_r / longest
                     self.arm_l_target = move_toward(self.arm_l_target, self.arm_l_goal,
                                                     speed_l, dt)
                     self.arm_r_target = move_toward(self.arm_r_target, self.arm_r_goal,
                                                     speed_r, dt)
-            elif c.arm_return_acceleration > 0:
-                self.return_elapsed = 0.
-                self.return_start_l, self.return_start_r = self.arm_l_target, self.arm_r_target
             if not self.arms_returned:
-                if (abs(self.arm_l_target - self.arm_l_goal) < (.005 if c.arm_return_acceleration else .08)
-                        and abs(self.arm_r_target - self.arm_r_goal) < (.005 if c.arm_return_acceleration else .08)
+                if (abs(self.arm_l_target - self.arm_l_goal) < 0.08
+                        and abs(self.arm_r_target - self.arm_r_goal) < 0.08
                         and (not c.measured_arm_arrival or
                              (abs(arm_l_meas - self.arm_l_goal) <= 0.15
                               and abs(arm_r_meas - self.arm_r_goal) <= 0.15))):
@@ -910,23 +906,10 @@ def current_firmware_config() -> FirmwareConfig:
     """
     source = (REPO_ROOT / 'src/config.h').read_text()
     def number(name):
-        # Read arithmetic constant expressions without evaluating arbitrary code.
-        import ast
-        match = re.search(r'\b' + name + r'\s*=\s*([^;]+);', source)
-        if not match: raise ValueError(f'Cannot read firmware constant {name}')
-        expression = re.sub(r'(?<=\d)f\b', '', match[1])
-        def value(node):
-            if isinstance(node, ast.Constant) and isinstance(node.value, (int,float)): return float(node.value)
-            if isinstance(node, ast.Name): return number(node.id)
-            if isinstance(node, ast.BinOp):
-                left,right=value(node.left),value(node.right)
-                if isinstance(node.op, ast.Mult): return left*right
-                if isinstance(node.op, ast.Div): return left/right
-                if isinstance(node.op, ast.Add): return left+right
-                if isinstance(node.op, ast.Sub): return left-right
-            if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub): return -value(node.operand)
-            raise ValueError(f'Unsupported constant expression: {name}')
-        return value(ast.parse(expression.strip(),mode='eval').body)
+        match = re.search(r'\b' + name + r'\s*=\s*([-+0-9.eE]+)f?\s*;', source)
+        if not match:
+            raise ValueError(f'Cannot read firmware constant {name}')
+        return float(match[1])
     mapping = {
         'kp': 'BALANCE_KP', 'kd': 'BALANCE_KD', 'comp_alpha': 'COMPLEMENTARY_ALPHA',
         'drift_vel_kp': 'BALANCE_DRIFT_VEL_KP', 'drift_max_vel': 'BALANCE_DRIFT_MAX_VEL',
