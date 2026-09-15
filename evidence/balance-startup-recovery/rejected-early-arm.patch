@@ -1,0 +1,547 @@
+diff --git a/scripts/balance_sim.py b/scripts/balance_sim.py
+index fdaad4b..847d07a 100644
+--- a/scripts/balance_sim.py
++++ b/scripts/balance_sim.py
+@@ -76,6 +76,15 @@ class FirmwareConfig:
+     setpoint_max: float = 110.0
+     capture_shift_max: float = 15.0
+     absolute_capture_trim: bool = False  # old records bounded the relative shift
++    startup_recovery: bool = False
++    startup_speed: float = 2.5
++    startup_force_speed: float = 4.0
++    startup_accel: float = 2.0
++    startup_accel_tau: float = .06
++    startup_confirm_ms: float = 60
++    startup_tip_max: float = .9
++    startup_min_frac: float = .20
++    startup_hold_ms: float = 120
+     base_sp_rate_max: float = 3.0
+     ramp_vel_slow: float = 2.0
+     ramp_vel_gate_floor: float = 0.3
+@@ -286,6 +295,14 @@ class OuterController:
+         self.return_elapsed = 0.0
+         self.return_start_l = self.arm_l_target
+         self.return_start_r = self.arm_r_target
++        self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
++        self.startup_recovery = False
++        self.startup_ms = 0.
++        self.startup_direction = 0.
++        self.startup_confirm = 0.
++        self.startup_confirm_direction = 0.
++        self.startup_previous_velocity = 0.
++        self.startup_acceleration = 0.
+         self.arms_returned = False
+         self.ramp_complete = False
+         self.ramp_complete_ms = 0.0
+@@ -440,7 +457,7 @@ class OuterController:
+             self.prev_scheduled_sp = scheduled_sp
+         else:
+             ramp_rate = c.base_sp_rate_max
+-            if not self.ramp_complete:
++            if not self.ramp_complete and not self.startup_recovery:
+                 vel_gate = 1.0 - clampf(abs(self.filtered_wheel_vel) / c.ramp_vel_slow,
+                                         0.0, 1.0)
+                 vel_gate = max(vel_gate, c.ramp_vel_gate_floor)
+@@ -484,6 +501,7 @@ class OuterController:
+             self.arms_returning = True
+             self.return_start_l = self.arm_l_target
+             self.return_start_r = self.arm_r_target
++            self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
+             self.arm_l_goal = 0.0
+             self.arm_r_goal = 0.0
+             if capture_settled:
+@@ -499,6 +517,8 @@ class OuterController:
+                 self.engage_capture_shift = 0.0
+ 
+         if self.arms_returning and not self.ramp_complete:
++            if c.startup_recovery:
++                self.arm_l_target, self.arm_r_target = self.nominal_l, self.nominal_r
+             crisis = abs(last_cmd) > 10.0 or abs(rate) > 30.0
+             if c.arm_return_gate and not crisis:
+                 lagging = (abs(self.effective_setpoint - tilt) > c.arm_gate_err_deg
+@@ -539,7 +559,9 @@ class OuterController:
+             elif c.arm_return_acceleration > 0:
+                 self.return_elapsed = 0.
+                 self.return_start_l, self.return_start_r = self.arm_l_target, self.arm_r_target
+-            if not self.arms_returned:
++            if c.startup_recovery:
++                self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
++            if not self.arms_returned and not c.startup_recovery:
+                 if (abs(self.arm_l_target - self.arm_l_goal) < (.005 if c.arm_return_acceleration else .08)
+                         and abs(self.arm_r_target - self.arm_r_goal) < (.005 if c.arm_return_acceleration else .08)
+                         and (not c.measured_arm_arrival or
+@@ -555,6 +577,30 @@ class OuterController:
+                                 0.0, 1.0)
+         self.filtered_wheel_vel += c.vel_filter_alpha * (wheel_vel_meas
+                                                          - self.filtered_wheel_vel)
++        if c.startup_recovery and not self.startup_recovery:
++            velocity = self.filtered_wheel_vel
++            acceleration = (velocity - self.startup_previous_velocity) / dt
++            self.startup_previous_velocity = velocity
++            self.startup_acceleration += clampf(dt/c.startup_accel_tau, 0, 1) * (acceleration-self.startup_acceleration)
++            direction = 1. if velocity > 0 else -1.
++            eligible = (self.arms_returning and not self.ramp_complete
++                        and self.tip_frac(arm_l_meas, arm_r_meas) <= c.startup_tip_max)
++            growing = direction * self.startup_acceleration >= c.startup_accel
++            candidate = (eligible and abs(velocity) >= c.startup_speed
++                         and (growing or abs(velocity) >= c.startup_force_speed))
++            if not candidate:
++                self.startup_confirm = 0.
++                self.startup_confirm_direction = 0.
++            else:
++                if direction != self.startup_confirm_direction:
++                    self.startup_confirm = 0.
++                    self.startup_confirm_direction = direction
++                self.startup_confirm += dt * 1000
++                if self.startup_confirm + .001 >= c.startup_confirm_ms:
++                    self.startup_recovery = True
++                    self.startup_ms = now_ms
++                    self.startup_direction = direction
++                    self.arm_stage, self.arm_sign, self.arm_calm_ms = 1, direction, 0.
+         target_vel = 0.0
+         if self.ramp_complete:
+             target_vel = clampf(-c.drift_vel_kp * meas_drift,
+@@ -607,7 +653,7 @@ class OuterController:
+                                      c.sp_offset_rate, dt)
+ 
+         # --- arm assist lifecycle ---
+-        if self.ramp_complete:
++        if self.ramp_complete or self.startup_recovery:
+             self.arm_assist_vel += clampf(dt / c.arm_assist_vel_tau, 0.0, 1.0) \
+                 * (vel_err - self.arm_assist_vel)
+             excess = 0.0
+@@ -617,6 +663,11 @@ class OuterController:
+                 excess = self.arm_assist_vel + c.arm_assist_thresh
+             demand = clampf(c.arm_assist_gain * excess,
+                             -c.arm_assist_range_neg, c.arm_assist_range_pos)
++            if (self.startup_recovery and now_ms-self.startup_ms < c.startup_hold_ms
++                    and self.filtered_wheel_vel*self.startup_direction > 0
++                    and abs(demand) < c.startup_min_frac):
++                demand = clampf(self.startup_direction*c.startup_min_frac,
++                                -c.arm_assist_range_neg,c.arm_assist_range_pos)
+ 
+             calm_now = abs(vel_err) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
+             if calm_now:
+@@ -669,8 +720,27 @@ class OuterController:
+ 
+             alpha = clampf(dt / tau, 0.0, 1.0)
+             self.arm_assist_frac += alpha * (target - self.arm_assist_frac)
+-            self.arm_l_target = self.arm_assist_frac * c.arm_center_left
+-            self.arm_r_target = self.arm_assist_frac * c.arm_center_right
++            if not self.ramp_complete:
++                lo,hi = -c.arm_assist_range_neg,c.arm_assist_range_pos
++                for nominal,center,tip in ((self.nominal_l,c.arm_center_left,c.arm_tip_left),
++                                            (self.nominal_r,c.arm_center_right,c.arm_tip_right)):
++                    lower=min(0,tip,-c.arm_assist_range_neg*center,c.arm_assist_range_pos*center)
++                    upper=max(0,tip,-c.arm_assist_range_neg*center,c.arm_assist_range_pos*center)
++                    if abs(center) < 1e-5: continue
++                    a,b=(lower-nominal)/center,(upper-nominal)/center
++                    lo,hi=max(lo,min(a,b)),min(hi,max(a,b))
++                self.arm_assist_frac=clampf(self.arm_assist_frac,lo,hi) if lo<=hi else 0.
++                self.arm_l_target = self.nominal_l+self.arm_assist_frac*c.arm_center_left
++                self.arm_r_target = self.nominal_r+self.arm_assist_frac*c.arm_center_right
++            else:
++                self.arm_l_target = self.arm_assist_frac * c.arm_center_left
++                self.arm_r_target = self.arm_assist_frac * c.arm_center_right
++
++        if (c.startup_recovery and self.arms_returning and not self.arms_returned
++                and abs(self.nominal_l-self.arm_l_goal)<.08 and abs(self.nominal_r-self.arm_r_goal)<.08
++                and abs(arm_l_meas-(self.arm_l_target if self.startup_recovery else self.arm_l_goal))<=.15
++                and abs(arm_r_meas-(self.arm_r_target if self.startup_recovery else self.arm_r_goal))<=.15):
++            self.arms_returned=True
+ 
+         effective = base_effective + self.sp_offset
+         if c.carrot_effective and not self.ramp_complete:
+@@ -952,6 +1022,14 @@ def current_firmware_config() -> FirmwareConfig:
+         'setpoint_min': 'BALANCE_SETPOINT_MIN', 'setpoint_max': 'BALANCE_SETPOINT_MAX',
+         'setpoint_arms_fwd': 'BALANCE_SETPOINT_ARMS_FWD', 'setpoint_arms_center': 'BALANCE_SETPOINT_ARMS_CENTER',
+         'capture_shift_max': 'BALANCE_CAPTURE_SHIFT_MAX_DEG',
++        'startup_speed': 'BALANCE_START_RECOVERY_SPEED',
++        'startup_force_speed': 'BALANCE_START_RECOVERY_FORCE_SPEED',
++        'startup_accel': 'BALANCE_START_RECOVERY_ACCEL',
++        'startup_accel_tau': 'BALANCE_START_RECOVERY_ACCEL_TAU',
++        'startup_confirm_ms': 'BALANCE_START_RECOVERY_CONFIRM_MS',
++        'startup_tip_max': 'BALANCE_START_RECOVERY_TIP_MAX',
++        'startup_min_frac': 'BALANCE_START_RECOVERY_MIN_FRAC',
++        'startup_hold_ms': 'BALANCE_START_RECOVERY_HOLD_MS',
+         'capture_err_max': 'BALANCE_CAPTURE_ERR_MAX_DEG', 'capture_rate_max': 'BALANCE_CAPTURE_RATE_MAX_DPS',
+         'capture_cmd_max': 'BALANCE_CAPTURE_CMD_MAX', 'capture_settle_ms': 'BALANCE_CAPTURE_SETTLE_MS',
+         'arm_hold_max_ms': 'BALANCE_ARM_HOLD_MAX_MS', 'arm_tip_left': 'BALANCE_ARM_TIP_LEFT',
+@@ -968,7 +1046,7 @@ def current_firmware_config() -> FirmwareConfig:
+     kwargs['sp_curve'] = tuple((float(a), float(b)) for a, b in
+                                re.findall(r'\{\s*([0-9.]+)f,\s*([0-9.]+)f\s*\}', curve))
+     return replace(FirmwareConfig(), **kwargs, proportional_return=True, early_pos_p=True,
+-                   absolute_capture_trim=True,
++                   absolute_capture_trim=True, startup_recovery=True,
+                    arm_event_end_calm_ms=150.0, measured_arm_arrival=True, hard_stop_latches=True)
+ 
+ 
+@@ -977,7 +1055,8 @@ def make_variant(name: str, base: FirmwareConfig | None = None) -> FirmwareConfi
+         return current_firmware_config()
+     if name == "july33":
+         return replace(current_firmware_config(), ramp_off_clamp=0.0, drift_vel_kp=0.05,
+-                       measured_arm_arrival=False, hard_stop_latches=False, absolute_capture_trim=False)
++                       measured_arm_arrival=False, hard_stop_latches=False, absolute_capture_trim=False,
++                       startup_recovery=False)
+     cfg = base if base is not None else FirmwareConfig()
+     for part in name.split("+"):
+         if part == "baseline":
+diff --git a/src/balance_controller.cpp b/src/balance_controller.cpp
+index 8d5124a..3bd9e20 100644
+--- a/src/balance_controller.cpp
++++ b/src/balance_controller.cpp
+@@ -468,9 +468,13 @@ void BalanceController::enterBalancing(float current_roll) {
+ 
+     _arm_assist_frac = BALANCE_ARM_ASSIST_BIAS_FRAC;
+     _arm_assist_vel  = 0.0f;
+-    _arm_stage       = 3;      // COOLDOWN: standup transients must not deploy arms
++    _arm_stage       = 3;      // normal assist waits; confirmed startup runaway may bypass
+     _arm_sign        = 0.0f;
+     _arm_calm_ms     = 0.0f;
++    _startup_detector.reset();
++    _startup_recovery = false;
++    _startup_recovery_ms = 0;
++    _startup_direction = 0;
+     _run_curve_shift = 0.0f;
+     const ArmCalibration& cal = _arms->getCalibration();
+     _arm_center_left  = cal.center_left;
+@@ -880,7 +884,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+ 
+         if (BALANCE_BASE_SP_RATE_MAX > 0.0f) {
+             float ramp_rate = BALANCE_BASE_SP_RATE_MAX;
+-            if (!_ramp_complete) {
++            if (!_ramp_complete && !_startup_recovery) {
+                 // The ramp waits for the robot: if the wheels are already
+                 // moving, slow the setpoint climb instead of towing the
+                 // robot across the floor (standup surge, runs 164837/171838).
+@@ -947,6 +951,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+             // the return delivers the assist's neutral stance directly.
+             _arm_left_goal  = _arms->getForwardLeft();
+             _arm_right_goal = _arms->getForwardRight();
++            _arm_nominal_left = _arm_left_target;
++            _arm_nominal_right = _arm_right_target;
+ 
+             // Re-anchor the curve to the settled tip stance. This is a quiet
+             // pose measurement, not proof of free balance: the arms may still
+@@ -984,8 +990,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+                 // return finished the short (right) arm first; the axis
+                 // decomposition read the imbalance as a center excursion
+                 // and the equilibrium dipped ~1 deg mid-return for nothing.
+-                float dist_l = fabsf(_arm_left_goal  - _arm_left_target);
+-                float dist_r = fabsf(_arm_right_goal - _arm_right_target);
++                float dist_l = fabsf(_arm_left_goal  - _arm_nominal_left);
++                float dist_r = fabsf(_arm_right_goal - _arm_nominal_right);
+                 float longest = (dist_l > dist_r) ? dist_l : dist_r;
+                 float speed_l = BALANCE_ARM_RETURN_SPEED;
+                 float speed_r = BALANCE_ARM_RETURN_SPEED;
+@@ -993,20 +999,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+                     speed_l *= dist_l / longest;
+                     speed_r *= dist_r / longest;
+                 }
+-                _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  speed_l, dt);
+-                _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, speed_r, dt);
+-            }
+-
+-            if (!_arms_returned) {
+-                float arm_err_l = fabsf(_arm_left_target - _arm_left_goal);
+-                float arm_err_r = fabsf(_arm_right_target - _arm_right_goal);
+-                if (arm_err_l < 0.08f && arm_err_r < 0.08f
+-                    && armsAtGoal(_arm_left_goal, _arm_right_goal)) {
+-                    _arms_returned = true;
+-                    Serial.printf("[Balance] Arms returned (drift=%.2f, base_sp=%.1f)\n",
+-                                  meas_drift, _smoothed_base_sp);
+-                }
++                _arm_nominal_left  = moveToward(_arm_nominal_left,  _arm_left_goal,  speed_l, dt);
++                _arm_nominal_right = moveToward(_arm_nominal_right, _arm_right_goal, speed_r, dt);
+             }
++            _arm_left_target = _arm_nominal_left;
++            _arm_right_target = _arm_nominal_right;
+         }
+ 
+         if (_arms_returning && !_arms_returned
+@@ -1041,6 +1038,29 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+         // run 164837). Position return and learning only after the ramp.
+         _filtered_wheel_vel += BALANCE_VEL_FILTER_ALPHA * (meas_vel - _filtered_wheel_vel);
+ 
++        const balance_math::RunawayConfig startup_config = {
++            BALANCE_START_RECOVERY_SPEED, BALANCE_START_RECOVERY_FORCE_SPEED,
++            BALANCE_START_RECOVERY_ACCEL, BALANCE_START_RECOVERY_ACCEL_TAU,
++            BALANCE_START_RECOVERY_CONFIRM_MS
++        };
++        const bool startup_eligible = _arms_returning && !_ramp_complete
++            && computeArmFraction() <= BALANCE_START_RECOVERY_TIP_MAX
++            && fb_age_l <= BALANCE_START_RECOVERY_FEEDBACK_MS
++            && fb_age_r <= BALANCE_START_RECOVERY_FEEDBACK_MS;
++        const float startup_direction = _startup_detector.update(
++            startup_eligible, _filtered_wheel_vel, dt, startup_config);
++        if (!_startup_recovery && startup_direction != 0.0f) {
++            _startup_recovery = true;
++            _startup_recovery_ms = now;
++            _startup_direction = startup_direction;
++            _arm_stage = 1;
++            _arm_sign = startup_direction;
++            _arm_calm_ms = 0;
++            Serial.printf("[Balance] Early runaway catch: vel=%.2f drift=%.2f tip=%.2f\n",
++                          _filtered_wheel_vel, meas_drift, computeArmFraction());
++        }
++        if (_startup_recovery && !_ramp_complete) _last_outer_diag |= BAL_DIAG_START_RECOVERY;
++
+         float target_vel = 0.0f;
+         if (_ramp_complete) {
+             target_vel = clampf(-_drift_vel_kp * meas_drift,
+@@ -1140,7 +1160,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+         // release: fires only on genuine disturbances, no idle chatter.
+         // ---------------------------------------------------------------
+         _last_arm_demand = 0.0f;
+-        if (_ramp_complete) {
++        if (_ramp_complete || _startup_recovery) {
+             // One-shot impulse-and-relax (operator design, run 231038): the
+             // arms answer the FIRST hit fast, then relax monotonically to
+             // neutral. They never flip sign mid-recovery -- the counter-
+@@ -1157,6 +1177,17 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+             float demand = clampf(BALANCE_ARM_ASSIST_GAIN * excess,
+                                   -BALANCE_ARM_ASSIST_RANGE_NEG,
+                                   BALANCE_ARM_ASSIST_RANGE_POS);
++            // A confirmed early catch gets a brief committed response.
++            // Stop the minimum pulse if measured travel reverses; thereafter
++            // the ordinary one-shot recovery and calm re-arm rules take over.
++            if (_startup_recovery
++                && now - _startup_recovery_ms < BALANCE_START_RECOVERY_HOLD_MS
++                && _filtered_wheel_vel * _startup_direction > 0) {
++                if (fabsf(demand) < BALANCE_START_RECOVERY_MIN_FRAC) {
++                    demand = clampf(_startup_direction * BALANCE_START_RECOVERY_MIN_FRAC,
++                                    -BALANCE_ARM_ASSIST_RANGE_NEG, BALANCE_ARM_ASSIST_RANGE_POS);
++                }
++            }
+             _last_arm_demand = demand;
+ 
+             // Engagement state machine. Discriminator between an external
+@@ -1257,12 +1288,39 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+ 
+             float fwd_l = _arms->getForwardLeft();
+             float fwd_r = _arms->getForwardRight();
+-            _arm_left_target  = fwd_l + _arm_assist_frac * _arm_center_left;
+-            _arm_right_target = fwd_r + _arm_assist_frac * _arm_center_right;
++            if (!_ramp_complete) {
++                const float limited = balance_math::limitArmAssist(
++                    _arm_nominal_left - fwd_l, _arm_nominal_right - fwd_r,
++                    _arm_center_left, _arm_center_right,
++                    BALANCE_ARM_TIP_LEFT, BALANCE_ARM_TIP_RIGHT, _arm_assist_frac,
++                    -BALANCE_ARM_ASSIST_RANGE_NEG, BALANCE_ARM_ASSIST_RANGE_POS);
++                if (fabsf(limited - _arm_assist_frac) > .00001f) {
++                    _last_outer_diag |= BAL_DIAG_ARM_ENVELOPE;
++                }
++                _arm_assist_frac = limited;
++                _arm_left_target = _arm_nominal_left + _arm_assist_frac * _arm_center_left;
++                _arm_right_target = _arm_nominal_right + _arm_assist_frac * _arm_center_right;
++            } else {
++                _arm_left_target  = fwd_l + _arm_assist_frac * _arm_center_left;
++                _arm_right_target = fwd_r + _arm_assist_frac * _arm_center_right;
++            }
++        }
++
++        // The return finishes when its nominal trajectory is home AND the
++        // measured arms reach the combined command. A deployed center catch
++        // must not deadlock completion and keep equilibrium learning disabled.
++        if (_arms_returning && !_arms_returned
++            && fabsf(_arm_nominal_left - _arm_left_goal) < 0.08f
++            && fabsf(_arm_nominal_right - _arm_right_goal) < 0.08f
++            && armsAtGoal(_startup_recovery ? _arm_left_target : _arm_left_goal,
++                          _startup_recovery ? _arm_right_target : _arm_right_goal)) {
++            _arms_returned = true;
++            Serial.printf("[Balance] Arms returned (drift=%.2f, base_sp=%.1f)\n",
++                          meas_drift, _smoothed_base_sp);
+         }
+ 
+         float arm_speed = 0.0f;
+-        if (_ramp_complete) {
++        if (_ramp_complete || _startup_recovery) {
+             arm_speed = BALANCE_ARM_ASSIST_SPEED;
+         } else if (_arms_returning) {
+             arm_speed = BALANCE_ARM_RETURN_SPEED;
+@@ -1311,7 +1369,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
+                     | (_safe_sat_timing ? 0x08 : 0)
+                     | (_capture_stable ? 0x10 : 0)
+                     | (_arms_returning ? 0x20 : 0)
+-                    | (_ramp_complete ? 0x40 : 0);
++                    | (_ramp_complete ? 0x40 : 0)
++                    | (_startup_recovery ? 0x80 : 0);
+ 
+         const bool front_l_ok = _motors->sendDrivePosition(MotorRole::FrontLeft, _front_left_hold, 0.0f);
+         const bool front_r_ok = _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0.0f);
+@@ -1450,6 +1509,9 @@ bool BalanceController::startLog() {
+     _log_config.log_duration_ms = BALANCE_LOG_DURATION_MS;
+     _log_config.balance_loop_hz = BALANCE_LOOP_HZ;
+     _log_config.control_loop_hz = CONTROL_LOOP_HZ;
++    _log_config.reserved[0] = static_cast<uint8_t>(BALANCE_START_RECOVERY_SPEED * 10 + .5f);
++    _log_config.reserved[1] = static_cast<uint8_t>(BALANCE_START_RECOVERY_FORCE_SPEED * 10 + .5f);
++    _log_config.reserved[2] = BALANCE_START_RECOVERY_CONFIRM_MS / 10;
+     _log_config.curve_len = (BALANCE_SP_CURVE_LEN < BALANCE_LOG_MAX_CURVE_POINTS)
+                           ? BALANCE_SP_CURVE_LEN : BALANCE_LOG_MAX_CURVE_POINTS;
+     for (int i = 0; i < _log_config.curve_len; i++) {
+@@ -1584,7 +1646,7 @@ void BalanceController::flushLogToFile() {
+     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
+     header.header_size = sizeof(BalanceLogFileHeader);
+     header.sample_size = sizeof(BalanceSample);
+-    header.reserved = 15;  // IMU age, RS05 units, fast CAN RX, absolute capture trim
++    header.reserved = 31;  // prior extensions plus early arm recovery v1
+     header.sample_count = _log_count;
+     header.start_uptime_ms = _log_start_ms;
+     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
+@@ -1734,6 +1796,12 @@ void BalanceController::dumpLog() {
+     out.println("# === BALANCE CONFIG ===");
+     out.println("# transport_checksum=fnv1a32");
+     out.printf("# telemetry_features=%u\n", header.reserved);
++    if (header.reserved & 16) {
++        out.println("# startup_recovery=wheel_velocity_arm_assist_v1");
++        out.printf("# startup_recovery_speed=%.1f\n", header.config.reserved[0] * .1f);
++        out.printf("# startup_recovery_force_speed=%.1f\n", header.config.reserved[1] * .1f);
++        out.printf("# startup_recovery_confirm_ms=%u\n", header.config.reserved[2] * 10);
++    }
+     if (header.reserved & 8) {
+         out.println("# capture_trim_bounds=absolute");
+     }
+diff --git a/src/balance_controller.h b/src/balance_controller.h
+index a348dcb..924a489 100644
+--- a/src/balance_controller.h
++++ b/src/balance_controller.h
+@@ -7,6 +7,7 @@
+ #include "arm_controller.h"
+ #include "settings.h"
+ #include "config.h"
++#include "balance_math.h"
+ 
+ enum class BalanceState : uint8_t {
+     Idle           = 0,
+@@ -99,6 +100,8 @@ enum BalanceDiagFlag : uint16_t {
+     BAL_DIAG_SAFETY_EXIT     = 0x0200,
+     BAL_DIAG_IMU_STALE       = 0x0400,
+     BAL_DIAG_CAN_TX_FAILED   = 0x0800,
++    BAL_DIAG_START_RECOVERY  = 0x1000,
++    BAL_DIAG_ARM_ENVELOPE    = 0x2000,
+ };
+ 
+ static constexpr int BALANCE_LOG_MAX_CURVE_POINTS = 6;
+@@ -276,6 +279,10 @@ private:
+     float   _arm_calm_ms      = 0.0f;   // accumulated calm time for re-arming
+     float _arm_center_left    = 0.0f;   // calibrated center-axis deltas from forward
+     float _arm_center_right   = 0.0f;
++    balance_math::RunawayDetector _startup_detector;
++    bool _startup_recovery = false;
++    uint32_t _startup_recovery_ms = 0;
++    float _startup_direction = 0.0f;
+     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)
+     float _sp_offset          = 0.0f;   // deg, added to base setpoint
+     float _filtered_wheel_vel = 0.0f;   // rad/s
+@@ -321,6 +328,8 @@ private:
+     // Arm ramp state (control task only)
+     float _arm_left_target  = 0.0f;
+     float _arm_right_target = 0.0f;
++    float _arm_nominal_left = 0.0f;  // return trajectory without center-axis catch
++    float _arm_nominal_right = 0.0f;
+     float _arm_left_goal    = 0.0f;
+     float _arm_right_goal   = 0.0f;
+     float _arm_ramp_speed   = 0.0f;
+diff --git a/src/balance_math.h b/src/balance_math.h
+index b4b03ef..c8dc458 100644
+--- a/src/balance_math.h
++++ b/src/balance_math.h
+@@ -14,6 +14,62 @@ inline float captureCurveShift(float tilt, float scheduled, float stored_trim,
+                                float absolute_limit) {
+     return clamp(tilt - scheduled, -absolute_limit, absolute_limit) - stored_trim;
+ }
++struct RunawayConfig {
++    float minimum_speed, unconditional_speed, minimum_acceleration, acceleration_tau;
++    uint32_t confirm_ms;
++};
++// One trigger per stand-up. Signed confirmation rejects a single velocity
++// spike and alternating noise; a high steady speed also qualifies.
++class RunawayDetector {
++public:
++    void reset() { *this = RunawayDetector{}; }
++    float update(bool eligible, float velocity, float dt, const RunawayConfig& c) {
++        if (!std::isfinite(velocity) || !std::isfinite(dt) || dt <= 0 || dt > .1f) {
++            reset();
++            return 0;
++        }
++        const float acceleration = _initialized ? (velocity - _previous_velocity) / dt : 0;
++        _previous_velocity = velocity;
++        _initialized = true;
++        _acceleration += clamp(dt / c.acceleration_tau, 0, 1) * (acceleration - _acceleration);
++        if (_triggered) return 0;
++        const float direction = velocity > 0 ? 1.0f : -1.0f;
++        const float speed = std::fabs(velocity);
++        const bool growing = direction * _acceleration >= c.minimum_acceleration;
++        const bool candidate = eligible && speed >= c.minimum_speed
++                            && (growing || speed >= c.unconditional_speed);
++        if (!candidate) { _qualifying_ms = 0; _direction = 0; return 0; }
++        if (direction != _direction) { _qualifying_ms = 0; _direction = direction; }
++        _qualifying_ms += dt * 1000;
++        if (_qualifying_ms + .001f < c.confirm_ms) return 0;
++        _triggered = true;
++        return direction;
++    }
++private:
++    float _previous_velocity = 0, _acceleration = 0, _qualifying_ms = 0, _direction = 0;
++    bool _initialized = false, _triggered = false;
++};
++
++// A center-axis catch is added to the remaining tip-axis return. Intersect
++// both arms' permitted fractions so the combined motion stays inside the
++// envelope already used by tip-up and normal arm assistance.
++inline float limitArmAssist(float nominal_left, float nominal_right,
++                            float center_left, float center_right,
++                            float tip_left, float tip_right,
++                            float requested, float minimum, float maximum) {
++    float lo = minimum, hi = maximum;
++    const auto constrain = [&](float nominal, float center, float tip) {
++        const float lower = std::fmin(std::fmin(0.0f, tip), std::fmin(minimum * center, maximum * center));
++        const float upper = std::fmax(std::fmax(0.0f, tip), std::fmax(minimum * center, maximum * center));
++        if (std::fabs(center) < .00001f) return;
++        const float a = (lower - nominal) / center, b = (upper - nominal) / center;
++        lo = std::fmax(lo, std::fmin(a, b));
++        hi = std::fmin(hi, std::fmax(a, b));
++    };
++    constrain(nominal_left, center_left, tip_left);
++    constrain(nominal_right, center_right, tip_right);
++    return lo <= hi ? clamp(requested, lo, hi) : 0.0f;
++}
+ struct WheelCommands { float left, right, yaw; };
+ inline WheelCommands mix(float common, float yaw, float limit) {
+     common = clamp(common, -limit, limit);
+diff --git a/src/config.h b/src/config.h
+index cc470ff..887ecb7 100644
+--- a/src/config.h
++++ b/src/config.h
+@@ -356,6 +356,18 @@ static constexpr float    BALANCE_ARM_CALM_MS           = 300.0f;   // sustained
+ static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.45f;
+ static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm motor speed limit
+ 
++// Early stand-up catch uses physical wheel units and fresh motion feedback.
++// The existing arm recovery remains available while the tip-axis return runs.
++static constexpr float    BALANCE_START_RECOVERY_SPEED = 2.5f;     // rad/s, outward acceleration required below forced threshold
++static constexpr float    BALANCE_START_RECOVERY_FORCE_SPEED = 4.0f;
++static constexpr float    BALANCE_START_RECOVERY_ACCEL = 2.0f;     // rad/s^2, in the direction of travel
++static constexpr float    BALANCE_START_RECOVERY_ACCEL_TAU = 0.06f;
++static constexpr uint32_t BALANCE_START_RECOVERY_CONFIRM_MS = 60;
++static constexpr float    BALANCE_START_RECOVERY_TIP_MAX = 0.90f;  // measured return must have begun
++static constexpr uint32_t BALANCE_START_RECOVERY_FEEDBACK_MS = 30;
++static constexpr float    BALANCE_START_RECOVERY_MIN_FRAC = 0.20f; // committed initial catch, further clipped to arm envelope
++static constexpr uint32_t BALANCE_START_RECOVERY_HOLD_MS = 120;
++
+ // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
+ // estimator (it converges to the true balance offset from the arm-curve
+ // nominal). Three additions make it dynamic instead of per-run:
+diff --git a/tests/test_telemetry.py b/tests/test_telemetry.py
+index 503297a..d112762 100644
+--- a/tests/test_telemetry.py
++++ b/tests/test_telemetry.py
+@@ -59,6 +59,8 @@ class TelemetryTests(unittest.TestCase):
+         self.assertEqual(c.arm_return_acceleration, 0)
+         self.assertEqual(c.arm_return_speed, 1.5)
+         self.assertTrue(c.absolute_capture_trim)
++        self.assertTrue(c.startup_recovery)
++        self.assertEqual(c.sp_curve, ((0.,84.),(.5,83.05),(1.,82.1)))
+         self.assertAlmostEqual(c.vel_sp_kp, 2.2*33/50)
+         self.assertTrue(c.measured_arm_arrival and c.hard_stop_latches)
+ 

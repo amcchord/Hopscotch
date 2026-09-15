@@ -1,0 +1,10 @@
+{'name': 'baseline', 'early': 4, 'late': 3, 'median_peak': 8.692577738569938}
+{'name': 'v1.0_ki0.5', 'early': 2, 'late': 17, 'median_peak': 9.095010930462031}
+{'name': 'v1.0_ki1.0', 'early': 0, 'late': 20, 'median_peak': 6.10657881142867}
+{'name': 'v1.0_ki2.0', 'early': 4, 'late': 17, 'median_peak': 5.094460259077115}
+{'name': 'v1.5_ki0.5', 'early': 2, 'late': 15, 'median_peak': 9.054913542535017}
+{'name': 'v1.5_ki1.0', 'early': 0, 'late': 17, 'median_peak': 7.668607408633035}
+{'name': 'v1.5_ki2.0', 'early': 3, 'late': 15, 'median_peak': 5.4082720234843435}
+{'name': 'v2.5_ki0.5', 'early': 4, 'late': 11, 'median_peak': 8.029629519457957}
+{'name': 'v2.5_ki1.0', 'early': 3, 'late': 11, 'median_peak': 7.867553521468447}
+{'name': 'v2.5_ki2.0', 'early': 3, 'late': 12, 'median_peak': 7.5048797886471466}

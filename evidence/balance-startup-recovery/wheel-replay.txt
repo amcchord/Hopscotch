@@ -1,0 +1,3 @@
+Startup recovery checks passed: signed trigger, one-shot lifecycle, rollover, calm hysteresis, stale input, anti-windup, 50000 bounded updates
+telemetry_logs/bal_20260914_222023_feedback-fix-first.csv trigger_s=0.76 filtered_velocity=1.3636 displacement=0.216 tip_fraction=0.8296 direction=1
+telemetry_logs/bal_20260914_223915_capture-trim-assisted.csv trigger_s=0.72 filtered_velocity=1.2223 displacement=0.142 tip_fraction=0.8507 direction=1

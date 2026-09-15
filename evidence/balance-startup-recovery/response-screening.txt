@@ -1,0 +1,13 @@
+{'name': 'baseline', 'early': 4, 'late': 3, 'median_peak': 8.692577738569938}
+{'name': 'v1.0_p0.2_h120.0', 'early': 6, 'late': 7, 'median_peak': 9.073994579511922}
+{'name': 'v1.0_p0.2_h300.0', 'early': 9, 'late': 10, 'median_peak': 12.761366661094355}
+{'name': 'v1.0_p0.4_h120.0', 'early': 8, 'late': 11, 'median_peak': 10.16136005894675}
+{'name': 'v1.0_p0.4_h300.0', 'early': 7, 'late': 9, 'median_peak': 8.58288663595171}
+{'name': 'v1.5_p0.2_h120.0', 'early': 8, 'late': 7, 'median_peak': 11.771935612242167}
+{'name': 'v1.5_p0.2_h300.0', 'early': 9, 'late': 8, 'median_peak': 14.130000152637301}
+{'name': 'v1.5_p0.4_h120.0', 'early': 8, 'late': 9, 'median_peak': 11.693651185175895}
+{'name': 'v1.5_p0.4_h300.0', 'early': 7, 'late': 8, 'median_peak': 11.2576192868918}
+{'name': 'v2.5_p0.2_h120.0', 'early': 8, 'late': 6, 'median_peak': 12.598247512214343}
+{'name': 'v2.5_p0.2_h300.0', 'early': 9, 'late': 6, 'median_peak': 12.526685608781587}
+{'name': 'v2.5_p0.4_h120.0', 'early': 8, 'late': 7, 'median_peak': 11.126728716946603}
+{'name': 'v2.5_p0.4_h300.0', 'early': 7, 'late': 7, 'median_peak': 9.492055964252414}

@@ -1,0 +1,2 @@
+{'recovery': False, 'cases': 324, 'early': 145, 'late': 49, 'no_ramp': 103, 'median_peak': 18.605937795356112}
+{'recovery': True, 'cases': 324, 'early': 158, 'late': 85, 'no_ramp': 85, 'median_peak': 25.771644767776397}

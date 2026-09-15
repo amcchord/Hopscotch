@@ -18,10 +18,10 @@ Record any mechanical variables that changed: floor surface, tire condition, bat
 
 Connect USB with both motor groups disarmed. Before flashing, download the previous run and retain `cal status`, `bal status`, and the settings export from the web dashboard/API. Take a device flash backup where the interface permits; the packaged rollback is a rebuild of source baseline `e8b1280`, not a readback of the current device.
 
-The corrected prepared files and hashes are in `artifacts/balance-start-fix/`; its `FLASHING.md` describes the frozen image. The earlier `balance-candidate` package is retained for history and contains the startup regression. To flash the corrected frozen application:
+The current reactive-startup candidate is in `artifacts/balance-startup-recovery/`; its `FLASHING.md` and manifest identify the exact frozen image. Previous releases remain separate packages. To flash the current candidate:
 
 ```bash
-.venv/bin/python scripts/flash_prepared_balance.py --package artifacts/balance-start-fix --flash
+.venv/bin/python scripts/flash_prepared_balance.py --package artifacts/balance-startup-recovery --flash
 ```
 
 For a source rebuild, use:
@@ -119,7 +119,7 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 | Power | cached bus voltage and summed motor current |
 | Operator alignment | cumulative `marker` set by CH12 or `bal mark` |
 
-`flags` retains the state-machine bits used by historical logs: `0x02` angle-error timer, `0x04` rate timer, `0x08` saturation timer, `0x10` capture stable, `0x20` arms returning, and `0x40` ramp complete.
+`flags` retains the state-machine bits used by historical logs: `0x02` angle-error timer, `0x04` rate timer, `0x08` saturation timer, `0x10` capture stable, `0x20` arms returning, and `0x40` ramp complete. With telemetry feature bit 16, `0x80` means the startup recovery was triggered during this run.
 
 `diag_flags` adds forensic conditions:
 
@@ -136,8 +136,14 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 | `0x0200` | Row captured immediately before a safety exit |
 | `0x0400` | IMU stale/invalid or sample deadline missed; latched until a deliberate new attempt |
 | `0x0800` | At least one rear-wheel speed command failed to enter the CAN transmit path |
+| `0x1000` | Early wheel recovery active (feature bit 16 only) |
+| `0x2000` | Temporary startup learning boost active |
+| `0x4000` | Startup correction rate/angle limit, anti-windup or stale-input hold |
+| `0x8000` | Recovery settled; current position captured for holding |
 
-`imu_age_ms` occupies the former reserved byte, preserving the 220-byte v2 sample size. `telemetry_features=1` identifies the extension; age saturates at 255 ms. Older v2 files export an empty age field because their age is unknown. Successful host download validates a `transport_fnv1a` trailer; old firmware exports retain their weaker legacy checks. FNV-1a detects accidental corruption, not deliberate tampering.
+`imu_age_ms` occupies the former reserved byte, preserving the 220-byte v2 sample size. `telemetry_features` bit 1 identifies the extension; age saturates at 255 ms. Older v2 files export an empty age field because their age is unknown. Successful host download validates a `transport_fnv1a` trailer; old firmware exports retain their weaker legacy checks. FNV-1a detects accidental corruption, not deliberate tampering.
+
+Current logs use feature flags 31: IMU age (1), corrected RS05 units (2), fast CAN receive/front-hold cadence (4), absolute capture trim (8), and wheel-feedback startup recovery v1 (16). Three reserved configuration bytes store the trigger speed, high-speed fallback and confirmation duration. The v1 metadata documents the fixed boost/limits; schema and 220-byte sample layout are unchanged. `meas_drift` always measures travel from engagement, including after a new holding position is captured.
 
 The file checksum covers stored sample bytes, not all binary-header metadata. The transport checksum protects the complete exported payload in transit. Captures marked `duration_limit` or `buffer_full` stop recording without establishing a fall time. Power loss before idle save loses the PSRAM run; keep power on after an attempt.
 

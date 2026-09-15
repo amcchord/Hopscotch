@@ -38,7 +38,7 @@ import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 INNER_DT = 1.0 / 200.0
 OUTER_EVERY = 4          # outer tick every 4 inner ticks (50 Hz)
@@ -76,21 +76,21 @@ class FirmwareConfig:
     setpoint_max: float = 110.0
     capture_shift_max: float = 15.0
     absolute_capture_trim: bool = False  # old records bounded the relative shift
-    startup_recovery: bool = False  # historical variants leave the early catch off
-    startup_speed: float = 1.0
+    recovery_hold_position: bool = False
+    wheel_recovery: bool = False
+    recovery_boost_ms: float = 800.0
+    recovery_ki: float = 1.0
+    recovery_limit: float = 6.0
+    recovery_rate: float = 6.0
+    startup_recovery: bool = False
+    startup_speed: float = 2.5
     startup_force_speed: float = 4.0
     startup_accel: float = 2.0
     startup_accel_tau: float = .06
     startup_confirm_ms: float = 60
     startup_tip_max: float = .9
-    recovery_ki: float = 1.0
-    recovery_boost_ms: float = 800
-    recovery_limit: float = 6.0
-    recovery_rate: float = 6.0
-    recovery_calm_vel: float = .7
-    recovery_calm_rate: float = 4.0
-    recovery_calm_err: float = 1.0
-    recovery_calm_ms: float = 400
+    startup_min_frac: float = .20
+    startup_hold_ms: float = 120
     base_sp_rate_max: float = 3.0
     ramp_vel_slow: float = 2.0
     ramp_vel_gate_floor: float = 0.3
@@ -301,20 +301,21 @@ class OuterController:
         self.return_elapsed = 0.0
         self.return_start_l = self.arm_l_target
         self.return_start_r = self.arm_r_target
+        self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
+        self.startup_recovery = False
+        self.recovery_calm_ms = 0.
+        self.recovery_done = False
+        self.startup_ms = 0.
+        self.startup_direction = 0.
+        self.startup_confirm = 0.
+        self.startup_confirm_direction = 0.
+        self.startup_previous_velocity = 0.
+        self.startup_acceleration = 0.
         self.arms_returned = False
         self.ramp_complete = False
         self.ramp_complete_ms = 0.0
         self.capture_was_settled = False
 
-        self.startup_triggered = False
-        self.startup_active = False
-        self.startup_ms = 0.
-        self.recovery_calm_ms = 0.
-        self.startup_accel = 0.
-        self.startup_previous_vel = None
-        self.startup_qualifying_ms = 0.
-        self.startup_direction = 0.
-        self.hold_drift = 0.
         self.vel_sp_integral = 0.0
         self.sp_offset = 0.0
         self.filtered_wheel_vel = 0.0
@@ -464,7 +465,7 @@ class OuterController:
             self.prev_scheduled_sp = scheduled_sp
         else:
             ramp_rate = c.base_sp_rate_max
-            if not self.ramp_complete and not self.startup_triggered:
+            if not self.ramp_complete and not self.startup_recovery:
                 vel_gate = 1.0 - clampf(abs(self.filtered_wheel_vel) / c.ramp_vel_slow,
                                         0.0, 1.0)
                 vel_gate = max(vel_gate, c.ramp_vel_gate_floor)
@@ -487,7 +488,7 @@ class OuterController:
                     and abs(self.smoothed_base_sp - raw_base_sp) < 0.1):
                 self.ramp_complete = True
                 self.ramp_complete_ms = now_ms
-                if not self.startup_triggered:
+                if not (c.wheel_recovery and self.startup_recovery):
                     self.vel_sp_integral = 0.0
 
         # --- capture / arm return ---
@@ -509,6 +510,7 @@ class OuterController:
             self.arms_returning = True
             self.return_start_l = self.arm_l_target
             self.return_start_r = self.arm_r_target
+            self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
             self.arm_l_goal = 0.0
             self.arm_r_goal = 0.0
             if capture_settled:
@@ -524,6 +526,8 @@ class OuterController:
                 self.engage_capture_shift = 0.0
 
         if self.arms_returning and not self.ramp_complete:
+            if c.startup_recovery:
+                self.arm_l_target, self.arm_r_target = self.nominal_l, self.nominal_r
             crisis = abs(last_cmd) > 10.0 or abs(rate) > 30.0
             if c.arm_return_gate and not crisis:
                 lagging = (abs(self.effective_setpoint - tilt) > c.arm_gate_err_deg
@@ -564,7 +568,9 @@ class OuterController:
             elif c.arm_return_acceleration > 0:
                 self.return_elapsed = 0.
                 self.return_start_l, self.return_start_r = self.arm_l_target, self.arm_r_target
-            if not self.arms_returned:
+            if c.startup_recovery:
+                self.nominal_l, self.nominal_r = self.arm_l_target, self.arm_r_target
+            if not self.arms_returned and not c.startup_recovery:
                 if (abs(self.arm_l_target - self.arm_l_goal) < (.005 if c.arm_return_acceleration else .08)
                         and abs(self.arm_r_target - self.arm_r_goal) < (.005 if c.arm_return_acceleration else .08)
                         and (not c.measured_arm_arrival or
@@ -580,41 +586,47 @@ class OuterController:
                                 0.0, 1.0)
         self.filtered_wheel_vel += c.vel_filter_alpha * (wheel_vel_meas
                                                          - self.filtered_wheel_vel)
-        # The plant model supplies fresh wheel samples; CAN loss and the
-        # production 30 ms eligibility guard are covered separately in native tests.
-        if c.startup_recovery and not self.startup_triggered:
-            acceleration = (0. if self.startup_previous_vel is None else
-                            (self.filtered_wheel_vel-self.startup_previous_vel)/dt)
-            self.startup_previous_vel = self.filtered_wheel_vel
-            self.startup_accel += clampf(dt/c.startup_accel_tau,0,1)*(acceleration-self.startup_accel)
-            direction = 1. if self.filtered_wheel_vel>0 else -1.
-            eligible = self.arms_returning and not self.ramp_complete and arm_frac<=c.startup_tip_max
-            qualifies = eligible and abs(self.filtered_wheel_vel)>=c.startup_speed and (
-                direction*self.startup_accel>=c.startup_accel or abs(self.filtered_wheel_vel)>=c.startup_force_speed)
-            if not qualifies:
-                self.startup_qualifying_ms = 0.
-                self.startup_direction = 0.
+        if (c.startup_recovery or c.wheel_recovery) and not self.startup_recovery:
+            velocity = self.filtered_wheel_vel
+            acceleration = (velocity - self.startup_previous_velocity) / dt
+            self.startup_previous_velocity = velocity
+            self.startup_acceleration += clampf(dt/c.startup_accel_tau, 0, 1) * (acceleration-self.startup_acceleration)
+            direction = 1. if velocity > 0 else -1.
+            eligible = (self.arms_returning and not self.ramp_complete
+                        and self.tip_frac(arm_l_meas, arm_r_meas) <= c.startup_tip_max)
+            growing = direction * self.startup_acceleration >= c.startup_accel
+            candidate = (eligible and abs(velocity) >= c.startup_speed
+                         and (growing or abs(velocity) >= c.startup_force_speed))
+            if not candidate:
+                self.startup_confirm = 0.
+                self.startup_confirm_direction = 0.
             else:
-                if direction != self.startup_direction:
-                    self.startup_qualifying_ms = 0.
-                    self.startup_direction = direction
-                self.startup_qualifying_ms += dt*1000
-                if self.startup_qualifying_ms+.001>=c.startup_confirm_ms:
-                    self.startup_triggered = self.startup_active = True
+                if direction != self.startup_confirm_direction:
+                    self.startup_confirm = 0.
+                    self.startup_confirm_direction = direction
+                self.startup_confirm += dt * 1000
+                if self.startup_confirm + .001 >= c.startup_confirm_ms:
+                    self.startup_recovery = True
                     self.startup_ms = now_ms
-        if self.startup_active:
-            calm = (self.ramp_complete and abs(self.filtered_wheel_vel)<c.recovery_calm_vel
-                    and abs(rate)<c.recovery_calm_rate
-                    and abs(self.effective_setpoint-tilt)<c.recovery_calm_err)
-            self.recovery_calm_ms = self.recovery_calm_ms+dt*1000 if calm else 0.
-            if self.recovery_calm_ms+.001>=c.recovery_calm_ms:
-                self.startup_active = False
-                self.hold_drift = meas_drift
+                    self.startup_direction = direction
+                    if c.startup_recovery:
+                        self.arm_stage, self.arm_sign, self.arm_calm_ms = 1, direction, 0.
+        wheel_active=c.wheel_recovery and self.startup_recovery and not self.recovery_done
+        if wheel_active:
+            calm=(self.ramp_complete and abs(self.filtered_wheel_vel)<.7 and abs(rate)<4.
+                  and abs(self.effective_setpoint-tilt)<1.)
+            self.recovery_calm_ms=self.recovery_calm_ms+dt*1000 if calm else 0.
+            if self.recovery_calm_ms>=400:
+                self.recovery_done=True
+                wheel_active=False
+                if c.recovery_hold_position:
+                    self.wheel_start_pos=wheel_pos
+                    meas_drift=0.
         target_vel = 0.0
-        if self.startup_active:
-            pass  # stop first, then hold the settled position
+        if wheel_active:
+            pass  # arrest motion before repaying accumulated position error
         elif self.ramp_complete:
-            target_vel = clampf(-c.drift_vel_kp * (meas_drift-self.hold_drift),
+            target_vel = clampf(-c.drift_vel_kp * meas_drift,
                                 -c.drift_max_vel, c.drift_max_vel)
         elif c.early_pos_p:
             target_vel = clampf(-c.early_drift_kp * meas_drift,
@@ -622,12 +634,11 @@ class OuterController:
         self.last_target_vel = target_vel
         vel_err = self.filtered_wheel_vel - target_vel
 
-        if self.startup_active:
-            ki = (c.recovery_ki if not self.ramp_complete and now_ms-self.startup_ms<c.recovery_boost_ms
-                  else c.vel_sp_ki)
-            change = clampf(ki*vel_err,-c.recovery_rate,c.recovery_rate)*dt
+        if wheel_active:
+            ki=c.recovery_ki if not self.ramp_complete and now_ms-self.startup_ms<c.recovery_boost_ms else c.vel_sp_ki
+            change=clampf(ki*vel_err,-c.recovery_rate,c.recovery_rate)*dt
             if abs(self.sp_offset)<c.recovery_limit-.05 or change*self.sp_offset<0:
-                self.vel_sp_integral = clampf(self.vel_sp_integral+change,-c.recovery_limit,c.recovery_limit)
+                self.vel_sp_integral=clampf(self.vel_sp_integral+change,-c.recovery_limit,c.recovery_limit)
         elif self.ramp_complete:
             ki = c.vel_sp_ki
             calm = abs(rate) < c.glide_rate_max and abs(last_cmd) < c.glide_cmd_max
@@ -664,15 +675,15 @@ class OuterController:
             off_max = c.ramp_off_clamp
         if self.ramp_complete and c.outer_handoff_ms > 0 and c.ramp_off_clamp > 0:
             off_max = c.ramp_off_clamp + authority * (c.sp_offset_max - c.ramp_off_clamp)
-        if self.startup_active:
-            off_max = c.recovery_limit
+        if wheel_active:
+            off_max=c.recovery_limit
         sp_offset_target = clampf(p_term * pos_gate * shed + self.vel_sp_integral,
                                   -off_max, off_max)
         self.sp_offset = move_toward(self.sp_offset, sp_offset_target,
                                      c.sp_offset_rate, dt)
 
         # --- arm assist lifecycle ---
-        if self.ramp_complete:
+        if self.ramp_complete or (c.startup_recovery and self.startup_recovery):
             self.arm_assist_vel += clampf(dt / c.arm_assist_vel_tau, 0.0, 1.0) \
                 * (vel_err - self.arm_assist_vel)
             excess = 0.0
@@ -682,6 +693,11 @@ class OuterController:
                 excess = self.arm_assist_vel + c.arm_assist_thresh
             demand = clampf(c.arm_assist_gain * excess,
                             -c.arm_assist_range_neg, c.arm_assist_range_pos)
+            if (self.startup_recovery and now_ms-self.startup_ms < c.startup_hold_ms
+                    and self.filtered_wheel_vel*self.startup_direction > 0
+                    and abs(demand) < c.startup_min_frac):
+                demand = clampf(self.startup_direction*c.startup_min_frac,
+                                -c.arm_assist_range_neg,c.arm_assist_range_pos)
 
             calm_now = abs(vel_err) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
             if calm_now:
@@ -734,8 +750,27 @@ class OuterController:
 
             alpha = clampf(dt / tau, 0.0, 1.0)
             self.arm_assist_frac += alpha * (target - self.arm_assist_frac)
-            self.arm_l_target = self.arm_assist_frac * c.arm_center_left
-            self.arm_r_target = self.arm_assist_frac * c.arm_center_right
+            if not self.ramp_complete:
+                lo,hi = -c.arm_assist_range_neg,c.arm_assist_range_pos
+                for nominal,center,tip in ((self.nominal_l,c.arm_center_left,c.arm_tip_left),
+                                            (self.nominal_r,c.arm_center_right,c.arm_tip_right)):
+                    lower=min(0,tip,-c.arm_assist_range_neg*center,c.arm_assist_range_pos*center)
+                    upper=max(0,tip,-c.arm_assist_range_neg*center,c.arm_assist_range_pos*center)
+                    if abs(center) < 1e-5: continue
+                    a,b=(lower-nominal)/center,(upper-nominal)/center
+                    lo,hi=max(lo,min(a,b)),min(hi,max(a,b))
+                self.arm_assist_frac=clampf(self.arm_assist_frac,lo,hi) if lo<=hi else 0.
+                self.arm_l_target = self.nominal_l+self.arm_assist_frac*c.arm_center_left
+                self.arm_r_target = self.nominal_r+self.arm_assist_frac*c.arm_center_right
+            else:
+                self.arm_l_target = self.arm_assist_frac * c.arm_center_left
+                self.arm_r_target = self.arm_assist_frac * c.arm_center_right
+
+        if (c.startup_recovery and self.arms_returning and not self.arms_returned
+                and abs(self.nominal_l-self.arm_l_goal)<.08 and abs(self.nominal_r-self.arm_r_goal)<.08
+                and abs(arm_l_meas-(self.arm_l_target if self.startup_recovery else self.arm_l_goal))<=.15
+                and abs(arm_r_meas-(self.arm_r_target if self.startup_recovery else self.arm_r_goal))<=.15):
+            self.arms_returned=True
 
         effective = base_effective + self.sp_offset
         if c.carrot_effective and not self.ramp_complete:
@@ -1017,6 +1052,14 @@ def current_firmware_config() -> FirmwareConfig:
         'setpoint_min': 'BALANCE_SETPOINT_MIN', 'setpoint_max': 'BALANCE_SETPOINT_MAX',
         'setpoint_arms_fwd': 'BALANCE_SETPOINT_ARMS_FWD', 'setpoint_arms_center': 'BALANCE_SETPOINT_ARMS_CENTER',
         'capture_shift_max': 'BALANCE_CAPTURE_SHIFT_MAX_DEG',
+        'startup_speed': 'BALANCE_START_RECOVERY_SPEED',
+        'startup_force_speed': 'BALANCE_START_RECOVERY_FORCE_SPEED',
+        'startup_accel': 'BALANCE_START_RECOVERY_ACCEL',
+        'startup_accel_tau': 'BALANCE_START_RECOVERY_ACCEL_TAU',
+        'startup_confirm_ms': 'BALANCE_START_RECOVERY_CONFIRM_MS',
+        'startup_tip_max': 'BALANCE_START_RECOVERY_TIP_MAX',
+        'startup_min_frac': 'BALANCE_START_RECOVERY_MIN_FRAC',
+        'startup_hold_ms': 'BALANCE_START_RECOVERY_HOLD_MS',
         'capture_err_max': 'BALANCE_CAPTURE_ERR_MAX_DEG', 'capture_rate_max': 'BALANCE_CAPTURE_RATE_MAX_DPS',
         'capture_cmd_max': 'BALANCE_CAPTURE_CMD_MAX', 'capture_settle_ms': 'BALANCE_CAPTURE_SETTLE_MS',
         'arm_hold_max_ms': 'BALANCE_ARM_HOLD_MAX_MS', 'arm_tip_left': 'BALANCE_ARM_TIP_LEFT',
@@ -1027,20 +1070,6 @@ def current_firmware_config() -> FirmwareConfig:
         'shed_vel_full': 'BALANCE_SHED_VEL_FULL', 'glide_vel_err': 'BALANCE_GLIDE_VEL_ERR',
         'glide_ki_boost': 'BALANCE_GLIDE_KI_BOOST', 'glide_rate_max': 'BALANCE_GLIDE_RATE_MAX_DPS',
         'glide_cmd_max': 'BALANCE_GLIDE_CMD_MAX',
-        'startup_speed': 'BALANCE_START_RECOVERY_SPEED',
-        'startup_force_speed': 'BALANCE_START_RECOVERY_FORCE_SPEED',
-        'startup_accel': 'BALANCE_START_RECOVERY_ACCEL',
-        'startup_accel_tau': 'BALANCE_START_RECOVERY_ACCEL_TAU',
-        'startup_confirm_ms': 'BALANCE_START_RECOVERY_CONFIRM_MS',
-        'startup_tip_max': 'BALANCE_START_RECOVERY_TIP_MAX',
-        'recovery_ki': 'BALANCE_START_RECOVERY_KI',
-        'recovery_boost_ms': 'BALANCE_START_RECOVERY_BOOST_MS',
-        'recovery_limit': 'BALANCE_START_RECOVERY_LIMIT_DEG',
-        'recovery_rate': 'BALANCE_START_RECOVERY_RATE_DPS',
-        'recovery_calm_vel': 'BALANCE_START_RECOVERY_CALM_VEL',
-        'recovery_calm_rate': 'BALANCE_START_RECOVERY_CALM_RATE',
-        'recovery_calm_err': 'BALANCE_START_RECOVERY_CALM_ERR',
-        'recovery_calm_ms': 'BALANCE_START_RECOVERY_CALM_MS',
     }
     kwargs = {field: number(const) for field, const in mapping.items()}
     curve = source.split('BALANCE_SP_CURVE[] = {', 1)[1].split('};', 1)[0]

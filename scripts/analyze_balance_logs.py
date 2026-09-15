@@ -269,6 +269,13 @@ def summarize(path: Path) -> dict[str, object] | None:
     diag["arm_active_rows"] = sum(
         1 for row in balance_rows if as_int(row, "arm_stage") in (1, 2)
     )
+    if as_int(config, "telemetry_features") & 16:
+        origin_ms = as_float(balance_rows[0], "t_ms") if balance_rows else 0
+        for label, bit in (("active",0x1000),("boost",0x2000),("limited",0x4000),("settled",0x8000)):
+            matching = [row for row in balance_rows if as_int(row,"diag_flags") & bit]
+            diag[f"startup_recovery_{label}_rows"] = len(matching)
+            diag[f"startup_recovery_{label}_first_s"] = ((as_float(matching[0],"t_ms")-origin_ms)/1000
+                                                        if matching else math.nan)
     diag["markers"] = max((as_int(row, "marker") for row in rows), default=0)
 
     if len(rows) >= 2999 and not config.get("end_reason"):

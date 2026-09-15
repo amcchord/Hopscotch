@@ -1,0 +1,3 @@
+Startup recovery checks passed: signed confirmation, spike rejection, fresh timing, reset, 50000 coupled arm envelopes
+telemetry_logs/bal_20260914_222023_feedback-fix-first.csv trigger_s=1 filtered_velocity=2.7897 displacement=0.755 tip_fraction=0.6967 direction=1
+telemetry_logs/bal_20260914_223915_capture-trim-assisted.csv trigger_s=1 filtered_velocity=2.735 displacement=0.761 tip_fraction=0.6958 direction=1

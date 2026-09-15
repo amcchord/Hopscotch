@@ -118,3 +118,9 @@ The host recorder is active, with log note `capture-trim-secured-sensor`. Austin
 has been asked for one short ordinary stand-up, prompt support/disarm if it runs
 away, five seconds untouched only if stable, and no tap. No tool armed motors or
 initiated physical movement. Physical improvement remains pending.
+
+## Capture-correction trial outcome
+
+The requested trial also ran away and needed a hand stop, then balanced well. All 1,119 samples were saved/checksummed (`0x3F3F58BA`, USB `0x28979A65`), end `drive disarmed`. The actual run was observed without reboot; run receiver maximum 516 µs, no stalls, CAN receive misses/TX failures zero. The first four balance seconds reached 19.735 rad/s average wheel speed and 15.244 rad wheel travel. Calibration was reread unchanged; learned trim is 2.44°. Thus the capture-bound bug fix is retained, but it does not solve the early runaway.
+
+Austin requested early runaway detection and a strong reactive correction instead of searching for a fixed angle. The unflashed 3.5°-curve candidate was discarded; the selected wheel-feedback learning response and its mixed model evidence are documented in [startup recovery](BALANCE_STARTUP_RECOVERY_2026-09.md).

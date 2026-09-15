@@ -356,6 +356,25 @@ static constexpr float    BALANCE_ARM_CALM_MS           = 300.0f;   // sustained
 static constexpr float    BALANCE_ARM_EMERGENCY_CMD_FRAC = 0.45f;
 static constexpr float    BALANCE_ARM_ASSIST_SPEED      = 12.0f;    // rad/s arm motor speed limit
 
+// React to incipient roll-away during arm return, before normal learning starts.
+// Physical RS05 units. A brief gain boost learns a correction from wheel motion;
+// the same integrator then hands over continuously to ordinary balance control.
+static constexpr float    BALANCE_START_RECOVERY_SPEED = 1.0f;  // rad/s; acceleration required below force threshold
+static constexpr float    BALANCE_START_RECOVERY_FORCE_SPEED = 4.0f;
+static constexpr float    BALANCE_START_RECOVERY_ACCEL = 2.0f;  // outward rad/s^2
+static constexpr float    BALANCE_START_RECOVERY_ACCEL_TAU = 0.06f;
+static constexpr uint32_t BALANCE_START_RECOVERY_CONFIRM_MS = 60;
+static constexpr float    BALANCE_START_RECOVERY_TIP_MAX = 0.90f;
+static constexpr uint32_t BALANCE_START_RECOVERY_FEEDBACK_MS = 30;
+static constexpr float    BALANCE_START_RECOVERY_KI = 1.0f;
+static constexpr uint32_t BALANCE_START_RECOVERY_BOOST_MS = 800;
+static constexpr float    BALANCE_START_RECOVERY_LIMIT_DEG = 6.0f;
+static constexpr float    BALANCE_START_RECOVERY_RATE_DPS = 6.0f;
+static constexpr float    BALANCE_START_RECOVERY_CALM_VEL = 0.7f;
+static constexpr float    BALANCE_START_RECOVERY_CALM_RATE = 4.0f;
+static constexpr float    BALANCE_START_RECOVERY_CALM_ERR = 1.0f;
+static constexpr uint32_t BALANCE_START_RECOVERY_CALM_MS = 400;
+
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
 // estimator (it converges to the true balance offset from the arm-curve
 // nominal). Three additions make it dynamic instead of per-run:

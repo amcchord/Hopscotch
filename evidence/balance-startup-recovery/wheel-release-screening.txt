@@ -1,0 +1,13 @@
+{'name': 'baseline', 'early': 4, 'late': 3, 'median_peak': 8.692577738569938}
+{'name': 'v1.0_ki1.0_ms400.0', 'early': 2, 'late': 5, 'median_peak': 5.280021132141691}
+{'name': 'v1.0_ki1.0_ms800.0', 'early': 0, 'late': 3, 'median_peak': 4.805274606917543}
+{'name': 'v1.0_ki1.0_ms5000.0', 'early': 0, 'late': 1, 'median_peak': 4.989616127842879}
+{'name': 'v1.0_ki2.0_ms400.0', 'early': 0, 'late': 4, 'median_peak': 4.33222853466077}
+{'name': 'v1.0_ki2.0_ms800.0', 'early': 4, 'late': 4, 'median_peak': 4.094107224156845}
+{'name': 'v1.0_ki2.0_ms5000.0', 'early': 4, 'late': 3, 'median_peak': 4.4250779090720425}
+{'name': 'v1.5_ki1.0_ms400.0', 'early': 2, 'late': 4, 'median_peak': 6.081737339304722}
+{'name': 'v1.5_ki1.0_ms800.0', 'early': 0, 'late': 7, 'median_peak': 6.352472612451544}
+{'name': 'v1.5_ki1.0_ms5000.0', 'early': 1, 'late': 4, 'median_peak': 6.508673642330578}
+{'name': 'v1.5_ki2.0_ms400.0', 'early': 0, 'late': 3, 'median_peak': 5.3903615517402175}
+{'name': 'v1.5_ki2.0_ms800.0', 'early': 3, 'late': 5, 'median_peak': 5.48823672116375}
+{'name': 'v1.5_ki2.0_ms5000.0', 'early': 4, 'late': 6, 'median_peak': 5.4736065526434645}

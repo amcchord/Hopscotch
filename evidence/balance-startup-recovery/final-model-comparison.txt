@@ -1,0 +1,3 @@
+{'name': 'installed', 'cases': 324, 'early': 145, 'late': 49, 'no_ramp': 103, 'median_peak': 18.605937795356112}
+{'name': 'early_wheel_recovery', 'cases': 324, 'early': 86, 'late': 60, 'no_ramp': 26, 'median_peak': 7.962599161595204}
+{'new_failures': 19, 'rescued_cases': 67}

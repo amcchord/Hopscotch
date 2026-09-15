@@ -7,6 +7,7 @@
 #include "arm_controller.h"
 #include "settings.h"
 #include "config.h"
+#include "balance_math.h"
 
 enum class BalanceState : uint8_t {
     Idle           = 0,
@@ -99,6 +100,10 @@ enum BalanceDiagFlag : uint16_t {
     BAL_DIAG_SAFETY_EXIT     = 0x0200,
     BAL_DIAG_IMU_STALE       = 0x0400,
     BAL_DIAG_CAN_TX_FAILED   = 0x0800,
+    BAL_DIAG_START_RECOVERY  = 0x1000,
+    BAL_DIAG_RECOVERY_BOOST  = 0x2000,
+    BAL_DIAG_RECOVERY_LIMIT  = 0x4000,
+    BAL_DIAG_RECOVERY_SETTLED = 0x8000,
 };
 
 static constexpr int BALANCE_LOG_MAX_CURVE_POINTS = 6;
@@ -258,6 +263,7 @@ private:
 
     // --- Setpoint handoff state (control task only) ---
     float _wheel_start_pos    = 0.0f;
+    float _hold_drift         = 0.0f; // settled hold relative to engage; raw travel remains logged
     float _engage_capture_shift = 0.0f;
     float _smoothed_base_sp = 0.0f;
     float _engage_arm_frac = 1.0f;
@@ -276,6 +282,8 @@ private:
     float   _arm_calm_ms      = 0.0f;   // accumulated calm time for re-arming
     float _arm_center_left    = 0.0f;   // calibrated center-axis deltas from forward
     float _arm_center_right   = 0.0f;
+    balance_math::RunawayDetector _startup_detector;
+    balance_math::StartupRecovery _startup_recovery;
     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)
     float _sp_offset          = 0.0f;   // deg, added to base setpoint
     float _filtered_wheel_vel = 0.0f;   // rad/s

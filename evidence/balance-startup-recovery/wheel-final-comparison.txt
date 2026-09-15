@@ -1,0 +1,3 @@
+{'name': 'baseline', 'cases': 324, 'early': 145, 'late': 49, 'no_ramp': 103, 'median_peak': 18.605937795356112}
+{'name': 'wheel_ms800.0_holdFalse', 'cases': 324, 'early': 86, 'late': 62, 'no_ramp': 26, 'median_peak': 7.962599161595204}
+{'name': 'wheel_ms800.0_holdTrue', 'cases': 324, 'early': 86, 'late': 60, 'no_ramp': 26, 'median_peak': 7.962599161595204}

@@ -7,6 +7,8 @@ PYTHON_BIN=python3
 if [ -x .venv/bin/python ]; then PYTHON_BIN=.venv/bin/python; fi
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_balance_native.cpp -o output/test_balance_native
 output/test_balance_native
+clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_startup_recovery.cpp -o output/test_startup_recovery
+output/test_startup_recovery
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_motor_setup.cpp src/motor_manager.cpp -o output/test_motor_setup
 output/test_motor_setup
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_crsf_native.cpp src/crsf.cpp -o output/test_crsf_native

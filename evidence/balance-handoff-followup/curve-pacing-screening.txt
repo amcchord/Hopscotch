@@ -1,0 +1,9 @@
+{'curve': 1.9, 'floor': 0.3, 'cases': 24, 'early': 4, 'late': 3, 'median_peak': 8.618417576920828}
+{'curve': 1.9, 'floor': 0.7, 'cases': 24, 'early': 4, 'late': 3, 'median_peak': 8.618417576920828}
+{'curve': 1.9, 'floor': 1.0, 'cases': 24, 'early': 4, 'late': 3, 'median_peak': 8.632232940555909}
+{'curve': 3.0, 'floor': 0.3, 'cases': 24, 'early': 6, 'late': 1, 'median_peak': 6.734063769112504}
+{'curve': 3.0, 'floor': 0.7, 'cases': 24, 'early': 6, 'late': 0, 'median_peak': 5.8452077277028955}
+{'curve': 3.0, 'floor': 1.0, 'cases': 24, 'early': 6, 'late': 0, 'median_peak': 5.84543293842154}
+{'curve': 4.0, 'floor': 0.3, 'cases': 24, 'early': 7, 'late': 7, 'median_peak': 9.20124818777759}
+{'curve': 4.0, 'floor': 0.7, 'cases': 24, 'early': 4, 'late': 3, 'median_peak': 5.6350375705970475}
+{'curve': 4.0, 'floor': 1.0, 'cases': 24, 'early': 4, 'late': 3, 'median_peak': 5.6350375705970475}
