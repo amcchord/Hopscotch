@@ -1,5 +1,6 @@
 #include "crsf.h"
 #include <Arduino.h>
+#include <cstring>
 #include "config.h"
 
 // CRC8 with poly 0xD5 (CRSF/DVB-S2 standard)
@@ -32,6 +33,8 @@ uint8_t CrsfReceiver::crc8(const uint8_t* data, int len) {
 
 void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_t baudrate) {
     _serial = &serial;
+    // Retain bursts between the 50 Hz control ticks (up to 840 wire bytes/tick).
+    _serial->setRxBufferSize(2048);
     _serial->begin(baudrate, SERIAL_8N1, rx_pin, tx_pin);
 
     // Initialize channels to center
@@ -41,67 +44,87 @@ void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_
 
     _buf_pos = 0;
     _last_frame_time = 0;
+    _max_update_us = 0;
+    _budget_yields = 0;
+    _received_bytes = 0;
     Serial.printf("[CRSF] Initialized on RX=%d TX=%d @ %lu baud\n", rx_pin, tx_pin, baudrate);
 }
 
 void CrsfReceiver::update() {
     if (!_serial) return;
 
-    // HARD BYTE BUDGET per call. The unbounded drain loop froze Core 1 for
-    // up to 31 SECONDS during RX byte storms (bal_20260703_224824 profiler)
-    // -- if bytes arrive as fast as they are drained, available() never
-    // goes false. 1024 bytes covers ~3x the legitimate per-tick traffic at
-    // 420kbaud/50Hz and bounds the worst case to ~1-2ms.
-    int budget = 1024;
-    while (budget-- > 0 && _serial->available()) {
-        uint8_t b = _serial->read();
+    // A byte limit alone did NOT bound elapsed time: the old available()/read()
+    // loop consumed 1.21 seconds in the September 14 tip-up log. Arduino ESP32
+    // 2.0.16 read(buffer, size) uses uartReadBytes(..., 0), unlike readBytes(),
+    // which waits for the Stream timeout. Amortize UART locking over each block.
+    static constexpr size_t BYTE_BUDGET = 1024;
+    static constexpr uint32_t TIME_BUDGET_US = 2000;
+    const uint32_t start = micros();
+    size_t processed = 0;
+    uint8_t bytes[128];
+    while (processed < BYTE_BUDGET && uint32_t(micros() - start) < TIME_BUDGET_US) {
+        const size_t remaining = BYTE_BUDGET - processed;
+        const size_t count = _serial->read(bytes, remaining < sizeof(bytes) ? remaining : sizeof(bytes));
+        if (!count) break;
+        // Finish the block before yielding so already-read bytes are never lost.
+        for (size_t i = 0; i < count; ++i) parseByte(bytes[i]);
+        processed += count;
+    }
+    const uint32_t elapsed = micros() - start;
+    _received_bytes += processed;
+    if (elapsed > _max_update_us) _max_update_us = elapsed;
+    if (processed == BYTE_BUDGET || elapsed >= TIME_BUDGET_US) ++_budget_yields;
+}
 
-        if (_buf_pos == 0) {
-            // Looking for sync byte
-            if (b == CRSF_SYNC_BYTE || b == 0xEE || b == 0xEA || b == 0xEC) {
-                _buf[0] = b;
-                _buf_pos = 1;
-            }
-            continue;
+void CrsfReceiver::parseByte(uint8_t b) {
+
+    if (_buf_pos == 0) {
+        // Looking for sync byte
+        if (b == CRSF_SYNC_BYTE || b == 0xEE || b == 0xEA || b == 0xEC) {
+            _buf[0] = b;
+            _buf_pos = 1;
         }
+        return;
+    }
 
-        _buf[_buf_pos++] = b;
+    _buf[_buf_pos++] = b;
 
-        if (_buf_pos == 2) {
-            // _buf[1] = frame length (includes type + payload + crc, NOT sync and length)
-            if (_buf[1] < 2 || _buf[1] > CRSF_MAX_PACKET_SIZE - 2) {
-                _buf_pos = 0;
-            }
-            continue;
-        }
-
-        int frame_total = _buf[1] + 2;  // sync + len + (type + payload + crc)
-
-        if (_buf_pos >= frame_total) {
-            // Full frame received
-            // CRC covers from type byte to end of payload (excludes sync, length, and crc itself)
-            uint8_t calc_crc = crc8(&_buf[2], _buf[1] - 1);
-            uint8_t recv_crc = _buf[frame_total - 1];
-
-            if (calc_crc == recv_crc) {
-                parseFrame(_buf, frame_total);
-            }
+    if (_buf_pos == 2) {
+        // _buf[1] = frame length (includes type + payload + crc, NOT sync and length)
+        if (_buf[1] < 2 || _buf[1] > CRSF_MAX_PACKET_SIZE - 2) {
             _buf_pos = 0;
         }
+        return;
+    }
 
-        if (_buf_pos >= CRSF_MAX_PACKET_SIZE) {
-            _buf_pos = 0;
+    int frame_total = _buf[1] + 2;  // sync + len + (type + payload + crc)
+
+    if (_buf_pos >= frame_total) {
+        // Full frame received
+        // CRC covers from type byte to end of payload (excludes sync, length, and crc itself)
+        uint8_t calc_crc = crc8(&_buf[2], _buf[1] - 1);
+        uint8_t recv_crc = _buf[frame_total - 1];
+
+        if (calc_crc == recv_crc) {
+            parseFrame(_buf, frame_total);
         }
+        _buf_pos = 0;
+    }
+
+    if (_buf_pos >= CRSF_MAX_PACKET_SIZE) {
+        _buf_pos = 0;
     }
 }
 
 void CrsfReceiver::parseFrame(const uint8_t* frame, int len) {
     uint8_t type = frame[2];
 
-    if (type == CRSF_FRAMETYPE_RC_CHANNELS_PACKED) {
+    // Frame total includes address/length/type/CRC. Reject truncated payloads;
+    // accept extensions, as required by CRSF forward compatibility.
+    if (type == CRSF_FRAMETYPE_RC_CHANNELS_PACKED && len >= 22 + 4) {
         decodeRcChannels(&frame[3]);
         _last_frame_time = millis();
-    } else if (type == CRSF_FRAMETYPE_LINK_STATISTICS) {
+    } else if (type == CRSF_FRAMETYPE_LINK_STATISTICS && len >= 10 + 4) {
         decodeLinkStats(&frame[3]);
     }
 }

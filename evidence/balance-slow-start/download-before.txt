@@ -1,0 +1,23 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+Received 10307 raw bytes
+Validated 20 samples (file integrity, row structure, USB checksum when available)
+
+Saved: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260914_213606_slow-start-before-fix.csv
+Samples: 20 (schema 2, checksum 1)
+Duration: 14849ms (14.8s)
+Config: 86 parameters recorded
+
+--- Analysis ---
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp  vel_off    drift  note
+----------------------------------------------------------------------------------------------------------------------------
+bal_20260914_213606_slow-start-before-fix.csv  14.85     --       --       --     --       --        --       --       --       --       --  no balance state
+
+bal_20260914_213606_slow-start-before-fix.csv
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_kp_low=0.7000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, ramp_sp_offset_max=1.50, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=-- deg, rate=-- dps
+  arm return: -- s, pre-return |err|=-- deg, |rate|=-- dps, |cmd|=-- rad/s
+  final window: sp=-- deg, vel_off=-- rad/s, drift=-- rad
+  note: no balance state
+
+Done.

@@ -1,0 +1,38 @@
+=== BALANCE STATUS ===
+  State: IDLE  (Speed mode off)
+  PD: Kp=2.0000  Kd=0.0800
+  Outer: drift_kp=0.0500  vel_kp=2.2000  vel_ki=0.3500
+  Cascade: sp_offset=0.000  integral=0.000  target_vel=0.000  filt_vel=0.000
+  Stored trim: 1.09 deg (persisted equilibrium estimate)
+  Balance loop: 200 Hz (control core, direct IMU)
+  IMU age: 5850 us, healthy since: 1774 ms, latched fault: 0x0000
+  Complementary filter: tilt=-2.4  gyro_rate=0.0
+  Max drive speed: 30.0 rad/s
+  Log: 4788 bytes, 20 buffered samples, schema v2
+  Logging: off  pending save: no  note: none
+======================
+==================================================
+[Loop] t=156634 tick=5730 | avg=12861us max=531469us overruns=1 ctlgap=1212030us
+[Loop] link=1 rssi=-60 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +0.4 roll=  -2.5 yaw=+176.0  [CF] tilt=  -2.4 rate=  +0.0
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,1364
+[Arm] pos=FWD cal_mode=no | L: 3.95 (cal 0.01) R: 3.55 (cal 0.01)
+
+[Motor] ID=10 ON  | pos=  -0.14 (raw= -0.14 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=22.0C | err=0x00
+[Motor] ID=20 OFF | pos=  -0.65 (raw= -0.65 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=22.0C | err=0x00
+[Motor] ID=30 OFF | pos=  -7.90 (raw=  7.90 off=  0.00) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.00 Nm | tmp=22.0C | err=0x00
+[Motor] ID=40 OFF | pos=  -5.29 (raw=  5.29 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=22.0C | err=0x00
+[Motor] ID= 1 OFF | pos=   3.95 (raw=  3.97 off= -0.02) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=22.0C | err=0x00
+[Motor] ID= 2 OFF | pos=   3.55 (raw=  3.55 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=22.0C | err=0x00
+[VBUS] 25.1V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=2 arb_lost=7529 bus_err=0
+[CAN] our_tx_ok=34632 our_tx_fail=0 our_rx=34628
+==================================================
+=== ARM CALIBRATION (deltas from Forward) ===
+  Position    Left (rad)  Right (rad)
+  Forward          0.000       0.000
+  Center           1.768      -1.767
+  Backward         3.661      -3.670
+  Calibrated: YES
+  Forward ref: left=3.939 right=3.537
+=============================================

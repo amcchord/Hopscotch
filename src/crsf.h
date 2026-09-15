@@ -49,6 +49,11 @@ public:
     uint8_t getLinkQuality() const { return _link_quality; }
     int8_t  getRssi() const { return _rssi; }
 
+    // Lifetime receive timing, visible while disarmed without starting a run.
+    uint32_t maxUpdateUs() const { return _max_update_us; }
+    uint32_t budgetYields() const { return _budget_yields; }
+    uint32_t receivedBytes() const { return _received_bytes; }
+
 private:
     HardwareSerial* _serial = nullptr;
     uint16_t _channels[CRSF_MAX_CHANNELS] = {0};
@@ -57,7 +62,11 @@ private:
     int      _buf_pos = 0;
     uint8_t  _link_quality = 0;
     int8_t   _rssi = 0;
+    uint32_t _max_update_us = 0;
+    uint32_t _budget_yields = 0;
+    uint32_t _received_bytes = 0;
 
+    void parseByte(uint8_t byte);
     void parseFrame(const uint8_t* frame, int len);
     void decodeRcChannels(const uint8_t* payload);
     void decodeLinkStats(const uint8_t* payload);

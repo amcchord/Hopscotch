@@ -1,0 +1,29 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+Received 2077269 raw bytes
+Validated 5648 samples (file integrity, row structure, USB checksum when available)
+
+Saved: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260913_230816_rs05-startup-fix-assisted.csv
+Samples: 5648 (schema 2, checksum 1)
+Duration: 119854ms (119.8s)
+Config: 78 parameters recorded
+
+--- Analysis ---
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp  vel_off    drift  note
+----------------------------------------------------------------------------------------------------------------------------
+bal_20260913_230816_rs05-startup-fix-assisted.csv  12.37 107.46    81.42    -0.01   0.54     0.01      0.20     0.04    85.48     2.25     0.42  sample gap
+
+bal_20260913_230816_rs05-startup-fix-assisted.csv
+  IMU max age=24 ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_kp_low=0.7000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, ramp_sp_offset_max=1.50, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=81.42 deg, rate=-0.01 dps
+  arm return: 0.54 s, pre-return |err|=0.01 deg, |rate|=0.20 dps, |cmd|=0.04 rad/s
+  final window: sp=85.48 deg, vel_off=2.25 rad/s, drift=0.42 rad
+  note: sample gap
+  timing: sample p99/max=24.0/1181.0 ms, inner max=5501 us, low-tick rows=8, feedback max=1119 ms
+  authority: |angle err|max=6.12 deg, |raw cmd|max=12.76 rad/s, |wheel vel|max=8.60 rad/s, |drift|max=9.91 rad
+  sensors/power: IMU disagree max=17.33 deg, accel norm=0.91..1.08 g, bus min=23.23 V, current max=1.24 A, rear torque max=0.77 Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=40, arm active rows=6, emergency-arm rows=0
+  capture: schema=2, checksum=1, end=duration_limit, test_note=none
+
+Done.

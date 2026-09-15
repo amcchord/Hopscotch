@@ -9,6 +9,8 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_balance_
 output/test_balance_native
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_motor_setup.cpp src/motor_manager.cpp -o output/test_motor_setup
 output/test_motor_setup
+clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_crsf_native.cpp src/crsf.cpp -o output/test_crsf_native
+output/test_crsf_native
 "$PYTHON_BIN" -m unittest discover -s tests -v
 "$PYTHON_BIN" -m py_compile scripts/*.py
 bash -n scripts/*.sh

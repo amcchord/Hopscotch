@@ -1,0 +1,26 @@
+==================================================
+[Status] t=55688 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Motor] ID=10 ON  | pos=   0.00 (raw=  0.32 unwrap_off= -0.32) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=27.0C | err=0x00
+[Motor] ID=20 ON  | pos=  -0.00 (raw=  1.94 unwrap_off= -1.94) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=27.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  4.70 unwrap_off= -4.70) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=27.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  3.97 unwrap_off= -3.97) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=27.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  4.93 unwrap_off= -4.93) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   0.00 (raw=  3.36 unwrap_off= -3.36) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=27.0C | err=0x00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2413 our_tx_fail=0 our_rx=2412
+==================================================
+=== BALANCE STATUS ===
+  State: IDLE  (Speed mode off)
+  PD: Kp=2.0000  Kd=0.0800
+  Outer: drift_kp=0.0500  vel_kp=2.2000  vel_ki=0.3500
+  Cascade: sp_offset=0.000  integral=0.000  target_vel=0.000  filt_vel=0.000
+  Stored trim: 1.09 deg (persisted equilibrium estimate)
+  Balance loop: 200 Hz (control core, direct IMU)
+  IMU age: 5913 us, healthy since: 1938 ms, latched fault: 0x0000
+  Complementary filter: tilt=-8.7  gyro_rate=-0.0
+  Max drive speed: 30.0 rad/s
+  Log: 1242948 bytes, 0 buffered samples, schema v2
+  Logging: off  pending save: no  note: none
+======================

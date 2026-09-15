@@ -16,6 +16,8 @@ public:
     }
 };
 inline uint32_t fake_ms = 0;
+inline uint32_t fake_us = 0;
+inline uint32_t micros() { return fake_us; }
 inline uint32_t millis() { return fake_ms; }
 inline void delay(uint32_t n) { fake_ms += n; }
 inline void delayMicroseconds(uint32_t) {}

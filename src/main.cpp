@@ -666,6 +666,9 @@ static void processSerialCommand(const char* cmd) {
                       now, simEnabled ? "ON" : "OFF", simThrottle, simSteering);
         Serial.printf("[Status] link=%d drv_armed=%d arm_armed=%d\n",
                       crsfRx.isLinkUp(), motorMgr.isDriveArmed(), motorMgr.isArmArmed());
+        Serial.printf("[CRSF] RX max_us=%lu bytes=%lu budget_yields=%lu age_ms=%lu\n",
+                      crsfRx.maxUpdateUs(), crsfRx.receivedBytes(),
+                      crsfRx.budgetYields(), crsfRx.timeSinceLastFrame());
         Serial.printf("[Status] max_speed=%.1f rad/s (%.0f RPM) horizon=%.1f s\n",
                       driveCtrl.getMaxSpeed(),
                       driveCtrl.getMaxSpeed() * RAD_S_TO_RPM,

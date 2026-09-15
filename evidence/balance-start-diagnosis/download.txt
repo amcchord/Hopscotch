@@ -1,0 +1,4 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+ERROR: log transfer did not complete within 240s
+Received 2129 raw lines
+Raw interrupted transfer retained: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260913_225425_rs05-startup-fix-assisted.failed.serial
