@@ -65,6 +65,70 @@ Consolidated checks and flash/live measurements are retained under
 are packaged under `artifacts/balance-timing-fix/`; release outcome is recorded
 in [current state](progress/CURRENT.md).
 
+## Flashed result and the next physical trial
+
+Source `5368df8290886c4b95052e68e5b40b2465bf1418` was programmed at `0x10000`
+and verified by OpenOCD. Application SHA-256:
+`154d8fbec14d326eab58db723026148e0e134776d7631b22f645a74c2fa8d229`.
+Both groups were disarmed before flashing. Calibration and the pre-test 1.09°
+trim were retained. No settings or filesystem image was uploaded.
+
+During the post-flash observation, Austin initiated a test. Before arming,
+receiver processing peaked at 486 µs over roughly 44 seconds of uptime with
+565,154 received bytes. The observer's disarmed-only assertion therefore stopped
+being applicable; its later `status` requests were safely refused during balance.
+This was an operator-started trial, not tool-initiated motion or a failed receiver
+regression. Live serial evidence is retained.
+
+The [new 1,405-row log](../telemetry_logs/bal_20260914_214925_crsf-timing-fix-assisted.csv)
+passed file CRC `0x77D64F12` and transport FNV `0x8115BEE4`. It spans 28.109
+seconds and ends with `drive disarmed`. Austin reports a little initial roll-away
+requiring a hand, then stable balance, a tap and deliberate motor disable.
+This is an assisted recovery and an intentionally ended capture. Contact/release
+and tap times were not marked.
+
+| Measurement | Slow attempt before fix | New assisted trial |
+|---|---:|---:|
+| Logged samples | 20 | 1,405 |
+| Sample span | 14.849 s | 28.109 s |
+| Maximum receiver section | 1,210,924 µs | 531 µs |
+| Maximum sample interval | 1,228 ms | 25 ms |
+| 99th percentile sample interval | — | 20 ms |
+| Recorded stall events | 15 | 0 |
+| Result | Tip-up timeout | BALANCE, then operator disarm |
+
+The new run reaches BALANCE at 8.846 seconds and records another 19.265 seconds
+in that state. Inner-loop maximum interval is 5.488 ms; IMU age peaks at 20 ms
+with no freshness-fault rows. The corrected timing is demonstrated under actual
+stand-up/balance activity, not solely by disarmed checks.
+
+The remaining initial surge is distinct: arm return begins about 0.54 seconds
+after engagement. By 2.0 seconds the target has risen to 87.01° while measured
+tilt is 81.84°, command is 10.46 rad/s and wheel displacement is 6.74 radians.
+Peak command in the first four seconds is 10.84 rad/s and peak reported wheel
+velocity is 7.48 rad/s. Timing stays regular throughout. This localizes the next
+control investigation to the arm-return/target transition; it does not establish
+the right gain change or identify the exact hand-contact time.
+
+![New trial: angle, wheel command/velocity, displacement](../evidence/balance-slow-start/trial-overview.png)
+
+Final observed state: IDLE, both groups disarmed, all six motors online with
+zero motor errors and zero CAN transmit failures. Existing trim learning saved
+2.31° from this trial; no manual calibration or trim reset was made. Receiver
+lifetime maximum was 564 µs after more than 2.26 million processed bytes.
+
+Remaining data caveats: motor feedback age reached 145 ms and the CAN receive
+miss counter increased to 12,517, so zero transmit errors do not imply lossless
+feedback. Investigate receive pressure before assuming all wheel feedback is
+fresh. Reported velocity uses the existing motor decoder; RS05-specific scaling
+needs review before quantitatively retuning velocity gains. The CSV's build
+date/time belongs to an unchanged compilation unit reused by the incremental
+build and still says September 13; the verified application hash above identifies
+this release. Future build metadata should identify the whole image. Finally,
+the host analyzer formerly labeled `sp_offset` as rad/s; its report now correctly
+prints degrees. Raw download evidence retains the old report, while
+`evidence/balance-slow-start/analysis-after.txt` contains the corrected report.
+
 ## Earlier assisted run and USB recovery
 
 The earlier USB transfer was repaired in source `213c9bc` and flashed with

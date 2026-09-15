@@ -1,0 +1,70 @@
+[Status] t=31706 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=486 bytes=384510 budget_yields=0 age_ms=20
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Loop] t=31946 tick=1499 | avg=522us max=678us overruns=0 ctlgap=5474us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=33946 tick=1599 | avg=521us max=714us overruns=0 ctlgap=5474us
+[VBUS] 24.9V  [Current] 0.00A
+  Center           1.768      -1.767
+  Backward         3.661      -3.670
+  Calibrated: YES
+[Loop] t=35946 tick=1698 | avg=517us max=669us overruns=0 ctlgap=5474us
+[VBUS] 24.9V  [Current] 0.00A
+  State: IDLE  (Speed mode off)
+  Stored trim: 1.09 deg (persisted equilibrium estimate)
+  IMU age: 6101 us, healthy since: 1945 ms, latched fault: 0x0000
+[Loop] t=37946 tick=1798 | avg=522us max=556us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=39946 tick=1897 | avg=519us max=612us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=41946 tick=1997 | avg=510us max=600us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=43946 tick=2097 | avg=523us max=695us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Status] t=45711 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=486 bytes=565154 budget_yields=0 age_ms=15
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Loop] t=45946 tick=2197 | avg=524us max=555us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=47946 tick=2297 | avg=525us max=637us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=49946 tick=2397 | avg=519us max=553us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=51946 tick=2497 | avg=603us max=1066us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.00A
+[Loop] t=53948 tick=2597 | avg=1765us max=2670us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.17A
+[Loop] t=55948 tick=2696 | avg=1943us max=2754us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.50A
+[Loop] t=57951 tick=2796 | avg=1939us max=2551us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.59A
+[Loop] t=59956 tick=2896 | avg=1920us max=2105us overruns=0 ctlgap=24996us
+[VBUS] 24.9V  [Current] 0.75A
+[Loop] t=61957 tick=2993 | avg=1962us max=81623us overruns=1 ctlgap=5431us
+[VBUS] 24.9V  [Current] 1.87A
+[Loop] t=63958 tick=3093 | avg=1061us max=1278us overruns=0 ctlgap=5431us
+[VBUS] 24.9V  [Current] 1.29A
+[Loop] t=65961 tick=3193 | avg=1071us max=1299us overruns=0 ctlgap=5431us
+[VBUS] 24.9V  [Current] 0.85A
+[Loop] t=67962 tick=3293 | avg=1063us max=1124us overruns=0 ctlgap=5431us
+[VBUS] 24.9V  [Current] 0.82A
+[Loop] t=69963 tick=3392 | avg=1150us max=1801us overruns=0 ctlgap=5803us
+[VBUS] 24.9V  [Current] 2.06A
+[Loop] t=71963 tick=3492 | avg=1227us max=1761us overruns=0 ctlgap=5803us
+[VBUS] 24.9V  [Current] 0.51A
+[Loop] t=73963 tick=3592 | avg=1217us max=1271us overruns=0 ctlgap=5803us
+[VBUS] 24.9V  [Current] 0.82A
+[Loop] t=75963 tick=3692 | avg=1230us max=1438us overruns=0 ctlgap=5803us
+[VBUS] 24.9V  [Current] 0.59A
+  State: BALANCE  (Speed mode ACTIVE)
+  Stored trim: 1.09 deg (persisted equilibrium estimate)
+  IMU age: 1784 us, healthy since: 1945 ms, latched fault: 0x0000
+[Loop] t=77963 tick=3792 | avg=1252us max=1433us overruns=0 ctlgap=5803us
+[VBUS] 24.9V  [Current] 0.65A
+Traceback (most recent call last):
+  File "/Users/austinmcchord/Development/Hopscotch/output/observe-timing-fix.py", line 16, in <module>
+    assert 'drv_armed=1' not in text and 'arm_armed=1' not in text
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

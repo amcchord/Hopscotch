@@ -1,0 +1,17 @@
+{
+  "source_log": "telemetry_logs/bal_20260914_213606_slow-start-before-fix.csv",
+  "sample_count": 20,
+  "span_ms": 14849,
+  "max_sample_dt_ms": 1228,
+  "states": [
+    "1"
+  ],
+  "run_duration_ms": "15276",
+  "end_reason": "tip-up timeout / arm tracking",
+  "profile_scope": "balance_run",
+  "prof_crsf_max_us": 1210924,
+  "prof_ctl_max_us": 1211819,
+  "checksum": "0xCD4704EC",
+  "transport_fnv1a": "0x8B58E877",
+  "checksum_valid": "1"
+}

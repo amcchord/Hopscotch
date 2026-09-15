@@ -1,0 +1,41 @@
+{
+  "source_commit": "5368df8290886c4b95052e68e5b40b2465bf1418",
+  "application_sha256": "154d8fbec14d326eab58db723026148e0e134776d7631b22f645a74c2fa8d229",
+  "flash_verified": true,
+  "rx_observations": [
+    {
+      "max_us": 486,
+      "bytes": 384510,
+      "budget_yields": 0,
+      "age_ms": 20
+    },
+    {
+      "max_us": 486,
+      "bytes": 565154,
+      "budget_yields": 0,
+      "age_ms": 15
+    }
+  ],
+  "calibration_retained": true,
+  "stored_trim_after_boot_deg": 1.09,
+  "observed_disarmed_before_user_test": true,
+  "user_armed_during_observation": true,
+  "observation_script_result": "Expected disarmed-only assertion failed because operator began a physical test; subsequent status requests were safely refused during active balance. This is not a parser or firmware test failure.",
+  "physical_result_so_far": "Assisted recovery; deliberately ended trial; both groups now disarmed",
+  "no_tool_initiated_motion": true,
+  "final_state": "IDLE",
+  "final_drive_armed": false,
+  "final_arm_armed": false,
+  "final_stored_trim_deg": 2.31,
+  "final_receiver_max_us": 564,
+  "final_receiver_bytes": 2268821,
+  "final_budget_yields": 3,
+  "run_receiver_max_us": 531,
+  "run_samples": 1405,
+  "run_sample_dt_max_ms": 25,
+  "run_stall_events": 0,
+  "run_end_reason": "drive disarmed",
+  "saved_file_crc": "0x77D64F12",
+  "saved_transport_fnv": "0x8115BEE4",
+  "operator_report": "Initial roll-away needed hand assistance, then stable; deliberate tap and operator motor disable. Times unmarked."
+}

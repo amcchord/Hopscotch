@@ -1,0 +1,17 @@
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp   offset  unit    drift  note
+----------------------------------------------------------------------------------------------------------------------------------
+bal_20260914_214925_crsf-timing-fix-assisted.csv   8.82  19.27    84.02    -0.01   0.54     0.01      0.31     0.05    87.38     2.96   deg     9.29  end=drive disarmed
+
+bal_20260914_214925_crsf-timing-fix-assisted.csv
+  IMU max age=20 ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0500, vel_sp_kp=2.2000, vel_sp_kp_low=0.7000, vel_sp_ki=0.3500
+          sp_offset_max=8.00, ramp_sp_offset_max=1.50, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=84.02 deg, rate=-0.01 dps
+  arm return: 0.54 s, pre-return |err|=0.01 deg, |rate|=0.31 dps, |cmd|=0.05 rad/s
+  final window: sp=87.38 deg, sp_offset=2.96 deg, drift=9.29 rad
+  note: end=drive disarmed
+  timing: sample p99/max=20.0/25.0 ms, inner max=5488 us, low-tick rows=1, feedback max=145 ms
+  authority: |angle err|max=5.18 deg, |raw cmd|max=10.84 rad/s, |wheel vel|max=7.48 rad/s, |drift|max=11.00 rad
+  sensors/power: IMU disagree max=20.82 deg, accel norm=0.89..1.09 g, bus min=24.91 V, current max=2.06 A, rear torque max=0.88 Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=44, arm active rows=110, emergency-arm rows=0
+  capture: schema=2, checksum=1, end=drive disarmed, test_note=none

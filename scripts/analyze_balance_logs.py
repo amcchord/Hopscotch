@@ -152,6 +152,8 @@ def summarize(path: Path) -> dict[str, object] | None:
     config = parse_config(path)
     balance_rows = [row for row in rows if row.get("state") == "2"]
     tip_rows = [row for row in rows if row.get("state") == "1"]
+    offset_name = next((key for key in ("sp_offset", "vel_offset", "vel_integ") if key in rows[0]), "offset")
+    offset_unit = "deg" if offset_name == "sp_offset" else "rad/s"
     if not balance_rows:
         return {
             "file": path.name,
@@ -165,6 +167,8 @@ def summarize(path: Path) -> dict[str, object] | None:
             "pre_cmd": math.nan,
             "final_sp": math.nan,
             "final_vel_off": math.nan,
+            "offset_name": offset_name,
+            "offset_unit": offset_unit,
             "final_drift": math.nan,
             "config": config,
             "diag": {},
@@ -296,6 +300,8 @@ def summarize(path: Path) -> dict[str, object] | None:
         "pre_cmd": pre_cmd,
         "final_sp": mean(as_float(row, "setpoint") for row in final_window),
         "final_vel_off": mean(final_vel_values),
+        "offset_name": offset_name,
+        "offset_unit": offset_unit,
         "final_drift": mean(as_float(row, drift_key) for row in final_window) if drift_key else math.nan,
         "config": config,
         "diag": diag,
@@ -391,7 +397,7 @@ def main() -> int:
     header = (
         f"{'file':24} {'tip_s':>6} {'bal_s':>6} {'eng_roll':>8} {'eng_rate':>8} "
         f"{'ret_s':>6} {'pre_err':>8} {'pre_rate':>9} {'pre_cmd':>8} "
-        f"{'final_sp':>8} {'vel_off':>8} {'drift':>8}  note"
+        f"{'final_sp':>8} {'offset':>8} {'unit':>5} {'drift':>8}  note"
     )
     print(header)
     print("-" * len(header))
@@ -408,6 +414,7 @@ def main() -> int:
             f"{fmt(summary['pre_cmd'], 8, 2)} "
             f"{fmt(summary['final_sp'], 8, 2)} "
             f"{fmt(summary['final_vel_off'], 8, 2)} "
+            f"{summary['offset_unit']:>5} "
             f"{fmt(summary['final_drift'], 8, 2)}  "
             f"{summary['note']}"
         )
@@ -451,7 +458,7 @@ def main() -> int:
             )
             print(
                 f"  final window: sp={fmt(summary['final_sp'], 0, 2).strip()} deg, "
-                f"vel_off={fmt(summary['final_vel_off'], 0, 2).strip()} rad/s, "
+                f"{summary['offset_name']}={fmt(summary['final_vel_off'], 0, 2).strip()} {summary['offset_unit']}, "
                 f"drift={fmt(summary['final_drift'], 0, 2).strip()} rad"
             )
             print(f"  note: {summary['note']}")
