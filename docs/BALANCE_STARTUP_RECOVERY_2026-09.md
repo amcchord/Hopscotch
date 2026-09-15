@@ -49,3 +49,10 @@ Rejected alternatives remain evidence only: a fixed 3.5° curve, faster arm retu
 Frozen package: `artifacts/balance-startup-recovery/`; exact source and image hashes are in its manifest. Previous installed image is `artifacts/balance-capture-fix/` (`068d043b64f957f577bae658446638e56c3c2b60ea523946bff4614a8d76a4c3`). The full original device backup is retained. Application-only programming at `0x10000` preserves settings and saved logs. The package's `--rollback` option selects the rebuilt original baseline, so use the **previous package without `--rollback`** to restore the immediate prior release.
 
 After fresh disarm verification, flash and verify the application, then read motor, IMU and calibration status while disarmed. For one operator-triggered trial: usual forward-arm starting pose, CH1/2/4 neutral, CH7/9/10 HIGH, wait two seconds, CH11 HIGH for one second then LOW once. Support and disarm promptly if it runs away; if it settles, leave it untouched for five seconds. No tap on this trial. Lower CH9 and CH10 and retain battery/USB for the checksummed download. Firmware starts recording automatically at tip-up; the host observer adds run/event context.
+
+
+## Flash and stationary verification
+
+Flashed and verified source `720f2e31939a249a215b2b7f7c197130f2301310`, application SHA-256 `5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35`, application only at `0x10000`. Fresh preflight and postflash both groups disarmed; all six motors online with no errors. IMU age 5.974 ms, tilt −1.9°, no latched fault; receiver maximum 516 µs and CAN receive misses/TX failures zero. Calibration remains valid with center deltas 1.768/−1.767 and back deltas 3.661/−3.670 rad; stored trim remains 2.44°. Forward references became 0/0 with ordinary boot encoder zeroing, while raw arm positions match the preflash pose. No calibration reset or tool-initiated movement.
+
+The observer is recording with note `early-wheel-recovery-v1`. One short normal operator-triggered attempt has been requested; physical benefit is pending.

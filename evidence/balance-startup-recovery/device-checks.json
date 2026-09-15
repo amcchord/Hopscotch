@@ -1,0 +1,35 @@
+{
+  "source_commit": "720f2e31939a249a215b2b7f7c197130f2301310",
+  "application_sha256": "5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35",
+  "application_only": true,
+  "flash_verified": true,
+  "preflight_disarmed": true,
+  "postflash_disarmed": true,
+  "all_six_motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "motor_errors": false,
+  "stored_trim_deg": 2.44,
+  "imu_fault": "0x0000",
+  "imu_age_us": 5974,
+  "stationary_tilt_deg": -1.9,
+  "receiver_max_us": 516,
+  "can_rx_missed": 0,
+  "can_tx_failed": 0,
+  "calibrated": true,
+  "center_deltas": [
+    1.768,
+    -1.767
+  ],
+  "back_deltas": [
+    3.661,
+    -3.67
+  ],
+  "forward_reference_note": "Forward references now 0/0 after ordinary boot encoder zeroing (previous 3.938/3.536); raw arm positions match preflash and calibration deltas are unchanged.",
+  "pending": "Short operator-triggered trial requested; USB observer active."
+}

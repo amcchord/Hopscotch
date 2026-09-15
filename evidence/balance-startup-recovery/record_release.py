@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('artifacts/balance-startup-recovery')
+m=json.loads((p/'manifest.json').read_text());commit=m['source_commit'];sha=m['files']['firmware.bin']['sha256']
+checks=dict(source_commit=commit,application_sha256=sha,application_only=True,flash_verified=True,preflight_disarmed=True,postflash_disarmed=True,all_six_motors_online=[1,2,10,20,30,40],motor_errors=False,stored_trim_deg=2.44,imu_fault='0x0000',imu_age_us=5974,stationary_tilt_deg=-1.9,receiver_max_us=516,can_rx_missed=0,can_tx_failed=0,calibrated=True,center_deltas=[1.768,-1.767],back_deltas=[3.661,-3.670],forward_reference_note='Forward references now 0/0 after ordinary boot encoder zeroing (previous 3.938/3.536); raw arm positions match preflash and calibration deltas are unchanged.',pending='Short operator-triggered trial requested; USB observer active.')
+(Path('evidence/balance-startup-recovery')/'device-checks.json').write_text(json.dumps(checks,indent=2)+'\n')
+for name in ('device-checks.json','flash.txt','preflash.txt','postflash.txt'):
+ shutil.copy2(Path('evidence/balance-startup-recovery')/name,p/name)
+release=f'''\n\n## Flash and stationary verification\n\nFlashed and verified source `{commit}`, application SHA-256 `{sha}`, application only at `0x10000`. Fresh preflight and postflash both groups disarmed; all six motors online with no errors. IMU age 5.974 ms, tilt −1.9°, no latched fault; receiver maximum 516 µs and CAN receive misses/TX failures zero. Calibration remains valid with center deltas 1.768/−1.767 and back deltas 3.661/−3.670 rad; stored trim remains 2.44°. Forward references became 0/0 with ordinary boot encoder zeroing, while raw arm positions match the preflash pose. No calibration reset or tool-initiated movement.\n\nThe observer is recording with note `early-wheel-recovery-v1`. One short normal operator-triggered attempt has been requested; physical benefit is pending.\n'''
+doc=Path('docs/BALANCE_STARTUP_RECOVERY_2026-09.md');doc.write_text(doc.read_text()+release)
+(p/'FINDINGS.md').write_text(doc.read_text().replace('(../','(../../'))
+m['release_outcome']='Application-only flash verified; all six motors online, both groups disarmed, sensor/calibration/trim checks passed; first short operator trial pending.'
+for f in sorted(p.rglob('*')):
+ if f.is_file() and f.name!='manifest.json':
+  b=f.read_bytes();m['files'][str(f.relative_to(p))]={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
+(p/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
+p=Path('docs/progress/CURRENT.md');s=p.read_text();a=s.index('- **Still installed');b=s.index('\n- **Latest physical',a)
+s=s[:a]+f'- **Installed now:** `{commit}`, application SHA-256 `{sha}`, package `artifacts/balance-startup-recovery/`. Application-only flash verified; fresh pre/post disarm, all six motors online/no errors, retained calibration and 2.44° trim, IMU 5.974 ms/no fault, receiver max 516 µs, CAN misses/TX failures zero. Prior package `artifacts/balance-capture-fix/` retained.'+s[b:]
+a=s.index('- **Next:**');s=s[:a]+'- **Next:** one short operator-triggered trial requested. Passive USB observer `evidence/balance-startup-recovery/record_trial.py` records `first-trial.serial` (session 65186, up to 240 seconds or log saved). No second serial reader while active. After both groups disarm, retrieve/checksum the new log and assess initial recovery/settling. No tool-initiated movement.\n';p.write_text(s)
+p=Path('telemetry_logs/TUNING_HISTORY.md');p.write_text(p.read_text()+f'''\n\nEarly wheel-recovery release: source `{commit}`, application `{sha}` flashed at `0x10000` only and verified. Fresh preflight/postflash both groups disarmed, all six motors online/no errors. IMU 5.974 ms, tilt −1.9°, no fault; receiver max 516 µs, CAN misses/TX failures zero. Center/back calibration deltas and 2.44° trim retained; forward coordinates zeroed normally on boot with unchanged raw arm pose. Observer running with note `early-wheel-recovery-v1`; one short operator-triggered test requested. Physical benefit pending. No tool motion, settings reset, filesystem upload or remote push.\n''')
