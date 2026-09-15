@@ -99,3 +99,22 @@ Next: confirm the sensor is fixed and inspect it stationary with both motor
 groups disarmed. Verify/package the capture-bound correction; record exact
 installed identity before any further operator-triggered diagnostic trial.
 Another unchanged full stand-up has not been requested.
+
+## Capture correction released for the next diagnostic
+
+Austin reported ready after the sensor/flat-pose request. Fresh USB preflight
+confirmed both motor groups disarmed. Flashed source
+`a8aa9a123fdb3e197d56e3d9ba8d5b9a6cb0ace7`, application SHA-256
+`068d043b64f957f577bae658446638e56c3c2b60ea523946bff4614a8d76a4c3`, at
+`0x10000` only; OpenOCD verification passed. Package:
+`artifacts/balance-capture-fix/`. Postflash: six motors online, no motor errors,
+both groups disarmed, trim 0.35°, stationary tilt −1.8°, IMU age 5.977 ms with no
+fault, receiver max 517 µs, CAN receive misses and TX failures zero. The existing
+calibration partition was not written; exact calibration reread follows the
+trial (the initial script used unsupported `arm status`, now corrected to
+`cal status`).
+
+The host recorder is active, with log note `capture-trim-secured-sensor`. Austin
+has been asked for one short ordinary stand-up, prompt support/disarm if it runs
+away, five seconds untouched only if stable, and no tap. No tool armed motors or
+initiated physical movement. Physical improvement remains pending.

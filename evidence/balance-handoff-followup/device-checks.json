@@ -1,0 +1,25 @@
+{
+  "source_commit": "a8aa9a123fdb3e197d56e3d9ba8d5b9a6cb0ace7",
+  "application_sha256": "068d043b64f957f577bae658446638e56c3c2b60ea523946bff4614a8d76a4c3",
+  "application_only": true,
+  "flash_verified": true,
+  "preflight_disarmed": true,
+  "postflash_disarmed": true,
+  "all_six_motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "stored_trim_deg": 0.35,
+  "imu_fault": "0x0000",
+  "imu_age_us": 5977,
+  "stationary_tilt_deg": -1.8,
+  "receiver_max_us": 517,
+  "can_rx_missed": 0,
+  "can_tx_failed": 0,
+  "calibration_note": "NVS untouched. Preflight script sent unsupported arm status; corrected to cal status for the post-trial reread.",
+  "pending": "User-triggered short stand-up requested; observer active"
+}
