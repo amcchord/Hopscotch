@@ -1,0 +1,32 @@
+{
+  "source_commit": "cad335c7d2c193f911ea903ee302d34fdc6cc36d",
+  "application_sha256": "f23b6faafba6cb615123955e0744ff73b28793b33b5c384ad4addea17339dcb3",
+  "application_only": true,
+  "flash_verified": true,
+  "preflight_disarmed": true,
+  "postflash_disarmed": true,
+  "all_six_motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "calibration_retained": true,
+  "stored_trim_before_test_deg": 2.31,
+  "receiver_max_us_before_test": 466,
+  "can_rx_missed_before_test": 0,
+  "can_tx_failed_before_test": 0,
+  "imu_fault_before_test": "0x0000",
+  "first_trial": {
+    "file": "telemetry_logs/bal_20260914_222023_feedback-fix-first.csv",
+    "samples": 1428,
+    "checksum_valid": true,
+    "end_reason": "arms disarmed",
+    "operator_report": "Stood, ran away far, stopped by hand, then stable; reboot attributed to USB cable bump",
+    "unaided_success": false,
+    "post_reboot_trim_deg": 0.35,
+    "post_reboot_profile_scope": "live, not evidence of previous run CAN counters"
+  }
+}

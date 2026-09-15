@@ -1,0 +1,4556 @@
+[
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.25,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 8,
+      "late": 7,
+      "median_peak": 18.153576624081076
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 5.924356741422051
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.3770923679212403
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.1058805711285045
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.451292512386717
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 42.65034022309077
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 13.344485765974428
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 33.620990863499564
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 31.120396414026104
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 17.344556742532077
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 3.9391357231233455
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 18.96259650563007
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.589755460793097
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.689706043879134
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.8849218490901922
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.8291777355636
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.6469153650422363
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 27.373537111221072
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 8.36147214646678
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 29.3953479122818
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 7.436044524759464
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.98172412122522
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 19.458994693926137
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 27.198110571282328
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 19.384255052763276
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.25,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 5,
+      "late": 9,
+      "median_peak": 6.848974320677394
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.4440803860131624
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.1931006760554053
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.7821304551029726
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.25236828207816
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.6,
+        "peak": 13.7840038025313
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.0742525123176145
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.62,
+        "peak": 27.31868591916936
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.2054216430555975
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.44,
+        "peak": 10.518644223665413
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.6731324961611285
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.46,
+        "peak": 11.278268144982741
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.11044803947501
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 31.54858476408612
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 3.601306800790286
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 28.671953646004255
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.490528773770874
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.48,
+        "peak": 17.60561265877898
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 5.723598945974462
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.5,
+        "peak": 19.52420651862233
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 5.433872606518697
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 28.430379288039937
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 8.472275616316422
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 25.978104914404977
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 7.974349695380326
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.25,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 5,
+      "late": 11,
+      "median_peak": 8.350235067654268
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.12,
+        "peak": 3.6593353214630717
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 0.96,
+        "peak": 1.5404445325961102
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.12,
+        "peak": 2.784942073733339
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 0.98,
+        "peak": 1.4100156768612104
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.44,
+        "peak": 13.90951922996017
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.96,
+        "peak": 2.642305596073671
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.44,
+        "peak": 24.747418447346515
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.98,
+        "peak": 2.272712708566895
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.26,
+        "peak": 10.642049650919022
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.0,
+        "peak": 2.9861264553433293
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.26,
+        "peak": 11.135639064309018
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.02,
+        "peak": 2.813430335874867
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.48,
+        "peak": 30.915296568404578
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.04,
+        "peak": 3.8897108086556123
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.46,
+        "peak": 28.616919300626204
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.1,
+        "peak": 4.302183530070812
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.3,
+        "peak": 18.200089039239167
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.02,
+        "peak": 5.997051680668007
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.3,
+        "peak": 19.486952971053505
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.06,
+        "peak": 6.058420484389514
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 27.768814441925368
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.18,
+        "peak": 18.574528468530087
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.46,
+        "peak": 25.403773918828072
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.24,
+        "peak": 29.432568580840424
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.462,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 4,
+      "late": 3,
+      "median_peak": 8.618417576920828
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 4.048386882244455
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.5019978144647195
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 4.303704610859494
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.665563346671113
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 9.423957616302756
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 5.127253725468902
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 14.222328706772094
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 7.8128775375389
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 12.56201202769366
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.871719963476912
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 13.047748113620232
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 3.4126291082916733
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 34.51173048432064
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.4153304621111302
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.464413998274424
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.263793563139309
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 21.369246063095147
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 7.069221717125915
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 23.223353472145313
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.631914954153417
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.026981370954594
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 16.733547112213706
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.20822226996275
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 16.922727824525964
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.462,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 4,
+      "late": 0,
+      "median_peak": 5.962952942647259
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.4966954434890014
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.6560775840411917
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.414420002516054
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.4511834686724172
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6,
+        "peak": 6.4167289957614715
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.9204842470531993
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 9.075278142931321
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.7100828369207406
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.44,
+        "peak": 8.705426510503782
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.336045562949316
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.48,
+        "peak": 8.954821123199448
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.6421009308082817
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 34.39725822883256
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.646855311000552
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 30.815847848723806
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.2406685729197098
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 14.914989218553453
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 5.509176889533046
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.54,
+        "peak": 16.931773313101907
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 5.049885276625645
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 29.697946136466367
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 7.97519246626794
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 27.1395589549559
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 7.502545169279551
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.462,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 5,
+      "late": 1,
+      "median_peak": 6.783731047452411
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.1400000000000001,
+        "peak": 2.558135815522912
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.96,
+        "peak": 1.2473132985458306
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.18,
+        "peak": 2.6705413375112204
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.0,
+        "peak": 1.2996052406633876
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.48,
+        "peak": 7.56483913829785
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.96,
+        "peak": 1.9083117504539628
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.48,
+        "peak": 10.028992334476845
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.02,
+        "peak": 2.1495492347362224
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 9.879832355975362
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.02,
+        "peak": 2.5501927401702362
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 10.191254723485287
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.06,
+        "peak": 2.5660939445774624
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.52,
+        "peak": 32.41030149978503
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.08,
+        "peak": 3.8141895906489736
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 29.965673009034123
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.22,
+        "peak": 4.420497884390006
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 16.867027215027825
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.06,
+        "peak": 5.8857627063048765
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.36,
+        "peak": 18.127666438967662
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.12,
+        "peak": 6.002622956606973
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.54,
+        "peak": 28.503885819719294
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.24,
+        "peak": 17.045794229261013
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 26.423096178688137
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 30.142147036862365
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.6,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 4,
+      "late": 1,
+      "median_peak": 6.48896274256186
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.151234626882929
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.8223322930030867
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.3243961364953
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.353386708259542
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 5.203181708946365
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.287740720147292
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 7.065139418471658
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 5.011873456219389
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 10.570007085570193
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.6978634567818367
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 10.361431449177108
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.5501646539999565
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 36.67969022426783
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.5930778942447197
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.361738394795747
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.4840656154972343
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 18.205580897218706
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.620620675658966
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 19.80590870317762
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.357304809464753
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.391310974749288
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 14.737960334972584
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.361407661118328
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 13.215731615877905
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.6,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 4,
+      "late": 2,
+      "median_peak": 4.9884177563598655
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.8542640975130709
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.533850200383556
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.168189556343163
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.300962548865667
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.56,
+        "peak": 4.214963313790549
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.9875157367038454
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6400000000000001,
+        "peak": 6.247187467746419
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.245628088737386
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.42,
+        "peak": 6.975738722610102
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.009755416722467
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.48,
+        "peak": 7.877275045003299
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.532306346466563
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 36.521791689619796
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 2.8882414269487664
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 31.95013999179873
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.692339539804135
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 13.267225695774991
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 5.19766960391851
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.56,
+        "peak": 15.464956346534676
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 4.779165908801221
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.68,
+        "peak": 30.011786388323483
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 8.272582171819867
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 27.636687158573775
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 6.101322668354786
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 1.9,
+      "gain": 0.6,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 5,
+      "late": 1,
+      "median_peak": 6.183400892981165
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.16,
+        "peak": 2.176689278495224
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.98,
+        "peak": 1.0910258922552385
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.2,
+        "peak": 2.694107316433359
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.02,
+        "peak": 1.2988551042177037
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.54,
+        "peak": 6.284059370777986
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 0.96,
+        "peak": 1.4107172461415804
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.5,
+        "peak": 7.660909277285662
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.06,
+        "peak": 1.2805765937382485
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 9.442833020608164
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.02,
+        "peak": 2.465961073369368
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.4000000000000001,
+        "peak": 9.343053988737184
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.1,
+        "peak": 2.733125330706897
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.58,
+        "peak": 32.61544466352034
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.1400000000000001,
+        "peak": 4.270209453862565
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.52,
+        "peak": 30.58186500668475
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 4.8435159354351764
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.42,
+        "peak": 16.809454880260184
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.08,
+        "peak": 5.8025728611437035
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.42,
+        "peak": 18.07176895219992
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.18,
+        "peak": 6.082742415184345
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.6,
+        "peak": 28.841318078414556
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 18.203585272229837
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.54,
+        "peak": 26.68470952575955
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 33.296926628183236
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.25,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 8,
+      "late": 8,
+      "median_peak": 11.286504310588011
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 2.9406247632209754
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 8.521959788809038
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.3142890949001935
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 8.851466630286055
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.62,
+        "peak": 39.87664768316032
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.46,
+        "peak": 35.37675752135848
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.64,
+        "peak": 40.30543895734555
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.42,
+        "peak": 32.84392326900819
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.46,
+        "peak": 13.721541990889966
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.5074471070167699
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.46,
+        "peak": 15.062984362798316
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.3571797300880517
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 33.19986756185535
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.24,
+        "peak": 4.800958667213611
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.71568100528697
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 8.288129068569338
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.5,
+        "peak": 28.898357589719417
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 4.14885188288753
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.52,
+        "peak": 32.10704557205801
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.870726491863911
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.85536297432128
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 3.7674802982594118
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.810896936692465
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.8685415505066403
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.25,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 7,
+      "late": 6,
+      "median_peak": 6.652104440320793
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 2.6860892683518234
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 4.851194810577521
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.72,
+        "peak": 3.196180848481533
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 5.121855194820595
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 43.312130044422446
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.34,
+        "peak": 8.151755780349141
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 39.210505547627825
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 7.774621733411293
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.04,
+        "peak": 13.68951778608038
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 0.6025202185364043
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.08,
+        "peak": 15.446877286980945
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 0.6496845887369954
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.38,
+        "peak": 32.21022773978395
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 0.9769904196705085
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.38,
+        "peak": 29.510322410871947
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 1.0663971104249206
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.12,
+        "peak": 30.00356208331956
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.3800000000000001,
+        "peak": 3.84291013439572
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 34.996811171494194
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.42,
+        "peak": 3.285246867126271
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.4,
+        "peak": 27.979413777617886
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.42,
+        "peak": 4.3929636736614395
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.38,
+        "peak": 26.364177798218
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.56,
+        "peak": 5.529587147230293
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.25,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 11,
+      "late": 9,
+      "median_peak": 25.755302120823437
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.98,
+        "peak": 4.4856532803967175
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.3,
+        "peak": 3.8730259098350373
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.02,
+        "peak": 5.272961115775582
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.34,
+        "peak": 4.040048983362371
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.32,
+        "peak": 40.31855507768885
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.26,
+        "peak": 6.133953639400546
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.32,
+        "peak": 36.727582017661575
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.3,
+        "peak": 9.138661658104786
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 26.595822679046538
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6,
+        "peak": 3.17521805630816
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 29.617415092936664
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.7,
+        "peak": 3.643137907675991
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.36,
+        "peak": 29.91363568440169
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.92,
+        "peak": 12.3157950727949
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 27.91110762950529
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.02,
+        "peak": 29.316872946506628
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2,
+        "peak": 48.214846671532285
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.9000000000000001,
+        "peak": 12.223097732688544
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2,
+        "peak": 50.23577539297939
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.94,
+        "peak": 13.611049007238547
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 26.853736322306645
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.08,
+        "peak": 32.649460527610266
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 24.914781562600336
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.14,
+        "peak": 30.62453313079405
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.462,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 6,
+      "late": 1,
+      "median_peak": 6.734063769112509
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.8651222270310743
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.219069302510269
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.9832483354365156
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 7.249058235714749
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.58,
+        "peak": 5.832064187102112
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.42,
+        "peak": 40.95289180024652
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.64,
+        "peak": 9.319324418206335
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.48,
+        "peak": 35.15473269099696
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.36,
+        "peak": 8.046160785487919
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 0.6997890052014447
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.4,
+        "peak": 8.48180075566477
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.3119038856534055
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.64,
+        "peak": 36.269790416117246
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.1496980628029383
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.6,
+        "peak": 33.98645252204484
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.446251261592679
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.48,
+        "peak": 18.98989492082556
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.890928667528525
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.48,
+        "peak": 21.074171900720003
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.731078082000428
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 32.00863757378613
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.4006525776736205
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.057017211029887
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.2705945355003476
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.462,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 4,
+      "late": 5,
+      "median_peak": 6.117711079135672
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6,
+        "peak": 2.0823607964602724
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 4.533146512933512
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.6600000000000001,
+        "peak": 2.3748119807617827
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 4.833318675220248
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.34,
+        "peak": 8.393631238446432
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 5.970964125958018
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.4,
+        "peak": 13.791876403431147
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 6.618608448598729
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.06,
+        "peak": 9.679399096076937
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 0.5992760207209488
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.1,
+        "peak": 11.06318925510418
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 0.6662889352022112
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.42,
+        "peak": 33.80510458653965
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 0.41121856263189804
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.4,
+        "peak": 31.46555234215668
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 0.5884550966913461
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 24.744860600705767
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.4000000000000001,
+        "peak": 3.493443078035461
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.2,
+        "peak": 28.793822095939827
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.44,
+        "peak": 2.83756655581865
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 29.54924285032694
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.52,
+        "peak": 4.570464311760349
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.42,
+        "peak": 27.08586026398058
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.7,
+        "peak": 6.2644580323133265
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.462,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 9,
+      "late": 5,
+      "median_peak": 19.481983291985287
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.8800000000000001,
+        "peak": 3.447302170884955
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.3,
+        "peak": 3.2729268089769024
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.98,
+        "peak": 4.025907993492307
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.34,
+        "peak": 3.7968927146317037
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.38,
+        "peak": 26.963442751676432
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 4.658529404801291
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.36,
+        "peak": 44.71683651872877
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 5.880118540138169
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.24,
+        "peak": 20.309136171893563
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.62,
+        "peak": 2.607509683935032
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.2600000000000002,
+        "peak": 23.779502683298702
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.72,
+        "peak": 3.2876938641060836
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 31.602568538189608
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.0,
+        "peak": 9.135765903322847
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.38,
+        "peak": 29.25898224119928
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.14,
+        "peak": 18.65483041207701
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2800000000000002,
+        "peak": 44.60613026158534
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.96,
+        "peak": 10.326330472082795
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2800000000000002,
+        "peak": 47.59478957469165
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.02,
+        "peak": 11.659274759939974
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 27.936911911885353
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.14,
+        "peak": 33.53412122962541
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 26.145729035840652
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.24,
+        "peak": 31.199316170962177
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.6,
+      "speed": 1.5,
+      "cases": 24,
+      "early": 5,
+      "late": 2,
+      "median_peak": 4.748459575201301
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.5145579328152412
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.16,
+        "peak": 6.11540283281251
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.6094404446006079
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 6.529246888278256
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.2473863147224553
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.4,
+        "peak": 23.021603543060372
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.266309874798878
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.46,
+        "peak": 37.66596264505951
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.2600000000000002,
+        "peak": 5.867781834274309
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 0.3603224479951226
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.3000000000000003,
+        "peak": 5.900567326115168
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 0.921700092268247
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.62,
+        "peak": 40.36479746326677
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 1.069879749761218
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.66,
+        "peak": 35.19905958736419
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.463032196376244
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 14.263932048232972
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.629137316128294
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.46,
+        "peak": 15.61473739106441
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.5743535069175327
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.64,
+        "peak": 33.231845396015906
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 3.5455348986988917
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 30.019084904773546
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.16,
+        "peak": 2.39909403904244
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.6,
+      "speed": 3.0,
+      "cases": 24,
+      "early": 4,
+      "late": 2,
+      "median_peak": 4.868611106029208
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.58,
+        "peak": 1.5831259051353257
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 3.7540268052683192
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.62,
+        "peak": 1.7521590541786922
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.28,
+        "peak": 4.663993653052523
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.24,
+        "peak": 4.451365504993662
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 5.073228559005893
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.4,
+        "peak": 6.937805244991589
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.48,
+        "peak": 6.838590438236864
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.06,
+        "peak": 7.798915282314541
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 0.6160447247776624
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.1,
+        "peak": 8.706960352420804
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.34,
+        "peak": 0.6938758179323612
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 34.98601481539589
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 0.3757241191508533
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 32.53601236514054
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.3800000000000001,
+        "peak": 0.5771590357818849
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.18,
+        "peak": 21.918054632990764
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.42,
+        "peak": 2.9410718890064467
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.22,
+        "peak": 26.436579114082182
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.46,
+        "peak": 2.926924875745536
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.48,
+        "peak": 30.131295301282826
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.58,
+        "peak": 4.5971651256532065
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 27.72868870826337
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.8,
+        "peak": 6.905700502605815
+      }
+    ]
+  },
+  {
+    "summary": {
+      "curve": 3.0,
+      "gain": 0.6,
+      "speed": 6.0,
+      "cases": 24,
+      "early": 8,
+      "late": 6,
+      "median_peak": 16.271828716984498
+    },
+    "cases": [
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.8,
+        "peak": 2.966393206892858
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.32,
+        "peak": 2.976921867396821
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.8800000000000001,
+        "peak": 3.3887310895734655
+      },
+      {
+        "delta": -1.9,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 1.34,
+        "peak": 3.7294755570214106
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.44,
+        "peak": 14.150497110715593
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.28,
+        "peak": 4.350542885879654
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.42,
+        "peak": 28.194204487070227
+      },
+      {
+        "delta": -1.9,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.36,
+        "peak": 5.0733117790940705
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.2800000000000002,
+        "peak": 18.3931603232534
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.62,
+        "peak": 2.438925423253319
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.32,
+        "peak": 22.233013334768163
+      },
+      {
+        "delta": -3.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 1.74,
+        "peak": 3.077166263173774
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.5,
+        "peak": 31.97297819201666
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.06,
+        "peak": 8.785667319586734
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.44,
+        "peak": 29.769825417267676
+      },
+      {
+        "delta": -3.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": true,
+        "ramp": 2.24,
+        "peak": 21.80996553924309
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 44.809498280227245
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.0,
+        "peak": 9.690775640147374
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.34,
+        "peak": 47.8264372650426
+      },
+      {
+        "delta": -4.5,
+        "af": 0.7,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": false,
+        "late": false,
+        "ramp": 2.08,
+        "peak": 11.229934724345881
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 28.26991709330241
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.005,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2,
+        "peak": 33.505484353036046
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": -0.4,
+        "early": true,
+        "late": false,
+        "ramp": null,
+        "peak": 25.957916519867666
+      },
+      {
+        "delta": -4.5,
+        "af": 1.4,
+        "tau": 0.06,
+        "offset": 0.4,
+        "early": true,
+        "late": false,
+        "ramp": 2.2800000000000002,
+        "peak": 31.636566308459397
+      }
+    ]
+  }
+]

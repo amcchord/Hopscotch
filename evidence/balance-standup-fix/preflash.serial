@@ -1,0 +1,48 @@
+==================================================
+[Status] t=1677756 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=564 bytes=21060437 budget_yields=3 age_ms=15
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Motor] ID=10 ON  | pos=  -2.68 (raw= -2.68 unwrap_off= -0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   5.96 (raw=  5.96 unwrap_off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.89 (raw=  0.89 unwrap_off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -7.82 (raw=  7.82 unwrap_off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   3.41 (raw=  3.43 unwrap_off= -0.02) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   4.08 (raw=  4.08 unwrap_off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=12517 arb_lost=9948 bus_err=0
+[CAN] our_tx_ok=124595 our_tx_fail=0 our_rx=112077
+==================================================
+==================================================
+[Loop] t=1678656 tick=83484 | avg=541us max=589us overruns=0 ctlgap=3606820us
+[Loop] link=1 rssi=-85 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.8 roll=-168.9 yaw=+279.7  [CF] tilt=-169.2 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1795,738
+[Arm] pos=FWD cal_mode=no | L: 3.41 (cal 0.00) R: 4.08 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=  -2.68 (raw= -2.68 off= -0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   5.96 (raw=  5.96 off=  0.00) | vel=   0.1 rad/s (    1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.89 (raw=  0.89 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -7.82 (raw=  7.82 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   3.41 (raw=  3.43 off= -0.02) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   4.08 (raw=  4.08 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=12517 arb_lost=9948 bus_err=0
+[CAN] our_tx_ok=124641 our_tx_fail=0 our_rx=112123
+==================================================
+==================================================
+[Loop] t=1680656 tick=83584 | avg=539us max=583us overruns=0 ctlgap=3606820us
+[Loop] link=1 rssi=-85 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.6 roll=-168.9 yaw=+279.2  [CF] tilt=-169.2 rate=  -0.2
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1795,768
+[Arm] pos=FWD cal_mode=no | L: 3.41 (cal 0.00) R: 4.08 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=  -2.68 (raw= -2.68 off= -0.00) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   5.96 (raw=  5.96 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.89 (raw=  0.89 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -7.82 (raw=  7.82 off=  0.00) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   3.41 (raw=  3.43 off= -0.02) | vel=  -0.1 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   4.08 (raw=  4.08 off=  0.00) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=12517 arb_lost=9948 bus_err=0
+[CAN] our_tx_ok=124741 our_tx_fail=0 our_rx=112223
+==================================================

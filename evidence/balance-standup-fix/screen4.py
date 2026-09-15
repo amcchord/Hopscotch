@@ -3,8 +3,12 @@ from pathlib import Path
 from dataclasses import replace,asdict
 import statistics
 sys.path.insert(0,str(Path.cwd()/'scripts'))
-import balance_sim as s
-base=s.current_firmware_config()
+import importlib.util
+spec=importlib.util.spec_from_file_location('screening_snapshot',Path(__file__).with_name('screening-simulator.py'))
+s=importlib.util.module_from_spec(spec)
+sys.modules[spec.name]=s
+spec.loader.exec_module(s)
+base=s.FirmwareConfig(**json.loads(Path(__file__).with_name('baseline-config.json').read_text()))
 
 plant=s.load_fitted_params(Path('evidence/balance-review/model-fit-speed.json'))
 variants={'baseline':base,'no_ramp_damper':replace(base,no_ramp_damper=True),'offset_05':replace(base,ramp_off_clamp=.5),'return_10':replace(base,arm_return_speed=1.),'return_08_no_damper':replace(base,arm_return_speed=.8,no_ramp_damper=True),'lead075':replace(base,carrot_effective=True,carrot_eff_lead_deg=.75),'lead15':replace(base,carrot_effective=True,carrot_eff_lead_deg=1.5),'eq_tracker':replace(base,eq_track=True),'gate2':replace(base,arm_return_gate=True,arm_gate_err_deg=2.,arm_gate_vel=3.)}

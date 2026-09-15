@@ -948,18 +948,16 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             _arm_left_goal  = _arms->getForwardLeft();
             _arm_right_goal = _arms->getForwardRight();
 
-            // Per-run self-calibration: a SETTLED capture is a genuine
-            // equilibrium measurement at the tip stance (err<1 deg, rate<4
-            // dps, quiet 400ms). Re-zero the whole curve to it -- the curve
-            // SHAPE is stable run-to-run but its absolute level wanders
-            // with CG state (battery seat, surface). Replaces the fading
-            // capture shift (which measured the same thing, less well, at
-            // engage); the 3 deg/s base rate limiter absorbs the tiny
-            // instantaneous difference between the two.
+            // Re-anchor the curve to the settled tip stance. This is a quiet
+            // pose measurement, not proof of free balance: the arms may still
+            // support the body. The tip-to-forward schedule remains a separate
+            // physical estimate. Bound TOTAL trim before removing the stored
+            // component; a relative +/-6 clamp biased the Sept 14 capture when
+            // the old trim was +2.31 and the newly measured correction was -4.
             if (capture_settled) {
                 float scheduled_now = computeScheduledSetpoint();
-                _run_curve_shift = clampf(tilt - (scheduled_now + _engage_trim),
-                                          -6.0f, 6.0f);
+                _run_curve_shift = balance_math::captureCurveShift(
+                    tilt, scheduled_now, _engage_trim, BALANCE_SP_OFFSET_MAX_DEG);
                 _engage_capture_shift = 0.0f;
                 Serial.printf("[Balance] Capture-calibrated: tilt=%.2f, curve shift %+.2f\n",
                               tilt, _run_curve_shift);
@@ -1586,7 +1584,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 7;  // v2 features: IMU age, RS05 units, fast CAN RX / 50 Hz front hold
+    header.reserved = 15;  // IMU age, RS05 units, fast CAN RX, absolute capture trim
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1736,6 +1734,9 @@ void BalanceController::dumpLog() {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
+    if (header.reserved & 8) {
+        out.println("# capture_trim_bounds=absolute");
+    }
     if (header.reserved & 2) {
         out.println("# wheel_feedback_velocity_range_rad_s=50");
         out.println("# wheel_feedback_torque_range_nm=5.5");

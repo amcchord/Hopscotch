@@ -15,6 +15,13 @@ int main() {
     assert(!balance_math::finiteImu(0,0,0,0,0,0));
     assert(!balance_math::finiteImu(0,0,1,std::numeric_limits<float>::quiet_NaN(),0,0));
     assert(!balance_math::finiteImu(0,0,1,0,std::numeric_limits<float>::infinity(),0));
+    // Sept 14 regression: old +2.31 trim must not clip a valid -4.1 capture.
+    for (float stored : {-8.0f, -2.0f, 0.0f, 2.3112f, 8.0f}) {
+        const float shift = balance_math::captureCurveShift(78.1f, 82.2f, stored, 8.0f);
+        assert(std::fabs(82.2f + stored + shift - 78.1f) < 0.00002f);
+        assert(std::fabs(balance_math::captureCurveShift(100, 82, stored, 8) + stored - 8) < 0.00002f);
+        assert(std::fabs(balance_math::captureCurveShift(60, 82, stored, 8) + stored + 8) < 0.00002f);
+    }
     std::mt19937 rng(42);
     std::uniform_real_distribution<float> command(-60,60), yaw(-4,4);
     for (int i=0; i<100000; ++i) {

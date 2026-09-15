@@ -110,3 +110,13 @@ tap. Record whether initial hand assistance is needed. After supporting the
 robot and lowering both CH9/CH10, retrieve the log and compare initial travel,
 receive misses, feedback freshness and recovery. Use CH12 to mark a later tap
 in a separate trial. Reliable unaided stand-up is not yet established.
+
+## First physical result
+
+The correction was flashed and verified from source `cad335c`; both groups were
+disarmed and all six motors online after programming. Austin's first trial still
+ran away, then stabilized after hand intervention. All 1,428 samples were saved
+and checksum-verified after a USB cable bump/reboot. Initial wheel displacement
+was 18.667 rad versus 9.187 rad in the preceding assisted trial. No unaided
+improvement is established. See the [follow-up analysis](BALANCE_HANDOFF_FOLLOWUP_2026-09.md)
+for the comparison, calibration-bound bug and rejected further experiments.

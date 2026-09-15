@@ -75,6 +75,7 @@ class FirmwareConfig:
     setpoint_min: float = 70.0
     setpoint_max: float = 110.0
     capture_shift_max: float = 15.0
+    absolute_capture_trim: bool = False  # old records bounded the relative shift
     base_sp_rate_max: float = 3.0
     ramp_vel_slow: float = 2.0
     ramp_vel_gate_floor: float = 0.3
@@ -488,8 +489,13 @@ class OuterController:
             if capture_settled:
                 self.capture_was_settled = True
                 scheduled_now = self.scheduled_setpoint(arm_l_meas, arm_r_meas)
-                self.run_curve_shift = clampf(tilt - (scheduled_now + self.engage_trim),
-                                              -6.0, 6.0)
+                if c.absolute_capture_trim:
+                    self.run_curve_shift = (clampf(tilt - scheduled_now,
+                                                   -c.sp_offset_max, c.sp_offset_max)
+                                            - self.engage_trim)
+                else:
+                    self.run_curve_shift = clampf(tilt - (scheduled_now + self.engage_trim),
+                                                  -6.0, 6.0)
                 self.engage_capture_shift = 0.0
 
         if self.arms_returning and not self.ramp_complete:
@@ -962,6 +968,7 @@ def current_firmware_config() -> FirmwareConfig:
     kwargs['sp_curve'] = tuple((float(a), float(b)) for a, b in
                                re.findall(r'\{\s*([0-9.]+)f,\s*([0-9.]+)f\s*\}', curve))
     return replace(FirmwareConfig(), **kwargs, proportional_return=True, early_pos_p=True,
+                   absolute_capture_trim=True,
                    arm_event_end_calm_ms=150.0, measured_arm_arrival=True, hard_stop_latches=True)
 
 
@@ -970,7 +977,7 @@ def make_variant(name: str, base: FirmwareConfig | None = None) -> FirmwareConfi
         return current_firmware_config()
     if name == "july33":
         return replace(current_firmware_config(), ramp_off_clamp=0.0, drift_vel_kp=0.05,
-                       measured_arm_arrival=False, hard_stop_latches=False)
+                       measured_arm_arrival=False, hard_stop_latches=False, absolute_capture_trim=False)
     cfg = base if base is not None else FirmwareConfig()
     for part in name.split("+"):
         if part == "baseline":

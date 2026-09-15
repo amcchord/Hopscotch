@@ -1,0 +1,31 @@
+[Status] t=35885 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=466 bytes=437886 budget_yields=0 age_ms=21
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1693 our_tx_fail=0 our_rx=1693
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1698 our_tx_fail=0 our_rx=1697
+  Center           1.768      -1.767
+  Backward         3.661      -3.670
+  Calibrated: YES
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1798 our_tx_fail=0 our_rx=1797
+  State: IDLE  (Speed mode off)
+  Outer: drift_kp=0.0758  vel_kp=1.4520  vel_ki=0.2310
+  Stored trim: 2.31 deg (persisted equilibrium estimate)
+  IMU age: 6094 us, healthy since: 1955 ms, latched fault: 0x0000
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1898 our_tx_fail=0 our_rx=1898
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1998 our_tx_fail=0 our_rx=1998
+[Status] t=43970 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=466 bytes=542226 budget_yields=0 age_ms=5
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2097 our_tx_fail=0 our_rx=2096
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2098 our_tx_fail=0 our_rx=2098
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2198 our_tx_fail=0 our_rx=2198

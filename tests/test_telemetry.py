@@ -57,6 +57,8 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(c.arm_calm_ms, 300)
         self.assertEqual(c.base_sp_rate_max, 4)
         self.assertEqual(c.arm_return_acceleration, 0)
+        self.assertEqual(c.arm_return_speed, 1.5)
+        self.assertTrue(c.absolute_capture_trim)
         self.assertAlmostEqual(c.vel_sp_kp, 2.2*33/50)
         self.assertTrue(c.measured_arm_arrival and c.hard_stop_latches)
 

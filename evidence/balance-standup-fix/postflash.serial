@@ -1,0 +1,151 @@
+==================================================
+[Status] t=35885 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=466 bytes=437886 budget_yields=0 age_ms=21
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 unwrap_off=  2.68) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 unwrap_off= -5.96) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 unwrap_off= -0.89) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 unwrap_off= -7.82) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 unwrap_off= -3.43) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   0.00 (raw=  4.08 unwrap_off= -4.08) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1693 our_tx_fail=0 our_rx=1693
+==================================================
+==================================================
+[Loop] t=35962 tick=1697 | avg=432us max=462us overruns=0 ctlgap=5535us
+[Loop] link=1 rssi=-85 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.6 roll=-169.0 yaw=+158.0  [CF] tilt=-169.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,798
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: -0.00 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=   0.1 rad/s (    1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 off= -7.82) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.00 (raw=  4.08 off= -4.08) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1698 our_tx_fail=0 our_rx=1697
+==================================================
+=== ARM CALIBRATION (deltas from Forward) ===
+  Position    Left (rad)  Right (rad)
+  Forward          0.000       0.000
+  Center           1.768      -1.767
+  Backward         3.661      -3.670
+  Calibrated: YES
+  Forward ref: left=0.000 right=0.000
+=============================================
+==================================================
+[Loop] t=37962 tick=1797 | avg=432us max=601us overruns=0 ctlgap=5535us
+[Loop] link=1 rssi=-85 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.5 roll=-169.0 yaw=+157.7  [CF] tilt=-169.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1795,768
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: -0.00 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=   0.1 rad/s (    1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 off= -7.82) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.00 (raw=  4.08 off= -4.08) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1798 our_tx_fail=0 our_rx=1797
+==================================================
+=== BALANCE STATUS ===
+  State: IDLE  (Speed mode off)
+  PD: Kp=2.0000  Kd=0.0800
+  Outer: drift_kp=0.0758  vel_kp=1.4520  vel_ki=0.2310
+  Cascade: sp_offset=0.000  integral=0.000  target_vel=0.000  filt_vel=0.000
+  Stored trim: 2.31 deg (persisted equilibrium estimate)
+  Balance loop: 200 Hz (control core, direct IMU)
+  IMU age: 6094 us, healthy since: 1955 ms, latched fault: 0x0000
+  Complementary filter: tilt=-169.0  gyro_rate=-0.1
+  Max drive speed: 30.0 rad/s
+  Log: 309488 bytes, 0 buffered samples, schema v2
+  Logging: off  pending save: no  note: none
+======================
+==================================================
+[Loop] t=39983 tick=1898 | avg=431us max=629us overruns=0 ctlgap=36750us
+[Loop] link=1 rssi=-86 lq=99 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.6 roll=-168.7 yaw=+157.3  [CF] tilt=-169.0 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,709
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: 0.00 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=   0.1 rad/s (    1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 off= -7.82) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   0.00 (raw=  4.08 off= -4.08) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1898 our_tx_fail=0 our_rx=1898
+==================================================
+==================================================
+[Loop] t=41986 tick=1998 | avg=435us max=552us overruns=0 ctlgap=36750us
+[Loop] link=1 rssi=-86 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.8 roll=-168.9 yaw=+157.0  [CF] tilt=-169.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,768
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: -0.00 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=   0.1 rad/s (    1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=   0.0 rad/s (    0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 off= -7.82) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.00 (raw=  4.08 off= -4.08) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=1998 our_tx_fail=0 our_rx=1998
+==================================================
+==================================================
+[Status] t=43970 sim=OFF thr=0.00 str=0.00
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=466 bytes=542226 budget_yields=0 age_ms=5
+[Status] max_speed=33.0 rad/s (315 RPM) horizon=3.0 s
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 unwrap_off=  2.68) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 unwrap_off= -5.96) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 unwrap_off= -0.89) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=   0.00 (raw=  7.82 unwrap_off= -7.82) | vel=   0.1 rad/s (    1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 unwrap_off= -3.43) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.00 (raw=  4.08 unwrap_off= -4.08) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2097 our_tx_fail=0 our_rx=2096
+==================================================
+==================================================
+[Loop] t=43986 tick=2098 | avg=433us max=545us overruns=0 ctlgap=36750us
+[Loop] link=1 rssi=-84 lq=100 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.6 roll=-169.0 yaw=+156.7  [CF] tilt=-169.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1811,768
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: -0.00 (cal -0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=  -0.1 rad/s (   -1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=   0.00 (raw=  7.82 off= -7.82) | vel=   0.1 rad/s (    1 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=  -0.00 (raw=  4.08 off= -4.08) | vel=  -0.1 rad/s (   -1 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2098 our_tx_fail=0 our_rx=2098
+==================================================
+==================================================
+[Loop] t=45986 tick=2198 | avg=433us max=604us overruns=0 ctlgap=36750us
+[Loop] link=1 rssi=-85 lq=98 | drv_armed=0 arm_armed=0 | thr=0.00 str=0.00 | wifi=1 | sim=off
+[IMU] pitch=  +1.5 roll=-169.0 yaw=+156.3  [CF] tilt=-169.1 rate=  -0.1
+[CRSF] CH: 992,992,174,992,1792,1792,1792,191,191,191,191,191,0,0,1795,798
+[Arm] pos=FWD cal_mode=no | L: 0.00 (cal 0.00) R: 0.00 (cal 0.00)
+
+[Motor] ID=10 ON  | pos=   0.00 (raw= -2.68 off=  2.68) | vel=  -0.0 rad/s (   -0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=20 ON  | pos=   0.00 (raw=  5.96 off= -5.96) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=30 ON  | pos=  -0.00 (raw=  0.89 off= -0.89) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID=40 ON  | pos=  -0.00 (raw=  7.82 off= -7.82) | vel=  -0.0 rad/s (   -0 RPM) | trq= 0.00 Nm | tmp=26.0C | err=0x00
+[Motor] ID= 1 ON  | pos=   0.00 (raw=  3.43 off= -3.43) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=24.0C | err=0x00
+[Motor] ID= 2 ON  | pos=   0.00 (raw=  4.08 off= -4.08) | vel=   0.0 rad/s (    0 RPM) | trq=-0.00 Nm | tmp=25.0C | err=0x00
+[VBUS] 24.6V  [Current] 0.00A
+[CAN] state=1 tx_err=0 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=0 bus_err=0
+[CAN] our_tx_ok=2198 our_tx_fail=0 our_rx=2198
+==================================================

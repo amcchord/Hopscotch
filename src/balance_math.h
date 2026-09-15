@@ -7,6 +7,13 @@ namespace balance_math {
 inline float clamp(float value, float lo, float hi) {
     return value < lo ? lo : (value > hi ? hi : value);
 }
+// Bound the measured total curve correction, then express it relative to the
+// trim already included in the base. Bounding the relative correction instead
+// makes the same physical capture depend on a previous run's stored trim.
+inline float captureCurveShift(float tilt, float scheduled, float stored_trim,
+                               float absolute_limit) {
+    return clamp(tilt - scheduled, -absolute_limit, absolute_limit) - stored_trim;
+}
 struct WheelCommands { float left, right, yaw; };
 inline WheelCommands mix(float common, float yaw, float limit) {
     common = clamp(common, -limit, limit);

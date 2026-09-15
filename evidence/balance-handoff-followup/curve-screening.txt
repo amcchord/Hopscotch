@@ -1,0 +1,4 @@
+{'curve': 1.9, 'cases': 54, 'early': 10, 'late': 6, 'median_peak': 6.113878699111721}
+{'curve': 3.0, 'cases': 54, 'early': 12, 'late': 6, 'median_peak': 3.4548969846696442}
+{'curve': 4.0, 'cases': 54, 'early': 16, 'late': 18, 'median_peak': 4.221769854095316}
+{'curve': 4.5, 'cases': 54, 'early': 19, 'late': 12, 'median_peak': 5.667700384133177}
