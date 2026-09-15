@@ -1,6 +1,6 @@
 # September 14: respond to early roll-away, then learn equilibrium
 
-The latest stand-up still required a hand stop. Austin's requested direction is to detect the developing runaway and respond promptly, giving the controller time to find equilibrium instead of guessing a fixed balance angle. This candidate implements that approach. Unaided physical improvement is not yet demonstrated.
+The latest stand-up still required a hand stop. Austin's requested direction is to detect the developing runaway and respond promptly, giving the controller time to find equilibrium instead of guessing a fixed balance angle. This firmware implements that approach. The first follow-up succeeded according to Austin, and the complete telemetry records an early catch followed by settling. This is one successful trial; repeatability remains to be measured.
 
 ## What the last trial established
 
@@ -56,3 +56,31 @@ After fresh disarm verification, flash and verify the application, then read mot
 Flashed and verified source `720f2e31939a249a215b2b7f7c197130f2301310`, application SHA-256 `5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35`, application only at `0x10000`. Fresh preflight and postflash both groups disarmed; all six motors online with no errors. IMU age 5.974 ms, tilt −1.9°, no latched fault; receiver maximum 516 µs and CAN receive misses/TX failures zero. Calibration remains valid with center deltas 1.768/−1.767 and back deltas 3.661/−3.670 rad; stored trim remains 2.44°. Forward references became 0/0 with ordinary boot encoder zeroing, while raw arm positions match the preflash pose. No calibration reset or tool-initiated movement.
 
 The observer is recording with note `early-wheel-recovery-v1`. One short normal operator-triggered attempt has been requested; physical benefit is pending.
+
+
+## First successful physical trial — September 14, 23:31 download
+
+Austin replied **“That worked perfectly!!”** to the requested unaided short stand-up. Preserve this as the first operator-reported successful start on the early wheel-recovery firmware. It does not justify changing gains after a single result. The installed source remains `720f2e31939a249a215b2b7f7c197130f2301310`, application SHA-256 `5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35`.
+
+[All 1,203 samples](../telemetry_logs/bal_20260914_233101_early-recovery-first-success.csv) were retrieved and validated: 24.173 seconds, including 15.350 seconds of BALANCE; end `drive disarmed`, file checksum `0x29CB8EA4`, USB checksum `0xA2EED9A2`. The log identifies feature flags 31 and `early-wheel-recovery-v1`. The passive host observer expired before the operator started; this result comes from the complete onboard capture and Austin's report, not a continuous host observation or video. The saved profiler has `balance_run` scope.
+
+| Recorded measurement | Previous assisted trial | First successful trial |
+|---|---:|---:|
+| Engagement tilt | 84.459° | 84.447° |
+| Peak average wheel speed, first 4 s | 19.735 rad/s | 3.561 rad/s |
+| Peak wheel command, first 4 s | 19.211 rad/s | 3.458 rad/s |
+| Peak wheel displacement from engagement, first 4 s | 15.244 rad | 4.186 rad |
+| Maximum balance target error | 9.009° | 1.903° |
+| Arm/base ramp completed after engagement | 2.961 s | 2.206 s |
+
+The initial speed peak fell **82.0%**, and peak wheel travel fell **72.5%** relative to the preceding assisted trial. Starting tilt and arm-return timing were nearly identical. These are single-trial comparisons; displacement is wheel rotation, not measured floor distance.
+
+Recovery triggered at **0.746 s** after engagement. The boost was recorded through 1.540 s, consistent with its 800 ms limit. The learned integral survived the 2.206 s ramp handoff, peaked at 2.557°, then relaxed to about 1.655°. Recovery declared calm and captured a hold reference at **5.681 s**, with only 0.410 rad remaining displacement. Raw logged travel retained its original origin and ended at 0.197 rad. Over the following 9.169 logged seconds (excluding the first half-second after hold capture), average wheel-speed RMS was 0.191 rad/s and travel range 0.239 rad. Arm assistance never became active: this trial demonstrates the early wheel-learning path rather than an arm throw. No contact markers were recorded.
+
+![Recorded comparison](../evidence/balance-startup-recovery/first-success-comparison.png)
+
+There were no recorded saturation, recovery-limit, IMU-fault or CAN-TX-fault rows and no stalls. Run receiver maximum was 537 µs and control interval maximum 5.390 ms. During BALANCE the largest recorded inner interval was 5.456 ms, IMU age 10 ms (19 ms over the whole tip-up plus balance capture), and wheel feedback age after the first 50 ms at most 6 ms. Maximum sample interval was 25 ms.
+
+Afterward both motor groups were confirmed disarmed, all six motors online with no errors, IMU healthy, and cumulative CAN receive misses/TX failures zero. Calibration deltas remained center 1.768/−1.767 and back 3.661/−3.670; the existing learner stored trim **3.16°**. No additional tuning, flash or motor action followed. Source/tests remain exactly those of the tested build.
+
+Austin requested documentation, commit and GitHub push. This successful trial, raw transfer, comparison script/figure/metrics and exact firmware identity are preserved on `codex/balance-review-ready`. Further reliability work should repeat the same firmware before considering changes.

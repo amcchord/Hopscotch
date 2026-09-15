@@ -10,3 +10,9 @@ The selected implementation is **early wheel-feedback learning**, in production 
 - `implement_wheel_*.py`: development transformation records against the restored capture-correction source; not idempotent build steps and not needed to reproduce final firmware.
 
 Definitive physical findings and limits: `docs/BALANCE_STARTUP_RECOVERY_2026-09.md`. Frozen source/image identity: `artifacts/balance-startup-recovery/manifest.json`. New device checks will be added only after an actual flash.
+
+## First reported successful physical trial
+
+`first-success-*` contains the checksummed download report, posttrial status, metrics and inspected comparison figure. `analyze_first_success.py` reproduces the comparison. `tested-firmware-identity.json` records the exact tested source/application hash for the unchanged firmware. The 1,203-row CSV and byte-exact USB transfer are in `telemetry_logs/bal_20260914_233101_early-recovery-first-success.*`.
+
+`first-trial.serial` is only the earlier passive observation window: it expired before the operator started and does not contain the successful attempt. Do not confuse it with the complete onboard CSV/raw download. All serial readers are now closed.

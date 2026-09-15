@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Prepared balance candidate:** [September findings and firmware changes](docs/BALANCE_REVIEW_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Built and checked offline; device flashing/checks are recorded in the review. Physical balance validation is pending.
+**First successful early-recovery stand-up — September 14, 2026:** [Findings, firmware changes and measured result](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Austin reports a successful unaided start; the complete 1,203-sample log records early recovery and settling. Peak initial wheel speed was 82% lower than the previous assisted attempt. Preserve the tested firmware while measuring repeatability. [Exact firmware identity](evidence/balance-startup-recovery/tested-firmware-identity.json).
 
 ![Robot Diagram](docs/RobotDiagram.png)
 
@@ -31,7 +31,7 @@ Two arm motors are driven in rate mode — stick input is integrated into a posi
 
 ### Self-Balance Mode
 
-An optional balancing mode activated via RC switch combinations. At the start of the tip-up sequence the rear wheels are switched from CSP position mode to Robstride Speed mode (while the robot is still static on all fours): a 200 Hz complementary-filter + PD control loop commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station and return to origin; the position loop also runs at reduced gain during the standup ramp so the robot stands up without rolling away.
+An optional balancing mode activated via RC switch combinations. At the start of the tip-up sequence the rear wheels are switched from CSP position mode to Robstride Speed mode (while the robot is still static on all fours): a 200 Hz complementary-filter + PD control loop commands wheel velocity directly, while the front wheels hold position in CSP. A 50 Hz outer cascade (position P -> velocity PI) adjusts the tilt setpoint to hold station. During arm return, sustained rising wheel speed triggers a short, bounded boost to the existing equilibrium-learning integral. Recovery first targets zero wheel speed, retains its learned correction through the arm handoff, then captures the settled location for position holding. Starts without a recovery event retain the original position reference.
 
 The balance point is self-calibrating: an arm-position-to-balance-point curve provides the shape, every settled capture re-zeros its absolute level, and a persisted trim learns residuals from recent calm intervals across runs. Movement of the sensor relative to the chassis during a run remains an unresolved physical uncertainty. The arms double as a second balance actuator: from their top-dead-center stance they throw against pushes through an engagement lifecycle (fast attack, one recoil handoff, calm-gated re-arm) intended to limit repeated self-triggering during disturbances, with a full-stop emergency throw when the wheels saturate. Safety systems include tilt/rate/saturation aborts, stale-feedback abort, CAN bus-off recovery, motor-side CAN watchdogs, a two-stage dead-man on the control heartbeat, and level-based disarm enforcement.
 

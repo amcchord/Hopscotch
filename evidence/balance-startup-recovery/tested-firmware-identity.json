@@ -1,0 +1,21 @@
+{
+  "source_commit": "720f2e31939a249a215b2b7f7c197130f2301310",
+  "source_branch": "codex/balance-review-ready",
+  "target": "esp32s3",
+  "environment": "m5stack-atoms3r",
+  "application_offset": "0x10000",
+  "platform": "espressif32@6.7.0",
+  "framework": "Arduino ESP32 2.0.16",
+  "flash_used_bytes": 1138013,
+  "static_ram_bytes": 50752,
+  "telemetry_features": 31,
+  "application": {
+    "bytes": 1138384,
+    "sha256": "5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35"
+  },
+  "local_package": "artifacts/balance-startup-recovery",
+  "first_success_log": "telemetry_logs/bal_20260914_233101_early-recovery-first-success.csv",
+  "first_success_file_checksum": "0x29CB8EA4",
+  "first_success_usb_checksum": "0xA2EED9A2",
+  "physical_validation": "One operator-reported successful unaided trial, supported by complete telemetry; repeatability pending"
+}
