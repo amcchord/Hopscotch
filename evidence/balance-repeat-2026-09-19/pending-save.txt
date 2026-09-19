@@ -1,0 +1,1 @@
+Initial read-only check: IDLE, drive disarmed, arms armed; 1303 samples, pending save YES. Requested operator CH9/CH10 LOW before download.

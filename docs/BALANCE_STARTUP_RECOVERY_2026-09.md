@@ -1,6 +1,6 @@
 # September 14: respond to early roll-away, then learn equilibrium
 
-The latest stand-up still required a hand stop. Austin's requested direction is to detect the developing runaway and respond promptly, giving the controller time to find equilibrium instead of guessing a fixed balance angle. This firmware implements that approach. The first follow-up succeeded according to Austin, and the complete telemetry records an early catch followed by settling. This is one successful trial; repeatability remains to be measured.
+The latest stand-up still required a hand stop. Austin's requested direction is to detect the developing runaway and respond promptly, giving the controller time to find equilibrium instead of guessing a fixed balance angle. This firmware implements that approach. The first follow-up succeeded according to Austin, and the complete telemetry records an early catch followed by settling. A September 19 repeat also succeeded with matching firmware/configuration metadata. Two captured successes support repeatability under these conditions; they do not measure a broader success rate.
 
 ## What the last trial established
 
@@ -84,3 +84,34 @@ There were no recorded saturation, recovery-limit, IMU-fault or CAN-TX-fault row
 Afterward both motor groups were confirmed disarmed, all six motors online with no errors, IMU healthy, and cumulative CAN receive misses/TX failures zero. Calibration deltas remained center 1.768/−1.767 and back 3.661/−3.670; the existing learner stored trim **3.16°**. No additional tuning, flash or motor action followed. Source/tests remain exactly those of the tested build.
 
 Austin requested documentation, commit and GitHub push. This successful trial, raw transfer, comparison script/figure/metrics and exact firmware identity are preserved on `codex/balance-review-ready`. Further reliability work should repeat the same firmware before considering changes.
+
+
+## Successful repeat — September 19
+
+Austin reported another very successful stand-up five days later. The new run initially remained in RAM because CH9 still armed the motors: drive was disarmed, logging stopped, 1,303 samples, `pending save: YES`. After Austin lowered both switches, fresh status showed disarmed and no pending save. The complete new file was then retrieved and validated. Do not confuse the initial pending-save observation with a failed balance attempt.
+
+[Repeat telemetry](../telemetry_logs/bal_20260919_143953_early-recovery-repeat-success.csv) contains **1,303 samples / 26.044 seconds**, including **17.220 seconds of BALANCE**; end `drive disarmed`, file checksum `0xD98A7CF5`, USB checksum `0xA13C1DF6`. Build timestamp (`Sep 14 2026 23:18:29`), all controller gains/thresholds and feature flags 31 match the first successful capture. Learned stored trim at engagement changed from 2.4380° to 3.1650°, as expected from the existing learner. The application was not freshly read back; metadata is consistent with the unchanged last-flashed image `5531c628…734e35`. No tool changed firmware or settings.
+
+| Measurement | September 14 success | September 19 repeat |
+|---|---:|---:|
+| Engagement tilt | 84.447° | 84.250° |
+| Early recovery trigger, after engagement | 0.746 s | 0.780 s |
+| Arm/base ramp completion | 2.206 s | 2.180 s |
+| Calm hold captured | 5.681 s | 4.700 s |
+| First-four-second peak average wheel speed | 3.561 rad/s | 3.291 rad/s |
+| First-four-second peak wheel displacement | 4.186 rad | 3.516 rad |
+| Maximum target error during balance | 1.903° | 1.729° |
+| Post-settle wheel-speed RMS* | 0.191 rad/s | 0.078 rad/s |
+| Post-settle wheel-travel range* | 0.239 rad | 0.035 rad |
+
+*Measured from 0.5 s after the controller's calm/hold event through the final logged balance sample: 9.169 s and 12.020 s respectively. Contact timing is unmarked, and the first trace includes an end-of-run disturbance; these are descriptive whole-window metrics, not a controlled steady-state comparison. Displacement is wheel rotation, not measured floor distance.
+
+The repeat settled about **0.98 seconds sooner**, with **7.6% lower initial speed** and **16.0% less peak initial wheel travel**. Its captured hold location was 1.038 rad from engagement and final displacement 1.145 rad, consistent with the intentional settled-location hold rather than a demand to return exactly to the start. No arm assistance activated in either successful run. The boost in the repeat is recorded from 0.780 through 1.560 s; the learned integral peaks at 2.302° and ends at 1.785°.
+
+![Two successful starts](../evidence/balance-repeat-2026-09-19/comparison.png)
+
+No recorded saturation, recovery-limit, IMU-fault or CAN-TX-fault rows, and no stalls. Run receiver maximum 530 µs; control interval maximum 5.500 ms. During BALANCE, inner interval maximum 5.010 ms, IMU age at most 10 ms and wheel feedback after the first 50 ms at most 6 ms. Across tip-up plus balance, inner interval maximum 5.011 ms, IMU age 19 ms, sample interval maximum 23 ms. Minimum recorded bus voltage was 25.09 V versus 23.72 V in the first successful run, so the two runs were not identical battery conditions.
+
+After disarm, all six motors were online/no errors, IMU healthy, calibration deltas retained, cumulative CAN receive misses/TX failures zero. The existing learner stored trim **3.51°**. All readers are closed. This is a second archived operator-reported success with complete telemetry, not proof that all unobserved attempts succeeded. Preserve this firmware and collect further unchanged runs before tuning. Source/build tests were not repeated because only evidence/documentation changed; new checksum/row validation, metadata comparison, analysis syntax and plot inspection passed.
+
+Evidence and reproduction script: [September 19 evidence](../evidence/balance-repeat-2026-09-19/README.md).

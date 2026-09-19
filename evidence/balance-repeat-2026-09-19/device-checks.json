@@ -1,0 +1,48 @@
+{
+  "last_flashed_source": "720f2e31939a249a215b2b7f7c197130f2301310",
+  "last_flashed_application_sha256": "5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35",
+  "identity_scope": "Log build/configuration metadata matches prior tested firmware; application not freshly read back",
+  "build_date": "Sep 14 2026",
+  "build_time": "23:18:29",
+  "controller_build_metadata_differences": {},
+  "initial_drive_armed": false,
+  "initial_arms_armed": true,
+  "initial_pending_save": true,
+  "initial_buffer_samples": 1303,
+  "after_operator_disarm_both_disarmed": true,
+  "after_operator_disarm_pending_save": false,
+  "all_six_motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "motor_errors": false,
+  "calibrated": true,
+  "center_deltas": [
+    1.768,
+    -1.767
+  ],
+  "back_deltas": [
+    3.661,
+    -3.67
+  ],
+  "posttrial_trim_deg": 3.51,
+  "imu_age_us": 1099,
+  "imu_fault": "0x0000",
+  "stationary_tilt_deg": -1.9,
+  "can_rx_missed": 0,
+  "can_tx_failed": 0,
+  "receiver_live_max_us": 584,
+  "receiver_run_max_us": 530,
+  "trial_file": "telemetry_logs/bal_20260919_143953_early-recovery-repeat-success.csv",
+  "trial_samples": 1303,
+  "trial_file_checksum": "0xD98A7CF5",
+  "trial_usb_checksum": "0xA13C1DF6",
+  "operator_report": "Another very successful run of standing up",
+  "firmware_or_settings_changed": false,
+  "motor_commands_sent": false,
+  "serial_readers_active": false
+}

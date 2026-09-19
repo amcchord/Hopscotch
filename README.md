@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**First successful early-recovery stand-up — September 14, 2026:** [Findings, firmware changes and measured result](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Austin reports a successful unaided start; the complete 1,203-sample log records early recovery and settling. Peak initial wheel speed was 82% lower than the previous assisted attempt. Preserve the tested firmware while measuring repeatability. [Exact firmware identity](evidence/balance-startup-recovery/tested-firmware-identity.json).
+**Successful early-recovery stand-ups — September 14 and 19, 2026:** [Findings, firmware changes and measured result](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Two reported successes are archived with complete 1,203- and 1,303-sample logs. The September 19 repeat settled about a second sooner and showed 16% less initial wheel travel than the first success. Preserve the tested firmware while collecting more repeatability evidence. [Exact firmware identity](evidence/balance-startup-recovery/tested-firmware-identity.json).
 
 ![Robot Diagram](docs/RobotDiagram.png)
 
