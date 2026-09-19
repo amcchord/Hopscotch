@@ -1,0 +1,13 @@
+{
+  "samples": 2881,
+  "exported_by_source": "d1ae97d5ef31b96a9f3f39a2765998f06b8d965b",
+  "original_log": "telemetry_logs/bal_20260919_155240_standing-drive-first-test.csv",
+  "new_export": "telemetry_logs/bal_20260919_160318_v1-export-on-drive-response-v2.csv",
+  "sample_rows_identical": true,
+  "original_config_and_integrity_metadata_identical": true,
+  "original_drive_version": "ch1_ch2_velocity_feedforward_v1",
+  "original_drive_limits": "velocity_rad_s:1 turn_rad_s:0.5 accel:0.5 decel:0.75 turn_accel:0.75",
+  "telemetry_features": "127",
+  "binary_checksum": "0x90FA4B79",
+  "transport_checksum": "0xED14696F"
+}

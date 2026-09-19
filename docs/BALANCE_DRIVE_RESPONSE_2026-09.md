@@ -50,3 +50,11 @@ Restore the tested but sluggish first-drive image with a fresh disarmed check an
 ```
 
 Exact v1 source `90f07e83e3472cebbc5ca2646e585bfbce20f2d7`, app `83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d`. The earlier recoil-release stand-only package and full original backup also remain. Do not use `--rollback`, which selects a much older image. Download any new run before restoration.
+
+## Verified upload
+
+Source **`d1ae97d5ef31b96a9f3f39a2765998f06b8d965b`**, application **`b28793cdd8d2b45cdfbcb344cc594ba85ba79fadcdb2e373bca321a1d86b172b`**, was uploaded at 0x10000 and OpenOCD reported `Verify OK`. Fresh preflight and postflash both confirmed drive/arms disarmed, IDLE, six online/error-free motors, calibration retained and 3.89° learned trim. Postflash IMU age 1.102 ms/no fault, receiver max 495 µs, CAN misses/TX failures zero. Forward coordinates normally zeroed on boot while raw poses and center/back deltas were retained. No tool arming or movement, partition/filesystem upload or settings reset.
+
+The saved first-drive log was downloaded again through the new firmware: all 2,881 sample rows and original configuration/integrity metadata are identical, including features127/v1 limits and both checksums. This checks historical-version export without relabeling the first trial as v2. New copy `bal_20260919_160318_v1-export-on-drive-response-v2.csv` is explicitly a compatibility export of the same run, not a second physical run.
+
+`evidence/balance-drive-response/device-checks.json` and `compat-check.json` record release checks. The frozen package is `artifacts/balance-drive-response/`; first-drive and recoil-release packages remain for restoration. Passive observer started with note `standing-drive-response-v2`; Austin was invited to test small inputs and report delay/stopping. Physical response-v2 benefit remains unverified until that run is retrieved and assessed.

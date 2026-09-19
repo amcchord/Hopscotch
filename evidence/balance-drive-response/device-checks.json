@@ -1,0 +1,43 @@
+{
+  "source_commit": "d1ae97d5ef31b96a9f3f39a2765998f06b8d965b",
+  "application_sha256": "b28793cdd8d2b45cdfbcb344cc594ba85ba79fadcdb2e373bca321a1d86b172b",
+  "application_bytes": 1141840,
+  "application_only": true,
+  "application_offset": "0x10000",
+  "flash_verified": true,
+  "preflight_disarmed": true,
+  "postflash_disarmed": true,
+  "all_six_motors_online": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "motor_errors": false,
+  "stored_trim_deg": 3.89,
+  "imu_fault": "0x0000",
+  "imu_age_us": 1102,
+  "stationary_tilt_deg": -2.8,
+  "receiver_max_us": 495,
+  "can_rx_missed": 0,
+  "can_tx_failed": 0,
+  "calibrated": true,
+  "center_deltas": [
+    1.768,
+    -1.767
+  ],
+  "back_deltas": [
+    3.661,
+    -3.67
+  ],
+  "forward_reference_note": "Normal boot zeroing; raw arm positions 3.95/3.54 retained, stored center/back deltas unchanged.",
+  "stored_log_size_bytes": 680304,
+  "pending_save": false,
+  "previous_application_sha256": "83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d",
+  "previous_package": "artifacts/balance-standing-drive",
+  "physical_response_v2_test": "pending",
+  "old_v1_export_verified": true,
+  "old_v1_samples_identical": 2881
+}
