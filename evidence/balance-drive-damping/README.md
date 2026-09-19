@@ -13,3 +13,4 @@ See [findings and firmware changes](../../docs/BALANCE_DRIVE_DAMPING_2026-09.md)
 - `preflash-download.txt`: preservation download of the existing physical v3 trial before programming.
 
 Run Python scripts with `.venv/bin/python` from the repository root. Run simulation scripts sequentially because they compile the same bridge library under ignored `output/drive-damping/`. They never open USB or command motors. Figures are offline model comparisons, not predicted physical stopping distances. Raw `.serial` captures are retained byte-for-byte.
+- `preflash.serial/.txt`, `postflash.serial/.txt`, `upload.txt`, `device-checks.json`: exact application-only upload/readback proof, retained disarmed/calibration/IMU state, and explicit limitation that powered motor health remains unverified (zero replies).

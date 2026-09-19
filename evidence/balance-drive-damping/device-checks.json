@@ -1,0 +1,30 @@
+{
+  "source_commit": "a2774d4999b1c0f9ce707a9377aecd2a3661a3fe",
+  "application_sha256": "90a3df4d16276860059caacc059959ea6d774d2dc8528b68353aee90043e757c",
+  "application_bytes": 1145552,
+  "application_offset": "0x10000",
+  "flash_verified": true,
+  "postflash_idle": true,
+  "both_groups_disarmed": true,
+  "live_v4_constants_match": true,
+  "imu_latched_fault": 0,
+  "imu_age_us": 6046,
+  "receiver_linked": true,
+  "receiver_max_us": 488,
+  "retained_trim_deg": 3.33,
+  "calibration_center": [
+    1.768,
+    -1.767
+  ],
+  "calibration_backward": [
+    3.661,
+    -3.67
+  ],
+  "saved_log_retained_bytes": 571828,
+  "motor_replies_since_boot": 0,
+  "powered_motor_health_verified": false,
+  "limitation": "Battery-on confirmation unanswered; motor RX=0 and bus errors increasing. Motor/default zero readings are not valid health evidence. Forward refs are transient software values captured on operator arming, not lost stored calibration.",
+  "physical_test_started": false,
+  "observer_started": false,
+  "original_backup_hash_verified": true
+}

@@ -69,3 +69,11 @@ The v3 log was downloaded again before programming to preserve the exact on-devi
 Release image/package identity and actual upload/stationary outcome are recorded below after deployment. The release uses only application offset `0x10000`; bootloader, partitions, NVS, LittleFS and calibration are preserved. Exact prior packages and the original full-device backup remain available. Download any new log **before restoring v3 or v2**: v3 would label the new same-layout log with older driving metadata, and v2 cannot read schema 4. Never use the helper's unrelated `--rollback` option.
 
 After the verified upload and stationary checks, this task stops. No passive test observer or physical trial is started.
+
+### Deployed outcome
+
+Application-only programming at `0x10000` and readback verification succeeded. Frozen firmware source is **`a2774d4999b1c0f9ce707a9377aecd2a3661a3fe`**, application SHA-256 **`90a3df4d16276860059caacc059959ea6d774d2dc8528b68353aee90043e757c`**, 1,145,552 bytes. Build flash use is 1,145,193 bytes and static RAM 50,848 bytes. Exact package: `artifacts/balance-drive-damping/`; prior v3 package also checksum-verified, and the original full-device backup hash was rechecked.
+
+Postflash USB status identifies Driving v4 / 0.006 s / gain1.50 / accel6 / brake8. IDLE, both groups disarmed; IMU age6.046ms/no latched fault, transmitter linked with receiver maximum488µs. Stored trim3.33° and center/back calibration deltas1.768/−1.767 and3.661/−3.670 remain. The previous571,828-byte saved log is still present. Forward references are transient software coordinates, captured on operator arming; their zero values before any motor communication are not a calibration reset.
+
+**Powered motor health is not verified.** No motor replies arrived after boot, all motor readings are defaults, and CAN errors increased. The earlier battery-on question has not been answered. This condition predates the upload; it must not be reported as healthy motors or proof of a firmware regression. The task stops at the completed upload and available stationary checks. No physical movement, arming, calibration/settings writes or trial observer were initiated. Later powered checks and physical log review remain for the operator's follow-up.

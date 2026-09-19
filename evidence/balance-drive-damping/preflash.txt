@@ -1,0 +1,17 @@
+[CAN] state=1 tx_err=128 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=11914 bus_err=9283780
+[CAN] our_tx_ok=119687 our_tx_fail=57421 our_rx=119671
+  State: IDLE  (Speed mode off)
+  Stored trim: 3.33 deg (persisted equilibrium estimate)
+  IMU age: 1073 us, healthy since: 391817 ms, latched fault: 0x0000
+  Complementary filter: tilt=-1.8  gyro_rate=0.0
+[CAN] state=1 tx_err=128 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=11914 bus_err=9296011
+[CAN] our_tx_ok=119687 our_tx_fail=57497 our_rx=119671
+[Status] link=1 drv_armed=0 arm_armed=0
+[CRSF] RX max_us=580 bytes=33245072 budget_yields=10 age_ms=5
+[CAN] state=1 tx_err=128 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=11914 bus_err=9299897
+[CAN] our_tx_ok=119687 our_tx_fail=57521 our_rx=119671
+[CAN] state=1 tx_err=128 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=11914 bus_err=9308207
+[CAN] our_tx_ok=119687 our_tx_fail=57571 our_rx=119671
+[CAN] state=1 tx_err=128 rx_err=0 hw_tx_fail=0 rx_miss=0 arb_lost=11914 bus_err=9320402
+[CAN] our_tx_ok=119687 our_tx_fail=57647 our_rx=119671
+Verified both groups disarmed in 5 status lines
