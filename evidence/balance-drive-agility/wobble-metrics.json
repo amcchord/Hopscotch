@@ -1,0 +1,125 @@
+{
+  "file": "telemetry_logs/bal_20260919_185559_drive-agility-wobble-wall.csv",
+  "samples": 2381,
+  "duration_s": 47.604,
+  "balance_s": 38.78,
+  "binary_checksum": "0x64EC16B9",
+  "transport_checksum": "0x58692019",
+  "end_reason": "bailout_angle_error",
+  "user_report": "stand-up worked; front-to-back rocking while driving; wall contact at end, exact time unmarked",
+  "first_ready_s": 4.1,
+  "first_driving_s": 6.74,
+  "ready_transitions": [
+    [
+      4.1,
+      true
+    ],
+    [
+      9.5,
+      false
+    ],
+    [
+      13.58,
+      true
+    ],
+    [
+      25.38,
+      false
+    ],
+    [
+      31.42,
+      true
+    ],
+    [
+      35.5,
+      false
+    ]
+  ],
+  "controller_transitions": [
+    [
+      6.76,
+      true
+    ],
+    [
+      13.6,
+      false
+    ],
+    [
+      13.76,
+      true
+    ],
+    [
+      31.44,
+      false
+    ],
+    [
+      32.26,
+      true
+    ]
+  ],
+  "inner_max_us": 5484,
+  "imu_max_ms": 14,
+  "imu_fault_rows": 0,
+  "can_tx_fault_rows": 0,
+  "post_engage_missing_input_rows": 0,
+  "first_positive_request_s": 6.74,
+  "first_actual_forward_half_rad_s": 7.04,
+  "planned_arm_peak": 0.1,
+  "actual_total_assist_min": -0.2999,
+  "actual_total_assist_max": 0.45,
+  "early_peak_filtered_speed": 17.0418,
+  "early_peak_body_rate": 48.006,
+  "early_peak_angle_error": 6.456,
+  "first_recovery_arm_s": 9.28,
+  "first_emergency_arm_s": 25.74,
+  "windows": {
+    "quiet_before_drive": {
+      "start_s": 4.2,
+      "end_s": 6.5,
+      "speed_min": -0.12,
+      "speed_max": 0.1459,
+      "speed_rms": 0.06511098217658831,
+      "tilt_span_deg": 0.1010000000000133,
+      "max_abs_requested_velocity": 0.0109,
+      "max_abs_steering": 0.0,
+      "body_rate_dominant_hz": 1.7391304347826084,
+      "max_abs_rate": 0.691
+    },
+    "first_stop": {
+      "start_s": 9.2,
+      "end_s": 13.5,
+      "speed_min": -4.7511,
+      "speed_max": 11.8291,
+      "speed_rms": 3.5396639681663125,
+      "tilt_span_deg": 5.272000000000006,
+      "max_abs_requested_velocity": 7.6873,
+      "max_abs_steering": 0.0,
+      "body_rate_dominant_hz": 4.651162790697675,
+      "max_abs_rate": 31.774
+    },
+    "second_stop": {
+      "start_s": 17.5,
+      "end_s": 20.5,
+      "speed_min": -1.4176,
+      "speed_max": 2.5022,
+      "speed_rms": 0.8599728010815226,
+      "tilt_span_deg": 2.4839999999999947,
+      "max_abs_requested_velocity": 0.0,
+      "max_abs_steering": 0.5311,
+      "body_rate_dominant_hz": 4.333333333333333,
+      "max_abs_rate": 14.904
+    },
+    "late_centered_wobble": {
+      "start_s": 20.5,
+      "end_s": 23.0,
+      "speed_min": -2.8638,
+      "speed_max": 1.4287,
+      "speed_rms": 1.1892050805475058,
+      "tilt_span_deg": 2.456000000000003,
+      "max_abs_requested_velocity": 0.0,
+      "max_abs_steering": 1.0,
+      "body_rate_dominant_hz": 4.4,
+      "max_abs_rate": 15.816
+    }
+  }
+}

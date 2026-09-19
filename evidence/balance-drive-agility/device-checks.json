@@ -27,7 +27,7 @@
     "speed": 20,
     "turn": 4.5
   },
-  "psram_allocation": "compiled capacity 1440000 bytes; boot allocation line not captured; verify on next log start",
-  "physical_test": "pending",
+  "psram_allocation": "Buffer operation verified by complete 561- and 2381-sample schema4 captures; full capacity not exercised.",
+  "physical_test": "Two archived trials: stand-up runaway with new drive inactive; repeat stood/drove with 4\u20135 Hz fore/aft rocking and reported wall contact. Firmware unchanged; correction pending.",
   "usb_reconnect_before_flash": "USB port briefly absent; subsequent disarmed preflight succeeded before programming"
 }

@@ -1,0 +1,29 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+Received 219823 raw bytes
+Validated 561 samples (file integrity, row structure, USB checksum when available)
+
+Saved: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260919_185202_drive-agility-standup-runaway.csv
+Samples: 561 (schema 4, checksum 1)
+Duration: 11204ms (11.2s)
+Config: 102 parameters recorded
+
+--- Analysis ---
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp   offset  unit    drift  note
+----------------------------------------------------------------------------------------------------------------------------------
+bal_20260919_185202_drive-agility-standup-runaway.csv   8.80   2.38    82.11     0.03   0.50     0.02      0.35     0.06    86.73     4.00   deg     8.02  end=bailout_angle_error, inner saturation
+
+bal_20260919_185202_drive-agility-standup-runaway.csv
+  IMU max age=19 ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0758, vel_sp_kp=1.4520, vel_sp_kp_low=0.4620, vel_sp_ki=0.2310
+          sp_offset_max=8.00, ramp_sp_offset_max=1.50, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=82.11 deg, rate=0.03 dps
+  arm return: 0.50 s, pre-return |err|=0.02 deg, |rate|=0.35 dps, |cmd|=0.06 rad/s
+  final window: sp=86.73 deg, sp_offset=4.00 deg, drift=8.02 rad
+  note: end=bailout_angle_error, inner saturation
+  timing: sample p99/max=20.0/23.0 ms, inner max=5326 us, low-tick rows=1, feedback max=162 ms
+  authority: |angle err|max=48.18 deg, |raw cmd|max=110.14 rad/s, |wheel vel|max=29.17 rad/s, |drift|max=26.60 rad
+  sensors/power: IMU disagree max=59.67 deg, accel norm=0.18..1.29 g, bus min=25.16 V, current max=1.12 A, rear torque max=0.41 Nm
+  events: markers=0, saturated rows=15, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=4, checksum=1, end=bailout_angle_error, test_note=none
+
+Done.
