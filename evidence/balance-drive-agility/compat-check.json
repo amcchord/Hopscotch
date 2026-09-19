@@ -1,0 +1,14 @@
+{
+  "original": "telemetry_logs/bal_20260919_181555_drive-response-v2-delayed.csv",
+  "reexport": "telemetry_logs/bal_20260919_184914_v2-export-on-drive-agility.csv",
+  "same_physical_trial": true,
+  "rows": 1666,
+  "all_original_sample_fields_identical": true,
+  "stored_metadata_identical": true,
+  "extra_column": "pilot_arm",
+  "extra_column_all_unknown": true,
+  "binary_checksum": "0x298924B0",
+  "original_transport": "0x72A5CE52",
+  "reexport_transport": "0xA5D84DD1",
+  "note": "CSV transport checksum changes because schema4-capable firmware appends a blank pilot_arm column to historical schema3 exports. This is not a new physical trial."
+}

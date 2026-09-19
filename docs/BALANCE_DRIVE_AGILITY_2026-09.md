@@ -67,3 +67,10 @@ Use normal stand-up with CH1/CH2/CH4 neutral, CH7/CH9/CH10 HIGH and one CH11 pul
 Exact application package: `artifacts/balance-drive-agility/`. Upload only its application at `0x10000`, using the existing prepared-package flasher. Preserve bootloader, partitions, NVS, calibration and LittleFS. Before upload, check fresh disarmed status and preserve any new saved/pending run. The latest physical v2 log above is already downloaded. Verify retained calibration/trim, allocation and firmware identity after upload; powered motor/receiver health is a separate required check before a moving test.
 
 Restore the known response-v2 application with `--package artifacts/balance-drive-response --flash` after downloading candidate data. Do not use `--rollback`, which selects an older historical baseline. Previous stand-only recoil-release and first standing-drive packages, plus the original full 8 MB device backup, remain available.
+
+
+## Verified upload
+
+Source `5a07ebabef8f6431e8a9908fa4b53170b24a2308`, image SHA-256 `75ccdb4412dc3ebd0e4cc567cde845ab6bb3107d7d105e7fdcf69f4b2afa8118` was programmed and verified at application offset `0x10000`. A USB reconnect during operator power preparation occurred before programming; a new disarmed preflight passed. After flashing: receiver linked, both groups disarmed, six motors online/error-free, 25.2 V, calibration and 3.33° trim retained, IMU age 5.997 ms with no fault, CAN receive misses/transmit failures/bus errors zero. The live status reports 20/4.5 rad/s limits and schema 4. The boot allocation message was not captured; buffer operation remains to be demonstrated by the first new run.
+
+The stored v2 run was reexported through v3 and all 1,666 original sample fields and stored controller metadata match exactly, including binary checksum `0x298924B0`. New `pilot_arm` values are blank as intended; the changed CSV transport checksum is `0xA5D84DD1`. `bal_20260919_184914_v2-export-on-drive-agility` is a compatibility copy, not a new trial. Frozen package and prior restore package both verify. No tool-initiated motion, calibration reset or filesystem upload. Operator physical test remains pending.

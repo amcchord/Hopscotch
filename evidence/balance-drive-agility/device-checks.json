@@ -1,0 +1,33 @@
+{
+  "source_commit": "5a07ebabef8f6431e8a9908fa4b53170b24a2308",
+  "application_sha256": "75ccdb4412dc3ebd0e4cc567cde845ab6bb3107d7d105e7fdcf69f4b2afa8118",
+  "application_bytes": 1144032,
+  "programming_verified": true,
+  "application_offset": "0x10000",
+  "disarmed_pre_and_post": true,
+  "receiver_link": true,
+  "healthy_motor_ids": [
+    1,
+    2,
+    10,
+    20,
+    30,
+    40
+  ],
+  "calibration_retained": true,
+  "stored_trim_deg": 3.33,
+  "imu_age_us": 5997,
+  "imu_fault": 0,
+  "can_tx_fail": 0,
+  "can_receive_misses": 0,
+  "can_bus_errors": 0,
+  "bus_voltage": 25.2,
+  "telemetry_schema": 4,
+  "live_limits": {
+    "speed": 20,
+    "turn": 4.5
+  },
+  "psram_allocation": "compiled capacity 1440000 bytes; boot allocation line not captured; verify on next log start",
+  "physical_test": "pending",
+  "usb_reconnect_before_flash": "USB port briefly absent; subsequent disarmed preflight succeeded before programming"
+}
