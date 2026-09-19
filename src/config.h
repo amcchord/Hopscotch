@@ -382,6 +382,21 @@ static constexpr float BALANCE_RECOIL_CONFIRM_MS = 60.0f;
 static constexpr float BALANCE_RECOIL_BLEND_MS = 120.0f;
 static constexpr float BALANCE_RECOIL_MULTIPLIER = 2.0f;
 
+// Standing drive v1. Physical rear-wheel rad/s, independent of ground speed knob.
+static constexpr float BALANCE_PILOT_DEADBAND = 0.06f;
+static constexpr float BALANCE_PILOT_MAX_VEL = 1.0f;
+static constexpr float BALANCE_PILOT_MAX_TURN = 0.50f; // per-wheel differential
+static constexpr float BALANCE_PILOT_ACCEL = 0.5f;
+static constexpr float BALANCE_PILOT_DECEL = 0.75f;
+static constexpr float BALANCE_PILOT_TURN_ACCEL = 0.75f;
+static constexpr float BALANCE_PILOT_READY_MS = 400.0f;
+static constexpr float BALANCE_PILOT_STOP_MS = 400.0f;
+static constexpr uint32_t BALANCE_PILOT_RC_FRESH_MS = 100;
+static constexpr float BALANCE_PILOT_STOP_SPEED = 0.30f;
+static constexpr float BALANCE_PILOT_STOP_TURN = 0.20f;
+static constexpr float BALANCE_PILOT_PAUSE_ERR = 5.0f;
+static constexpr float BALANCE_PILOT_PAUSE_RATE = 30.0f;
+
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
 // estimator (it converges to the true balance offset from the arm-curve
 // nominal). Three additions make it dynamic instead of per-run:

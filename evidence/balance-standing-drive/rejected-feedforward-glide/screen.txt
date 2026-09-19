@@ -1,0 +1,3 @@
+Neutral sticks: all 324 complete trajectories identical to installed firmware.
+{"profile": "forward_stop_reverse_stop", "cases": 54, "baseline_failures": 11, "drive_failures": 27, "new_failures": 16, "actual_commanded_cases": 36, "survivors_with_final_rms_below_point3": 0}
+{"profile": "input_loss", "cases": 54, "baseline_failures": 11, "drive_failures": 20, "new_failures": 10, "actual_commanded_cases": 31, "survivors_with_final_rms_below_point3": 0}

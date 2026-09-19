@@ -46,6 +46,23 @@ class TelemetryTests(unittest.TestCase):
     def test_legacy(self):
         raw = b't_ms,state,roll\n20,2,83.1\n[Balance] --- End of log ---\n'
         self.assertEqual(validate(raw)[1], 1)
+    def test_old_log_exported_with_unknown_pilot_fields(self):
+        def raw(schema,features):
+            body=(b'# === BALANCE CONFIG ===\n# transport_checksum=fnv1a32\n'
+                  + f'# telemetry_schema={schema}\n# telemetry_features={features}\n'.encode()
+                  + b'# checksum_valid=1\n# sample_count=1\n'
+                    b't_ms,state,pilot_forward,pilot_steering,pilot_turn,pilot_flags\n20,2,,,,\n')
+            return body+f'# transport_fnv1a=0x{fnv1a(body):08X}\n[Balance] --- End of log ---\n'.encode()
+        self.assertEqual(validate(raw(2,63))[1],1)
+        with self.assertRaises(ValueError):
+            validate(raw(3,127))
+    def test_schema3_full_duration_pilot_transfer(self):
+        body=(b'# === BALANCE CONFIG ===\n# telemetry_schema=3\n# telemetry_features=127\n# sample_size_bytes=236\n'
+              b'# checksum_valid=1\n# sample_count=6000\n# transport_checksum=fnv1a32\n'
+              b't_ms,state,pilot_forward,pilot_steering,pilot_turn,pilot_flags\n')
+        body+=b''.join(f'{i*20},2,.5,-.5,-.3,15\n'.encode() for i in range(6000))
+        raw=body+f'# transport_fnv1a=0x{fnv1a(body):08X}\n[Balance] --- End of log ---\n'.encode()
+        self.assertEqual(validate(raw)[1],6000)
     def test_full_120_second_capture(self):
         rows = b''.join(f'{i*20},2,84.5,1\r\n'.encode() for i in range(6000))
         self.assertEqual(validate(transfer(rows, 6000))[1], 6000)

@@ -325,6 +325,7 @@ class OuterController:
         self.recoil_blend = 0.
         self.recoil_confirmed = False
         self.hold_drift = 0.
+        self.pilot = None  # optional production-C++ pilot adapter for drive screening
         self.vel_sp_integral = 0.0
         self.sp_offset = 0.0
         self.filtered_wheel_vel = 0.0
@@ -620,9 +621,20 @@ class OuterController:
             if self.recovery_calm_ms+.001>=c.recovery_calm_ms:
                 self.startup_active = False
                 self.hold_drift = meas_drift
+        pilot_moving = False
+        if self.pilot is not None:
+            was_moving = self.pilot.moving
+            tracking_error = abs(self.effective_setpoint-tilt)
+            self.pilot.update(now_ms, self.ramp_complete and not self.startup_active,
+                              self.filtered_wheel_vel, rate, tracking_error, dt)
+            pilot_moving = self.pilot.moving
+            if was_moving or pilot_moving:
+                self.hold_drift = meas_drift
         target_vel = 0.0
         if self.startup_active:
             pass  # stop first, then hold the settled position
+        elif pilot_moving:
+            target_vel = self.pilot.velocity
         elif self.ramp_complete:
             target_vel = clampf(-c.drift_vel_kp * (meas_drift-self.hold_drift),
                                 -c.drift_max_vel, c.drift_max_vel)
@@ -670,7 +682,7 @@ class OuterController:
         elif self.ramp_complete:
             ki = c.vel_sp_ki
             calm = abs(rate) < c.glide_rate_max and abs(last_cmd) < c.glide_cmd_max
-            if calm and abs(vel_err) > c.glide_vel_err:
+            if not pilot_moving and calm and abs(vel_err) > c.glide_vel_err:
                 ki *= c.glide_ki_boost
             self.vel_sp_integral += ki * vel_err * pos_gate * dt
             self.vel_sp_integral = clampf(self.vel_sp_integral,
@@ -811,6 +823,7 @@ class SimResult:
     drift: list = field(default_factory=list)
     sp_offset: list = field(default_factory=list)
     eq: list = field(default_factory=list)
+    target_vel: list = field(default_factory=list)
     fell: bool = False
     abort_reason: str | None = None
     ramp_complete_s: float | None = None
@@ -837,7 +850,7 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
              pushes: list[Push] | None = None,
              seed: int = 1,
              engage_trim: float = 0.0,
-             deadman_v1: bool = False) -> SimResult:
+             deadman_v1: bool = False, pilot_factory=None) -> SimResult:
     """Run one standup + balance episode.
 
     deadman_v1: replicate the run-13-era dead-man (wheel STOP at soft
@@ -864,6 +877,8 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
 
     outer = OuterController(cfg, engage_tilt=theta, engage_trim=engage_trim,
                             now_ms=0.0)
+    if pilot_factory is not None:
+        outer.pilot = pilot_factory()
 
     # Inner-loop filter state
     tilt_est = theta
@@ -933,6 +948,8 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
         else:
             angle_err = setpoint - tilt_est
             cmd = c.kp * angle_err - c.kd * gyro_filt
+            if outer.pilot is not None and outer.pilot.moving:
+                cmd += outer.pilot.velocity
             cmd = clampf(cmd, -cmd_max, cmd_max)
         last_cmd = cmd
 
@@ -990,6 +1007,7 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
             res.drift.append(wheel_pos)
             res.sp_offset.append(outer.sp_offset)
             res.eq.append(eq_now)
+            res.target_vel.append(outer.last_target_vel)
             in_standup = res.ramp_complete_s is None or t < res.ramp_complete_s + 2.0
             if in_standup:
                 if abs(wheel_pos) > abs(res.peak_drift_standup):

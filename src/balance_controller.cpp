@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 2;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 3;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -29,9 +29,9 @@ struct BalanceLogFileHeader {
     BalanceLogConfigSnapshot config;
 };
 
-static_assert(sizeof(BalanceSample) == 220,
+static_assert(sizeof(BalanceSample) == 236,
               "BalanceSample size changed; re-check LittleFS capacity");
-static_assert(sizeof(BalanceSample) * BALANCE_LOG_MAX_SAMPLES < 1350000,
+static_assert(sizeof(BalanceSample) * BALANCE_LOG_MAX_SAMPLES < 1450000,
               "Balance telemetry no longer fits safely in LittleFS");
 
 static uint16_t clampU16(uint32_t value) {
@@ -282,7 +282,9 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     }
 
     float angle_err = _effective_setpoint - _tilt_angle;
-    float motor_vel_raw = _kp * angle_err - _kd * _gyro_rate;
+    // Feed forward the bounded cruising speed so the equilibrium integral need
+    // not relearn a speed-dependent angle bias on every start and stop.
+    float motor_vel_raw = _pilot_velocity_ff + _kp * angle_err - _kd * _gyro_rate;
     float motor_vel = motor_vel_raw;
 
     if (motor_vel >  cmd_max) motor_vel =  cmd_max;
@@ -460,6 +462,9 @@ void BalanceController::enterBalancing(float current_roll) {
     _startup_detector.reset();
     _startup_recovery.reset();
     _recoil_unwind.reset();
+    _pilot.reset();
+    _pilot_input_valid = false;
+    _pilot_velocity_ff = 0;
     _hold_drift = 0.0f;
     _vel_sp_integral    = 0.0f;
     _sp_offset          = 0.0f;
@@ -635,7 +640,8 @@ void BalanceController::resetSafetyTimers() {
 // ---------------------------------------------------------------------------
 
 void BalanceController::update(float roll_deg, float roll_rate_dps,
-                                bool ch7_active, bool ch11_edge, float dt) {
+                                bool ch7_active, bool ch11_edge, float dt,
+                                float pilot_forward, float pilot_turn, bool pilot_valid) {
     if (!_motors || !_arms) return;
     {
         uint32_t now0 = millis();
@@ -1081,9 +1087,35 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (recovering) _last_outer_diag |= BAL_DIAG_START_RECOVERY;
         if (recovery_boost) _last_outer_diag |= BAL_DIAG_RECOVERY_BOOST;
 
+        const balance_math::PilotConfig pilot_config = {
+            BALANCE_PILOT_DEADBAND, BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
+            BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_TURN_ACCEL,
+            BALANCE_PILOT_READY_MS, BALANCE_PILOT_STOP_MS
+        };
+        _pilot_input_valid = pilot_valid;
+        const bool pilot_allowed = pilot_valid && _ramp_complete && !recovering
+            && recovery_feedback_fresh && _motors->isDriveArmed() && _motors->isArmArmed()
+            && eff_err < BALANCE_PILOT_PAUSE_ERR && fabsf(rate) < BALANCE_PILOT_PAUSE_RATE;
+        const float differential_velocity = (_motors->getMotor(MotorRole::BackLeft).velocity
+                                            - _motors->getMotor(MotorRole::BackRight).velocity) * .5f;
+        const bool pilot_calm = recovery_calm
+            && fabsf(_filtered_wheel_vel) < BALANCE_PILOT_STOP_SPEED
+            && fabsf(differential_velocity) < BALANCE_PILOT_STOP_TURN;
+        const bool pilot_was_ready = _pilot.ready();
+        const bool pilot_was_moving = _pilot.moving();
+        _pilot.update(pilot_allowed, pilot_calm, pilot_forward, pilot_turn, dt, pilot_config);
+        _pilot_velocity_ff = _pilot.moving() ? _pilot.velocity() : 0;
+        if (_pilot.ready() && !pilot_was_ready)
+            Serial.println("[Balance] Standing drive READY: CH1 steer, CH2 speed");
+        // Move the eventual hold point with the robot while driving/braking.
+        // Raw odometry still uses the original engagement position in the log.
+        if (_pilot.moving() || pilot_was_moving) _hold_drift = meas_drift;
+
         float target_vel = 0.0f;
         if (recovering) {
             // Arrest wheel motion before requesting position correction.
+        } else if (_pilot.moving()) {
+            target_vel = _pilot.velocity();
         } else if (_ramp_complete) {
             target_vel = clampf(-_drift_vel_kp * (meas_drift - _hold_drift),
                                 -BALANCE_DRIFT_MAX_VEL, BALANCE_DRIFT_MAX_VEL);
@@ -1126,7 +1158,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             float ki = _vel_sp_ki;
             bool calm = fabsf(rate) < BALANCE_GLIDE_RATE_MAX_DPS
                      && fabsf((float)_last_motor_vel) < BALANCE_GLIDE_CMD_MAX;
-            if (calm && fabsf(vel_err) > BALANCE_GLIDE_VEL_ERR) {
+            if (!_pilot.moving() && calm && fabsf(vel_err) > BALANCE_GLIDE_VEL_ERR) {
                 ki *= BALANCE_GLIDE_KI_BOOST;
                 _last_outer_diag |= BAL_DIAG_GLIDE_BOOST;
             }
@@ -1342,8 +1374,12 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // value. In Speed mode the two velocity loops are independent and
         // their tracking errors integrate into heading drift.
         // ---------------------------------------------------------------
+        if (_pilot.captureHeading()) _yaw_lock_diff = meas_bl - meas_br;
         float yaw_diff = (meas_bl - meas_br) - _yaw_lock_diff;
-        float yaw_corr_raw = BALANCE_YAW_SYNC_KP * yaw_diff * 0.5f;
+        // mix() subtracts yaw from left and adds it to right. Negate pilot
+        // steering so positive CH1 matches ground drive (left faster).
+        float yaw_corr_raw = _pilot.turning() ? -_pilot.turn()
+                            : BALANCE_YAW_SYNC_KP * yaw_diff * 0.5f;
         _yaw_corr = clampf(yaw_corr_raw,
                            -BALANCE_YAW_SYNC_MAX, BALANCE_YAW_SYNC_MAX);
         if ((float)_yaw_corr != yaw_corr_raw) {
@@ -1356,7 +1392,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         armAxisFractions(tip_frac, center_frac);
         _last_arm_tip_frac = tip_frac;
 
-        const bool trim_calm = _ramp_complete && _arm_stage == 0
+        if (_pilot.moving()) _qualified_trim_ms = 0;
+        const bool trim_calm = !_pilot.moving() && _ramp_complete && _arm_stage == 0
             && fabsf(meas_vel) < 0.8f * BALANCE_WHEEL_VELOCITY_SCALE && fabsf(rate) < 4.0f
             && fabsf((float)_last_angle_err) < 1.0f && abs_cmd < 2.0f
             && fabsf(_arm_assist_frac) < 0.05f && !_last_outer_diag && !_last_inner_diag;
@@ -1416,6 +1453,9 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 bool BalanceController::startLog() {
     if (_logging) return true;
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) return false;
+
+    _pilot.reset();
+    _pilot_input_valid = false;
 
     _inner_fault = 0;
     _log_count = 0;
@@ -1629,6 +1669,11 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.yaw_corr       = _yaw_corr;
     s.bus_voltage    = _motors->getBusVoltage();
     s.total_current  = _motors->getTotalCurrent();
+    s.pilot_forward = _pilot.forwardStick();
+    s.pilot_steering = _pilot.turnStick();
+    s.pilot_turn = _pilot.turn();
+    s.pilot_flags = (_pilot.ready() ? 1 : 0) | (_pilot.moving() ? 2 : 0)
+                  | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0);
     _log_count++;
     _last_log_sample_ms = now;
 
@@ -1654,7 +1699,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 63;  // prior extensions plus confirmed recoil release v1
+    header.reserved = 127;  // prior extensions plus standing drive v1
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1672,7 +1717,7 @@ void BalanceController::flushLogToFile() {
     uint32_t start = millis();
 
     // A legacy CSV can occupy ~350 KB; remove it before allocating the new
-    // 1.3 MB binary file or LittleFS may run out of space mid-write.
+    // 1.42 MB binary file or LittleFS may run out of space mid-write.
     LittleFS.remove(BALANCE_LEGACY_LOG_PATH);
     File f = LittleFS.open(BALANCE_LOG_PATH, "w");
     if (!f) {
@@ -1774,19 +1819,18 @@ void BalanceController::dumpLog() {
     BalanceLogFileHeader header = {};
     if (f.read(reinterpret_cast<uint8_t*>(&header), sizeof(header)) != sizeof(header)
         || header.magic != BALANCE_LOG_MAGIC
-        || header.schema_version != BALANCE_LOG_SCHEMA_VERSION
+        || !balance_log::supported(header.schema_version, header.sample_size)
         || header.header_size != sizeof(BalanceLogFileHeader)
-        || header.sample_size != sizeof(BalanceSample)
         || header.sample_count > BALANCE_LOG_MAX_SAMPLES) {
         out.println("[Balance] Telemetry file is invalid or uses an unsupported schema");
         f.close();
         return;
     }
 
-    size_t expected_size = sizeof(header) + header.sample_count * sizeof(BalanceSample);
+    size_t expected_size = sizeof(header) + header.sample_count * header.sample_size;
     uint32_t checksum = 2166136261u;
     uint8_t verify_buf[512];
-    size_t remaining = header.sample_count * sizeof(BalanceSample);
+    size_t remaining = header.sample_count * header.sample_size;
     while (remaining > 0) {
         size_t chunk = remaining > sizeof(verify_buf) ? sizeof(verify_buf) : remaining;
         int got = f.read(verify_buf, chunk);
@@ -1804,6 +1848,12 @@ void BalanceController::dumpLog() {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
+    if (header.reserved & 64) {
+        out.println("# standing_drive=ch1_ch2_velocity_feedforward_v1");
+        out.println("# standing_drive_limits=velocity_rad_s:1 turn_rad_s:0.5 accel:0.5 decel:0.75 turn_accel:0.75");
+        out.println("# standing_drive_gates=deadband:0.06 neutral_calm_ms:400 stop_calm_ms:400 rc_fresh_ms:100");
+        out.println("# standing_drive_flags=ready:1 moving_or_braking:2 turning:4 fresh_input:8");
+    }
     if (header.reserved & 32) {
         // Describe the stored algorithm version, not the downloader's settings.
         out.println("# startup_recoil=confirmed_unwind_v1");
@@ -1904,10 +1954,11 @@ void BalanceController::dumpLog() {
                    "bl_pos,br_pos,bl_vel,br_vel,bl_torque,br_torque,feedback_age_l_ms,feedback_age_r_ms,"
                    "arm_l,arm_r,arm_l_tgt,arm_r_tgt,arm_l_vel,arm_r_vel,arm_l_torque,arm_r_torque,"
                    "arm_tip_frac,arm_assist_frac,arm_assist_vel,arm_demand,arm_calm_ms,arm_stage,"
-                   "meas_drift,meas_vel,yaw_diff,yaw_corr,update_age_ms,bus_voltage,total_current,imu_age_ms");
+                   "meas_drift,meas_vel,yaw_diff,yaw_corr,update_age_ms,bus_voltage,total_current,imu_age_ms,"
+                   "pilot_forward,pilot_steering,pilot_turn,pilot_flags");
     for (uint32_t i = 0; i < header.sample_count && !out.failed(); i++) {
-        BalanceSample s;
-        if (f.read(reinterpret_cast<uint8_t*>(&s), sizeof(s)) != sizeof(s)) break;
+        BalanceSample s = {};
+        if (f.read(reinterpret_cast<uint8_t*>(&s), header.sample_size) != header.sample_size) break;
         out.printf("%lu,%u,%u,%u,%u,%u,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.4f,",
                       (unsigned long)s.t_ms, s.sample_dt_ms, s.inner_dt_max_us,
                       s.inner_ticks, s.inner_sat_ticks, s.state, s.flags,
@@ -1931,6 +1982,10 @@ void BalanceController::dumpLog() {
                       s.meas_drift, s.meas_vel, s.yaw_diff, s.yaw_corr,
                       s.update_age_ms, s.bus_voltage, s.total_current);
         if (header.reserved & 1) out.printf("%u", s.imu_age_ms);
+        if (header.schema_version >= 3 && (header.reserved & 64))
+            out.printf(",%.4f,%.4f,%.4f,%lu", s.pilot_forward, s.pilot_steering,
+                       s.pilot_turn, (unsigned long)s.pilot_flags);
+        else out.printf(",,,,"); // historical files have unknown pilot fields
         out.println();
     }
     f.close();
@@ -2009,6 +2064,9 @@ void BalanceController::printStatus() {
     Serial.printf("  Complementary filter: tilt=%.1f  gyro_rate=%.1f\n",
                   (float)_tilt_angle, (float)_gyro_rate);
     Serial.printf("  Max drive speed: %.1f rad/s\n", BALANCE_MAX_DRIVE_SPEED);
+    Serial.printf("  Standing drive: CH1 steer / CH2 speed, limit %.2f rad/s, turn %.2f rad/s, %s\n",
+                  BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
+                  _state == BalanceState::Balancing && _pilot.ready() ? "READY" : "waiting for centered calm balance");
 
     if (_state == BalanceState::Balancing) {
         Serial.printf("  Setpoint: %.2f  (base + offset=%+.2f)\n",

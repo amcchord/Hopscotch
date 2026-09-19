@@ -51,6 +51,10 @@ def validate(raw: bytes) -> tuple[bytes, int]:
         for key, value in zip(header, row):
             if key == 'imu_age_ms' and value == '' and not (int(config.get('telemetry_features', '0')) & 1):
                 continue  # pre-extension v2 file: unknown, not a fabricated zero
+            if (key in ('pilot_forward','pilot_steering','pilot_turn','pilot_flags') and value == ''
+                    and int(config.get('telemetry_schema','1')) < 3
+                    and not (int(config.get('telemetry_features','0')) & 64)):
+                continue  # schema-2 log exported by new firmware: pilot intent unknown
             if not math.isfinite(float(value)):
                 raise ValueError(f'Row {index} has nonfinite {key}')
         timestamp = int(row[0])

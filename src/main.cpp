@@ -1276,7 +1276,14 @@ static void controlTick() {
             balanceCtrl.markEvent();
         }
         uint32_t prof_bal = micros();
-        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt);
+        // Explicit CH1/CH2 standing-drive mapping; never accept serial simulation
+        // as pilot input. Link freshness is stricter than the global failsafe.
+        const bool pilotValid = !simEnabled && crsfRx.isLinkUp()
+            && crsfRx.timeSinceLastFrame() <= BALANCE_PILOT_RC_FRESH_MS
+            && isSwitchActive(drive_arm_sw) && isSwitchActive(arm_arm_sw);
+        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt,
+                           crsfRx.getChannelNormalized(DEFAULT_CH_THROTTLE),
+                           crsfRx.getChannelNormalized(DEFAULT_CH_STEERING), pilotValid);
         profRecord(PROF_BAL, prof_bal);
 
         bool balanceDriving = balanceCtrl.isControllingDrive();
@@ -1380,7 +1387,10 @@ static void controlTick() {
             // 6. Drive control
             uint32_t prof_adrv = micros();
             if (motorMgr.isDriveArmed()) {
-                driveCtrl.update(throttle, steering, dt);
+                // CH7 selects standing control: do not let a held stick drive
+                // on the floor before tip-up or while balance releases the arms.
+                driveCtrl.update(ch7Active ? 0.0f : throttle,
+                                 ch7Active ? 0.0f : steering, dt);
             }
 
             // 7. Arm control (always called -- calibration works even when disarmed,
