@@ -11,6 +11,7 @@
 #include "robstride.h"
 #include "motor_manager.h"
 #include "crsf.h"
+#include "radio_status.h"
 #include "drive_controller.h"
 #include "arm_controller.h"
 #include "balance_controller.h"
@@ -1112,6 +1113,71 @@ void setup() {
 // (CAN access stays single-threaded), IMU, CRSF RX/TX, CAN scan/feedback,
 // arming, balance state machine, drive and arm control.
 // ---------------------------------------------------------------------------
+// Read-only radio snapshot: all motor/state-machine reads stay on their owner
+// task. Fast-loop scalar reads are diagnostic, not a coherent control sample.
+static radio_status::Snapshot radioSnapshot(uint32_t now, uint16_t sequence) {
+    using namespace radio_status;
+    Snapshot s;
+    s.sequence = sequence;
+    const bool drive = motorMgr.isDriveArmed(), arms = motorMgr.isArmArmed();
+    if (drive) s.flags |= DriveArmed;
+    if (arms) s.flags |= ArmsArmed;
+    if (motorMgr.isArmingDrive()) s.flags |= DriveArming;
+    if (motorMgr.isArmingArms()) s.flags |= ArmsArming;
+    if (crsfRx.isLinkUp()) s.flags |= RcLinked;
+    if (armCtrl.isMoving()) s.flags |= ArmsMoving;
+    if (rcRearmRequired) s.flags |= RearmRequired;
+    if (balanceCtrl.isLogPendingFlush()) s.flags |= SavingLog;
+    if (simEnabled || testModeActive) s.flags |= Simulation;
+    const uint32_t sample = balanceCtrl.getImuSampleUs();
+    if (sample && uint32_t(micros() - sample) <= BALANCE_IMU_STALE_US) {
+        s.flags |= ImuFresh;
+        s.tilt = angle(balanceCtrl.getTiltAngle());
+        if (balanceCtrl.isActive())
+            s.error = angle(balanceCtrl.getTiltAngle() - balanceCtrl.getEffectiveSetpoint());
+    }
+    if (motorMgr.busVoltageFresh(now)) s.flags |= VoltageFresh;
+    if (motorMgr.motorCurrentFresh(now)) s.flags |= CurrentFresh;
+    s.voltage = unsignedScaled(motorMgr.getBusVoltage(), 10);
+    s.motor_current = unsignedScaled(motorMgr.getTotalCurrent(), 10);
+    s.inner_fault = balanceCtrl.getInnerFault();
+    for (int i = 0; i < NUM_MOTORS; ++i) {
+        const auto& m = motorMgr.getMotor(i);
+        if (m.has_fault) s.faults |= 1u << i;
+        if (!m.online || !m.has_first_feedback || uint32_t(now - m.last_feedback_ms) > 500) continue;
+        s.online |= 1u << i;
+        if (m.enabled) s.enabled |= 1u << i;
+        if (std::isfinite(m.temperature) && m.temperature >= 0) {
+            const auto t = static_cast<uint8_t>(fminf(m.temperature, 254));
+            if (s.max_temp == 255 || t > s.max_temp) s.max_temp = t;
+        }
+    }
+    s.mode = (drive || arms) ? 1 : 0;
+    s.label = drive ? "WHEELS READY" : (arms ? "ARMS READY" : "DISARMED");
+    if (drive) {
+        for (int i = 0; i < NUM_DRIVE_MOTORS; ++i) {
+            const auto state = driveCtrl.getMotorState(static_cast<MotorRole>(i));
+            if (state == DriveMotorState::Braking) s.label = "BRAKING";
+            if (state == DriveMotorState::Driving) { s.label = "DRIVING"; break; }
+        }
+    }
+    if (arms) {
+        s.motion = 1 + static_cast<uint8_t>(armCtrl.getCurrentPosition());
+        if (armCtrl.isMoving()) { s.label = armCtrl.getStateString(); s.phase = 1; }
+    }
+    if (balanceCtrl.isActive()) {
+        s.mode = 2; s.motion = 0x0100;
+        s.phase = 2 + static_cast<uint8_t>(balanceCtrl.getState());
+        s.label = balanceCtrl.getStateString();
+    } else if (armCtrl.isInCalMode()) {
+        s.mode = 3; s.phase = 6;
+        s.calibration = static_cast<uint8_t>(armCtrl.getCalStep());
+        s.label = armCtrl.getStateString();
+    }
+    if (motorMgr.isArming()) { s.label = "ARMING"; s.phase = 2; }
+    return s;
+}
+
 static void controlTick() {
     uint32_t now = millis();
     uint32_t nowUs = micros();
@@ -1434,15 +1500,23 @@ static void controlTick() {
         lastTelTick = now;
         uint32_t prof_start = micros();
 
-        const char* state;
-        if (motorMgr.isArming()) {
-            state = "ARMING";
-        } else if (balanceCtrl.isActive()) {
-            state = balanceCtrl.getStateString();
+        static uint16_t radioSequence = 0;
+        static uint8_t radioDetailTick = 0;
+        const auto status = radioSnapshot(now, radioSequence++);
+        // One custom frame per tick: four status snapshots then one run-detail
+        // frame. Fixed stack buffers, no heap, no delays, no retries on full TX.
+        if (++radioDetailTick == 5) {
+            radioDetailTick = 0;
+            uint8_t payload[radio_status::DETAIL_SIZE];
+            radio_status::encodeDetail(status.sequence, balanceCtrl.getLogEndMs(),
+                                      balanceCtrl.getLogEndReason(), payload);
+            crsfRx.sendRobotTelemetry(payload, sizeof(payload));
         } else {
-            state = armCtrl.getStateString();
+            uint8_t payload[radio_status::STATUS_SIZE];
+            radio_status::encode(status, payload);
+            crsfRx.sendRobotTelemetry(payload, sizeof(payload));
         }
-        crsfRx.sendFlightMode(state);
+        crsfRx.sendFlightMode(status.label);
         crsfRx.sendBatteryTelemetry(motorMgr.getBusVoltage(),
                                     motorMgr.getTotalCurrent());
         crsfRx.sendAttitudeTelemetry(ahrsFilter.getPitch(),

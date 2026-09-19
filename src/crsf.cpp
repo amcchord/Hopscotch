@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <cstring>
 #include "config.h"
+#include "radio_status.h"
 
 // CRC8 with poly 0xD5 (CRSF/DVB-S2 standard)
 static const uint8_t crc8_lut[256] = {
@@ -47,6 +48,7 @@ void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_
     _max_update_us = 0;
     _budget_yields = 0;
     _received_bytes = 0;
+    _telemetry_drops = 0;
     Serial.printf("[CRSF] Initialized on RX=%d TX=%d @ %lu baud\n", rx_pin, tx_pin, baudrate);
 }
 
@@ -177,7 +179,7 @@ void CrsfReceiver::sendFlightMode(const char* mode) {
     uint8_t crc = crc8(&frame[2], slen + 2);
     frame[3 + slen + 1] = crc;
 
-    _serial->write(frame, 3 + slen + 2);
+    writeTelemetry(frame, 3 + slen + 2);
 }
 
 void CrsfReceiver::sendBatteryTelemetry(float voltage_v, float current_a) {
@@ -213,7 +215,7 @@ void CrsfReceiver::sendBatteryTelemetry(float voltage_v, float current_a) {
     frame[10] = 0;
 
     frame[11] = crc8(&frame[2], PAYLOAD_LEN + 1);
-    _serial->write(frame, sizeof(frame));
+    writeTelemetry(frame, sizeof(frame));
 }
 
 void CrsfReceiver::sendAttitudeTelemetry(float pitch_deg, float roll_deg, float yaw_deg) {
@@ -242,7 +244,27 @@ void CrsfReceiver::sendAttitudeTelemetry(float pitch_deg, float roll_deg, float 
     frame[8] = yaw_raw & 0xFF;
 
     frame[9] = crc8(&frame[2], PAYLOAD_LEN + 1);
-    _serial->write(frame, sizeof(frame));
+    writeTelemetry(frame, sizeof(frame));
+}
+
+bool CrsfReceiver::writeTelemetry(const uint8_t* frame, size_t length) {
+    if (!_serial) return false;
+    if (_serial->availableForWrite() < static_cast<int>(length)) {
+        ++_telemetry_drops;
+        return false;
+    }
+    return _serial->write(frame, length) == length;
+}
+
+bool CrsfReceiver::sendRobotTelemetry(const uint8_t* payload, size_t length) {
+    if (!payload || length < 6 || length > CRSF_MAX_PACKET_SIZE - 4) return false;
+    uint8_t frame[CRSF_MAX_PACKET_SIZE];
+    frame[0] = CRSF_SYNC_BYTE;
+    frame[1] = static_cast<uint8_t>(length + 2);
+    frame[2] = radio_status::FRAME_TYPE;
+    memcpy(frame + 3, payload, length);
+    frame[3 + length] = crc8(frame + 2, length + 1);
+    return writeTelemetry(frame, length + 4);
 }
 
 uint16_t CrsfReceiver::getChannel(int ch) const {

@@ -39,6 +39,11 @@ public:
     // Send attitude telemetry (pitch, roll, yaw in degrees)
     void sendAttitudeTelemetry(float pitch_deg, float roll_deg, float yaw_deg);
 
+    // Drop whole telemetry frames when UART space is unavailable; never wait
+    // for transmission from the control task. No command receive path added.
+    bool sendRobotTelemetry(const uint8_t* payload, size_t length);
+    uint32_t telemetryDrops() const { return _telemetry_drops; }
+
     // Is the receiver link active?
     bool isLinkUp() const;
 
@@ -65,6 +70,8 @@ private:
     uint32_t _max_update_us = 0;
     uint32_t _budget_yields = 0;
     uint32_t _received_bytes = 0;
+    uint32_t _telemetry_drops = 0;
+    bool writeTelemetry(const uint8_t* frame, size_t length);
 
     void parseByte(uint8_t byte);
     void parseFrame(const uint8_t* frame, int len);

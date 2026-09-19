@@ -2,12 +2,18 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <cstring>
+#include <limits>
 
 static twai_message_t packet(uint8_t id, uint8_t type=2, uint8_t length=8) {
     twai_message_t m{};m.extd=true;m.identifier=(uint32_t(type)<<24)|(uint32_t(id)<<8)|0xFD;
     m.data_length_code=length;return m;
 }
 static void field(twai_message_t& m, int i, uint16_t value) {m.data[i]=value>>8;m.data[i+1]=value;}
+static twai_message_t parameter(uint8_t id, uint16_t address, float value) {
+    auto m=packet(id,17);m.data[0]=address;m.data[1]=address>>8;
+    std::memcpy(m.data+4,&value,sizeof(value));return m;
+}
 int main() {
     Robstride can;MotorManager motors;
     assert(can.begin(5,6));motors.begin(&can);
@@ -46,5 +52,24 @@ int main() {
     const auto sent=fake_can_tx.back();assert(sent.data[2]==255 && sent.data[3]==255);
     assert(((sent.identifier>>8)&65535)==65535);
     fake_can_tx_fail=true;assert(!can.sendPositionCommand(77,0xFD,0,1));
+    // Radio power freshness is based on actual parameter replies, not polling.
+    assert(!motors.busVoltageFresh(fake_ms) && !motors.motorCurrentFresh(fake_ms));
+    fake_ms=UINT32_MAX-100;
+    fake_can_rx.push_back(parameter(20,RobstrideParam::VBUS,25.2f));motors.processFeedback();
+    assert(motors.busVoltageFresh(fake_ms) && motors.busVoltageFresh(100));
+    assert(!motors.busVoltageFresh(2000));
+    const float voltage=motors.getBusVoltage();
+    fake_can_rx.push_back(parameter(99,RobstrideParam::VBUS,35));
+    fake_can_rx.push_back(parameter(20,RobstrideParam::VBUS,std::numeric_limits<float>::quiet_NaN()));
+    fake_ms=2000;motors.processFeedback();
+    assert(motors.getBusVoltage()==voltage && !motors.busVoltageFresh(fake_ms));
+    for (int i=0;i<NUM_MOTORS;++i) {
+        const auto id=motors.getMotor(i).can_id;
+        fake_can_rx.push_back(packet(id));
+        fake_can_rx.push_back(parameter(id,RobstrideParam::IQ_FILT,1.5f));
+    }
+    motors.processFeedback();
+    assert(motors.motorCurrentFresh(2000) && !motors.motorCurrentFresh(4001));
+    assert(std::fabs(motors.getTotalCurrent()-9)<.001);
     std::cout<<"Motor feedback tests passed: RS05/RS00, remapping, malformed/ack/fault freshness, receive budgets\n";
 }

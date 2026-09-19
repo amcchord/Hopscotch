@@ -164,6 +164,15 @@ public:
 
     // Sum of absolute motor currents (amps) from IQ_FILT param reads
     float getTotalCurrent() const;
+    bool busVoltageFresh(uint32_t now) const {
+        return _voltage_received && uint32_t(now - _voltage_ms) <= 2000;
+    }
+    bool motorCurrentFresh(uint32_t now) const {
+        for (int i = 0; i < NUM_MOTORS; ++i)
+            if (!_motors[i].online || !(_current_received & (1u << i)) ||
+                uint32_t(now - _current_ms[i]) > 2000) return false;
+        return true;
+    }
 
     Robstride* getCanBus() { return _can; }
 
@@ -185,6 +194,9 @@ private:
 
     float _bus_voltage = 0.0f;
     float _motor_current[NUM_MOTORS] = {};
+    uint32_t _voltage_ms = 0, _current_ms[NUM_MOTORS] = {};
+    bool _voltage_received = false;
+    uint8_t _current_received = 0;
     int   _iq_scan_index = 0;
     uint32_t _last_enforce_stop_ms = 0;
 };

@@ -12,6 +12,8 @@ struct HardwareSerial {
     uint32_t read_cost_us = 40;
     bool storm = false;
     bool begun = false;
+    int tx_space = 128;
+    int availableForWrite() { return tx_space; }
     size_t setRxBufferSize(size_t n) { buffer_size = begun ? 0 : n; return buffer_size; }
     void begin(uint32_t, int, int, int) { begun = true; }
     int available() { ++available_calls; return storm ? 2048 : rx.size(); }

@@ -1,5 +1,6 @@
 #include "motor_manager.h"
 #include <Arduino.h>
+#include <cmath>
 
 static MotorState makeMotor(uint8_t can_id, MotorRole role, bool reversed) {
     MotorState m = {};
@@ -481,15 +482,21 @@ void MotorManager::processFeedback() {
                 findMotorByCanId(fb.motor_id) == _arming.current_idx) {
                 _arming.read_pos = fb.param_value;
                 _arming.pos_received = true;
-            } else if (fb.param_addr == RobstrideParam::VBUS) {
+            } else if (fb.param_addr == RobstrideParam::VBUS &&
+                       findMotorByCanId(fb.motor_id) >= 0 &&
+                       std::isfinite(fb.param_value) && fb.param_value > 0.0f) {
                 if (_bus_voltage == 0.0f && fb.param_value > 0.0f) {
                     Serial.printf("[Motors] First VBUS reading: %.1fV\n", fb.param_value);
                 }
                 _bus_voltage = fb.param_value;
+                _voltage_ms = millis();
+                _voltage_received = true;
             } else if (fb.param_addr == RobstrideParam::IQ_FILT) {
                 int idx = findMotorByCanId(fb.motor_id);
-                if (idx >= 0) {
+                if (idx >= 0 && std::isfinite(fb.param_value)) {
                     _motor_current[idx] = fb.param_value;
+                    _current_ms[idx] = millis();
+                    _current_received |= 1u << idx;
                 }
             }
             continue;

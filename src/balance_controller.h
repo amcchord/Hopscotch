@@ -71,6 +71,9 @@ public:
 
     float getTiltAngle() const { return _tilt_angle; }
     float getGyroRate() const { return _gyro_rate; }
+    uint32_t getImuSampleUs() const { return _last_imu_sample_us; }
+    uint16_t getInnerFault() const { return _inner_fault; }
+    const char* getLogEndReason() const { return _log_end_reason; }
 
     // Gain setters for serial tuning
     void setKp(float v) { _kp = v; }
