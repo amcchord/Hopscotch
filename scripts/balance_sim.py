@@ -703,6 +703,10 @@ class OuterController:
             p_term = sign * (c.vel_sp_kp_low * c.vel_sp_knee
                              + high_kp * (abs_err - c.vel_sp_knee))
 
+        if pilot_moving and hasattr(self.pilot, 'velocity_correction'):
+            p_term = self.pilot.velocity_correction(
+                vel_err, c.vel_sp_kp_low, high_kp, c.vel_sp_knee, self.ramp_complete)
+
         arm_dev = abs(self.arm_assist_frac - c.arm_assist_bias)
         arm_share = clampf(arm_dev / c.arm_assist_range_pos, 0.0, 1.0)
         p_term *= (1.0 - 0.6 * arm_share)

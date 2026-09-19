@@ -1,0 +1,47 @@
+{
+  "file": "telemetry_logs/bal_20260919_155240_standing-drive-first-test.csv",
+  "samples": 2881,
+  "balance_seconds": 48.78,
+  "first_ready_s": 4.88,
+  "ready_dropouts_before_disarm": 0,
+  "recovery_start_s": 0.821,
+  "recovery_settled_s": 2.681,
+  "moving_start_s": 6.3,
+  "pilot_max_velocity": 1.0,
+  "pilot_max_turn": 0.4994,
+  "min_bus_voltage": 24.18,
+  "max_tracking_error_deg": 1.511,
+  "saturation_rows": 0,
+  "imu_fault_rows": 0,
+  "can_tx_fault_rows": 0,
+  "inner_max_us": 5032,
+  "balance_sample_max_ms": 21,
+  "imu_age_max_ms": 20,
+  "rear_feedback_max_after_first_50ms": 2,
+  "max_arm_assist_fraction": 0.0049,
+  "episodes": [
+    {
+      "name": "forward",
+      "input_start_s": 20.8,
+      "input_end_s": 31.5,
+      "target_point9_delay_s": 1.7799999999999976,
+      "measured_point25_delay_s": 6.419999999999998,
+      "peak_velocity_rad_s": 3.1694,
+      "integral_start_deg": 1.8159,
+      "integral_end_deg": 1.2243
+    },
+    {
+      "name": "reverse",
+      "input_start_s": 32.92,
+      "input_end_s": 45.58,
+      "target_point9_delay_s": 1.7999999999999972,
+      "measured_point25_delay_s": 6.839999999999996,
+      "peak_velocity_rad_s": 3.0973,
+      "integral_start_deg": 1.0815,
+      "integral_end_deg": 1.9687
+    }
+  ],
+  "turn_same_sign_fraction": 1.0,
+  "turn_differential_error_rms": 0.08973451195216987,
+  "last_2s_velocity_rms": 0.03564590883013829
+}

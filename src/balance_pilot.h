@@ -64,6 +64,12 @@ public:
     float turn() const { return _turn; }
     float forwardStick() const { return _forward_stick; }
     float turnStick() const { return _turn_stick; }
+    float velocityCorrection(float error, float hold_low, float high, float knee,
+                             float drive_low, bool ramp_complete) const {
+        const float low = _moving && ramp_complete ? drive_low : hold_low;
+        if (std::fabs(error) <= knee || !ramp_complete) return low * error;
+        return std::copysign(low * knee + high * (std::fabs(error)-knee), error);
+    }
 private:
     static float approach(float value, float target, float rate, float dt) {
         return value + clamp(target-value, -rate*dt, rate*dt);

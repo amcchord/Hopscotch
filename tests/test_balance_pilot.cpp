@@ -30,12 +30,24 @@ int main() {
     assert(!p.ready());
     unlock(p);
     assert(p.forwardStick()==0 && p.turnStick()==0);
+    auto correction = [&](float error, bool ramp=true) {
+        return p.velocityCorrection(error, BALANCE_VEL_SP_KP_LOW,
+            BALANCE_VEL_SP_KP, BALANCE_VEL_SP_KNEE, BALANCE_PILOT_VEL_KP_LOW, ramp);
+    };
+    assert(std::fabs(correction(.5f)-.5f*BALANCE_VEL_SP_KP_LOW)<.00001f);
     p.update(true,true,.05f,-.05f,.02f,config);
     assert(!p.moving()); // center jitter stays inside deadband
     for(int sign : {-1,1}) {
         p.reset();unlock(p);
         p.update(true,false,sign,sign,.02f,config);
         assert(p.moving() && p.turning());
+        assert(std::fabs(correction(sign*.5f)-sign*.5f*BALANCE_PILOT_VEL_KP_LOW)<.00001f);
+        assert(std::fabs(correction(sign*.5f,false)-sign*.5f*BALANCE_VEL_SP_KP_LOW)<.00001f);
+        const float knee=BALANCE_VEL_SP_KNEE;
+        assert(std::fabs(correction(knee+.0001f)-correction(knee-.0001f))<.001f);
+        // Starting at equilibrium: the P response must overcome cruising FF,
+        // briefly moving wheels opposite the request to initiate the lean.
+        assert(sign*(sign*.5f + 2.f*correction(-sign*.5f)) < 0);
         assert(std::fabs(p.velocity()-sign*config.acceleration*.02f)<.00001f);
         for(int i=0;i<150;++i) p.update(true,false,sign,sign,.02f,config);
         assert(p.velocity()==sign*config.max_velocity && p.turn()==sign*config.max_turn);
@@ -57,6 +69,7 @@ int main() {
         assert(p.moving()); // do not capture hold while still physically rolling
         for(int i=0;i<20;++i) p.update(true,true,0,0,.02f,config);
         assert(p.ready() && !p.moving());
+        assert(std::fabs(correction(.5f)-.5f*BALANCE_VEL_SP_KP_LOW)<.00001f);
     }
     p.reset();unlock(p);
     p.update(true,true,0,1,.02f,config);

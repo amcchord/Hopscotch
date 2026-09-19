@@ -1,0 +1,10 @@
+installed forward_stop_reverse fails 10 commanded 36 new_vs_v1 0
+installed input_loss fails 10 commanded 31 new_vs_v1 0
+gain0.7_speed3 forward_stop_reverse fails 9 commanded 36 new_vs_v1 0
+gain0.7_speed3 input_loss fails 11 commanded 31 new_vs_v1 2
+gain1.0_speed3 forward_stop_reverse fails 9 commanded 36 new_vs_v1 0
+gain1.0_speed3 input_loss fails 12 commanded 31 new_vs_v1 2
+gain1.25_speed3 forward_stop_reverse fails 9 commanded 36 new_vs_v1 0
+gain1.25_speed3 input_loss fails 10 commanded 31 new_vs_v1 1
+gain1_speed2 forward_stop_reverse fails 9 commanded 36 new_vs_v1 0
+gain1_speed2 input_loss fails 9 commanded 31 new_vs_v1 0

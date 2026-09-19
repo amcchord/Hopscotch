@@ -1174,16 +1174,12 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // During the standup ramp only the low slope applies -- forward
         // glide is REQUIRED to stand up, and the tap-recovery slope whipped
         // the setpoint 1.5 deg past equilibrium (+13 rad tow, run 232626).
-        float abs_err = fabsf(vel_err);
-        float p_term;
-        if (abs_err <= BALANCE_VEL_SP_KNEE || !_ramp_complete) {
-            p_term = BALANCE_VEL_SP_KP_LOW * vel_err;
-        } else {
-            float sign = 1.0f;
-            if (vel_err < 0.0f) sign = -1.0f;
-            p_term = sign * (BALANCE_VEL_SP_KP_LOW * BALANCE_VEL_SP_KNEE
-                             + _vel_sp_kp * (abs_err - BALANCE_VEL_SP_KNEE));
-        }
+        // The pilot uses a firmer low-error response while moving/braking.
+        // Otherwise cruising feedforward almost cancels the gentle stationary
+        // P term, leaving the integral to initiate motion several seconds later.
+        float p_term = _pilot.velocityCorrection(
+            vel_err, BALANCE_VEL_SP_KP_LOW, _vel_sp_kp, BALANCE_VEL_SP_KNEE,
+            BALANCE_PILOT_VEL_KP_LOW, _ramp_complete);
 
         // Actuator coordination: a deployed arm is already shifting the
         // equilibrium (its center-term lowers/raises the scheduled sp).
@@ -1699,7 +1695,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 127;  // prior extensions plus standing drive v1
+    header.reserved = 255;  // prior extensions plus standing drive response v2
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1849,8 +1845,15 @@ void BalanceController::dumpLog() {
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 64) {
-        out.println("# standing_drive=ch1_ch2_velocity_feedforward_v1");
-        out.println("# standing_drive_limits=velocity_rad_s:1 turn_rad_s:0.5 accel:0.5 decel:0.75 turn_accel:0.75");
+        // Decode the stored version; exporting an older log must retain its limits.
+        if (header.reserved & 128) {
+            out.println("# standing_drive=ch1_ch2_velocity_response_v2");
+            out.println("# standing_drive_limits=velocity_rad_s:2 turn_rad_s:1.5 accel:1.5 decel:2 turn_accel:3");
+            out.println("# standing_drive_velocity_kp_low=1.0");
+        } else {
+            out.println("# standing_drive=ch1_ch2_velocity_feedforward_v1");
+            out.println("# standing_drive_limits=velocity_rad_s:1 turn_rad_s:0.5 accel:0.5 decel:0.75 turn_accel:0.75");
+        }
         out.println("# standing_drive_gates=deadband:0.06 neutral_calm_ms:400 stop_calm_ms:400 rc_fresh_ms:100");
         out.println("# standing_drive_flags=ready:1 moving_or_braking:2 turning:4 fresh_input:8");
     }

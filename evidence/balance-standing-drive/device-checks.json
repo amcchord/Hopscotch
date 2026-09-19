@@ -1,0 +1,31 @@
+{
+  "source_commit": "90f07e83e3472cebbc5ca2646e585bfbce20f2d7",
+  "application_sha256": "83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d",
+  "application_bytes": 1141584,
+  "application_only": true,
+  "application_offset": "0x10000",
+  "flash_verified": true,
+  "preflight_disarmed": true,
+  "postflash_disarmed": false,
+  "postflash_note": "Operator had armed CH9/CH10 by postflash read; read-only helper correctly rejected armed state. New firmware was IDLE with six online/error-free motors, healthy IMU and retained calibration. No tool arming.",
+  "posttrial_disarmed": true,
+  "posttrial_saved_samples": 2881,
+  "posttrial_stored_trim_deg": 3.89,
+  "posttrial_imu_age_us": 2229,
+  "posttrial_imu_fault": "0x0000",
+  "can_tx_failed": 0,
+  "can_rx_missed": 0,
+  "center_deltas": [
+    1.768,
+    -1.767
+  ],
+  "back_deltas": [
+    3.661,
+    -3.67
+  ],
+  "old_schema2_physical_download": "Not performed before new run; previous schema2 run was already archived. Native/host compatibility checks passed.",
+  "operator_report": "Everything worked; turning slow and responsive; forward/back worked very slowly only after a long delay. Requested faster and more responsive.",
+  "trial": "telemetry_logs/bal_20260919_155240_standing-drive-first-test.csv",
+  "binary_checksum": "0x90FA4B79",
+  "transport_checksum": "0xED14696F"
+}

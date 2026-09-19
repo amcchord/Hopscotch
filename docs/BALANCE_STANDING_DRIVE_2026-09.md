@@ -50,7 +50,7 @@ Movement screens have 54 parameter cases per profile. At the selected gentle lim
 
 Rejected, never-flashed screens are retained under `evidence/balance-standing-drive/`: at a 2 rad/s limit, no feedforward introduced 10 new forward/reverse failures; adding feedforward reduced that to 3; enabling the 4× glide boost during movement increased it to 16. The final lower 1 rad/s speed / 0.5 rad/s² acceleration and feedforward policy introduced none in the screened cases. Input-loss comparisons likewise improved from 5/0/10 new failures in those variants to zero. These are approximate-model findings, not physical reliability rates.
 
-Application file: **1,141,584 bytes**, SHA-256 `83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d`. Build flash usage 1,141,221 bytes, static RAM 50,800 bytes. Source/package/actual upload checks are recorded in `evidence/balance-standing-drive/` and `artifacts/balance-standing-drive/`. Physical standing-drive validation remains pending.
+Application file: **1,141,584 bytes**, SHA-256 `83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d`. Build flash usage 1,141,221 bytes, static RAM 50,800 bytes. Source/package/actual upload checks are recorded in `evidence/balance-standing-drive/` and `artifacts/balance-standing-drive/`. The first physical drive test completed; results and response follow-up are below.
 
 ## Release and restoration
 
@@ -63,3 +63,19 @@ Restore the immediately preceding successful recoil-release image, after confirm
 ```
 
 Do not add `--rollback`: that flag refers to a much older rebuilt original baseline. Download any new schema-3 log before restoring older firmware, which cannot decode the new sample layout. The original full-device backup and earlier packages remain available locally.
+
+## First physical test and response follow-up
+
+Source `90f07e83e3472cebbc5ca2646e585bfbce20f2d7` / app `83d50ac277799094e58395cab3a9296e66c27718226da847a0442eea5a4c7c7d` was flashed and verified at 0x10000 after a fresh disarmed preflight. By the postflash status check Austin had armed both groups; the disarm-only helper correctly rejected that state, while raw output confirmed IDLE, six healthy motors, preserved calibration/3.57° trim, and healthy IMU/CAN. No tool arming or motion commands occurred. The prior v2 log was already archived; a physical v2 compatibility download did not occur before the new run replaced it.
+
+Austin reported that all directions worked, turning was slow/responsive, and forward/back was very slow with a long delay. Retrieved all **2,881 samples / 57.601 seconds**, including 48.780 seconds BALANCE, in `bal_20260919_155240_standing-drive-first-test.csv`. Schema 3/features 127, binary checksum `0x90FA4B79`, USB `0xED14696F`; end arms disarmed. Posttrial both groups disarmed, pending save clear, six motors healthy, calibration retained, trim learner 3.89°.
+
+Driving unlocked at 4.880 seconds after engagement and did not drop out during the driving portion. Full forward input took **6.420 seconds** to exceed +0.25 rad/s; reverse took **6.840 seconds** to exceed −0.25 rad/s, despite target reaching 90% in about 1.8 seconds. Filtered speed then overshot to +3.169/−3.097 rad/s against a ±1 target. Short initial throttle inputs produced almost no travel. Turn differential followed the requested sign for every sample with >0.2 rad/s turn command; RMS differential error 0.090 rad/s. Final two-second average-speed RMS was 0.036 rad/s.
+
+This is a controller response problem: near rest, the old low-error P term is −0.462° per +1 rad/s request. With inner Kp=2, its −0.924 rad/s contribution nearly cancels +1 rad/s cruising feedforward. The slow integral must change before substantial lean/motion develops. This arithmetic explains the cancellation, while the delayed surge is measured evidence; neither guarantees a proposed replacement's physical response.
+
+No saturation, IMU fault or CAN TX-failure rows. Maximum tracking error 1.511°, BALANCE inner interval 5.032 ms, sample interval 21 ms, rear feedback age <=2 ms after the first 50 ms. Logged IMU maximum 20 ms remained below the fault threshold. Minimum bus 24.18 V; arm-assist maximum fraction 0.0049. Existing zero-stall profile retained. Raw observer includes stop retries after operator disarm; contact/handling timing was not marked. Intentional travel is not classified as runaway.
+
+![First drive telemetry](../evidence/balance-standing-drive/first-drive-trial.png)
+
+Reproducible metrics/figure: `evidence/balance-standing-drive/analyze_trial.py`. Austin authorized a faster response follow-up; see [response v2](BALANCE_DRIVE_RESPONSE_2026-09.md). The exact first-drive package remains available as `artifacts/balance-standing-drive/` for restoration.
