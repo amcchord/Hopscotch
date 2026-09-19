@@ -5,7 +5,7 @@ namespace balance_math {
 struct PilotConfig {
     float deadband, max_velocity, max_turn, acceleration, deceleration, turn_acceleration;
     float ready_ms, stop_ms;
-    float arm_gain, arm_limit, arm_tau;
+    float velocity_lead, accel_tau, accel_lean, lean_limit;
 };
 
 // CH2 commands average wheel velocity through the balance cascade. CH1 commands
@@ -21,9 +21,10 @@ public:
              : std::copysign((std::fabs(value)-deadband)/(1-deadband), value);
     }
     void update(bool allowed, bool calm, float throttle, float steering, float dt,
-                const PilotConfig& c) {
+                const PilotConfig& c, float measured_velocity = NAN) {
         const bool timing_ok = std::isfinite(dt) && dt > 0 && dt <= .1f;
         allowed = allowed && timing_ok && std::isfinite(throttle) && std::isfinite(steering);
+        allowed = allowed && (c.velocity_lead <= 0 || std::isfinite(measured_velocity));
         _forward_stick = stick(throttle, c.deadband);
         _turn_stick = stick(steering, c.deadband);
         const bool neutral = _forward_stick == 0 && _turn_stick == 0;
@@ -34,7 +35,7 @@ public:
             _neutral_ms = neutral && calm ? _neutral_ms + dt * 1000 : 0;
             _ready = _neutral_ms + .001f >= c.ready_ms;
         }
-        const float requested_velocity = _ready ? _forward_stick * c.max_velocity : 0;
+        float requested_velocity = _ready ? _forward_stick * c.max_velocity : 0;
         const float requested_turn = _ready ? _turn_stick * c.max_turn : 0;
         if (requested_velocity != 0 || requested_turn != 0) _moving = true;
         // A late tick cannot create a large command jump. Input loss requests
@@ -42,12 +43,24 @@ public:
         const float step_dt = timing_ok ? dt : .02f;
         const bool braking = _velocity * requested_velocity < 0
                           || std::fabs(requested_velocity) < std::fabs(_velocity);
+        _lead_limited = false;
+        if (_moving && c.velocity_lead > 0 && std::isfinite(measured_velocity)) {
+            // Govern acceleration AND braking. Dropping cruising feedforward
+            // far below measured speed before the body leans back can tip it.
+            // A centered/lost RC signal still targets zero; its trajectory stays
+            // near the wheels until braking brings them down to zero.
+            const float bounded = clamp(requested_velocity,
+                measured_velocity-c.velocity_lead, measured_velocity+c.velocity_lead);
+            _lead_limited = bounded != requested_velocity;
+            requested_velocity = bounded;
+        }
         const float previous_velocity = _velocity;
         _velocity = approach(_velocity, requested_velocity,
                              braking ? c.deceleration : c.acceleration, step_dt);
-        const float arm_target = clamp(-c.arm_gain*(_velocity-previous_velocity)/step_dt,
-                                       -c.arm_limit,c.arm_limit);
-        _arm += step_dt/(c.arm_tau+step_dt)*(arm_target-_arm);
+        const float acceleration = (_velocity-previous_velocity)/step_dt;
+        const float alpha = c.accel_tau > 0 ? step_dt/(c.accel_tau+step_dt) : 1;
+        _acceleration += alpha * (acceleration-_acceleration);
+        _lean_ff = clamp(-c.accel_lean*_acceleration, -c.lean_limit, c.lean_limit);
         _turn = approach(_turn, requested_turn, c.turn_acceleration, step_dt);
         const bool was_turning = _turning;
         _turning = _turn != 0;
@@ -69,18 +82,8 @@ public:
     float turn() const { return _turn; }
     float forwardStick() const { return _forward_stick; }
     float turnStick() const { return _turn_stick; }
-    float armAssist() const { return _moving ? _arm : 0; }
-    float plannedArm(uint8_t recovery_stage) const {
-        return recovery_stage == 1 || recovery_stage == 2 ? 0 : armAssist();
-    }
-    float yawCorrection(float hold_correction, float hold_limit) const {
-        // Intentional turns have their own limit; the smaller heading-hold
-        // clamp must not silently cap the requested steering range.
-        return _turning ? -_turn : clamp(hold_correction, -hold_limit, hold_limit);
-    }
-    static float armVelocityError(float speed, float target) {
-        return speed-clamp(speed,std::fmin(0,target),std::fmax(0,target));
-    }
+    float leanFeedforward() const { return _moving ? _lean_ff : 0; }
+    bool leadLimited() const { return _lead_limited; }
     float velocityCorrection(float error, float hold_low, float high, float knee,
                              float drive_low, bool ramp_complete) const {
         const float low = _moving && ramp_complete ? drive_low : hold_low;
@@ -93,7 +96,8 @@ private:
     }
     float _velocity=0, _turn=0, _neutral_ms=0, _stop_ms=0;
     float _forward_stick=0, _turn_stick=0;
-    float _arm=0;
+    float _acceleration=0, _lean_ff=0;
+    bool _lead_limited=false;
     bool _ready=false, _moving=false, _turning=false, _capture_heading=false;
 };
 }  // namespace balance_math

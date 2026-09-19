@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 4;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 3;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -29,7 +29,7 @@ struct BalanceLogFileHeader {
     BalanceLogConfigSnapshot config;
 };
 
-static_assert(sizeof(BalanceSample) == 240,
+static_assert(sizeof(BalanceSample) == 236,
               "BalanceSample size changed; re-check LittleFS capacity");
 static_assert(sizeof(BalanceSample) * BALANCE_LOG_MAX_SAMPLES < 1450000,
               "Balance telemetry no longer fits safely in LittleFS");
@@ -246,8 +246,6 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     }
 
     if (_state != BalanceState::Balancing || !_targets_initialized) {
-        _pilot_drive.reset();
-        _pilot_drive_active = false;
         _last_inner_diag = 0;
         _last_update_age_ms = 0;
         return;
@@ -262,8 +260,6 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     _last_update_age_ms = clampU16(update_age);
     if (update_age > BALANCE_DEADMAN_HARD_MS) _inner_fault |= BAL_DIAG_DEADMAN_HARD;
     if (_inner_fault) {
-        _pilot_drive.reset();
-        _pilot_drive_active = false;
         _last_inner_diag = _inner_fault;
         portENTER_CRITICAL(&_telemetry_mux);
         _inner_diag_window |= _inner_fault;
@@ -286,16 +282,9 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     }
 
     float angle_err = _effective_setpoint - _tilt_angle;
-    const float pd_command = _kp * angle_err - _kd * _gyro_rate;
-    const balance_math::DriveConfig drive_config = {
-        BALANCE_DRIVE_ANGLE_K, BALANCE_DRIVE_RATE_K, BALANCE_DRIVE_SPEED_K,
-        BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE
-    };
-    const auto drive = _pilot_drive.step(_pilot_driving, angle_err, _gyro_rate,
-        _pilot_measured_vel, _pilot_velocity_ff, pd_command, _last_motor_vel,
-        dt, cmd_max, drive_config);
-    _pilot_drive_active = drive.active;
-    float motor_vel_raw = drive.raw;
+    // Feed forward the bounded cruising speed so the equilibrium integral need
+    // not relearn a speed-dependent angle bias on every start and stop.
+    float motor_vel_raw = _pilot_velocity_ff + _kp * angle_err - _kd * _gyro_rate;
     float motor_vel = motor_vel_raw;
 
     if (motor_vel >  cmd_max) motor_vel =  cmd_max;
@@ -476,9 +465,6 @@ void BalanceController::enterBalancing(float current_roll) {
     _pilot.reset();
     _pilot_input_valid = false;
     _pilot_velocity_ff = 0;
-    _pilot_measured_vel = 0;
-    _pilot_driving = false;
-    _pilot_arm_applied = 0;
     _hold_drift = 0.0f;
     _vel_sp_integral    = 0.0f;
     _sp_offset          = 0.0f;
@@ -1105,7 +1091,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             BALANCE_PILOT_DEADBAND, BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
             BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_TURN_ACCEL,
             BALANCE_PILOT_READY_MS, BALANCE_PILOT_STOP_MS,
-            BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU
+            BALANCE_PILOT_VEL_LEAD, BALANCE_PILOT_ACCEL_TAU,
+            BALANCE_PILOT_ACCEL_LEAN, BALANCE_PILOT_LEAN_LIMIT
         };
         _pilot_input_valid = pilot_valid;
         const bool pilot_allowed = pilot_valid && _ramp_complete && !recovering
@@ -1118,10 +1105,9 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             && fabsf(differential_velocity) < BALANCE_PILOT_STOP_TURN;
         const bool pilot_was_ready = _pilot.ready();
         const bool pilot_was_moving = _pilot.moving();
-        _pilot.update(pilot_allowed, pilot_calm, pilot_forward, pilot_turn, dt, pilot_config);
+        _pilot.update(pilot_allowed, pilot_calm, pilot_forward, pilot_turn, dt, pilot_config,
+                      _filtered_wheel_vel);
         _pilot_velocity_ff = _pilot.moving() ? _pilot.velocity() : 0;
-        _pilot_measured_vel = _filtered_wheel_vel;
-        _pilot_driving = _pilot.moving();
         if (_pilot.ready() && !pilot_was_ready)
             Serial.println("[Balance] Standing drive READY: CH1 steer, CH2 speed");
         // Move the eventual hold point with the robot while driving/braking.
@@ -1180,10 +1166,12 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                 _last_outer_diag |= BAL_DIAG_GLIDE_BOOST;
             }
 
-            // Intentional speed changes must not wind up the equilibrium
-            // estimate. Resume its ordinary learning near the requested speed.
-            if (!_pilot.moving() || fabsf(vel_err) < BALANCE_DRIVE_LEARN_ERR)
-                _vel_sp_integral += ki * vel_err * pos_gate * dt;
+            // Acceleration/large tracking errors are motion, not a new balance
+            // angle. Keep the single learned bias through these transients.
+            const bool pilot_learning = !_pilot.moving()
+                || (fabsf(_pilot.leanFeedforward()) < BALANCE_PILOT_LEARN_LEAN
+                    && recovery_feedback_fresh && !_last_inner_diag);
+            if (pilot_learning) _vel_sp_integral += ki * vel_err * pos_gate * dt;
             _vel_sp_integral = clampf(_vel_sp_integral,
                                       -BALANCE_SP_OFFSET_MAX_DEG, BALANCE_SP_OFFSET_MAX_DEG);
         }
@@ -1194,11 +1182,13 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // During the standup ramp only the low slope applies -- forward
         // glide is REQUIRED to stand up, and the tap-recovery slope whipped
         // the setpoint 1.5 deg past equilibrium (+13 rad tow, run 232626).
-        // Driving uses direct acceleration feedback about the learned equilibrium.
-        // Do not put a second speed-error lean loop in front of that controller.
-        float p_term = _pilot.moving() ? 0 : _pilot.velocityCorrection(
+        // The pilot uses a firmer low-error response while moving/braking.
+        // Otherwise cruising feedforward almost cancels the gentle stationary
+        // P term, leaving the integral to initiate motion several seconds later.
+        float p_term = _pilot.velocityCorrection(
             vel_err, BALANCE_VEL_SP_KP_LOW, _vel_sp_kp, BALANCE_VEL_SP_KNEE,
             BALANCE_PILOT_VEL_KP_LOW, _ramp_complete);
+        p_term += _pilot.leanFeedforward();
 
         // Actuator coordination: a deployed arm is already shifting the
         // equilibrium (its center-term lowers/raises the scheduled sp).
@@ -1217,6 +1207,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float shed = 1.0f - clampf((fabsf(_filtered_wheel_vel) - BALANCE_SHED_VEL_START)
                                    / (BALANCE_SHED_VEL_FULL - BALANCE_SHED_VEL_START),
                                    0.0f, 1.0f);
+        if (_pilot.moving()) shed = 1.0f;
         _last_shed = shed;
 
         // During the standup ramp the damper gets a much tighter clamp: the
@@ -1252,18 +1243,14 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // release: fires only on genuine disturbances, no idle chatter.
         // ---------------------------------------------------------------
         _last_arm_demand = 0.0f;
-        _pilot_arm_applied = 0;
         if (_ramp_complete) {
             // One-shot impulse-and-relax (operator design, run 231038): the
             // arms answer the FIRST hit fast, then relax monotonically to
             // neutral. They never flip sign mid-recovery -- the counter-
             // swing belongs to the wheels. This kills the deploy/counter-
             // deploy flip-flop that kept the robot from settling.
-            const float arm_error = _pilot.moving()
-                ? balance_math::BalancePilot::armVelocityError(_filtered_wheel_vel, target_vel)
-                : vel_err;
             _arm_assist_vel += clampf(dt / BALANCE_ARM_ASSIST_VEL_TAU, 0.0f, 1.0f)
-                             * (arm_error - _arm_assist_vel);
+                             * (vel_err - _arm_assist_vel);
             float excess = 0.0f;
             if (_arm_assist_vel > BALANCE_ARM_ASSIST_THRESH) {
                 excess = _arm_assist_vel - BALANCE_ARM_ASSIST_THRESH;
@@ -1282,7 +1269,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // (push + recoil handoff), then the arms hold neutral until the
             // robot has been genuinely calm -- the wheels-only loop is
             // proven stable and extinguishes any residual oscillation.
-            bool calm_now = fabsf(arm_error) < BALANCE_ARM_CALM_VEL
+            bool calm_now = fabsf(vel_err) < BALANCE_ARM_CALM_VEL
                          && fabsf(rate) < BALANCE_ARM_CALM_RATE;
             if (calm_now) {
                 _arm_calm_ms += dt * 1000.0f;
@@ -1356,27 +1343,16 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // arms to their full stop in the braking direction.
             bool wheels_railed = fabsf((float)_last_motor_vel)
                                >= BALANCE_MAX_DRIVE_SPEED * BALANCE_ARM_EMERGENCY_CMD_FRAC;
-            if (wheels_railed && fabsf(arm_error) > BALANCE_ARM_ASSIST_THRESH) {
+            if (wheels_railed && fabsf(vel_err) > BALANCE_ARM_ASSIST_THRESH) {
                 _last_outer_diag |= BAL_DIAG_ARM_EMERGENCY;
-                _arm_sign  = (arm_error > 0.0f) ? 1.0f : -1.0f;
+                _arm_sign  = (vel_err > 0.0f) ? 1.0f : -1.0f;
                 _arm_stage = 1;   // exits as a normal ACTIVE engagement
-                if (arm_error > 0.0f) {
+                if (vel_err > 0.0f) {
                     target = BALANCE_ARM_ASSIST_BIAS_FRAC + BALANCE_ARM_ASSIST_RANGE_POS;
                 } else {
                     target = BALANCE_ARM_ASSIST_BIAS_FRAC - BALANCE_ARM_ASSIST_RANGE_NEG;
                 }
                 tau = BALANCE_ARM_ASSIST_TAU_IN;
-            }
-
-            // Small deliberate COM shift on starts/stops. Disturbance recovery
-            // has priority; never subtract a planned swing from an active catch.
-            if (_pilot.moving() && _arm_stage != 1 && _arm_stage != 2) {
-                _pilot_arm_applied = _pilot.plannedArm(_arm_stage);
-                target = clampf(target + _pilot_arm_applied,
-                    BALANCE_ARM_ASSIST_BIAS_FRAC-BALANCE_ARM_ASSIST_RANGE_NEG,
-                    BALANCE_ARM_ASSIST_BIAS_FRAC+BALANCE_ARM_ASSIST_RANGE_POS);
-                if (fabsf(_pilot_arm_applied) > .01f)
-                    tau = fminf(tau, BALANCE_ARM_ASSIST_TAU_IN);
             }
 
             float alpha = clampf(dt / tau, 0.0f, 1.0f);
@@ -1410,8 +1386,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // steering so positive CH1 matches ground drive (left faster).
         float yaw_corr_raw = _pilot.turning() ? -_pilot.turn()
                             : BALANCE_YAW_SYNC_KP * yaw_diff * 0.5f;
-        _yaw_corr = _pilot.yawCorrection(BALANCE_YAW_SYNC_KP * yaw_diff * 0.5f,
-                                        BALANCE_YAW_SYNC_MAX);
+        _yaw_corr = clampf(yaw_corr_raw,
+                           -BALANCE_YAW_SYNC_MAX, BALANCE_YAW_SYNC_MAX);
         if ((float)_yaw_corr != yaw_corr_raw) {
             _last_outer_diag |= BAL_DIAG_YAW_CLAMPED;
         }
@@ -1703,9 +1679,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.pilot_steering = _pilot.turnStick();
     s.pilot_turn = _pilot.turn();
     s.pilot_flags = (_pilot.ready() ? 1 : 0) | (_pilot.moving() ? 2 : 0)
-                  | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0)
-                  | (_pilot_drive_active ? 16 : 0);
-    s.pilot_arm = _pilot_arm_applied;
+                  | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0);
     _log_count++;
     _last_log_sample_ms = now;
 
@@ -1731,7 +1705,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 511;  // prior extensions plus acceleration drive / planned arms v3
+    header.reserved = 255;  // prior extensions plus standing drive response v2
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1749,7 +1723,7 @@ void BalanceController::flushLogToFile() {
     uint32_t start = millis();
 
     // A legacy CSV can occupy ~350 KB; remove it before allocating the new
-    // 1.44 MB binary file or LittleFS may run out of space mid-write.
+    // 1.42 MB binary file or LittleFS may run out of space mid-write.
     LittleFS.remove(BALANCE_LEGACY_LOG_PATH);
     File f = LittleFS.open(BALANCE_LOG_PATH, "w");
     if (!f) {
@@ -1882,16 +1856,7 @@ void BalanceController::dumpLog() {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 64) {
         // Decode the stored version; exporting an older log must retain its limits.
-        if (header.reserved & 256) {
-            out.println("# standing_drive=ch1_ch2_acceleration_arms_v3");
-            out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:12 decel:16 turn_accel:18");
-            out.println("# standing_drive_acceleration=angle_k:8.8 rate_k:3.1 speed_k:3 speed_error_limit:8 accel_limit:100 handoff_rate:30");
-            out.println("# standing_drive_learning=max_abs_velocity_error:1 velocity_p:0");
-            out.println("# standing_drive_arms=gain:0.008333333 limit_fraction:0.1 tau_s:0.08 recovery_priority:1");
-            out.println("# standing_drive_arm_error=measured_minus_projection_onto_zero_to_target_interval");
-            out.println("# standing_drive_active_flag=16 includes_pd_handoff:1");
-            out.println("# pilot_arm_units=planned_center_fraction_after_recovery_priority_before_output_filter");
-        } else if (header.reserved & 128) {
+        if (header.reserved & 128) {
             out.println("# standing_drive=ch1_ch2_velocity_response_v2");
             out.println("# standing_drive_limits=velocity_rad_s:2 turn_rad_s:1.5 accel:1.5 decel:2 turn_accel:3");
             out.println("# standing_drive_velocity_kp_low=1.0");
@@ -2003,7 +1968,7 @@ void BalanceController::dumpLog() {
                    "arm_l,arm_r,arm_l_tgt,arm_r_tgt,arm_l_vel,arm_r_vel,arm_l_torque,arm_r_torque,"
                    "arm_tip_frac,arm_assist_frac,arm_assist_vel,arm_demand,arm_calm_ms,arm_stage,"
                    "meas_drift,meas_vel,yaw_diff,yaw_corr,update_age_ms,bus_voltage,total_current,imu_age_ms,"
-                   "pilot_forward,pilot_steering,pilot_turn,pilot_flags,pilot_arm");
+                   "pilot_forward,pilot_steering,pilot_turn,pilot_flags");
     for (uint32_t i = 0; i < header.sample_count && !out.failed(); i++) {
         BalanceSample s = {};
         if (f.read(reinterpret_cast<uint8_t*>(&s), header.sample_size) != header.sample_size) break;
@@ -2034,9 +1999,6 @@ void BalanceController::dumpLog() {
             out.printf(",%.4f,%.4f,%.4f,%lu", s.pilot_forward, s.pilot_steering,
                        s.pilot_turn, (unsigned long)s.pilot_flags);
         else out.printf(",,,,"); // historical files have unknown pilot fields
-        if (header.schema_version >= 4 && (header.reserved & 256))
-            out.printf(",%.5f", s.pilot_arm);
-        else out.printf(","); // old files have no planned-arm measurement
         out.println();
     }
     f.close();

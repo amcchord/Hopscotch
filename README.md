@@ -4,6 +4,8 @@ Firmware for a remote-controlled 4-wheel robot with two arms and an experimental
 
 **Successful early-recovery stand-ups — September 14 and 19, 2026:** [Findings, firmware changes and measured result](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Two reported successes are archived with complete 1,203- and 1,303-sample logs. The September 19 repeat settled about a second sooner and showed 16% less initial wheel travel than the first success. Preserve the tested firmware while collecting more repeatability evidence. [Exact firmware identity](evidence/balance-startup-recovery/tested-firmware-identity.json).
 
+**Current drive work — September 19:** [Acceleration control and planned arm assistance](docs/BALANCE_DRIVE_AGILITY_2026-09.md) addresses the full-stick delay in two completed standing-drive tests. The candidate raises forward/turn limits to 20/4.5 rad/s and records planned arm commands. See [current state](docs/progress/CURRENT.md) for exact build/deployment status; physical improvement is not yet established.
+
 ![Robot Diagram](docs/RobotDiagram.png)
 
 ## Hardware

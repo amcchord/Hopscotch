@@ -290,6 +290,11 @@ def summarize(path: Path) -> dict[str, object] | None:
             diag[f"pilot_{label}_rows"] = len(matching)
             diag[f"pilot_{label}_first_s"] = ((as_float(matching[0], "t_ms")-origin_ms)/1000
                                                if matching else math.nan)
+    if as_int(config, "telemetry_features") & 256:
+        diag["pilot_acceleration_or_handoff_rows"] = sum(
+            bool(as_int(row, "pilot_flags") & 16) for row in balance_rows)
+        diag["pilot_planned_arm_peak_fraction"] = max(
+            (abs(as_float(row, "pilot_arm")) for row in balance_rows), default=0)
     diag["markers"] = max((as_int(row, "marker") for row in rows), default=0)
 
     if len(rows) >= 2999 and not config.get("end_reason"):

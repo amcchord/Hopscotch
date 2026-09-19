@@ -1,0 +1,29 @@
+Downloading telemetry from /dev/cu.usbmodem2101...
+Received 646693 raw bytes
+Validated 1666 samples (file integrity, row structure, USB checksum when available)
+
+Saved: /Users/austinmcchord/Development/Hopscotch/telemetry_logs/bal_20260919_181555_drive-response-v2-delayed.csv
+Samples: 1666 (schema 3, checksum 1)
+Duration: 33304ms (33.3s)
+Config: 97 parameters recorded
+
+--- Analysis ---
+file                      tip_s  bal_s eng_roll eng_rate  ret_s  pre_err  pre_rate  pre_cmd final_sp   offset  unit    drift  note
+----------------------------------------------------------------------------------------------------------------------------------
+bal_20260919_181555_drive-response-v2-delayed.csv   8.80  24.48    83.99    -0.15   0.50     0.01      0.15     0.03    86.76     0.95   deg    -3.94  end=drive disarmed
+
+bal_20260919_181555_drive-response-v2-delayed.csv
+  IMU max age=9 ms, freshness-fault rows=0, CAN TX-failure rows=0
+  config: inner_kp=2.0000, inner_kd=0.0800, drift_vel_kp=0.0758, vel_sp_kp=1.4520, vel_sp_kp_low=0.4620, vel_sp_ki=0.2310
+          sp_offset_max=8.00, ramp_sp_offset_max=1.50, max_drive_speed=30.00, base_sp_fwd=84.00, base_sp_tip=82.10
+  engage: roll=83.99 deg, rate=-0.15 dps
+  arm return: 0.50 s, pre-return |err|=0.01 deg, |rate|=0.15 dps, |cmd|=0.03 rad/s
+  final window: sp=86.76 deg, sp_offset=0.95 deg, drift=-3.94 rad
+  note: end=drive disarmed
+  timing: sample p99/max=21.0/23.0 ms, inner max=5016 us, low-tick rows=1, feedback max=220 ms
+  authority: |angle err|max=1.05 deg, |raw cmd|max=2.30 rad/s, |wheel vel|max=3.93 rad/s, |drift|max=4.44 rad
+  sensors/power: IMU disagree max=3.30 deg, accel norm=0.94..1.00 g, bus min=23.83 V, current max=1.49 A, rear torque max=0.22 Nm
+  events: markers=0, saturated rows=0, SP-clamped rows=0, arm active rows=0, emergency-arm rows=0
+  capture: schema=3, checksum=1, end=drive disarmed, test_note=standing-drive-response-v2
+
+Done.

@@ -9,6 +9,7 @@
 #include "config.h"
 #include "balance_math.h"
 #include "balance_pilot.h"
+#include "balance_drive.h"
 #include "balance_telemetry.h"
 
 enum class BalanceState : uint8_t {
@@ -173,7 +174,12 @@ private:
     balance_math::RecoilUnwind _recoil_unwind;
     balance_math::BalancePilot _pilot;
     bool _pilot_input_valid = false;
-    volatile float _pilot_velocity_ff = 0; // common speed reference, added inside the 200 Hz controller
+    volatile float _pilot_velocity_ff = 0; // requested speed for the 200 Hz driving controller
+    volatile float _pilot_measured_vel = 0; // 50 Hz filtered feedback snapshot
+    volatile bool _pilot_driving = false;
+    balance_math::BalanceDrive _pilot_drive;
+    volatile bool _pilot_drive_active = false;
+    float _pilot_arm_applied = 0;
     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)
     float _sp_offset          = 0.0f;   // deg, added to base setpoint
     float _filtered_wheel_vel = 0.0f;   // rad/s

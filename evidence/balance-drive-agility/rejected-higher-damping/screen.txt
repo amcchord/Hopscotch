@@ -1,0 +1,4 @@
+Neutral identical: 324
+{"profile": "short_input", "cases": 54, "old_falls": 9, "new_falls": 23, "new_failures": 14, "old_commanded": 34, "new_commanded": 34}
+{"profile": "full_input", "cases": 54, "old_falls": 9, "new_falls": 35, "new_failures": 26, "old_commanded": 38, "new_commanded": 38}
+{"profile": "input_loss", "cases": 54, "old_falls": 9, "new_falls": 24, "new_failures": 15, "old_commanded": 31, "new_commanded": 31}

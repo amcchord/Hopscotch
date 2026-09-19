@@ -2,7 +2,7 @@
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode. The firmware captures up to 120 seconds, including tip-up, in PSRAM, saves it to LittleFS after balance ends and **both drive and arms are disarmed**, and exports a checksummed CSV over USB. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. A later trigger test exposed an RS05 write-only register check that prevented startup; use the [corrected firmware](BALANCE_START_FIX_2026-09.md). Three successful balancing runs are archived; standing drive is the next physical test. Read the [current state](progress/CURRENT.md) before repeating any upload.
+The [September review](BALANCE_REVIEW_2026-09.md) documents the evidence, changes, rejected experiments and offline validation. A later trigger test exposed an RS05 write-only register check that prevented startup; use the [corrected firmware](BALANCE_START_FIX_2026-09.md). Successful stand-ups and two standing-drive trials are archived; the current acceleration/arm-assist candidate addresses the remaining full-stick delay. Read the [current state](progress/CURRENT.md) before repeating any upload.
 
 ## Safety and Test Area
 
@@ -18,10 +18,10 @@ Record any mechanical variables that changed: floor surface, tire condition, bat
 
 Connect USB with both motor groups disarmed. Before flashing, download the previous run and retain `cal status`, `bal status`, and the settings export from the web dashboard/API. Take a device flash backup where the interface permits; the packaged rollback is a rebuild of source baseline `e8b1280`, not a readback of the current device.
 
-The current standing-drive candidate is in `artifacts/balance-standing-drive/`; its `FLASHING.md` and manifest identify the exact frozen image. Previous releases remain separate packages. To flash the current candidate:
+The current standing-drive candidate is in `artifacts/balance-drive-agility/`; its `FLASHING.md` and manifest identify the exact frozen image. Previous releases remain separate packages. To flash the current candidate:
 
 ```bash
-.venv/bin/python scripts/flash_prepared_balance.py --package artifacts/balance-standing-drive --flash
+.venv/bin/python scripts/flash_prepared_balance.py --package artifacts/balance-drive-agility --flash
 ```
 
 For a source rebuild, use:
@@ -37,7 +37,7 @@ This test round does **not** require `uploadfs`. Avoiding `uploadfs` preserves t
 ./scripts/monitor.sh
 ```
 
-At boot, confirm that the console reports a 1,416,000-byte balance log buffer in PSRAM and that all six motors come online without faults. While disarmed, run `cal status` and `bal status`; verify retained calibration, plausible tilt/rate, fresh IMU age (normally a few milliseconds), no latched fault, and at least 200 ms of continuous healthy samples. Check the disarm/rearm behavior while supported on the floor. Do not force-engage a flat robot.
+At boot, confirm that the console reports a 1,440,000-byte balance log buffer in PSRAM and that all six motors come online without faults. While disarmed, run `cal status` and `bal status`; verify retained calibration, plausible tilt/rate, fresh IMU age (normally a few milliseconds), no latched fault, and at least 200 ms of continuous healthy samples. Check the disarm/rearm behavior while supported on the floor. Do not force-engage a flat robot.
 
 Hardware and calibration are unchanged from July. Do not recalibrate or reset trim merely to install this firmware. Keep the sensor mounting consistent; record any movement.
 
@@ -58,9 +58,9 @@ Allow at least two seconds after raising the arm switches and confirm both group
 
 ## Driving while standing
 
-After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 requests forward/back travel and CH1 steers; keep CH7/CH9/CH10 HIGH. Begin with small, separate forward, backward and steering inputs. Center the sticks between each and wait for a stop. Motion is deliberately slow (1 rad/s average wheel request, 0.5 rad/s differential turn) and ramps gradually. The controller holds the new position/heading after stopping.
+After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 requests forward/back travel and CH1 steers; keep CH7/CH9/CH10 HIGH. Begin with small, separate forward, backward and steering inputs. Center the sticks between each and wait for a stop. The new limits are 20 rad/s average wheel request and 4.5 rad/s per-wheel differential turn. Start around 10% stick (about 0.85 rad/s forward request after deadband), not full stick. Planned arm movements assist acceleration/braking; confirm clean starts/stops before increasing input. The controller holds the new position/heading after stopping.
 
-A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. CH7 HIGH also inhibits ground-drive stick commands before tip-up. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [standing-drive findings](BALANCE_STANDING_DRIVE_2026-09.md) for behavior, evidence and limits.
+A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. CH7 HIGH also inhibits ground-drive stick commands before tip-up. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [acceleration-drive findings](BALANCE_DRIVE_AGILITY_2026-09.md) for behavior, evidence and limits.
 
 ## Commands and RC Markers
 

@@ -684,7 +684,9 @@ class OuterController:
             calm = abs(rate) < c.glide_rate_max and abs(last_cmd) < c.glide_cmd_max
             if not pilot_moving and calm and abs(vel_err) > c.glide_vel_err:
                 ki *= c.glide_ki_boost
-            if not pilot_moving or not hasattr(self.pilot,'learning_allowed') or self.pilot.learning_allowed(vel_err):
+            learning = (not pilot_moving or not hasattr(self.pilot, 'learning_allowed')
+                        or self.pilot.learning_allowed(vel_err))
+            if learning:
                 self.vel_sp_integral += ki * vel_err * pos_gate * dt
             self.vel_sp_integral = clampf(self.vel_sp_integral,
                                           -c.sp_offset_max, c.sp_offset_max)
@@ -714,6 +716,8 @@ class OuterController:
 
         shed = 1.0 - clampf((abs(self.filtered_wheel_vel) - c.shed_vel_start)
                             / (c.shed_vel_full - c.shed_vel_start), 0.0, 1.0)
+        if pilot_moving and getattr(self.pilot, 'governed_motion', False):
+            shed = 1.0
 
         off_max = c.sp_offset_max
         if c.ramp_off_clamp > 0.0 and not self.ramp_complete:
@@ -729,10 +733,8 @@ class OuterController:
 
         # --- arm assist lifecycle ---
         if self.ramp_complete:
-            arm_error=(self.pilot.arm_velocity_error(self.filtered_wheel_vel,target_vel)
-                       if pilot_moving and hasattr(self.pilot,'arm_velocity_error') else vel_err)
             self.arm_assist_vel += clampf(dt / c.arm_assist_vel_tau, 0.0, 1.0) \
-                * (arm_error - self.arm_assist_vel)
+                * (vel_err - self.arm_assist_vel)
             excess = 0.0
             if self.arm_assist_vel > c.arm_assist_thresh:
                 excess = self.arm_assist_vel - c.arm_assist_thresh
@@ -741,7 +743,7 @@ class OuterController:
             demand = clampf(c.arm_assist_gain * excess,
                             -c.arm_assist_range_neg, c.arm_assist_range_pos)
 
-            calm_now = abs(arm_error) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
+            calm_now = abs(vel_err) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
             if calm_now:
                 self.arm_calm_ms += dt * 1000.0
             else:
@@ -781,20 +783,15 @@ class OuterController:
                     self.arm_stage = 0
 
             wheels_railed = abs(last_cmd) >= c.max_drive_speed * c.arm_emergency_cmd_frac
-            if wheels_railed and abs(arm_error) > c.arm_assist_thresh:
-                self.arm_sign = 1.0 if arm_error > 0.0 else -1.0
+            if wheels_railed and abs(vel_err) > c.arm_assist_thresh:
+                self.arm_sign = 1.0 if vel_err > 0.0 else -1.0
                 self.arm_stage = 1
-                if arm_error > 0.0:
+                if vel_err > 0.0:
                     target = c.arm_assist_bias + c.arm_assist_range_pos
                 else:
                     target = c.arm_assist_bias - c.arm_assist_range_neg
                 tau = c.arm_assist_tau_in
 
-            if pilot_moving and hasattr(self.pilot,'arm_command') and self.arm_stage not in (1,2):
-                planned=self.pilot.arm_command()
-                target=clampf(target+planned,c.arm_assist_bias-c.arm_assist_range_neg,
-                              c.arm_assist_bias+c.arm_assist_range_pos)
-                if abs(planned)>.01:tau=min(tau,c.arm_assist_tau_in)
             alpha = clampf(dt / tau, 0.0, 1.0)
             self.arm_assist_frac += alpha * (target - self.arm_assist_frac)
             self.arm_l_target = self.arm_assist_frac * c.arm_center_left
@@ -959,11 +956,10 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
             # wheels commanded to 0 speed; the motor tracks it
         else:
             angle_err = setpoint - tilt_est
-            cmd = c.kp * angle_err - c.kd * gyro_filt
-            if outer.pilot is not None and hasattr(outer.pilot,'drive_step'):
-                cmd=outer.pilot.drive_step(angle_err,gyro_filt,outer.filtered_wheel_vel,
-                                           cmd,last_cmd,INNER_DT,cmd_max)
-            elif outer.pilot is not None and outer.pilot.moving:
+            drive_kd = (outer.pilot.damping_gain(c.kd)
+                        if outer.pilot is not None and hasattr(outer.pilot, 'damping_gain') else c.kd)
+            cmd = c.kp * angle_err - drive_kd * gyro_filt
+            if outer.pilot is not None and outer.pilot.moving:
                 cmd += outer.pilot.velocity
             cmd = clampf(cmd, -cmd_max, cmd_max)
         last_cmd = cmd

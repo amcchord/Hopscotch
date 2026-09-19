@@ -382,14 +382,22 @@ static constexpr float BALANCE_RECOIL_CONFIRM_MS = 60.0f;
 static constexpr float BALANCE_RECOIL_BLEND_MS = 120.0f;
 static constexpr float BALANCE_RECOIL_MULTIPLIER = 2.0f;
 
-// Standing drive v3: speed requests use an acceleration controller after settling.
+// Standing drive v3. Physical rear-wheel rad/s, independent of ground speed knob.
+// Requested 10x travel / 3x turn ceilings. Reference stays near measured speed;
+// bounded acceleration lean initiates movement without waiting on trim learning.
 static constexpr float BALANCE_PILOT_DEADBAND = 0.06f;
 static constexpr float BALANCE_PILOT_MAX_VEL = 20.0f;
-static constexpr float BALANCE_PILOT_MAX_TURN = 4.5f;
+static constexpr float BALANCE_PILOT_MAX_TURN = 4.50f; // per-wheel differential
 static constexpr float BALANCE_PILOT_ACCEL = 12.0f;
 static constexpr float BALANCE_PILOT_DECEL = 16.0f;
 static constexpr float BALANCE_PILOT_TURN_ACCEL = 18.0f;
-static constexpr float BALANCE_PILOT_VEL_KP_LOW = 1.0f; // historical v2 helper only
+static constexpr float BALANCE_PILOT_VEL_KP_LOW = 1.0f; // deg per rad/s of error
+static constexpr float BALANCE_PILOT_VEL_LEAD = 1.5f; // reference lead while accelerating
+static constexpr float BALANCE_PILOT_ACCEL_TAU = 0.08f;
+static constexpr float BALANCE_PILOT_ACCEL_LEAN = 0.6f; // deg per wheel rad/s^2
+static constexpr float BALANCE_PILOT_LEAN_LIMIT = 3.0f;
+static constexpr float BALANCE_PILOT_LEARN_ERR = 0.5f;
+static constexpr float BALANCE_PILOT_LEARN_LEAN = 0.15f;
 static constexpr float BALANCE_PILOT_READY_MS = 400.0f;
 static constexpr float BALANCE_PILOT_STOP_MS = 400.0f;
 static constexpr uint32_t BALANCE_PILOT_RC_FRESH_MS = 100;
@@ -397,16 +405,6 @@ static constexpr float BALANCE_PILOT_STOP_SPEED = 0.30f;
 static constexpr float BALANCE_PILOT_STOP_TURN = 0.20f;
 static constexpr float BALANCE_PILOT_PAUSE_ERR = 5.0f;
 static constexpr float BALANCE_PILOT_PAUSE_RATE = 30.0f;
-static constexpr float BALANCE_DRIVE_ANGLE_K = 8.8f; // wheel rad/s^2 per body degree
-static constexpr float BALANCE_DRIVE_RATE_K = 3.1f;
-static constexpr float BALANCE_DRIVE_SPEED_K = 3.0f;
-static constexpr float BALANCE_DRIVE_ERROR_LIMIT = 8.0f;
-static constexpr float BALANCE_DRIVE_ACCEL_LIMIT = 100.0f; // same motor acceleration ceiling
-static constexpr float BALANCE_DRIVE_HANDOFF_RATE = 30.0f; // command continuity into stationary PD
-static constexpr float BALANCE_DRIVE_LEARN_ERR = 1.0f;
-static constexpr float BALANCE_PILOT_ARM_GAIN = 0.008333333f; // center fraction per wheel rad/s^2
-static constexpr float BALANCE_PILOT_ARM_LIMIT = 0.10f; // about 10 degrees at each shoulder
-static constexpr float BALANCE_PILOT_ARM_TAU = 0.08f;
 
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
 // estimator (it converges to the true balance offset from the arm-curve

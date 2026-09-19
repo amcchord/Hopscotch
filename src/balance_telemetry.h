@@ -64,7 +64,9 @@ struct BalanceSample {
     float    pilot_forward;
     float    pilot_steering;
     float    pilot_turn;
-    uint32_t pilot_flags; // ready=1, moving/braking=2, turning=4, fresh RC=8
+    uint32_t pilot_flags; // ready=1, moving/braking=2, turning=4, fresh RC=8, accel/handoff=16
+    // Schema 4 preserves the complete schema-3 prefix.
+    float    pilot_arm; // planned center fraction after recovery priority, before arm output filter
 };
 
 // One 50 Hz sample for the complete 120-second capture. The in-memory and
@@ -128,11 +130,15 @@ struct BalanceLogConfigSnapshot {
 namespace balance_log {
 static constexpr uint16_t V2_SAMPLE_BYTES = 220;
 static constexpr uint16_t V3_SAMPLE_BYTES = 236;
+static constexpr uint16_t V4_SAMPLE_BYTES = 240;
 inline bool supported(uint16_t schema, uint16_t bytes) {
     return (schema == 2 && bytes == V2_SAMPLE_BYTES)
-        || (schema == 3 && bytes == V3_SAMPLE_BYTES);
+        || (schema == 3 && bytes == V3_SAMPLE_BYTES)
+        || (schema == 4 && bytes == V4_SAMPLE_BYTES);
 }
 }
 static_assert(offsetof(BalanceSample, pilot_forward) == balance_log::V2_SAMPLE_BYTES,
               "Schema 2 prefix changed");
-static_assert(sizeof(BalanceSample) == balance_log::V3_SAMPLE_BYTES, "Schema 3 layout changed");
+static_assert(offsetof(BalanceSample, pilot_arm) == balance_log::V3_SAMPLE_BYTES,
+              "Schema 3 prefix changed");
+static_assert(sizeof(BalanceSample) == balance_log::V4_SAMPLE_BYTES, "Schema 4 layout changed");

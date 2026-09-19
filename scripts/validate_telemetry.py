@@ -55,6 +55,10 @@ def validate(raw: bytes) -> tuple[bytes, int]:
                     and int(config.get('telemetry_schema','1')) < 3
                     and not (int(config.get('telemetry_features','0')) & 64)):
                 continue  # schema-2 log exported by new firmware: pilot intent unknown
+            if (key == 'pilot_arm' and value == ''
+                    and int(config.get('telemetry_schema','1')) < 4
+                    and not (int(config.get('telemetry_features','0')) & 256)):
+                continue  # old log: no planned-arm measurement
             if not math.isfinite(float(value)):
                 raise ValueError(f'Row {index} has nonfinite {key}')
         timestamp = int(row[0])

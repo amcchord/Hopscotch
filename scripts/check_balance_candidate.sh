@@ -11,6 +11,8 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_startup_
 output/test_startup_recovery
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_balance_pilot.cpp -o output/test_balance_pilot
 output/test_balance_pilot
+clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_balance_drive.cpp -o output/test_balance_drive
+output/test_balance_drive
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_motor_setup.cpp src/motor_manager.cpp -o output/test_motor_setup
 output/test_motor_setup
 clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_crsf_native.cpp src/crsf.cpp -o output/test_crsf_native
@@ -20,5 +22,5 @@ output/test_motor_feedback
 "$PYTHON_BIN" -m unittest discover -s tests -v
 "$PYTHON_BIN" -m py_compile scripts/*.py
 bash -n scripts/*.sh
-git diff --check
+git diff --check -- . ':!*.serial'
 ./scripts/build.sh

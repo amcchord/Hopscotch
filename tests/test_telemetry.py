@@ -66,6 +66,22 @@ class TelemetryTests(unittest.TestCase):
     def test_full_120_second_capture(self):
         rows = b''.join(f'{i*20},2,84.5,1\r\n'.encode() for i in range(6000))
         self.assertEqual(validate(transfer(rows, 6000))[1], 6000)
+    def test_old_logs_unknown_planned_arms(self):
+        for schema,features,allowed in ((2,63,True),(3,255,True),(4,511,False),(3,511,False)):
+            body=(f'# === BALANCE CONFIG ===\n# telemetry_schema={schema}\n# telemetry_features={features}\n'
+                  '# checksum_valid=1\n# sample_count=1\n# transport_checksum=fnv1a32\n'
+                  't_ms,state,pilot_arm\n20,2,\n').encode()
+            raw=body+f'# transport_fnv1a=0x{fnv1a(body):08X}\n[Balance] --- End of log ---\n'.encode()
+            if allowed:self.assertEqual(validate(raw)[1],1)
+            else:
+                with self.assertRaises(ValueError):validate(raw)
+    def test_schema4_full_duration_drive_arms_transfer(self):
+        body=(b'# === BALANCE CONFIG ===\n# telemetry_schema=4\n# telemetry_features=511\n# sample_size_bytes=240\n'
+              b'# checksum_valid=1\n# sample_count=6000\n# transport_checksum=fnv1a32\n'
+              b't_ms,state,pilot_forward,pilot_steering,pilot_turn,pilot_flags,pilot_arm\n')
+        body+=b''.join(f'{i*20},2,.5,-.5,-4.5,31,-.1\n'.encode() for i in range(6000))
+        raw=body+f'# transport_fnv1a=0x{fnv1a(body):08X}\n[Balance] --- End of log ---\n'.encode()
+        self.assertEqual(validate(raw)[1],6000)
     def test_simulator_reads_candidate_settings(self):
         c = current_firmware_config()
         self.assertEqual(c.ramp_off_clamp, 1.5)
