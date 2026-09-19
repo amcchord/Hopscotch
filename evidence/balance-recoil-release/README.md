@@ -7,6 +7,6 @@ Source `1d80257e5609a173d9bbe104997eab1f9d4c7341` was uploaded application-only 
 - `validation.txt`: five native suites, 21 Python tests, syntax/whitespace and build. Text log trailing spaces trimmed; raw USB `.serial` unchanged.
 - `preflash.serial`, `postflash.serial` and summaries: fresh disarm, calibration/trim and device health.
 - `flash.txt`: OpenOCD application-only write and successful verification.
-- `record_trial.py`: bounded passive observer plus descriptive note; never arms or moves the robot. Its `first-trial.serial` is live until completion and will be archived separately with the trial result. Onboard capture does not depend on this host observer.
+- `record_trial.py`: bounded passive observer plus descriptive note; never arms or moves the robot. Its completed `first-trial.serial` captured the actual attempt and save confirmation. Onboard capture does not depend on this host observer.
 
-Physical candidate result is pending; two-success baseline is preserved in `artifacts/balance-startup-recovery/`.
+First physical run reported successful: 1,241 complete samples, 4.600 s settled, reduced recoil versus latest baseline. See `trial-metrics.json`, `trial-analysis.txt`, `trial-comparison.png`, `trial-config-diff.json`, `trial-device-checks.json` and `analyze_trial.py`. Raw transfer is in `../../telemetry_logs/bal_20260919_151011_confirmed-recoil-release-success.serial`. The two-success baseline is preserved in `artifacts/balance-startup-recovery/`; installed application is unchanged after this run.

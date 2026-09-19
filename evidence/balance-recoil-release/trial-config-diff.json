@@ -1,0 +1,106 @@
+{
+  "build_date": [
+    "Sep 14 2026",
+    "Sep 19 2026"
+  ],
+  "build_time": [
+    "23:18:29",
+    "15:04:50"
+  ],
+  "checksum": [
+    "0xD98A7CF5",
+    "0xCE65B6D9"
+  ],
+  "prof_adrv_max_us": [
+    "1907",
+    "1823"
+  ],
+  "prof_bal_max_us": [
+    "1148",
+    "1226"
+  ],
+  "prof_can_max_us": [
+    "269",
+    "287"
+  ],
+  "prof_crsf_max_us": [
+    "530",
+    "525"
+  ],
+  "prof_ctl_max_us": [
+    "81360",
+    "81628"
+  ],
+  "prof_ctlgap_max_us": [
+    "5500",
+    "5431"
+  ],
+  "prof_disp_max_us": [
+    "8850",
+    "9018"
+  ],
+  "prof_imu_max_us": [
+    "1140",
+    "1089"
+  ],
+  "prof_loopgap_max_us": [
+    "11924",
+    "13285"
+  ],
+  "prof_tel_max_us": [
+    "276",
+    "213"
+  ],
+  "prof_ws_max_us": [
+    "17",
+    "24"
+  ],
+  "profile_run_start_uptime_ms": [
+    "20050",
+    "69021"
+  ],
+  "run_duration_ms": [
+    "26046",
+    "25351"
+  ],
+  "run_end_uptime_ms": [
+    "46096",
+    "94372"
+  ],
+  "run_start_uptime_ms": [
+    "20050",
+    "69021"
+  ],
+  "sample_count": [
+    "1303",
+    "1241"
+  ],
+  "startup_recoil": [
+    null,
+    "confirmed_unwind_v1"
+  ],
+  "startup_recoil_active_flag": [
+    null,
+    "0x01"
+  ],
+  "startup_recoil_multiplier": [
+    null,
+    "2 enter_rad_s=0.35 exit_rad_s=0.15 confirm_ms=60 blend_ms=120"
+  ],
+  "stored_trim": [
+    "3.1650",
+    "3.5117"
+  ],
+  "telemetry_features": [
+    "31",
+    "63"
+  ],
+  "test_note": [
+    "none",
+    "confirmed-recoil-release-v1"
+  ],
+  "transport_fnv1a": [
+    "0xA13C1DF6",
+    "0xB8588771"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "physical_report": "Austin: This worked great; it felt like it settled faster; it looks good.",
+  "both_groups_disarmed": true,
+  "all_six_motors_online": true,
+  "motor_errors": false,
+  "stored_trim_deg": 3.57,
+  "calibration_retained": true,
+  "imu_age_us": 5855,
+  "imu_fault": "0x0000",
+  "can_rx_missed": 0,
+  "can_tx_failed": 0,
+  "serial_readers_closed": true,
+  "log_samples": 1241,
+  "log": "bal_20260919_151011_confirmed-recoil-release-success.csv",
+  "binary_checksum": "0xCE65B6D9",
+  "transport_checksum": "0xB8588771",
+  "features": 63,
+  "application_unchanged_since_flash": true
+}
