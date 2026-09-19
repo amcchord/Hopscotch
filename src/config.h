@@ -375,6 +375,13 @@ static constexpr float    BALANCE_START_RECOVERY_CALM_RATE = 4.0f;
 static constexpr float    BALANCE_START_RECOVERY_CALM_ERR = 1.0f;
 static constexpr uint32_t BALANCE_START_RECOVERY_CALM_MS = 400;
 
+// Versioned recoil-release v1: only during active, post-ramp startup recovery.
+static constexpr float BALANCE_RECOIL_ENTER_SPEED = 0.35f;
+static constexpr float BALANCE_RECOIL_EXIT_SPEED = 0.15f;
+static constexpr float BALANCE_RECOIL_CONFIRM_MS = 60.0f;
+static constexpr float BALANCE_RECOIL_BLEND_MS = 120.0f;
+static constexpr float BALANCE_RECOIL_MULTIPLIER = 2.0f;
+
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium
 // estimator (it converges to the true balance offset from the arm-curve
 // nominal). Three additions make it dynamic instead of per-run:

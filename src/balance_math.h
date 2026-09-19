@@ -78,16 +78,57 @@ private:
     uint32_t _start_ms = 0;
     float _calm_ms = 0;
 };
+struct RecoilConfig {
+    float enter_speed, exit_speed, confirm_ms, blend_ms, multiplier;
+};
+// Release the transient correction only after confirmed motion against it.
+// Direction changes, stale feedback and leaving recovery reset confirmation.
+// Speed hysteresis and a gain ramp avoid chasing the first near-zero crossing.
+class RecoilUnwind {
+public:
+    void reset() { *this = RecoilUnwind{}; }
+    float update(bool eligible, float velocity, float integral, float dt,
+                 const RecoilConfig& c) {
+        if (!eligible || !std::isfinite(velocity) || !std::isfinite(integral)
+            || !std::isfinite(dt) || dt <= 0 || dt > .1f || velocity * integral >= 0) {
+            reset();
+            return 1;
+        }
+        const float direction = velocity > 0 ? 1.0f : -1.0f;
+        if (direction != _direction) { reset(); _direction = direction; }
+        const float speed = std::fabs(velocity);
+        if (_confirmed && speed <= c.exit_speed) {
+            _confirmed = false;
+            _qualifying_ms = 0;
+        }
+        if (!_confirmed) {
+            _qualifying_ms = speed >= c.enter_speed ? _qualifying_ms + dt * 1000 : 0;
+            _confirmed = _qualifying_ms + .001f >= c.confirm_ms;
+        }
+        _blend = clamp(_blend + (_confirmed ? 1 : -1) * dt * 1000 / c.blend_ms, 0, 1);
+        return 1 + _blend * (c.multiplier - 1);
+    }
+private:
+    float _direction = 0, _qualifying_ms = 0, _blend = 0;
+    bool _confirmed = false;
+};
 struct IntegralUpdate { float value; bool limited; };
 // Use the existing equilibrium integrator. Rate/angle bounds and conditional
 // integration prevent a saturated correction accumulating hidden windup;
 // reversing velocity can always unwind it. Invalid/stale inputs hold it.
 inline IntegralUpdate recoveryIntegral(float current, float velocity_error, float ki,
                                       float dt, float offset, float limit, float rate,
-                                      bool feedback_fresh) {
+                                      bool feedback_fresh, float unwind_multiplier = 1) {
     if (!feedback_fresh || !std::isfinite(velocity_error) || !std::isfinite(dt)
         || dt <= 0 || dt > .1f) return {current, true};
-    const float desired_rate = ki * velocity_error;
+    float desired_rate = ki * velocity_error;
+    if (unwind_multiplier > 1 && desired_rate * current < 0) {
+        // Extra learning may remove existing correction, never accumulate a
+        // correction of the opposite sign. Ordinary integration can cross zero.
+        const float ceiling = std::fmax(std::fabs(current) / dt, std::fabs(desired_rate));
+        desired_rate = std::copysign(std::fmin(std::fabs(desired_rate) * unwind_multiplier,
+                                             ceiling), desired_rate);
+    }
     const float bounded_rate = clamp(desired_rate, -rate, rate);
     const float change = bounded_rate * dt;
     if (std::fabs(offset) >= limit - .05f && change * offset >= 0)

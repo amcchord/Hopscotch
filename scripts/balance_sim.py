@@ -91,6 +91,12 @@ class FirmwareConfig:
     recovery_calm_rate: float = 4.0
     recovery_calm_err: float = 1.0
     recovery_calm_ms: float = 400
+    recoil_unwind: bool = False  # historical variants retain the original release
+    recoil_enter_speed: float = .35
+    recoil_exit_speed: float = .15
+    recoil_confirm_ms: float = 60
+    recoil_blend_ms: float = 120
+    recoil_multiplier: float = 2
     base_sp_rate_max: float = 3.0
     ramp_vel_slow: float = 2.0
     ramp_vel_gate_floor: float = 0.3
@@ -314,6 +320,10 @@ class OuterController:
         self.startup_previous_vel = None
         self.startup_qualifying_ms = 0.
         self.startup_direction = 0.
+        self.recoil_direction = 0.
+        self.recoil_qualifying_ms = 0.
+        self.recoil_blend = 0.
+        self.recoil_confirmed = False
         self.hold_drift = 0.
         self.vel_sp_integral = 0.0
         self.sp_offset = 0.0
@@ -622,10 +632,39 @@ class OuterController:
         self.last_target_vel = target_vel
         vel_err = self.filtered_wheel_vel - target_vel
 
+        # Mirror balance_math::RecoilUnwind; fresh feedback supplied by model.
+        unwind_multiplier = 1.
+        eligible = c.recoil_unwind and self.startup_active and self.ramp_complete
+        direction = 1. if vel_err > 0 else -1.
+        if (not eligible or vel_err*self.vel_sp_integral >= 0
+                or not math.isfinite(dt) or dt <= 0 or dt > .1):
+            self.recoil_direction = self.recoil_qualifying_ms = self.recoil_blend = 0.
+            self.recoil_confirmed = False
+        else:
+            if direction != self.recoil_direction:
+                self.recoil_qualifying_ms = self.recoil_blend = 0.
+                self.recoil_confirmed = False
+                self.recoil_direction = direction
+            speed = abs(vel_err)
+            if self.recoil_confirmed and speed <= c.recoil_exit_speed:
+                self.recoil_confirmed = False
+                self.recoil_qualifying_ms = 0.
+            if not self.recoil_confirmed:
+                self.recoil_qualifying_ms = (self.recoil_qualifying_ms+dt*1000
+                                             if speed >= c.recoil_enter_speed else 0.)
+                self.recoil_confirmed = self.recoil_qualifying_ms+.001 >= c.recoil_confirm_ms
+            self.recoil_blend = clampf(self.recoil_blend + (1 if self.recoil_confirmed else -1)
+                                       * dt*1000/c.recoil_blend_ms, 0, 1)
+            unwind_multiplier = 1+self.recoil_blend*(c.recoil_multiplier-1)
+
         if self.startup_active:
             ki = (c.recovery_ki if not self.ramp_complete and now_ms-self.startup_ms<c.recovery_boost_ms
                   else c.vel_sp_ki)
-            change = clampf(ki*vel_err,-c.recovery_rate,c.recovery_rate)*dt
+            desired_rate = ki*vel_err
+            if unwind_multiplier > 1 and desired_rate*self.vel_sp_integral < 0:
+                ceiling = max(abs(self.vel_sp_integral)/dt,abs(desired_rate))
+                desired_rate = math.copysign(min(abs(desired_rate)*unwind_multiplier,ceiling),desired_rate)
+            change = clampf(desired_rate,-c.recovery_rate,c.recovery_rate)*dt
             if abs(self.sp_offset)<c.recovery_limit-.05 or change*self.sp_offset<0:
                 self.vel_sp_integral = clampf(self.vel_sp_integral+change,-c.recovery_limit,c.recovery_limit)
         elif self.ramp_complete:
@@ -1041,13 +1080,18 @@ def current_firmware_config() -> FirmwareConfig:
         'recovery_calm_rate': 'BALANCE_START_RECOVERY_CALM_RATE',
         'recovery_calm_err': 'BALANCE_START_RECOVERY_CALM_ERR',
         'recovery_calm_ms': 'BALANCE_START_RECOVERY_CALM_MS',
+        'recoil_enter_speed': 'BALANCE_RECOIL_ENTER_SPEED',
+        'recoil_exit_speed': 'BALANCE_RECOIL_EXIT_SPEED',
+        'recoil_confirm_ms': 'BALANCE_RECOIL_CONFIRM_MS',
+        'recoil_blend_ms': 'BALANCE_RECOIL_BLEND_MS',
+        'recoil_multiplier': 'BALANCE_RECOIL_MULTIPLIER',
     }
     kwargs = {field: number(const) for field, const in mapping.items()}
     curve = source.split('BALANCE_SP_CURVE[] = {', 1)[1].split('};', 1)[0]
     kwargs['sp_curve'] = tuple((float(a), float(b)) for a, b in
                                re.findall(r'\{\s*([0-9.]+)f,\s*([0-9.]+)f\s*\}', curve))
     return replace(FirmwareConfig(), **kwargs, proportional_return=True, early_pos_p=True,
-                   absolute_capture_trim=True, startup_recovery=True,
+                   absolute_capture_trim=True, startup_recovery=True, recoil_unwind=True,
                    arm_event_end_calm_ms=150.0, measured_arm_arrival=True, hard_stop_latches=True)
 
 
@@ -1057,7 +1101,7 @@ def make_variant(name: str, base: FirmwareConfig | None = None) -> FirmwareConfi
     if name == "july33":
         return replace(current_firmware_config(), ramp_off_clamp=0.0, drift_vel_kp=0.05,
                        measured_arm_arrival=False, hard_stop_latches=False, absolute_capture_trim=False,
-                       startup_recovery=False)
+                       startup_recovery=False, recoil_unwind=False)
     cfg = base if base is not None else FirmwareConfig()
     for part in name.split("+"):
         if part == "baseline":

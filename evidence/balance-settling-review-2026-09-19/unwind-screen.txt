@@ -1,0 +1,4 @@
+{'unwind_multiplier': 1.0, 'early': 0, 'late': 2, 'survived_and_settled': 17, 'median_settle': 6.12}
+{'unwind_multiplier': 1.5, 'early': 0, 'late': 2, 'survived_and_settled': 18, 'median_settle': 5.609999999999999, 'new_failures': 0, 'rescues': 0}
+{'unwind_multiplier': 2.0, 'early': 0, 'late': 1, 'survived_and_settled': 19, 'median_settle': 5.26, 'new_failures': 0, 'rescues': 1}
+{'unwind_multiplier': 3.0, 'early': 0, 'late': 1, 'survived_and_settled': 20, 'median_settle': 6.09, 'new_failures': 0, 'rescues': 1}

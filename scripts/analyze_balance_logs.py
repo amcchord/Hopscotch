@@ -276,6 +276,13 @@ def summarize(path: Path) -> dict[str, object] | None:
             diag[f"startup_recovery_{label}_rows"] = len(matching)
             diag[f"startup_recovery_{label}_first_s"] = ((as_float(matching[0],"t_ms")-origin_ms)/1000
                                                         if matching else math.nan)
+    if as_int(config, "telemetry_features") & 32:
+        matching = [row for row in balance_rows if as_int(row, "flags") & 0x01]
+        origin_ms = as_float(balance_rows[0], "t_ms")
+        diag["startup_recoil_rows"] = len(matching)
+        for label, row in (("first", matching[:1]), ("last", matching[-1:])):
+            diag[f"startup_recoil_{label}_s"] = ((as_float(row[0], "t_ms")-origin_ms)/1000
+                                                if row else math.nan)
     diag["markers"] = max((as_int(row, "marker") for row in rows), default=0)
 
     if len(rows) >= 2999 and not config.get("end_reason"):

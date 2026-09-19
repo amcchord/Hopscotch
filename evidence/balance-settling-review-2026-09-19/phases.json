@@ -1,0 +1,61 @@
+[
+  {
+    "file": "bal_20260914_233101_early-recovery-first-success.csv",
+    "first_forward_stop_s": 2.525,
+    "peak_reverse_speed_rad_s": -2.0431,
+    "peak_reverse_time_s": 4.175,
+    "settle_s": 5.681,
+    "stop_to_settle_s": 3.156,
+    "integral_at_first_stop_deg": 2.5566,
+    "integral_at_settle_deg": 1.6996,
+    "approximate_calm_spans_before_settle": [
+      {
+        "start_s": 2.345,
+        "last_s": 2.365,
+        "span_s": 0.020000000000000018
+      },
+      {
+        "start_s": 2.406,
+        "last_s": 2.65,
+        "span_s": 0.24399999999999977
+      },
+      {
+        "start_s": 2.711,
+        "last_s": 2.711,
+        "span_s": 0.0
+      },
+      {
+        "start_s": 5.24,
+        "last_s": 5.26,
+        "span_s": 0.019999999999999574
+      },
+      {
+        "start_s": 5.3,
+        "last_s": 15.08,
+        "span_s": 9.780000000000001
+      }
+    ]
+  },
+  {
+    "file": "bal_20260919_143953_early-recovery-repeat-success.csv",
+    "first_forward_stop_s": 2.42,
+    "peak_reverse_speed_rad_s": -1.9839,
+    "peak_reverse_time_s": 3.4,
+    "settle_s": 4.7,
+    "stop_to_settle_s": 2.2800000000000002,
+    "integral_at_first_stop_deg": 2.3016,
+    "integral_at_settle_deg": 1.7298,
+    "approximate_calm_spans_before_settle": [
+      {
+        "start_s": 2.28,
+        "last_s": 2.54,
+        "span_s": 0.26000000000000023
+      },
+      {
+        "start_s": 4.32,
+        "last_s": 17.22,
+        "span_s": 12.899999999999999
+      }
+    ]
+  }
+]

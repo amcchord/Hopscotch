@@ -284,6 +284,7 @@ private:
     float _arm_center_right   = 0.0f;
     balance_math::RunawayDetector _startup_detector;
     balance_math::StartupRecovery _startup_recovery;
+    balance_math::RecoilUnwind _recoil_unwind;
     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)
     float _sp_offset          = 0.0f;   // deg, added to base setpoint
     float _filtered_wheel_vel = 0.0f;   // rad/s

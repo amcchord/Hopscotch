@@ -1,0 +1,2 @@
+{"label": "two-success baseline", "early": 86, "late": 60, "survived_and_settled": 126, "median_settle": 6.300000000000001}
+{"label": "confirmed recoil release v1", "early": 79, "late": 42, "survived_and_settled": 140, "median_settle": 5.58, "new_failures": 0, "rescues": 25, "paired_settle_cases": 120, "paired_median_settle_delta": 0.0, "initial_catch_identical_cases": 324}

@@ -7,6 +7,33 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from balance_sim import OuterController, PlantParams, current_firmware_config, make_variant, simulate
 
 class StartupModelTests(unittest.TestCase):
+    def test_recoil_release_preserves_initial_catch(self):
+        cfg=current_firmware_config()
+        plant=PlantParams(feedback_velocity_scale=1.,fb_hold_ticks=1)
+        old=simulate(replace(cfg,recoil_unwind=False),plant,duration_s=2.)
+        new=simulate(cfg,plant,duration_s=2.)
+        self.assertEqual(old.cmd,new.cmd)
+        self.assertEqual(old.setpoint,new.setpoint)
+        self.assertEqual(old.drift,new.drift)
+        self.assertFalse(make_variant('july33').recoil_unwind)
+
+    def test_recoil_release_requires_confirmation_and_resets_after_settle(self):
+        c=self.at_forward()
+        c.ramp_complete=True
+        c.smoothed_base_sp=84.
+        c.effective_setpoint=86.
+        c.vel_sp_integral=c.sp_offset=2.
+        c.filtered_wheel_vel=-1.
+        for i in range(8):
+            c.tick(1000+i*20,84,0,0,0,-1,0,0,.02)
+            if i<2:self.assertEqual(c.recoil_blend,0.)
+        self.assertAlmostEqual(c.recoil_blend,1.)
+        c.startup_active=False
+        before=c.vel_sp_integral
+        c.tick(1160,84,0,0,0,-1,0,0,.02)
+        self.assertEqual(c.recoil_blend,0.)
+        self.assertLessEqual(abs(c.vel_sp_integral-before),c.cfg.vel_sp_ki*.02)
+
     def test_before_detection_matches_installed(self):
         cfg=current_firmware_config()
         plant=PlantParams(feedback_velocity_scale=1.,fb_hold_ticks=1)

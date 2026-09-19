@@ -63,6 +63,10 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(c.sp_curve, ((0.,84.),(.5,83.05),(1.,82.1)))
         self.assertEqual(c.startup_speed,1.)
         self.assertEqual(c.recovery_boost_ms,800.)
+        self.assertTrue(c.recoil_unwind)
+        self.assertEqual(c.recoil_multiplier,2.)
+        self.assertEqual(c.recoil_confirm_ms,60.)
+        self.assertEqual(c.recoil_blend_ms,120.)
         self.assertAlmostEqual(c.vel_sp_kp, 2.2*33/50)
         self.assertTrue(c.measured_arm_arrival and c.hard_stop_latches)
 

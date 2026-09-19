@@ -1,0 +1,6 @@
+Startup recovery checks passed: signed trigger, one-shot lifecycle, rollover, calm hysteresis, stale input, anti-windup, 50000 bounded updates
+Recoil release checks passed: both directions, confirmation, hysteresis, blend, stale/settled reset, no extra opposite windup, 50000 bounded updates
+telemetry_logs/bal_20260914_233101_early-recovery-first-success.csv trigger_s=0.746 filtered_velocity=1.2591 displacement=0.174 tip_fraction=0.8397 direction=1
+telemetry_logs/bal_20260914_233101_early-recovery-first-success.csv observed-input recoil replay: first_s=2.63 last_s=5.66 samples=151 max_multiplier=2 (not predicted motion)
+telemetry_logs/bal_20260919_143953_early-recovery-repeat-success.csv trigger_s=0.78 filtered_velocity=1.1781 displacement=0.174 tip_fraction=0.8176 direction=1
+telemetry_logs/bal_20260919_143953_early-recovery-repeat-success.csv observed-input recoil replay: first_s=2.56 last_s=4.62 samples=104 max_multiplier=2 (not predicted motion)

@@ -119,7 +119,7 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 | Power | cached bus voltage and summed motor current |
 | Operator alignment | cumulative `marker` set by CH12 or `bal mark` |
 
-`flags` retains the state-machine bits used by historical logs: `0x02` angle-error timer, `0x04` rate timer, `0x08` saturation timer, `0x10` capture stable, `0x20` arms returning, and `0x40` ramp complete. With telemetry feature bit 16, `0x80` means the startup recovery was triggered during this run.
+`flags` retains the state-machine bits used by historical logs: `0x02` angle-error timer, `0x04` rate timer, `0x08` saturation timer, `0x10` capture stable, `0x20` arms returning, and `0x40` ramp complete. With telemetry feature bit 16, `0x80` means the startup recovery was triggered during this run. With feature bit 32, `0x01` means the temporary recoil-unwind multiplier is above 1, including its blend-out. It is an enabled-gain flag, not a measurement of the applied integral change; existing rate/angle/zero-crossing limits still apply.
 
 `diag_flags` adds forensic conditions:
 
@@ -143,7 +143,7 @@ The CSV contains the full 50 Hz state-machine/outer-loop stream plus aggregates 
 
 `imu_age_ms` occupies the former reserved byte, preserving the 220-byte v2 sample size. `telemetry_features` bit 1 identifies the extension; age saturates at 255 ms. Older v2 files export an empty age field because their age is unknown. Successful host download validates a `transport_fnv1a` trailer; old firmware exports retain their weaker legacy checks. FNV-1a detects accidental corruption, not deliberate tampering.
 
-Current logs use feature flags 31: IMU age (1), corrected RS05 units (2), fast CAN receive/front-hold cadence (4), absolute capture trim (8), and wheel-feedback startup recovery v1 (16). Three reserved configuration bytes store the trigger speed, high-speed fallback and confirmation duration. The v1 metadata documents the fixed boost/limits; schema and 220-byte sample layout are unchanged. `meas_drift` always measures travel from engagement, including after a new holding position is captured.
+The two-success baseline logs use feature flags 31: IMU age (1), corrected RS05 units (2), fast CAN receive/front-hold cadence (4), absolute capture trim (8), and wheel-feedback startup recovery v1 (16). The September 19 recoil-release candidate adds bit 32 (total 63): post-ramp active recovery, opposing velocity ≥0.35 rad/s for 60 ms, release below 0.15 rad/s, 120 ms gain blend, maximum 2× ordinary Ki. Three reserved configuration bytes still store the initial trigger speed, high-speed fallback and confirmation duration. Metadata describes the stored algorithm version; older files downloaded with new firmware keep their original feature interpretation. Schema and 220-byte sample layout are unchanged. `meas_drift` always measures travel from engagement, including after a new holding position is captured.
 
 The file checksum covers stored sample bytes, not all binary-header metadata. The transport checksum protects the complete exported payload in transit. Captures marked `duration_limit` or `buffer_full` stop recording without establishing a fall time. Power loss before idle save loses the PSRAM run; keep power on after an attempt.
 

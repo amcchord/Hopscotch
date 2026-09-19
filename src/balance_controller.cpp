@@ -459,6 +459,7 @@ void BalanceController::enterBalancing(float current_roll) {
 
     _startup_detector.reset();
     _startup_recovery.reset();
+    _recoil_unwind.reset();
     _hold_drift = 0.0f;
     _vel_sp_integral    = 0.0f;
     _sp_offset          = 0.0f;
@@ -1098,6 +1099,14 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float vel_err = _filtered_wheel_vel - target_vel;
         _last_vel_err = vel_err;
 
+        const balance_math::RecoilConfig recoil_config = {
+            BALANCE_RECOIL_ENTER_SPEED, BALANCE_RECOIL_EXIT_SPEED,
+            BALANCE_RECOIL_CONFIRM_MS, BALANCE_RECOIL_BLEND_MS, BALANCE_RECOIL_MULTIPLIER
+        };
+        const float unwind_multiplier = _recoil_unwind.update(
+            recovering && _ramp_complete && recovery_feedback_fresh,
+            vel_err, _vel_sp_integral, dt, recoil_config);
+
         if (recovering) {
             // One integrator, bounded gain/time/angle/rate. The initial catch
             // is not suppressed by angle-error gating; normal P damping still
@@ -1106,7 +1115,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             const auto next = balance_math::recoveryIntegral(
                 _vel_sp_integral, vel_err, ki, dt, _sp_offset,
                 BALANCE_START_RECOVERY_LIMIT_DEG, BALANCE_START_RECOVERY_RATE_DPS,
-                recovery_feedback_fresh);
+                recovery_feedback_fresh, unwind_multiplier);
             _vel_sp_integral = next.value;
             if (next.limited) _last_outer_diag |= BAL_DIAG_RECOVERY_LIMIT;
         } else if (_ramp_complete) {
@@ -1362,7 +1371,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             _trim_calm_since_ms = 0;
         }
 
-        _last_flags = (_safe_err_timing ? 0x02 : 0)
+        _last_flags = (unwind_multiplier > 1 ? 0x01 : 0)
+                    | (_safe_err_timing ? 0x02 : 0)
                     | (_safe_rate_timing ? 0x04 : 0)
                     | (_safe_sat_timing ? 0x08 : 0)
                     | (_capture_stable ? 0x10 : 0)
@@ -1644,7 +1654,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 31;  // prior extensions plus wheel-feedback startup recovery v1
+    header.reserved = 63;  // prior extensions plus confirmed recoil release v1
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1794,6 +1804,12 @@ void BalanceController::dumpLog() {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
+    if (header.reserved & 32) {
+        // Describe the stored algorithm version, not the downloader's settings.
+        out.println("# startup_recoil=confirmed_unwind_v1");
+        out.println("# startup_recoil_multiplier=2 enter_rad_s=0.35 exit_rad_s=0.15 confirm_ms=60 blend_ms=120");
+        out.println("# startup_recoil_active_flag=0x01");
+    }
     if (header.reserved & 16) {
         out.println("# startup_recovery=wheel_velocity_learning_v1");
         out.printf("# startup_recovery_speed=%.1f\n", header.config.reserved[0] * .1f);

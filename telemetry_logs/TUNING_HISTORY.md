@@ -1447,3 +1447,17 @@ Posttrial: both groups disarmed, six motors healthy, calibration retained, learn
 
 
 September 19 publication verified: GitHub `codex/balance-review-ready` matched evidence commit `977b075f0cdc803347b5540b1f13716f18d04e39` after push. All four newly archived raw USB files match their on-disk bytes; their intentional CRLF endings are excluded from whitespace checks, which pass for the text/analysis/documentation changes. Robot firmware remains unchanged, disarmed and ready for later use.
+
+
+### September 19 — settling recommendations, no firmware change
+
+Austin asked what could settle sooner or more robustly. Read-only source/log review finds first forward stop at 2.525/2.420 s versus calm hold 5.681/4.700 s; reverse filtered speeds reach about −2 rad/s while the existing integral relaxes from 2.557/2.302° to about 1.70/1.73°. Recommend investigating a bounded faster unwind only during confirmed post-ramp recoil, retaining the initial catch and continuous integral. Preserve 400 ms calm confirmation: logged fields briefly satisfy calm criteria for roughly 244–260 ms before recoil.
+
+An isolated, source-derived 324-case model screen changes only active-recovery unwind gain: current early/late failures 86/60; 1.5× 82/46 (3 new failures, 21 rescues); 2× 79/43 (2 new failures, 26 rescues). Changing-cohort median settling improves, but common surviving/settling cases have zero median paired improvement. This is mixed screening evidence, not proof of faster physical settling. Extra hysteresis/blending remains a proposal, not implemented. Findings and primary-source control principle are documented in `docs/BALANCE_SETTLING_REVIEW_2026-09-19.md`; scripts/results under `evidence/balance-settling-review-2026-09-19/`. Analysis syntax and unchanged production source verified. No device connection, firmware/settings edits, motion or flash; no commit/push this advice turn.
+
+
+### September 19 — confirmed recoil-release candidate authorized
+
+Austin requested implementing and uploading the settling experiment. Added confirmed opposing-motion release only during active recovery after measured ramp completion: 0.35 rad/s entry for 60 ms, 0.15 rad/s exit, 120 ms blend to 2× ordinary Ki (0.462). Extra release cannot create extra opposite-sign integral. Existing angle/rate/freshness limits, initial catch, arm motion, inner/stable gains, continuous integral and 400 ms calm hold remain. Feature bit 32 / sample flag 0x01 records the new phase without changing the 220-byte layout; old saved logs retain their version metadata.
+
+Five native suites and 21 Python tests, syntax/whitespace and build passed. Production replay enables release at 2.630/2.560 s in the successful old traces; this tests phase selection, not predicted new motion. Final 324-case model: early/later failures 79/42 vs 86/60, 0 new failures, 25 rescues, identical pre-ramp outputs in all cases. Common surviving/settling cases have zero median paired time improvement. Physical benefit remains unverified. App SHA-256 `5d3465e0269f9df19065d1583de35d093b46f947fdd27e49ef0de0bbf28d4dd0`; flash usage 1,138,913 / static RAM 50,768 bytes. Findings/evidence in `docs/BALANCE_RECOIL_RELEASE_2026-09.md` and `evidence/balance-recoil-release/`. The previous advice analysis is included; its historical screen now explicitly loads frozen baseline source/config. No upload yet; next fresh disarm check, application-only flash, stationary health checks and user test.
