@@ -38,11 +38,11 @@ CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devk
 PLATFORM: Espressif 32 (6.7.0) > Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)
 HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
 DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
-PACKAGES: 
- - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
- - tool-esptoolpy @ 1.40501.0 (4.5.1) 
- - tool-openocd-esp32 @ 2.1100.20220706 (11.0) 
- - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+PACKAGES:
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16)
+ - tool-esptoolpy @ 1.40501.0 (4.5.1)
+ - tool-openocd-esp32 @ 2.1100.20220706 (11.0)
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5
  - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
 LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
 LDF Modes: Finder ~ chain, Compatibility ~ soft

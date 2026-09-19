@@ -52,3 +52,9 @@ To restore the two-success baseline, verify disarm and run:
 Do **not** add `--rollback`: that option selects the much older rebuilt `e8b1280` image.
 
 For one comparison, use the usual forward arm position and neutral CH1/2/4; set CH7/9/10 HIGH, wait two seconds, then CH11 HIGH one second and LOW once. Support/disarm promptly on runaway. If it settles, leave it untouched for five seconds, then support and lower both CH9/10; keep battery/USB connected for retrieval. Compare forward and reverse speed, wheel excursion, time to sustained calm, and later drift against the two successful runs. Skip disturbance taps for this first comparison.
+
+## Upload outcome
+
+Flashed and verified source `1d80257e5609a173d9bbe104997eab1f9d4c7341`, application `5d3465e0269f9df19065d1583de35d093b46f947fdd27e49ef0de0bbf28d4dd0`, application only at `0x10000`. Fresh preflight confirmed both groups disarmed, no pending log and the prior 1,303-sample run already safely archived. OpenOCD verification passed.
+
+After boot: IDLE, both groups disarmed, six motors online/no errors, calibrated center/back deltas and 3.51° learned trim retained. Forward coordinates reset to zero normally on boot; raw arm poses match preflash. IMU age 5.953 ms, tilt −1.9°, no fault; receiver max 446 µs, CAN receive misses/TX failures zero. Original saved log size remains 287,048 bytes. No tool arming, calibration reset or filesystem upload. Passive observer started with note `confirmed-recoil-release-v1`; onboard logging starts automatically at tip-up. Physical result remains pending.
