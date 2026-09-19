@@ -1,0 +1,57 @@
+Neutral identical: 324
+{
+  "small": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.004538005761689382,
+    "candidate_ring_median": 0.0005606932370111572
+  },
+  "full": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.01579979210495559,
+    "candidate_ring_median": 0.000254723773005104
+  },
+  "reverse": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.018546340998421076,
+    "candidate_ring_median": 0.00022903696394548903
+  },
+  "loss": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.006140927262489174,
+    "candidate_ring_median": 0.0005703562041549479
+  },
+  "turn": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.0018815690433383896,
+    "candidate_ring_median": 0.0008839756369820123
+  },
+  "push": {
+    "cases": 72,
+    "v3_falls": 4,
+    "candidate_falls": 0,
+    "new_falls": 0,
+    "commanded": 69,
+    "v3_ring_median": 0.007976686789249773,
+    "candidate_ring_median": 0.0007069763417042035
+  }
+}

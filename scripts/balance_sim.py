@@ -250,6 +250,13 @@ class PlantParams:
     # -> each wheel refreshes every ~120 ms; L/R staggered -> ~60 ms average
     # refresh). The outer loop consumes a zero-order-held measurement.
     fb_hold_ticks: int = 3          # outer ticks between wheel feedback updates
+    # Optional driving sensitivity model. Zero omega retains the historical
+    # first-order motor exactly. Measured v3 rocking shows >1 gain near 4.5 Hz,
+    # which a first-order lag cannot represent.
+    motor_omega: float = 0.0       # second-order natural angular frequency, rad/s
+    motor_zeta: float = 0.5
+    motor_delay_s: float = 0.0
+    sensor_delay_s: float = 0.0
 
     def true_eq(self, tip_frac: float, center_frac: float) -> float:
         # Monotonic rise tip -> forward (linear in tip_frac; the measured
@@ -740,6 +747,8 @@ class OuterController:
                 excess = self.arm_assist_vel + c.arm_assist_thresh
             demand = clampf(c.arm_assist_gain * excess,
                             -c.arm_assist_range_neg, c.arm_assist_range_pos)
+            if pilot_moving and hasattr(self.pilot,'arm_demand'):
+                demand=self.pilot.arm_demand(demand)
 
             calm_now = abs(arm_error) < c.arm_calm_vel and abs(rate) < c.arm_calm_rate
             if calm_now:
@@ -781,7 +790,11 @@ class OuterController:
                     self.arm_stage = 0
 
             wheels_railed = abs(last_cmd) >= c.max_drive_speed * c.arm_emergency_cmd_frac
-            if wheels_railed and abs(arm_error) > c.arm_assist_thresh:
+            emergency=wheels_railed and abs(arm_error)>c.arm_assist_thresh
+            if self.pilot is not None and hasattr(self.pilot,'arm_emergency'):
+                emergency=self.pilot.arm_emergency(pilot_moving,last_cmd,arm_error,
+                    self.effective_setpoint-tilt,rate,dt,c.max_drive_speed,emergency)
+            if emergency:
                 self.arm_sign = 1.0 if arm_error > 0.0 else -1.0
                 self.arm_stage = 1
                 if arm_error > 0.0:
@@ -862,7 +875,8 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
              pushes: list[Push] | None = None,
              seed: int = 1,
              engage_trim: float = 0.0,
-             deadman_v1: bool = False, pilot_factory=None) -> SimResult:
+             deadman_v1: bool = False, pilot_factory=None,
+             settled_start: bool = False) -> SimResult:
     """Run one standup + balance episode.
 
     deadman_v1: replicate the run-13-era dead-man (wheel STOP at soft
@@ -892,6 +906,17 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
     if pilot_factory is not None:
         outer.pilot = pilot_factory()
 
+    if settled_start:
+        # Isolate driving after successful capture; this does not claim to
+        # simulate physical self-righting or remove startup failures.
+        theta = plant.eq_fwd + engage_offset_deg
+        arm_l = arm_r = 0.0
+        outer.arms_returned = outer.ramp_complete = True
+        outer.arm_l_target = outer.arm_r_target = 0.0
+        outer.engage_capture_shift = 0.0
+        outer.run_curve_shift = plant.eq_fwd - c.setpoint_arms_fwd - engage_trim
+        outer.smoothed_base_sp = outer.effective_setpoint = plant.eq_fwd
+
     # Inner-loop filter state
     tilt_est = theta
     gyro_filt = 0.0
@@ -908,6 +933,9 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
         return any(s.start_s <= t_s < s.start_s + s.duration_s for s in stalls)
 
     hard_stop_latched = False
+    motor_acceleration = 0.0
+    command_history = [0.0] * round(plant.motor_delay_s / INNER_DT)
+    sensor_history = [(theta, theta_dot)] * round(plant.sensor_delay_s / INNER_DT)
     for step in range(n_steps):
         t = step * INNER_DT
         now_ms = t * 1000.0
@@ -919,8 +947,10 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
                 theta_dot += p.delta_rate
 
         # --- 200 Hz inner tick (Core 0) ---
-        accel_angle = theta + rng.gauss(0.0, plant.accel_noise_deg)
-        gyro_raw = theta_dot + rng.gauss(0.0, plant.gyro_noise_dps)
+        sensor_history.append((theta, theta_dot))
+        sensed_theta, sensed_rate = sensor_history.pop(0) if plant.sensor_delay_s else sensor_history.pop()
+        accel_angle = sensed_theta + rng.gauss(0.0, plant.accel_noise_deg)
+        gyro_raw = sensed_rate + rng.gauss(0.0, plant.gyro_noise_dps)
         tilt_est = (c.comp_alpha * (tilt_est + gyro_raw * INNER_DT)
                     + (1.0 - c.comp_alpha) * accel_angle)
         gyro_filt = c.gyro_lpf_alpha * gyro_raw + (1.0 - c.gyro_lpf_alpha) * gyro_filt
@@ -960,7 +990,10 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
         else:
             angle_err = setpoint - tilt_est
             cmd = c.kp * angle_err - c.kd * gyro_filt
-            if outer.pilot is not None and hasattr(outer.pilot,'drive_step'):
+            if outer.pilot is not None and hasattr(outer.pilot,'drive_step_raw'):
+                cmd=outer.pilot.drive_step_raw(angle_err,gyro_raw,gyro_filt,outer.filtered_wheel_vel,
+                                               cmd,last_cmd,INNER_DT,cmd_max)
+            elif outer.pilot is not None and hasattr(outer.pilot,'drive_step'):
                 cmd=outer.pilot.drive_step(angle_err,gyro_filt,outer.filtered_wheel_vel,
                                            cmd,last_cmd,INNER_DT,cmd_max)
             elif outer.pilot is not None and outer.pilot.moving:
@@ -969,7 +1002,15 @@ def simulate(cfg: FirmwareConfig, plant: PlantParams,
         last_cmd = cmd
 
         # --- motor + plant integration ---
-        dv = (INNER_DT / (plant.tau_m + INNER_DT)) * (cmd - wheel_vel)
+        command_history.append(cmd)
+        delayed_command = command_history.pop(0) if plant.motor_delay_s else command_history.pop()
+        if plant.motor_omega > 0:
+            motor_acceleration += INNER_DT * (plant.motor_omega**2 * (delayed_command-wheel_vel)
+                - 2 * plant.motor_zeta * plant.motor_omega * motor_acceleration)
+            motor_acceleration = clampf(motor_acceleration,-plant.acc_limit,plant.acc_limit)
+            dv = INNER_DT * motor_acceleration
+        else:
+            dv = (INNER_DT / (plant.tau_m + INNER_DT)) * (delayed_command - wheel_vel)
         max_dv = plant.acc_limit * INNER_DT
         dv = clampf(dv, -max_dv, max_dv)
         dv += rng.gauss(0.0, plant.process_accel_noise) * INNER_DT

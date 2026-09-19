@@ -1,0 +1,6 @@
+v3 {'falls': 14, 'new_falls': 0, 'ring_median': 0.006140926953850553, 'ring_p95': 3.509173392781331}
+fast_rate15 {'falls': 0, 'new_falls': 0, 'ring_median': 0.00040652411023211197, 'ring_p95': 1.0511317178990924}
+fast_rate20 {'falls': 0, 'new_falls': 0, 'ring_median': 0.0007533309975201719, 'ring_p95': 1.737919350146436}
+fast_rate10 {'falls': 0, 'new_falls': 0, 'ring_median': 0.00020024080092775594, 'ring_p95': 1.0419265948941074}
+tau10 {'falls': 0, 'new_falls': 0, 'ring_median': 0.0004959687436551319, 'ring_p95': 1.0431535371258824}
+lower_speed_gain {'falls': 0, 'new_falls': 0, 'ring_median': 0.00024373194556302226, 'ring_p95': 1.0525513326378442}

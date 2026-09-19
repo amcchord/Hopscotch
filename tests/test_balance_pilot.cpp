@@ -53,7 +53,9 @@ int main() {
         // briefly moving wheels opposite the request to initiate the lean.
         assert(sign*(sign*.5f + 2.f*correction(-sign*.5f)) < 0);
         assert(std::fabs(p.velocity()-sign*config.acceleration*.02f)<.00001f);
-        for(int i=0;i<150;++i) p.update(true,false,sign,sign,.02f,config);
+        // Allow the configured ramp to finish, then verify planned arms relax.
+        const int cruise_ticks=static_cast<int>(std::ceil(config.max_velocity/(config.acceleration*.02f)))+60;
+        for(int i=0;i<cruise_ticks;++i) p.update(true,false,sign,sign,.02f,config);
         assert(p.velocity()==sign*config.max_velocity && p.turn()==sign*config.max_turn);
         assert(p.yawCorrection(99,BALANCE_YAW_SYNC_MAX)==-sign*config.max_turn);
         assert(std::fabs(p.armAssist())<.00001f); // relax during steady cruise
@@ -71,7 +73,8 @@ int main() {
         assert(sign*p.armAssist()>0); // brake: shift in the other direction
         assert(!p.ready() && p.moving());
         assert(std::fabs(p.velocity()-sign*(config.max_velocity-config.deceleration*.02f))<.00001f);
-        for(int i=0;i<100;++i) p.update(true,false,sign,sign,.02f,config);
+        const int brake_ticks=static_cast<int>(std::ceil(config.max_velocity/(config.deceleration*.02f)))+1;
+        for(int i=0;i<brake_ticks;++i) p.update(true,false,sign,sign,.02f,config);
         assert(!p.ready() && p.velocity()==0 && p.turn()==0);
         assert(p.moving()); // do not capture hold while still physically rolling
         for(int i=0;i<20;++i) p.update(true,true,0,0,.02f,config);

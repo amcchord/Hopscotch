@@ -2,6 +2,63 @@
 #include "balance_math.h"
 
 namespace balance_math {
+// Separate driving-rate filter. The original stationary/startup rate remains
+// untouched. Call only on a fresh IMU sample, with that sample's actual dt.
+class DriveRateFilter {
+public:
+    float update(float raw, float dt, float tau) {
+        if (!std::isfinite(raw) || !std::isfinite(dt) || dt<=0 || dt>.02f
+            || !std::isfinite(tau) || tau<0) {
+            reset(); return 0;
+        }
+        if (!_initialized) { _value=raw; _initialized=true; }
+        else _value+=dt/(tau+dt)*(raw-_value);
+        return _value;
+    }
+    void reset() { _value=0; _initialized=false; }
+private:
+    float _value=0;
+    bool _initialized=false;
+};
+
+struct DriveArmConfig {
+    float ordinary_scale, ordinary_limit, headroom, error, rate, confirm_ms;
+    float severe_error, severe_rate;
+};
+class DriveArmRecovery {
+public:
+    static float ordinary(float demand,const DriveArmConfig& c) {
+        return clamp(demand*c.ordinary_scale,-c.ordinary_limit,c.ordinary_limit);
+    }
+    void reset() { _qualifying_ms=0; _direction=0; }
+    bool update(bool driving,float command,float speed_error,float angle_error,
+                float rate,float dt,float limit,float speed_threshold,
+                const DriveArmConfig& c) {
+        if (!driving || !std::isfinite(command) || !std::isfinite(speed_error)
+            || !std::isfinite(angle_error) || !std::isfinite(rate)
+            || !std::isfinite(dt) || dt<=0 || dt>.1f) { reset(); return false; }
+        // Positive outward rate means the body is moving away from its target.
+        const float outward=angle_error>0 ? -rate : rate;
+        const bool moving_away=std::fabs(angle_error)>=c.error && outward>=c.rate;
+        const bool velocity_disturbance=std::fabs(speed_error)>speed_threshold;
+        const bool near_limit=limit-std::fabs(command)<=c.headroom;
+        const bool qualifying=velocity_disturbance && moving_away && near_limit;
+        const float direction=angle_error>0 ? 1.0f : -1.0f;
+        if (!qualifying) reset();
+        else {
+            if (direction!=_direction) _qualifying_ms=0;
+            _direction=direction;
+            _qualifying_ms+=dt*1000;
+        }
+        // A large and worsening lean is urgent even before a wheel rails.
+        const bool severe=velocity_disturbance && std::fabs(angle_error)>=c.severe_error
+                          && outward>=c.severe_rate;
+        return severe || _qualifying_ms+.001f>=c.confirm_ms;
+    }
+private:
+    float _qualifying_ms=0, _direction=0;
+};
+
 struct DriveConfig {
     float angle_gain, rate_gain, speed_gain, speed_error_limit;
     float acceleration_limit, handoff_rate;

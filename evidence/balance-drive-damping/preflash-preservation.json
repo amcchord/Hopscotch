@@ -1,0 +1,12 @@
+{
+  "same_physical_trial": true,
+  "samples": 2381,
+  "binary_checksum": "0x64EC16B9",
+  "transport_checksum": "0x58692019",
+  "all_sample_fields_equal": true,
+  "all_metadata_equal": true,
+  "files": {
+    "telemetry_logs/bal_20260919_185559_drive-agility-wobble-wall.csv": "7536bdfdd3cc5bcaf5b96ce5ba36c68a84e5f2669fc030ae2576628c0ecc8a5b",
+    "telemetry_logs/bal_20260919_192941_v3-preserved-before-drive-damping.csv": "7536bdfdd3cc5bcaf5b96ce5ba36c68a84e5f2669fc030ae2576628c0ecc8a5b"
+  }
+}

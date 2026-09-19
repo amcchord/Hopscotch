@@ -111,6 +111,8 @@ private:
     // --- Complementary filter (fast task) ---
     volatile float _tilt_angle = 0.0f;
     volatile float _gyro_rate  = 0.0f;
+    balance_math::DriveRateFilter _drive_rate_filter; // fast-task owned
+    volatile float _drive_gyro_rate = 0.0f;
     volatile float _last_accel_angle = 0.0f;
     volatile float _last_gyro_raw    = 0.0f;
     volatile float _last_accel_norm  = 0.0f;
@@ -178,6 +180,7 @@ private:
     volatile float _pilot_measured_vel = 0; // 50 Hz filtered feedback snapshot
     volatile bool _pilot_driving = false;
     balance_math::BalanceDrive _pilot_drive;
+    balance_math::DriveArmRecovery _drive_arm_recovery; // control-task owned
     volatile bool _pilot_drive_active = false;
     float _pilot_arm_applied = 0;
     float _vel_sp_integral    = 0.0f;   // deg (the single integrator = equilibrium estimate)

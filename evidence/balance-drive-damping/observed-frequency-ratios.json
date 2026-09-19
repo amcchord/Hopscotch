@@ -1,0 +1,125 @@
+{
+  "source": "telemetry_logs/bal_20260919_185559_drive-agility-wobble-wall.csv",
+  "method": "Hann-window FFT peak of raw gyro in 3\u20136 Hz; observed closed-loop ratios; no wall/contact interval >=32s included",
+  "windows": [
+    {
+      "start_s": 7,
+      "end_s": 9,
+      "frequency_hz": 4.5,
+      "raw_gyro_over_wheel": {
+        "magnitude": 14.574317091977129,
+        "phase_deg": 0.31927166255565503
+      },
+      "wheel_over_command": {
+        "magnitude": 1.1294303439659772,
+        "phase_deg": -36.40218338276944
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.49331349073581066,
+        "phase_deg": -54.054483544361396
+      }
+    },
+    {
+      "start_s": 9.5,
+      "end_s": 12.5,
+      "frequency_hz": 4.666666666666666,
+      "raw_gyro_over_wheel": {
+        "magnitude": 13.848541781462066,
+        "phase_deg": -3.2349351604401364
+      },
+      "wheel_over_command": {
+        "magnitude": 1.24417982033687,
+        "phase_deg": -31.333970957595476
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5040099858128553,
+        "phase_deg": -52.89166467160738
+      }
+    },
+    {
+      "start_s": 14,
+      "end_s": 16,
+      "frequency_hz": 4.5,
+      "raw_gyro_over_wheel": {
+        "magnitude": 13.218414166607555,
+        "phase_deg": -11.439855543140432
+      },
+      "wheel_over_command": {
+        "magnitude": 1.2450733032714552,
+        "phase_deg": -28.47542934235746
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5040456544661702,
+        "phase_deg": -49.963543518661965
+      }
+    },
+    {
+      "start_s": 17.5,
+      "end_s": 20.5,
+      "frequency_hz": 4.333333333333333,
+      "raw_gyro_over_wheel": {
+        "magnitude": 13.00666090817439,
+        "phase_deg": -10.606844216105374
+      },
+      "wheel_over_command": {
+        "magnitude": 1.1762960726691234,
+        "phase_deg": -24.45393130410612
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5260460592154981,
+        "phase_deg": -51.53209754012177
+      }
+    },
+    {
+      "start_s": 20.5,
+      "end_s": 23,
+      "frequency_hz": 4.4,
+      "raw_gyro_over_wheel": {
+        "magnitude": 12.954036478161651,
+        "phase_deg": -8.906801123019353
+      },
+      "wheel_over_command": {
+        "magnitude": 1.2258207898648803,
+        "phase_deg": -29.894936391911465
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5180224750891708,
+        "phase_deg": -50.41830891984174
+      }
+    },
+    {
+      "start_s": 24,
+      "end_s": 27,
+      "frequency_hz": 4.333333333333333,
+      "raw_gyro_over_wheel": {
+        "magnitude": 13.032432395675873,
+        "phase_deg": -8.348975302381858
+      },
+      "wheel_over_command": {
+        "magnitude": 1.2332496563043613,
+        "phase_deg": -30.98359496067749
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5294855482821061,
+        "phase_deg": -50.295921981518724
+      }
+    },
+    {
+      "start_s": 27,
+      "end_s": 30,
+      "frequency_hz": 4.333333333333333,
+      "raw_gyro_over_wheel": {
+        "magnitude": 13.228539345007956,
+        "phase_deg": -8.488873632305564
+      },
+      "wheel_over_command": {
+        "magnitude": 1.1697006934207856,
+        "phase_deg": -27.219142520563754
+      },
+      "filtered_over_raw_gyro": {
+        "magnitude": 0.5271949934032746,
+        "phase_deg": -51.9818246277064
+      }
+    }
+  ]
+}

@@ -233,6 +233,8 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         if (!_filter_initialized || missed_deadline) {
             _tilt_angle = accel_angle;
             _gyro_rate = gyro_raw;
+            _drive_rate_filter.reset();
+            _drive_gyro_rate = _drive_rate_filter.update(gyro_raw, .005f, BALANCE_DRIVE_RATE_TAU);
             _filter_initialized = true;
         } else {
             const float sensor_dt = uint32_t(imu.sample_us - _last_imu_sample_us) * 1e-6f;
@@ -241,6 +243,7 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
             _tilt_angle = alpha * (_tilt_angle + gyro_raw * sensor_dt)
                         + (1.0f - alpha) * accel_angle;
             _gyro_rate = (1.0f - gyro_alpha) * gyro_raw + gyro_alpha * _gyro_rate;
+            _drive_gyro_rate = _drive_rate_filter.update(gyro_raw, sensor_dt, BALANCE_DRIVE_RATE_TAU);
         }
         _last_imu_sample_us = imu.sample_us;
     }
@@ -291,7 +294,7 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         BALANCE_DRIVE_ANGLE_K, BALANCE_DRIVE_RATE_K, BALANCE_DRIVE_SPEED_K,
         BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE
     };
-    const auto drive = _pilot_drive.step(_pilot_driving, angle_err, _gyro_rate,
+    const auto drive = _pilot_drive.step(_pilot_driving, angle_err, _drive_gyro_rate,
         _pilot_measured_vel, _pilot_velocity_ff, pd_command, _last_motor_vel,
         dt, cmd_max, drive_config);
     _pilot_drive_active = drive.active;
@@ -474,6 +477,7 @@ void BalanceController::enterBalancing(float current_roll) {
     _startup_recovery.reset();
     _recoil_unwind.reset();
     _pilot.reset();
+    _drive_arm_recovery.reset();
     _pilot_input_valid = false;
     _pilot_velocity_ff = 0;
     _pilot_measured_vel = 0;
@@ -1251,6 +1255,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         // authority the wheels lack near saturation. High threshold + slow
         // release: fires only on genuine disturbances, no idle chatter.
         // ---------------------------------------------------------------
+        static const balance_math::DriveArmConfig drive_arms = {
+            BALANCE_DRIVE_ARM_SCALE, BALANCE_DRIVE_ARM_LIMIT, BALANCE_DRIVE_ARM_HEADROOM,
+            BALANCE_DRIVE_ARM_ERROR, BALANCE_DRIVE_ARM_OUTWARD_RATE, BALANCE_DRIVE_ARM_CONFIRM_MS,
+            BALANCE_DRIVE_ARM_SEVERE_ERROR, BALANCE_DRIVE_ARM_SEVERE_RATE
+        };
         _last_arm_demand = 0.0f;
         _pilot_arm_applied = 0;
         if (_ramp_complete) {
@@ -1273,6 +1282,8 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             float demand = clampf(BALANCE_ARM_ASSIST_GAIN * excess,
                                   -BALANCE_ARM_ASSIST_RANGE_NEG,
                                   BALANCE_ARM_ASSIST_RANGE_POS);
+            if (_pilot.moving())
+                demand = balance_math::DriveArmRecovery::ordinary(demand, drive_arms);
             _last_arm_demand = demand;
 
             // Engagement state machine. Discriminator between an external
@@ -1356,7 +1367,15 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // arms to their full stop in the braking direction.
             bool wheels_railed = fabsf((float)_last_motor_vel)
                                >= BALANCE_MAX_DRIVE_SPEED * BALANCE_ARM_EMERGENCY_CMD_FRAC;
-            if (wheels_railed && fabsf(arm_error) > BALANCE_ARM_ASSIST_THRESH) {
+            // Ordinary travel can exceed the historical 13.5 rad/s threshold.
+            // During driving, require genuinely exhausted headroom AND a
+            // worsening lean, or an immediately severe outward lean.
+            const bool drive_emergency = _drive_arm_recovery.update(_pilot.moving(),
+                _last_motor_vel, arm_error, _effective_setpoint - tilt, _drive_gyro_rate,
+                dt, BALANCE_MAX_DRIVE_SPEED, BALANCE_ARM_ASSIST_THRESH, drive_arms);
+            const bool emergency = _pilot.moving() ? drive_emergency
+                : wheels_railed && fabsf(arm_error) > BALANCE_ARM_ASSIST_THRESH;
+            if (emergency) {
                 _last_outer_diag |= BAL_DIAG_ARM_EMERGENCY;
                 _arm_sign  = (arm_error > 0.0f) ? 1.0f : -1.0f;
                 _arm_stage = 1;   // exits as a normal ACTIVE engagement
@@ -1485,6 +1504,7 @@ bool BalanceController::startLog() {
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) return false;
 
     _pilot.reset();
+    _drive_arm_recovery.reset();
     _pilot_input_valid = false;
 
     _inner_fault = 0;
@@ -1731,7 +1751,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 511;  // prior extensions plus acceleration drive / planned arms v3
+    header.reserved = 1023; // prior extensions plus driving damping / graded recovery v4
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1882,7 +1902,19 @@ void BalanceController::dumpLog() {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 64) {
         // Decode the stored version; exporting an older log must retain its limits.
-        if (header.reserved & 256) {
+        if (header.reserved & 512) {
+            out.println("# standing_drive=ch1_ch2_damped_acceleration_arms_v4");
+            out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
+            out.println("# standing_drive_acceleration=angle_k:8.8 rate_k:1.5 speed_k:3 speed_error_limit:8 accel_limit:100 handoff_rate:30");
+            out.println("# standing_drive_rate_filter=tau_s:0.006 fresh_sample_dt:1 stationary_filter_unchanged:1");
+            out.println("# standing_drive_learning=max_abs_velocity_error:1 velocity_p:0");
+            out.println("# standing_drive_arms=gain:0.008333333 limit_fraction:0.1 tau_s:0.08 recovery_priority:1");
+            out.println("# standing_drive_arm_ordinary=scale:0.3 limit_fraction:0.12");
+            out.println("# standing_drive_arm_emergency=headroom_rad_s:3 min_error_deg:2 outward_rate_dps:8 confirm_ms:60 severe_error_deg:8 severe_outward_rate_dps:20 requires_velocity_disturbance:1");
+            out.println("# standing_drive_arm_error=measured_minus_projection_onto_zero_to_target_interval");
+            out.println("# standing_drive_active_flag=16 includes_pd_handoff:1");
+            out.println("# pilot_arm_units=planned_center_fraction_after_recovery_priority_before_output_filter");
+        } else if (header.reserved & 256) {
             out.println("# standing_drive=ch1_ch2_acceleration_arms_v3");
             out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:12 decel:16 turn_accel:18");
             out.println("# standing_drive_acceleration=angle_k:8.8 rate_k:3.1 speed_k:3 speed_error_limit:8 accel_limit:100 handoff_rate:30");
@@ -2118,6 +2150,9 @@ void BalanceController::printStatus() {
     Serial.printf("  Standing drive: CH1 steer / CH2 speed, limit %.2f rad/s, turn %.2f rad/s, %s\n",
                   BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
                   _state == BalanceState::Balancing && _pilot.ready() ? "READY" : "waiting for centered calm balance");
+    Serial.printf("  Driving v4: rate_tau=%.3fs rate_k=%.2f accel=%.1f brake=%.1f graded_arms=YES\n",
+                  BALANCE_DRIVE_RATE_TAU, BALANCE_DRIVE_RATE_K,
+                  BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL);
 
     if (_state == BalanceState::Balancing) {
         Serial.printf("  Setpoint: %.2f  (base + offset=%+.2f)\n",

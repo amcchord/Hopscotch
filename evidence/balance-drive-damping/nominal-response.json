@@ -1,0 +1,18 @@
+{
+  "small_v3": {
+    "first_positive_half_rad_after_input_s": 0.5800000000000001,
+    "first_below_point3_after_center_s": 0.5200000000000005
+  },
+  "small_candidate": {
+    "first_positive_half_rad_after_input_s": 0.6400000000000001,
+    "first_below_point3_after_center_s": 2.46
+  },
+  "full_v3": {
+    "first_positive_half_rad_after_input_s": 0.3799999999999999,
+    "first_below_point3_after_center_s": 0.17999999999999972
+  },
+  "full_candidate": {
+    "first_positive_half_rad_after_input_s": 0.6400000000000001,
+    "first_below_point3_after_center_s": 7.32
+  }
+}

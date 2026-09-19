@@ -71,5 +71,50 @@ int main() {
     }
     const auto mixed=balance_math::mix(20,-BALANCE_PILOT_MAX_TURN,30);
     assert(mixed.left==24.5f && mixed.right==15.5f);
-    std::cout<<"Acceleration drive checks passed: untouched PD, immediate lean, balance authority, anti-windup, handoff, invalid inputs, 50000 bounded mixer updates\n";
+    balance_math::DriveRateFilter rate_filter;
+    assert(rate_filter.update(0,.005f,.006f)==0);
+    float filtered=0;
+    for (int i=0;i<4;++i) filtered=rate_filter.update(10,.005f,.006f);
+    assert(filtered>9 && filtered<10); // >90% response in 20 ms
+    assert(rate_filter.update(NAN,.005f,.006f)==0);
+    assert(rate_filter.update(7,.005f,.006f)==7); // fresh reinitialization
+    assert(rate_filter.update(7,.03f,.006f)==0);
+    assert(rate_filter.update(7,.005f,-1)==0);
+    assert(rate_filter.update(7,.005f,NAN)==0);
+    balance_math::DriveArmRecovery arms;
+    const balance_math::DriveArmConfig ac={
+        BALANCE_DRIVE_ARM_SCALE,BALANCE_DRIVE_ARM_LIMIT,BALANCE_DRIVE_ARM_HEADROOM,
+        BALANCE_DRIVE_ARM_ERROR,BALANCE_DRIVE_ARM_OUTWARD_RATE,BALANCE_DRIVE_ARM_CONFIRM_MS,
+        BALANCE_DRIVE_ARM_SEVERE_ERROR,BALANCE_DRIVE_ARM_SEVERE_RATE};
+    auto emergency=[&](bool driving,float command,float speed_error,float angle_error,
+                       float body_rate,float dt=.02f) {
+        return arms.update(driving,command,speed_error,angle_error,body_rate,dt,30,
+                           BALANCE_ARM_ASSIST_THRESH,ac);
+    };
+    for (int sign : {-1,1}) {
+        arms.reset();
+        for(int i=0;i<20;++i) {
+            // Intentional cruise/braking below the physical rail is ordinary.
+            assert(!emergency(true,sign*20,sign*4,sign*3,-sign*10));
+            // Even near the rail, a body closing on its target is not outward.
+            assert(!emergency(true,sign*29,sign*4,sign*3,sign*10));
+        }
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        assert(emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        assert(!emergency(false,sign*28,sign*4,sign*3,-sign*10));
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        // Direction change must restart confirmation; no oscillatory shortcut.
+        assert(!emergency(true,-sign*28,-sign*4,-sign*3,sign*10));
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10,.2f));
+        assert(!emergency(true,sign*28,sign*4,sign*3,-sign*10));
+        arms.reset();
+        assert(emergency(true,sign*15,sign*4,sign*9,-sign*25)); // immediate severe catch
+        assert(!emergency(true,sign*29,0,sign*9,-sign*25)); // no velocity disturbance
+        assert(!emergency(true,NAN,sign*4,sign*9,-sign*25));
+        assert(std::fabs(balance_math::DriveArmRecovery::ordinary(sign*1.f,ac))<=.120001f);
+        assert(std::fabs(balance_math::DriveArmRecovery::ordinary(sign*.1f,ac)-sign*.03f)<.000001f);
+    }
+    std::cout<<"Acceleration drive checks passed: untouched PD, immediate lean, balance authority, anti-windup, handoff, invalid inputs, 50000 bounded mixer updates, fast fresh-sample rate filter, graded and direction-confirmed emergency arms\n";
 }
