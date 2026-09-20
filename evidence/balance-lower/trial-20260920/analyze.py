@@ -92,9 +92,11 @@ def replay(rows, lowering, summary):
     deployed_header = subprocess.check_output(
         ['git', 'show', '43b1967:src/balance_lower.h'], cwd=ROOT)
     (build/'balance_lower.h').write_bytes(deployed_header)
+    (build/'bridge.cpp').write_bytes(subprocess.check_output(
+        ['git', 'show', '43b1967:scripts/lowering_bridge.cpp'], cwd=ROOT))
     subprocess.run(['clang++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
                     '-shared', '-fPIC', '-I'+str(build),
-                    str(ROOT/'scripts/lowering_bridge.cpp'), '-o', str(binary)], check=True)
+                    str(build/'bridge.cpp'), '-o', str(binary)], check=True)
     lib = C.CDLL(str(binary))
     floats = C.POINTER(C.c_float)
     lib.lower_new.restype = C.c_void_p

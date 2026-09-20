@@ -1,0 +1,316 @@
+nominal: lower_complete; peak 19.84 deg/s; tilt 0.00
+no_floor: lower_motion_limit; peak 67.30 deg/s; tilt 72.08
+one_arm_only: lower_missed_catch; peak 20.05 deg/s; tilt 85.62
+stale_feedback: lower_invalid_feedback; peak 1.13 deg/s; tilt 90.71
+stale_in_fall: lower_invalid_feedback; peak 10.68 deg/s; tilt 89.55
+stale_supported: lower_invalid_feedback; peak 19.84 deg/s; tilt 85.66
+no_reach: lower_motion_limit; peak 67.30 deg/s; tilt 72.08
+slow_servo: lower_prepare_timeout; peak 0.25 deg/s; tilt 90.04
+contact_loss: lower_support_lost; peak 42.19 deg/s; tilt 71.83
+both_arms_obstructed: lower_motion_limit; peak 67.32 deg/s; tilt 69.54
+wrong_wheel_sign: lower_wrong_direction; peak 12.69 deg/s; tilt 93.60
+false_load_no_floor: lower_motion_limit; peak 67.65 deg/s; tilt 69.06
+high_inertia_limit: lower_complete; peak 22.12 deg/s; tilt 0.00
+sweep_13: lower_complete; peak 12.13 deg/s; tilt 0.00
+sweep_14: lower_complete; peak 11.25 deg/s; tilt 0.00
+sweep_15: lower_complete; peak 15.95 deg/s; tilt 0.00
+sweep_16: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_17: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_18: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_19: lower_complete; peak 13.51 deg/s; tilt 0.00
+sweep_20: lower_complete; peak 12.15 deg/s; tilt 0.00
+sweep_21: lower_complete; peak 15.20 deg/s; tilt 0.00
+sweep_22: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_23: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_24: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_25: lower_complete; peak 12.13 deg/s; tilt 0.00
+sweep_26: lower_complete; peak 14.45 deg/s; tilt 0.00
+sweep_27: lower_complete; peak 18.45 deg/s; tilt 0.00
+sweep_28: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_29: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_30: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_31: lower_complete; peak 13.51 deg/s; tilt 0.00
+sweep_32: lower_complete; peak 13.23 deg/s; tilt 0.00
+sweep_33: lower_complete; peak 14.78 deg/s; tilt 0.00
+sweep_34: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_35: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_36: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_37: lower_complete; peak 15.49 deg/s; tilt 0.00
+sweep_38: lower_complete; peak 15.31 deg/s; tilt 0.00
+sweep_39: lower_complete; peak 17.05 deg/s; tilt 0.00
+sweep_40: lower_complete; peak 16.94 deg/s; tilt 0.00
+sweep_41: lower_complete; peak 14.35 deg/s; tilt 0.00
+sweep_42: lower_complete; peak 16.63 deg/s; tilt 0.00
+sweep_43: lower_complete; peak 18.20 deg/s; tilt 0.00
+sweep_44: lower_complete; peak 15.46 deg/s; tilt 0.00
+sweep_45: lower_complete; peak 17.10 deg/s; tilt 0.00
+sweep_46: lower_complete; peak 16.61 deg/s; tilt 0.00
+sweep_47: lower_complete; peak 12.36 deg/s; tilt 0.00
+sweep_48: lower_complete; peak 20.10 deg/s; tilt 0.00
+sweep_49: lower_complete; peak 15.49 deg/s; tilt 0.00
+sweep_50: lower_complete; peak 15.92 deg/s; tilt 0.00
+sweep_51: lower_complete; peak 17.32 deg/s; tilt 0.00
+sweep_52: lower_complete; peak 13.06 deg/s; tilt 0.00
+sweep_53: lower_complete; peak 14.32 deg/s; tilt 0.00
+sweep_54: lower_complete; peak 16.24 deg/s; tilt 0.00
+sweep_55: lower_complete; peak 18.20 deg/s; tilt 0.00
+sweep_56: lower_complete; peak 15.46 deg/s; tilt 0.00
+sweep_57: lower_complete; peak 13.66 deg/s; tilt 0.00
+sweep_58: lower_complete; peak 12.82 deg/s; tilt 0.00
+sweep_59: lower_complete; peak 12.08 deg/s; tilt 0.00
+sweep_60: lower_complete; peak 12.03 deg/s; tilt 0.00
+sweep_61: lower_complete; peak 20.82 deg/s; tilt 0.00
+sweep_62: lower_complete; peak 19.11 deg/s; tilt 0.00
+sweep_63: lower_complete; peak 18.78 deg/s; tilt 0.00
+sweep_64: lower_complete; peak 15.10 deg/s; tilt 0.00
+sweep_65: lower_complete; peak 17.13 deg/s; tilt 0.00
+sweep_66: lower_complete; peak 17.17 deg/s; tilt 0.00
+sweep_67: lower_complete; peak 24.24 deg/s; tilt 0.00
+sweep_68: lower_complete; peak 22.15 deg/s; tilt 0.00
+sweep_69: lower_complete; peak 19.25 deg/s; tilt 0.00
+sweep_70: lower_complete; peak 18.48 deg/s; tilt 0.00
+sweep_71: lower_complete; peak 17.84 deg/s; tilt 0.00
+sweep_72: lower_complete; peak 15.55 deg/s; tilt 0.00
+sweep_73: lower_complete; peak 20.82 deg/s; tilt 0.00
+sweep_74: lower_complete; peak 18.71 deg/s; tilt 0.00
+sweep_75: lower_complete; peak 17.07 deg/s; tilt 0.00
+sweep_76: lower_complete; peak 15.10 deg/s; tilt 0.00
+sweep_77: lower_complete; peak 17.82 deg/s; tilt 0.00
+sweep_78: lower_complete; peak 18.02 deg/s; tilt 0.00
+sweep_79: lower_complete; peak 24.24 deg/s; tilt 0.00
+sweep_80: lower_complete; peak 22.15 deg/s; tilt 0.00
+sweep_81: lower_complete; peak 19.25 deg/s; tilt 0.00
+sweep_82: lower_complete; peak 18.48 deg/s; tilt 0.00
+sweep_83: lower_complete; peak 17.84 deg/s; tilt 0.00
+sweep_84: lower_complete; peak 15.82 deg/s; tilt 0.00
+sweep_85: lower_complete; peak 16.99 deg/s; tilt 0.00
+sweep_86: lower_complete; peak 16.05 deg/s; tilt 0.00
+sweep_87: lower_complete; peak 19.12 deg/s; tilt 0.00
+sweep_88: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_89: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_90: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_91: lower_complete; peak 19.37 deg/s; tilt 0.00
+sweep_92: lower_complete; peak 15.73 deg/s; tilt 0.00
+sweep_93: lower_complete; peak 15.11 deg/s; tilt 0.00
+sweep_94: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_95: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_96: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_97: lower_complete; peak 16.99 deg/s; tilt 0.00
+sweep_98: lower_complete; peak 15.05 deg/s; tilt 0.00
+sweep_99: lower_complete; peak 15.55 deg/s; tilt 0.00
+sweep_100: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_101: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_102: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_103: lower_complete; peak 19.37 deg/s; tilt 0.00
+sweep_104: lower_complete; peak 15.36 deg/s; tilt 0.00
+sweep_105: lower_complete; peak 15.00 deg/s; tilt 0.00
+sweep_106: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_107: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_108: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_109: lower_complete; peak 22.53 deg/s; tilt 0.00
+sweep_110: lower_complete; peak 19.61 deg/s; tilt 0.00
+sweep_111: lower_complete; peak 17.52 deg/s; tilt 0.00
+sweep_112: lower_complete; peak 14.27 deg/s; tilt 0.00
+sweep_113: lower_complete; peak 17.57 deg/s; tilt 0.00
+sweep_114: lower_complete; peak 15.33 deg/s; tilt 0.00
+sweep_115: lower_complete; peak 26.97 deg/s; tilt 0.00
+sweep_116: lower_complete; peak 23.21 deg/s; tilt 0.00
+sweep_117: lower_complete; peak 21.15 deg/s; tilt 0.00
+sweep_118: lower_complete; peak 17.68 deg/s; tilt 0.00
+sweep_119: lower_complete; peak 15.22 deg/s; tilt 0.00
+sweep_120: lower_complete; peak 16.75 deg/s; tilt 0.00
+sweep_121: lower_complete; peak 22.53 deg/s; tilt 0.00
+sweep_122: lower_complete; peak 19.61 deg/s; tilt 0.00
+sweep_123: lower_complete; peak 17.16 deg/s; tilt 0.00
+sweep_124: lower_complete; peak 14.27 deg/s; tilt 0.00
+sweep_125: lower_complete; peak 15.20 deg/s; tilt 0.00
+sweep_126: lower_complete; peak 15.41 deg/s; tilt 0.00
+sweep_127: lower_complete; peak 26.97 deg/s; tilt 0.00
+sweep_128: lower_complete; peak 23.21 deg/s; tilt 0.00
+sweep_129: lower_complete; peak 19.60 deg/s; tilt 0.00
+sweep_130: lower_complete; peak 17.68 deg/s; tilt 0.00
+sweep_131: lower_complete; peak 14.65 deg/s; tilt 0.00
+sweep_132: lower_complete; peak 12.94 deg/s; tilt 0.00
+sweep_133: lower_complete; peak 31.41 deg/s; tilt 0.00
+sweep_134: lower_complete; peak 28.58 deg/s; tilt 0.00
+sweep_135: lower_complete; peak 24.24 deg/s; tilt 0.00
+sweep_136: lower_complete; peak 21.40 deg/s; tilt 0.00
+sweep_137: lower_complete; peak 19.70 deg/s; tilt 0.00
+sweep_138: lower_complete; peak 22.25 deg/s; tilt 0.00
+sweep_139: lower_complete; peak 36.82 deg/s; tilt 0.00
+sweep_140: lower_complete; peak 34.07 deg/s; tilt 0.00
+sweep_141: lower_complete; peak 29.99 deg/s; tilt 0.00
+sweep_142: lower_complete; peak 27.14 deg/s; tilt 0.00
+sweep_143: lower_complete; peak 26.14 deg/s; tilt 0.00
+sweep_144: lower_complete; peak 23.31 deg/s; tilt 0.00
+sweep_145: lower_complete; peak 31.41 deg/s; tilt 0.00
+sweep_146: lower_complete; peak 28.58 deg/s; tilt 0.00
+sweep_147: lower_complete; peak 25.13 deg/s; tilt 0.00
+sweep_148: lower_complete; peak 21.40 deg/s; tilt 0.00
+sweep_149: lower_complete; peak 19.70 deg/s; tilt 0.00
+sweep_150: lower_complete; peak 21.75 deg/s; tilt 0.00
+sweep_151: lower_complete; peak 36.82 deg/s; tilt 0.00
+sweep_152: lower_complete; peak 34.07 deg/s; tilt 0.00
+sweep_153: lower_complete; peak 29.99 deg/s; tilt 0.00
+sweep_154: lower_complete; peak 27.14 deg/s; tilt 0.00
+sweep_155: lower_complete; peak 26.14 deg/s; tilt 0.00
+sweep_156: lower_complete; peak 22.04 deg/s; tilt 0.00
+sweep_157: lower_complete; peak 24.68 deg/s; tilt 0.00
+sweep_158: lower_complete; peak 20.23 deg/s; tilt 0.00
+sweep_159: lower_complete; peak 23.59 deg/s; tilt 0.00
+sweep_160: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_161: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_162: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_163: lower_complete; peak 28.33 deg/s; tilt 0.00
+sweep_164: lower_complete; peak 23.59 deg/s; tilt 0.00
+sweep_165: lower_complete; peak 22.41 deg/s; tilt 0.00
+sweep_166: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_167: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_168: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_169: lower_complete; peak 24.68 deg/s; tilt 0.00
+sweep_170: lower_complete; peak 19.92 deg/s; tilt 0.00
+sweep_171: lower_complete; peak 24.52 deg/s; tilt 0.00
+sweep_172: lower_prepare_disturbed; peak 6.89 deg/s; tilt 89.07
+sweep_173: lower_prepare_disturbed; peak 7.21 deg/s; tilt 88.75
+sweep_174: lower_prepare_disturbed; peak 7.38 deg/s; tilt 88.70
+sweep_175: lower_complete; peak 28.33 deg/s; tilt 0.00
+sweep_176: lower_complete; peak 23.59 deg/s; tilt 0.00
+sweep_177: lower_complete; peak 22.41 deg/s; tilt 0.00
+sweep_178: lower_prepare_disturbed; peak 6.71 deg/s; tilt 89.18
+sweep_179: lower_prepare_disturbed; peak 6.93 deg/s; tilt 89.04
+sweep_180: lower_prepare_disturbed; peak 7.15 deg/s; tilt 89.02
+sweep_181: lower_complete; peak 33.88 deg/s; tilt 0.00
+sweep_182: lower_complete; peak 30.12 deg/s; tilt 0.00
+sweep_183: lower_complete; peak 31.41 deg/s; tilt 0.00
+sweep_184: lower_complete; peak 19.95 deg/s; tilt 0.00
+sweep_185: lower_complete; peak 16.03 deg/s; tilt 0.00
+sweep_186: lower_complete; peak 16.30 deg/s; tilt 0.00
+sweep_187: lower_complete; peak 40.23 deg/s; tilt 0.00
+sweep_188: lower_complete; peak 35.68 deg/s; tilt 0.00
+sweep_189: lower_complete; peak 32.58 deg/s; tilt 0.00
+sweep_190: lower_complete; peak 25.58 deg/s; tilt 0.00
+sweep_191: lower_complete; peak 21.60 deg/s; tilt 0.00
+sweep_192: lower_complete; peak 20.06 deg/s; tilt 0.00
+sweep_193: lower_complete; peak 33.88 deg/s; tilt 0.00
+sweep_194: lower_complete; peak 30.02 deg/s; tilt 0.00
+sweep_195: lower_complete; peak 31.16 deg/s; tilt 0.00
+sweep_196: lower_complete; peak 19.95 deg/s; tilt 0.00
+sweep_197: lower_complete; peak 16.03 deg/s; tilt 0.00
+sweep_198: lower_complete; peak 16.93 deg/s; tilt 0.00
+sweep_199: lower_complete; peak 40.23 deg/s; tilt 0.00
+sweep_200: lower_complete; peak 35.68 deg/s; tilt 0.00
+sweep_201: lower_complete; peak 32.58 deg/s; tilt 0.00
+sweep_202: lower_complete; peak 25.58 deg/s; tilt 0.00
+sweep_203: lower_complete; peak 21.60 deg/s; tilt 0.00
+sweep_204: lower_complete; peak 19.65 deg/s; tilt 0.00
+sweep_205: lower_complete; peak 47.30 deg/s; tilt 0.00
+sweep_206: lower_complete; peak 45.97 deg/s; tilt 0.00
+sweep_207: lower_complete; peak 40.42 deg/s; tilt 0.00
+sweep_208: lower_complete; peak 31.58 deg/s; tilt 0.00
+sweep_209: lower_complete; peak 29.04 deg/s; tilt 0.00
+sweep_210: lower_complete; peak 26.55 deg/s; tilt 0.00
+sweep_211: lower_complete; peak 55.15 deg/s; tilt 0.00
+sweep_212: lower_complete; peak 52.33 deg/s; tilt 0.00
+sweep_213: lower_complete; peak 46.65 deg/s; tilt 0.00
+sweep_214: lower_complete; peak 40.29 deg/s; tilt 0.00
+sweep_215: lower_complete; peak 39.12 deg/s; tilt 0.00
+sweep_216: lower_complete; peak 33.83 deg/s; tilt 0.00
+sweep_217: lower_complete; peak 47.30 deg/s; tilt 0.00
+sweep_218: lower_complete; peak 44.19 deg/s; tilt 0.00
+sweep_219: lower_complete; peak 42.07 deg/s; tilt 0.00
+sweep_220: lower_complete; peak 31.58 deg/s; tilt 0.00
+sweep_221: lower_complete; peak 29.04 deg/s; tilt 0.00
+sweep_222: lower_complete; peak 26.11 deg/s; tilt 0.00
+sweep_223: lower_complete; peak 55.15 deg/s; tilt 0.00
+sweep_224: lower_complete; peak 52.33 deg/s; tilt 0.00
+sweep_225: lower_complete; peak 46.65 deg/s; tilt 0.00
+sweep_226: lower_complete; peak 40.29 deg/s; tilt 0.00
+sweep_227: lower_complete; peak 39.12 deg/s; tilt 0.00
+sweep_228: lower_complete; peak 33.83 deg/s; tilt 0.00
+{
+  "name": "nominal",
+  "model": {
+    "pivot": 0.12,
+    "arm": 0.3,
+    "wheel_radius": 0.055,
+    "equilibrium": 86.63,
+    "arm_eq_slope": -6.3,
+    "nonlinear_com": 0.0,
+    "arm_inertia_ratio": 0.03,
+    "arm_joint_inertia": 0.004,
+    "gravity": 8.82,
+    "wheel_coupling": 6.0,
+    "wheel_tau": 0.06,
+    "stiffness": 240,
+    "damping_ratio": 0.8,
+    "servo_tau": 0.04,
+    "servo_limit": 1.5,
+    "joint_stiffness": 25,
+    "torque_per_acceleration": 0.004,
+    "center_left": 1.768,
+    "center_right": -1.767,
+    "initial_speed": 0,
+    "floor": true,
+    "right_contact": true,
+    "stale_at": 1000000000.0,
+    "stale_phase": -1,
+    "slip_at": 1000000000.0,
+    "slip_after_catch": 1000000000.0,
+    "jam": false,
+    "launch_sign": 1,
+    "false_load": false
+  },
+  "outcome": "lower_complete",
+  "final_phase": "complete",
+  "commit_s": 5.92,
+  "catch_s": 6.74,
+  "first_flat_s": 17.66,
+  "elapsed_s": 19.9,
+  "peak_rate_dps": 19.838,
+  "peak_wheel_rad_s": 1.73,
+  "peak_model_torque_nm": 3.708,
+  "peak_target_lead_rad": 0.08435,
+  "final_tilt_deg": 0.0,
+  "transitions": [
+    {
+      "time_s": 0.0,
+      "phase": "stopping",
+      "tilt_deg": 86.63
+    },
+    {
+      "time_s": 0.48,
+      "phase": "reaching",
+      "tilt_deg": 86.63
+    },
+    {
+      "time_s": 5.92,
+      "phase": "committing",
+      "tilt_deg": 91.395
+    },
+    {
+      "time_s": 6.42,
+      "phase": "catching",
+      "tilt_deg": 89.753
+    },
+    {
+      "time_s": 6.74,
+      "phase": "descending",
+      "tilt_deg": 85.712
+    },
+    {
+      "time_s": 18.44,
+      "phase": "ground_hold",
+      "tilt_deg": 0.0
+    },
+    {
+      "time_s": 19.04,
+      "phase": "retracting",
+      "tilt_deg": 0.0
+    },
+    {
+      "time_s": 19.9,
+      "phase": "complete",
+      "tilt_deg": 0.0
+    }
+  ]
+}

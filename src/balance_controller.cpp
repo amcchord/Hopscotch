@@ -155,7 +155,7 @@ void BalanceController::begin(MotorManager* motors, ArmController* arms) {
     _arms   = arms;
     _state  = BalanceState::Idle;
     _lowering.reset();
-    _lower_lean_offset = 0;
+    _lower_wheel_command = 0;
     _targets_initialized = false;
     _filter_initialized = false;
     _logging = false;
@@ -286,14 +286,17 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
         return;
     }
     if (_state == BalanceState::Lowering) {
-        // Arms now carry the front of the body. Keep rear wheels at zero speed
-        // with the same fresh-IMU/dead-man checks; restore CSP only when flat.
+        // Deliberate forward fall/catch owns a small wheel command. The upright
+        // PD must not fight it. Never keep a fall-initiation command through a
+        // stalled 50 Hz owner; the ordinary balance dead-man is too long here.
         _pilot_drive.reset();
         _pilot_drive_active = false;
-        const bool left = _motors->sendDriveSpeed(MotorRole::BackLeft, 0);
-        const bool right = _motors->sendDriveSpeed(MotorRole::BackRight, 0);
-        _last_motor_vel_raw = _last_motor_vel = _last_cmd_left = _last_cmd_right = 0;
-        _last_inner_diag = left && right ? 0 : BAL_DIAG_CAN_TX_FAILED;
+        const auto wheel = balance_math::lowerWheelCommand(_lower_wheel_command, update_age);
+        if (wheel.fault) _inner_fault |= BAL_DIAG_DEADMAN_HARD;
+        const bool left = _motors->sendDriveSpeed(MotorRole::BackLeft, wheel.value);
+        const bool right = _motors->sendDriveSpeed(MotorRole::BackRight, wheel.value);
+        _last_motor_vel_raw = _last_motor_vel = _last_cmd_left = _last_cmd_right = wheel.value;
+        _last_inner_diag = _inner_fault | (left && right ? 0 : BAL_DIAG_CAN_TX_FAILED);
         if (!left || !right) _inner_fault |= BAL_DIAG_CAN_TX_FAILED;
         return;
     }
@@ -450,7 +453,7 @@ void BalanceController::enterTippingUp() {
 
 void BalanceController::enterBalancing(float current_roll) {
     _lowering.reset();
-    _lower_lean_offset = 0;
+    _lower_wheel_command = 0;
     _state = BalanceState::Balancing;
     _targets_initialized = false;   // gate fast task until Speed mode is ready
 
@@ -573,7 +576,7 @@ void BalanceController::persistLearnedTrim() {
 
 void BalanceController::enterReturningArms(const char* reason) {
     _lowering.reset();
-    _lower_lean_offset = 0;
+    _lower_wheel_command = 0;
     persistLearnedTrim();
     stopLog(reason);  // freeze run time before any blocking mode restoration
     _state = BalanceState::ReturningArms;
@@ -637,7 +640,7 @@ void BalanceController::hardAbort(const char* reason) {
 
     stopLog(reason);
     _lowering.reset();
-    _lower_lean_offset = 0;
+    _lower_wheel_command = 0;
     _state = BalanceState::Idle;
     _targets_initialized = false;
     exitSpeedMode();
@@ -687,7 +690,7 @@ void BalanceController::resetSafetyTimers() {
 
 balance_math::LowerInput BalanceController::lowerInput(bool pilot_valid) const {
     balance_math::LowerInput in;
-    in.tilt = _tilt_angle; in.rate = _gyro_rate;
+    in.tilt = _tilt_angle; in.rate = _drive_gyro_rate; // fast catch/impact rate, tau 6 ms
     in.error = _effective_setpoint - _tilt_angle;
     in.wheel_left = _motors->getMotor(MotorRole::BackLeft).velocity;
     in.wheel_right = _motors->getMotor(MotorRole::BackRight).velocity;
@@ -702,7 +705,7 @@ balance_math::LowerInput BalanceController::lowerInput(bool pilot_valid) const {
     for (int i = 0; i < NUM_MOTORS; ++i) {
         const auto& motor = _motors->getMotor(i);
         in.healthy = in.healthy && motor.enabled && motor.online && !motor.has_fault
-            && !motor.errors && millis() - motor.last_feedback_ms <= BALANCE_FEEDBACK_STALE_MS;
+            && !motor.errors && millis() - motor.last_feedback_ms <= 100; // catch requires current arm and wheel load
     }
     return in;
 }
@@ -757,7 +760,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         const auto& cal = _arms->getCalibration();
         if (_ramp_complete && _lowering.request(millis(), lowerInput(pilot_valid), cal.center_left, cal.center_right)) {
             persistLearnedTrim(); // Save only the already-qualified ordinary balance estimate.
-            Serial.println("[Balance] LOWER requested: stop, reach, support, descend");
+            Serial.println("[Balance] LOWER requested: stop, prepare, fall forward, catch, descend");
         } else {
             Serial.println("[Balance] LOWER refused: wait for settled startup and healthy armed feedback");
         }
@@ -782,9 +785,10 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                 _lowering.reset();
                 return;
             }
-            _lowering.reset(); // No support: remain balancing after slow arm retraction.
+            _lowering.reset(); // Stop request timed out before leaving balance control.
             _pilot.reset();    // Require fresh neutral before accepting driving again.
-        } else if (_lowering.supported()) {
+        } else if (_lowering.committed()) {
+            _lower_wheel_command = _lowering.wheelCommand();
             _pilot_driving = false;
             _pilot_velocity_ff = 0;
             _yaw_corr = 0;
@@ -1509,12 +1513,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         if (_lowering.overridesArms()) {
             _arm_left_target = _arms->getForwardLeft() + _lowering.left();
             _arm_right_target = _arms->getForwardRight() + _lowering.right();
-            arm_speed = balance_math::LowerConfig{}.retract_speed;
+            arm_speed = _lowering.armSpeed();
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, arm_speed);
 
-        _lower_lean_offset = moveToward(_lower_lean_offset, _lowering.leanOffset(), 2.0f, dt);
-        _effective_setpoint = base_effective_setpoint + _sp_offset + _lower_lean_offset;
+        _effective_setpoint = base_effective_setpoint + _sp_offset;
         _effective_setpoint = clampf(_effective_setpoint, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
 
         // ---------------------------------------------------------------
@@ -1576,7 +1579,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
     case BalanceState::Lowering: {
         _arm_left_target = _arms->getForwardLeft() + _lowering.left();
         _arm_right_target = _arms->getForwardRight() + _lowering.right();
-        _arms->setOverrideTargets(_arm_left_target, _arm_right_target, balance_math::LowerConfig{}.retract_speed);
+        _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _lowering.armSpeed());
         const bool left = _motors->sendDrivePosition(MotorRole::FrontLeft, _front_left_hold, 0);
         const bool right = _motors->sendDrivePosition(MotorRole::FrontRight, _front_right_hold, 0);
         if (!left || !right) {
@@ -1787,7 +1790,8 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.inner_sat_ticks = inner_sat_ticks;
     s.imu_age_ms     = imu_age_ms;
     s.roll           = roll_deg;
-    s.roll_rate      = roll_rate_dps;
+    s.roll_rate      = _lowering.phase() != balance_math::LowerPhase::Idle
+                    ? (float)_drive_gyro_rate : roll_rate_dps;
     s.accel_angle    = _last_accel_angle;
     s.gyro_raw       = _last_gyro_raw;
     s.accel_norm     = _last_accel_norm;
@@ -1870,7 +1874,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 4095; // prior extensions plus progressive braking and supported lowering
+    header.reserved = 8191; // prior extensions plus forward-fall/catch lowering v2
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -2019,7 +2023,17 @@ void BalanceController::dumpLog(Print* sink) {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
-    if (header.reserved & 2048) {
+    if (header.reserved & 4096) {
+        out.println("# lowering=experimental_ch11_forward_catch_v2 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        out.println("# lowering_phases=0:idle 1:stopping 2:preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
+        out.println("# lowering_prepare=travel_rad:1.3 speed_rad_s:0.25 confirm_ms:200");
+        out.println("# lowering_launch=rear_accel_rad_s2:4 rear_speed_rad_s:-2 forward_drop_deg:1 forward_rate_dps:2 accel_pause_rate_dps:6 coast_min_arm_rad:1.8 timeout_ms:1800");
+        out.println("# lowering_catch=travel_rad:2.4 speed_rad_s:1.5 first_load_nm:0.4 sustained_load_nm:0.2 confirm_ms:80 timeout_ms:2500 yield_rad:0.06 yield_rad_s:0.12 early_catch_drop_deg:0.5 first_load_delay_ms:100 arm_start_rate_dps:-1");
+        out.println("# lowering_support=both_arms measured_forward_fall_and_deceleration required tracking_stall_not_required");
+        out.println("# lowering_rate=roll_rate_uses_fast_tau_s:0.006 while_pilot_phase_nonzero:1 ordinary_balance_filter_unchanged:1");
+        out.println("# lowering_limits=target_lead_rad:0.12 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:0.75 owner_timeout_ms:100 motor_feedback_ms:100 rate_filter_tau_s:0.006");
+        out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600");
+    } else if (header.reserved & 2048) {
         out.println("# lowering=experimental_ch11_supported_v1 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:reaching 3:descending 4:ground_hold 5:retracting 6:canceling 7:complete 8:fault 9:loading");
         out.println("# lowering_load=lean_deg:-3 lean_rate_dps:2 arm_travel_rad:0.035 forward_tilt_deg:2 confirm_ms:240 timeout_ms:5000");
@@ -2261,11 +2275,13 @@ const char* BalanceController::getStateString() const {
                 case balance_math::LowerPhase::Stopping: return "LOWER_WAIT";
                 case balance_math::LowerPhase::Reaching: return "LOWER_REACH";
                 case balance_math::LowerPhase::Canceling: return "LOWER_CANCEL";
-                case balance_math::LowerPhase::Loading: return "LOWER_LOAD";
                 default: return "BALANCE";
             }
         case BalanceState::ReturningArms: return "RET_ARMS";
-        case BalanceState::Lowering:      return "LOWERING";
+        case BalanceState::Lowering:
+            if (_lowering.phase() == balance_math::LowerPhase::Committing) return "LOWER_FALL";
+            if (_lowering.phase() == balance_math::LowerPhase::Catching) return "LOWER_CATCH";
+            return "LOWERING";
     }
     return "?";
 }

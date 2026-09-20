@@ -16,7 +16,8 @@ void lower_step(void* p, uint32_t now, float dt, const float* values, bool healt
     result[0] = lower.left(); result[1] = lower.right();
     result[2] = static_cast<float>(lower.phase()); result[3] = lower.supported();
     result[4] = lower.overridesArms();
-    result[5] = lower.leanOffset();
+    result[5] = lower.wheelCommand();
+    result[6] = lower.committed();
 }
 const char* lower_reason(void* p) { return static_cast<BalanceLower*>(p)->reason(); }
 }
