@@ -501,6 +501,7 @@ void BalanceController::enterBalancing(float current_roll) {
     _arms_reached_tip = true;
     _arms_returning   = false;
     _arms_returned    = false;
+    _fast_tip_release.reset();
     _ramp_complete    = false;
     _balance_start_ms = millis();
     _qualified_trim_ms = 0;
@@ -1089,6 +1090,10 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
                                ? clampf(arm_frac / _engage_arm_frac, 0.0f, 1.0f)
                                : 1.0f;
             }
+            if (_fast_tip_run) {
+                capture_weight = _fast_tip_release.weight(
+                    _arms_returning, _arms_returned, _engage_arm_frac, arm_frac);
+            }
             capture_shift = _engage_capture_shift * capture_weight;
         }
         _last_capture_shift = capture_shift;
@@ -1166,18 +1171,22 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             _arm_left_goal  = _arms->getForwardLeft();
             _arm_right_goal = _arms->getForwardRight();
 
-            // Re-anchor the curve to the settled tip stance. This is a quiet
-            // pose measurement, not proof of free balance: the arms may still
-            // support the body. The tip-to-forward schedule remains a separate
-            // physical estimate. Bound TOTAL trim before removing the stored
+            // Preserve the established slow capture calibration. A fast tip
+            // can settle while the arms carry substantial load (Sept 20 trial),
+            // so retain its transient reference and release it with the arms
+            // instead of learning that supported angle as free equilibrium.
+            // For slow capture, bound TOTAL trim before removing the stored
             // component; a relative +/-6 clamp biased the Sept 14 capture when
             // the old trim was +2.31 and the newly measured correction was -4.
             if (capture_settled) {
                 float scheduled_now = computeScheduledSetpoint();
-                _run_curve_shift = balance_math::captureCurveShift(
-                    tilt, scheduled_now, _engage_trim, BALANCE_SP_OFFSET_MAX_DEG);
-                _engage_capture_shift = 0.0f;
-                Serial.printf("[Balance] Capture-calibrated: tilt=%.2f, curve shift %+.2f\n",
+                const auto offsets = balance_math::captureOffsets(
+                    _fast_tip_run, tilt, scheduled_now, _engage_trim,
+                    BALANCE_SP_OFFSET_MAX_DEG, _engage_capture_shift);
+                _run_curve_shift = offsets.curve;
+                _engage_capture_shift = offsets.transient;
+                Serial.printf("[Balance] Capture %s: tilt=%.2f, curve shift %+.2f\n",
+                              _fast_tip_run ? "supported; preserving stored trim" : "calibrated",
                               tilt, _run_curve_shift);
             }
             Serial.printf("[Balance] Arms beginning return to forward/TDC (%s after %lu ms)\n",

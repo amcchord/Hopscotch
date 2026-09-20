@@ -181,6 +181,9 @@ static constexpr float    BALANCE_FAST_TIP_MAX_TILT_DEG = 100.0f;
 static constexpr float    BALANCE_FAST_TIP_MAX_RATE_DPS = 100.0f;
 static constexpr float    BALANCE_FAST_TIP_CAPTURE_RATE_DPS = 8.0f;
 static constexpr float    BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S = 0.30f;
+// A supported fast capture is transient. Release that reference during the
+// first 10% of measured arm return; the existing base slew bounds the output.
+static constexpr float    BALANCE_FAST_TIP_RELEASE_FRACTION = 0.10f;
 static constexpr uint32_t BALANCE_FAST_TIP_CAPTURE_MS = 120;
 static constexpr uint32_t BALANCE_FAST_TIP_STALL_MS = 400;
 static constexpr uint32_t BALANCE_FAST_TIP_TIMEOUT_MS = 4500;

@@ -1,4 +1,5 @@
 #include "balance_tip_up.h"
+#include "balance_math.h"
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -163,20 +164,79 @@ int main(int argc, char** argv) {
 
     // A late body rebound or moving arm cannot qualify a capture based only on
     // generated targets. When motion stops, require a NEW continuous quiet dwell.
-    for(int moving=0;moving<3;++moving) {
+    for(int moving=0;moving<7;++moving) {
         FastTipUp tip; auto in=flat(); assert(tip.begin(0,in));
         for(uint32_t now=20;now<=3400;now+=20) {
             track(in,tip,.02f,.04f,2.2f);
+            in.wheel_left = in.wheel_right = 0;
             if(now>2500 && now<3100) {
                 if(moving==0) in.rate=9;
                 if(moving==1) in.left_velocity=.31f;
                 if(moving==2) in.right_velocity=-.31f;
+                if(moving==3) in.wheel_left=.76f;
+                if(moving==4) in.wheel_right=-.76f;
+                if(moving==5) in.wheel_left=in.wheel_right=5;
+                if(moving==6) { in.wheel_left=5; in.wheel_right=-5; }
             }
             tip.step(now,.02f,in);
             assert(!tip.fault());
             if(now<3220) assert(!tip.ready());
         }
         assert(tip.ready());
+    }
+
+    // Rolling never acquires capture, even with quiet body/arms, and it still
+    // reaches the original deadline. The mean speed must not hide counterspin.
+    for(float right : {-5.0f, 5.0f}) {
+        FastTipUp tip; auto in=flat(); assert(tip.begin(0,in));
+        for(uint32_t now=20;now<=4520;now+=20) {
+            track(in,tip,.02f,.04f,2.2f);
+            if(now>2400) { in.wheel_left=5; in.wheel_right=right; }
+            tip.step(now,.02f,in);
+            assert(!tip.ready());
+            if(now<=4500) assert(!tip.fault());
+        }
+        assert(std::strcmp(tip.fault(),"fast_tip_timeout")==0);
+    }
+
+    // Recorded fast trial: supported 82.456-degree capture erased 2.86 degrees
+    // of the saved 3.2398-degree equilibrium correction. Release must restore
+    // that saved reference, not carry the support angle to Forward forever.
+    {
+        constexpr float tilt=82.456f, scheduled=82.0762f, stored=3.2398f;
+        const float initial_shift=tilt-scheduled-stored;
+        const auto fast=balance_math::captureOffsets(true,tilt,scheduled,stored,8,initial_shift);
+        const auto slow=balance_math::captureOffsets(false,tilt,scheduled,stored,8,initial_shift);
+        assert(std::fabs(slow.curve+2.86f)<.00002f && slow.transient==0);
+        assert(fast.curve==0 && fast.transient==initial_shift);
+        balance_math::FastTipRelease release;
+        assert(release.weight(false,false,1,.95f)==1); // hold until return owns arms
+        assert(release.weight(true,false,1,1)==1); // targets alone do not release
+        float previous=1;
+        for(float fraction : {1.f,.999f,.992f,.984f,.975f,.966f,.955f,.943f,.933f,.923f,.912f,.902f,.891f}) {
+            const float weight=release.weight(true,false,1,fraction);
+            assert(weight>=0 && weight<=previous); previous=weight;
+        }
+        assert(previous==0);
+        assert(release.weight(true,false,1,.99f)==0); // bounce cannot reapply bias
+        assert(release.weight(true,true,1,1)==0); // assistance cannot reapply it
+        assert(std::fabs(84+stored+fast.curve+fast.transient*previous-87.2398f)<.00002f);
+        release.reset();
+        assert(std::fabs(release.weight(true,false,1,.95f)-.5f)<.00001f);
+        assert(std::fabs(release.weight(true,false,1,.96f)-.5f)<.00001f);
+        assert(std::fabs(release.weight(true,false,1,std::numeric_limits<float>::quiet_NaN())-.5f)<.00001f);
+        assert(release.weight(false,true,1,.95f)==0);
+    }
+
+    // Slow capture retains the exact prior absolute-trim arithmetic, including
+    // clipping and both signs of saved trim. Fast never writes a new curve.
+    for(float tilt : {60.f,78.1f,82.456f,100.f})
+    for(float stored : {-8.f,-2.f,0.f,3.2398f,8.f}) {
+        const auto slow=balance_math::captureOffsets(false,tilt,82.1f,stored,8,2);
+        assert(slow.curve==balance_math::captureCurveShift(tilt,82.1f,stored,8));
+        assert(slow.transient==0);
+        const auto fast=balance_math::captureOffsets(true,tilt,82.1f,stored,8,2);
+        assert(fast.curve==0 && fast.transient==2);
     }
 
     // Stuck arms: bound target lead, keep the other arm on the shared path,
