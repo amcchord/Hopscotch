@@ -1,0 +1,5113 @@
+{
+  "model_scope": "Screen the production stand-down policy against a planar arm/floor model.\n\nThe actual C++ policy runs through a tiny native bridge. This model assumes\nthe existing wheel balance controller can maintain near-equilibrium balance\nduring preparation; it does NOT validate that assumption or replace the\nstanding-drive simulations. After contact, gravity, arm servo lag, unilateral\nfloor support, compliance and damping determine body motion. Dimensions and\ncontact stiffness are assumptions swept here, not measured robot geometry.\n",
+  "results": [
+    {
+      "name": "nominal",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.8,
+      "first_flat_s": 23.580000000000002,
+      "elapsed_s": 26.12,
+      "peak_rate_dps": 18.091,
+      "peak_target_lead_rad": 0.06428,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.12,
+          "phase": "loading",
+          "tilt_deg": 95.532
+        },
+        {
+          "time_s": 11.8,
+          "phase": "descending",
+          "tilt_deg": 93.002
+        },
+        {
+          "time_s": 24.82,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.42,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.12,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "no_floor",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": false,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.02925,
+      "final_tilt_deg": 88.046,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.88
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.046
+        }
+      ]
+    },
+    {
+      "name": "one_arm_only",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": false,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 26.76,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.065,
+      "final_tilt_deg": 87.868,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 18.5,
+          "phase": "canceling",
+          "tilt_deg": 95.995
+        },
+        {
+          "time_s": 26.76,
+          "phase": "complete",
+          "tilt_deg": 87.868
+        }
+      ]
+    },
+    {
+      "name": "stale_feedback",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 3,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_invalid_feedback",
+      "final_phase": "fault",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 3.0,
+      "peak_rate_dps": 0.89,
+      "peak_target_lead_rad": 0.02229,
+      "final_tilt_deg": 89.295,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 3.0,
+          "phase": "fault",
+          "tilt_deg": 89.295
+        }
+      ]
+    },
+    {
+      "name": "no_reach",
+      "model": {
+        "pivot": 0.23,
+        "arm": 0.26,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.02925,
+      "final_tilt_deg": 88.046,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.88
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.046
+        }
+      ]
+    },
+    {
+      "name": "slow_servo",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.06,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 36.2,
+      "peak_rate_dps": 0.214,
+      "peak_target_lead_rad": 0.12,
+      "final_tilt_deg": 87.799,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 18.5,
+          "phase": "canceling",
+          "tilt_deg": 91.255
+        },
+        {
+          "time_s": 36.2,
+          "phase": "complete",
+          "tilt_deg": 87.799
+        }
+      ]
+    },
+    {
+      "name": "contact_loss",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 14,
+        "jam": false
+      },
+      "outcome": "lower_support_lost",
+      "final_phase": "fault",
+      "contact_s": 11.8,
+      "first_flat_s": null,
+      "elapsed_s": 14.2,
+      "peak_rate_dps": 41.284,
+      "peak_target_lead_rad": 0.06428,
+      "final_tilt_deg": 71.971,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.12,
+          "phase": "loading",
+          "tilt_deg": 95.532
+        },
+        {
+          "time_s": 11.8,
+          "phase": "descending",
+          "tilt_deg": 93.002
+        },
+        {
+          "time_s": 14.2,
+          "phase": "fault",
+          "tilt_deg": 71.971
+        }
+      ]
+    },
+    {
+      "name": "both_arms_obstructed",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": false,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": true
+      },
+      "outcome": "lower_weight_transfer_failed",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 19.82,
+      "peak_rate_dps": 2.005,
+      "peak_target_lead_rad": 0.065,
+      "final_tilt_deg": 88.043,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 8.58,
+          "phase": "loading",
+          "tilt_deg": 94.16
+        },
+        {
+          "time_s": 13.6,
+          "phase": "canceling",
+          "tilt_deg": 91.138
+        },
+        {
+          "time_s": 19.82,
+          "phase": "complete",
+          "tilt_deg": 88.043
+        }
+      ]
+    },
+    {
+      "name": "moving_entry",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.3,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 240,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.08,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 20,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 14.22,
+      "first_flat_s": 26.0,
+      "elapsed_s": 28.54,
+      "peak_rate_dps": 18.091,
+      "peak_target_lead_rad": 0.06428,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 2.9,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 12.54,
+          "phase": "loading",
+          "tilt_deg": 95.532
+        },
+        {
+          "time_s": 14.22,
+          "phase": "descending",
+          "tilt_deg": 93.002
+        },
+        {
+          "time_s": 27.24,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 27.84,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 28.54,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_9",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.98,
+      "first_flat_s": 21.7,
+      "elapsed_s": 24.18,
+      "peak_rate_dps": 18.694,
+      "peak_target_lead_rad": 0.06433,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.36,
+          "phase": "loading",
+          "tilt_deg": 91.368
+        },
+        {
+          "time_s": 10.98,
+          "phase": "descending",
+          "tilt_deg": 88.923
+        },
+        {
+          "time_s": 22.84,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.44,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.18,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_10",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.3,
+      "first_flat_s": 22.16,
+      "elapsed_s": 24.72,
+      "peak_rate_dps": 17.617,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.66,
+          "phase": "loading",
+          "tilt_deg": 95.11
+        },
+        {
+          "time_s": 11.3,
+          "phase": "descending",
+          "tilt_deg": 92.617
+        },
+        {
+          "time_s": 23.3,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.9,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.72,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_11",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.66,
+      "first_flat_s": 22.84,
+      "elapsed_s": 25.5,
+      "peak_rate_dps": 17.66,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.98,
+          "phase": "loading",
+          "tilt_deg": 99.894
+        },
+        {
+          "time_s": 11.66,
+          "phase": "descending",
+          "tilt_deg": 97.338
+        },
+        {
+          "time_s": 24.0,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.6,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.5,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_12",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.08,
+      "first_flat_s": 21.8,
+      "elapsed_s": 24.22,
+      "peak_rate_dps": 17.453,
+      "peak_target_lead_rad": 0.06479,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.44,
+          "phase": "loading",
+          "tilt_deg": 91.354
+        },
+        {
+          "time_s": 11.08,
+          "phase": "descending",
+          "tilt_deg": 88.89
+        },
+        {
+          "time_s": 22.94,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.54,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.22,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_13",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.42,
+      "first_flat_s": 22.36,
+      "elapsed_s": 24.84,
+      "peak_rate_dps": 16.001,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.78,
+          "phase": "loading",
+          "tilt_deg": 95.11
+        },
+        {
+          "time_s": 11.42,
+          "phase": "descending",
+          "tilt_deg": 92.619
+        },
+        {
+          "time_s": 23.5,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.1,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.84,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_14",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 22.96,
+      "elapsed_s": 25.56,
+      "peak_rate_dps": 14.83,
+      "peak_target_lead_rad": 0.06495,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.1,
+          "phase": "loading",
+          "tilt_deg": 99.894
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 97.34
+        },
+        {
+          "time_s": 24.12,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.72,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.56,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_15",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.98,
+      "first_flat_s": 21.84,
+      "elapsed_s": 24.28,
+      "peak_rate_dps": 19.967,
+      "peak_target_lead_rad": 0.06433,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.36,
+          "phase": "loading",
+          "tilt_deg": 91.368
+        },
+        {
+          "time_s": 10.98,
+          "phase": "descending",
+          "tilt_deg": 88.923
+        },
+        {
+          "time_s": 23.0,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.6,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.28,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_16",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.3,
+      "first_flat_s": 22.44,
+      "elapsed_s": 24.9,
+      "peak_rate_dps": 18.812,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.66,
+          "phase": "loading",
+          "tilt_deg": 95.11
+        },
+        {
+          "time_s": 11.3,
+          "phase": "descending",
+          "tilt_deg": 92.617
+        },
+        {
+          "time_s": 23.58,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.18,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.9,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_17",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.66,
+      "first_flat_s": 23.16,
+      "elapsed_s": 25.66,
+      "peak_rate_dps": 18.582,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.98,
+          "phase": "loading",
+          "tilt_deg": 99.894
+        },
+        {
+          "time_s": 11.66,
+          "phase": "descending",
+          "tilt_deg": 97.338
+        },
+        {
+          "time_s": 24.3,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.9,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.66,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_18",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.08,
+      "first_flat_s": 21.94,
+      "elapsed_s": 24.3,
+      "peak_rate_dps": 18.005,
+      "peak_target_lead_rad": 0.06479,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.44,
+          "phase": "loading",
+          "tilt_deg": 91.354
+        },
+        {
+          "time_s": 11.08,
+          "phase": "descending",
+          "tilt_deg": 88.89
+        },
+        {
+          "time_s": 23.08,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.68,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.3,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_19",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.42,
+      "first_flat_s": 22.52,
+      "elapsed_s": 24.92,
+      "peak_rate_dps": 16.596,
+      "peak_target_lead_rad": 0.06496,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.78,
+          "phase": "loading",
+          "tilt_deg": 95.11
+        },
+        {
+          "time_s": 11.42,
+          "phase": "descending",
+          "tilt_deg": 92.619
+        },
+        {
+          "time_s": 23.66,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.26,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.92,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_20",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 23.240000000000002,
+      "elapsed_s": 25.68,
+      "peak_rate_dps": 15.102,
+      "peak_target_lead_rad": 0.06495,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.1,
+          "phase": "loading",
+          "tilt_deg": 99.894
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 97.34
+        },
+        {
+          "time_s": 24.38,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.98,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.68,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_21",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.620000000000001,
+      "first_flat_s": 20.98,
+      "elapsed_s": 23.3,
+      "peak_rate_dps": 18.756,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.0,
+          "phase": "loading",
+          "tilt_deg": 91.023
+        },
+        {
+          "time_s": 10.62,
+          "phase": "descending",
+          "tilt_deg": 88.564
+        },
+        {
+          "time_s": 22.08,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 22.68,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.3,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_22",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.96,
+      "first_flat_s": 21.54,
+      "elapsed_s": 23.92,
+      "peak_rate_dps": 18.137,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.34,
+          "phase": "loading",
+          "tilt_deg": 94.773
+        },
+        {
+          "time_s": 10.96,
+          "phase": "descending",
+          "tilt_deg": 92.294
+        },
+        {
+          "time_s": 22.62,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.22,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.92,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_23",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.22,
+      "first_flat_s": 22.080000000000002,
+      "elapsed_s": 24.54,
+      "peak_rate_dps": 17.506,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.56,
+          "phase": "loading",
+          "tilt_deg": 99.533
+        },
+        {
+          "time_s": 11.22,
+          "phase": "descending",
+          "tilt_deg": 97.014
+        },
+        {
+          "time_s": 23.18,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.78,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.54,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_24",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.74,
+      "first_flat_s": 21.12,
+      "elapsed_s": 23.38,
+      "peak_rate_dps": 17.535,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.12,
+          "phase": "loading",
+          "tilt_deg": 91.023
+        },
+        {
+          "time_s": 10.74,
+          "phase": "descending",
+          "tilt_deg": 88.566
+        },
+        {
+          "time_s": 22.22,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 22.82,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.38,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_25",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.88,
+      "first_flat_s": 21.42,
+      "elapsed_s": 23.74,
+      "peak_rate_dps": 15.83,
+      "peak_target_lead_rad": 0.06275,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.2,
+          "phase": "loading",
+          "tilt_deg": 94.683
+        },
+        {
+          "time_s": 10.88,
+          "phase": "descending",
+          "tilt_deg": 92.192
+        },
+        {
+          "time_s": 22.52,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.12,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.74,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_26",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.34,
+      "first_flat_s": 22.2,
+      "elapsed_s": 24.6,
+      "peak_rate_dps": 14.663,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.68,
+          "phase": "loading",
+          "tilt_deg": 99.533
+        },
+        {
+          "time_s": 11.34,
+          "phase": "descending",
+          "tilt_deg": 97.016
+        },
+        {
+          "time_s": 23.3,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.9,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.6,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_27",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.620000000000001,
+      "first_flat_s": 21.14,
+      "elapsed_s": 23.38,
+      "peak_rate_dps": 20.103,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.0,
+          "phase": "loading",
+          "tilt_deg": 91.023
+        },
+        {
+          "time_s": 10.62,
+          "phase": "descending",
+          "tilt_deg": 88.564
+        },
+        {
+          "time_s": 22.22,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 22.82,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.38,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_28",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.96,
+      "first_flat_s": 21.740000000000002,
+      "elapsed_s": 24.04,
+      "peak_rate_dps": 19.325,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.34,
+          "phase": "loading",
+          "tilt_deg": 94.773
+        },
+        {
+          "time_s": 10.96,
+          "phase": "descending",
+          "tilt_deg": 92.294
+        },
+        {
+          "time_s": 22.84,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.44,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.04,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_29",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.22,
+      "first_flat_s": 22.36,
+      "elapsed_s": 24.7,
+      "peak_rate_dps": 18.426,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.56,
+          "phase": "loading",
+          "tilt_deg": 99.533
+        },
+        {
+          "time_s": 11.22,
+          "phase": "descending",
+          "tilt_deg": 97.014
+        },
+        {
+          "time_s": 23.46,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.06,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.7,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_30",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.74,
+      "first_flat_s": 21.240000000000002,
+      "elapsed_s": 23.42,
+      "peak_rate_dps": 18.065,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.12,
+          "phase": "loading",
+          "tilt_deg": 91.023
+        },
+        {
+          "time_s": 10.74,
+          "phase": "descending",
+          "tilt_deg": 88.566
+        },
+        {
+          "time_s": 22.32,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 22.92,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.42,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_31",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 10.88,
+      "first_flat_s": 21.64,
+      "elapsed_s": 23.86,
+      "peak_rate_dps": 16.168,
+      "peak_target_lead_rad": 0.06275,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.2,
+          "phase": "loading",
+          "tilt_deg": 94.683
+        },
+        {
+          "time_s": 10.88,
+          "phase": "descending",
+          "tilt_deg": 92.192
+        },
+        {
+          "time_s": 22.74,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.34,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 23.86,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_32",
+      "model": {
+        "pivot": 0.08,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.34,
+      "first_flat_s": 22.46,
+      "elapsed_s": 24.74,
+      "peak_rate_dps": 15.078,
+      "peak_target_lead_rad": 0.06487,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 9.68,
+          "phase": "loading",
+          "tilt_deg": 99.533
+        },
+        {
+          "time_s": 11.34,
+          "phase": "descending",
+          "tilt_deg": 97.016
+        },
+        {
+          "time_s": 23.56,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.16,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.74,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_33",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.84,
+      "first_flat_s": 23.5,
+      "elapsed_s": 26.14,
+      "peak_rate_dps": 18.536,
+      "peak_target_lead_rad": 0.06494,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.22,
+          "phase": "loading",
+          "tilt_deg": 92.055
+        },
+        {
+          "time_s": 11.84,
+          "phase": "descending",
+          "tilt_deg": 89.576
+        },
+        {
+          "time_s": 24.78,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.38,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.14,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_34",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.02,
+      "first_flat_s": 23.86,
+      "elapsed_s": 26.56,
+      "peak_rate_dps": 17.997,
+      "peak_target_lead_rad": 0.06354,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.34,
+          "phase": "loading",
+          "tilt_deg": 95.742
+        },
+        {
+          "time_s": 12.02,
+          "phase": "descending",
+          "tilt_deg": 93.199
+        },
+        {
+          "time_s": 25.12,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.72,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.56,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_35",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05964,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.396
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_36",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.74,
+      "first_flat_s": 23.44,
+      "elapsed_s": 26.0,
+      "peak_rate_dps": 17.275,
+      "peak_target_lead_rad": 0.06283,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 91.966
+        },
+        {
+          "time_s": 11.74,
+          "phase": "descending",
+          "tilt_deg": 89.507
+        },
+        {
+          "time_s": 24.7,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.3,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.0,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_37",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.06,
+      "first_flat_s": 23.900000000000002,
+      "elapsed_s": 26.56,
+      "peak_rate_dps": 16.027,
+      "peak_target_lead_rad": 0.06474,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.36,
+          "phase": "loading",
+          "tilt_deg": 95.703
+        },
+        {
+          "time_s": 12.06,
+          "phase": "descending",
+          "tilt_deg": 93.169
+        },
+        {
+          "time_s": 25.18,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.78,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.56,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_38",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.06105,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.306
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_39",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.84,
+      "first_flat_s": 23.66,
+      "elapsed_s": 26.2,
+      "peak_rate_dps": 19.872,
+      "peak_target_lead_rad": 0.06494,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.22,
+          "phase": "loading",
+          "tilt_deg": 92.055
+        },
+        {
+          "time_s": 11.84,
+          "phase": "descending",
+          "tilt_deg": 89.576
+        },
+        {
+          "time_s": 24.92,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.52,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.2,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_40",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.02,
+      "first_flat_s": 24.14,
+      "elapsed_s": 26.74,
+      "peak_rate_dps": 19.17,
+      "peak_target_lead_rad": 0.06354,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.34,
+          "phase": "loading",
+          "tilt_deg": 95.742
+        },
+        {
+          "time_s": 12.02,
+          "phase": "descending",
+          "tilt_deg": 93.199
+        },
+        {
+          "time_s": 25.4,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.0,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.74,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_41",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05964,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.396
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_42",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.74,
+      "first_flat_s": 23.56,
+      "elapsed_s": 26.06,
+      "peak_rate_dps": 17.545,
+      "peak_target_lead_rad": 0.06283,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 91.966
+        },
+        {
+          "time_s": 11.74,
+          "phase": "descending",
+          "tilt_deg": 89.507
+        },
+        {
+          "time_s": 24.84,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.44,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.06,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_43",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.06,
+      "first_flat_s": 24.12,
+      "elapsed_s": 26.64,
+      "peak_rate_dps": 16.269,
+      "peak_target_lead_rad": 0.06474,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.36,
+          "phase": "loading",
+          "tilt_deg": 95.703
+        },
+        {
+          "time_s": 12.06,
+          "phase": "descending",
+          "tilt_deg": 93.169
+        },
+        {
+          "time_s": 25.38,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.98,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.64,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_44",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.06105,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.306
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_45",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.16,
+      "first_flat_s": 22.26,
+      "elapsed_s": 24.68,
+      "peak_rate_dps": 18.588,
+      "peak_target_lead_rad": 0.06432,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.52,
+          "phase": "loading",
+          "tilt_deg": 91.511
+        },
+        {
+          "time_s": 11.16,
+          "phase": "descending",
+          "tilt_deg": 89.03
+        },
+        {
+          "time_s": 23.46,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.06,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.68,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_46",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.5,
+      "first_flat_s": 22.740000000000002,
+      "elapsed_s": 25.26,
+      "peak_rate_dps": 17.694,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.86,
+          "phase": "loading",
+          "tilt_deg": 95.262
+        },
+        {
+          "time_s": 11.5,
+          "phase": "descending",
+          "tilt_deg": 92.759
+        },
+        {
+          "time_s": 23.94,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.54,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.26,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_47",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 23.34,
+      "elapsed_s": 25.94,
+      "peak_rate_dps": 17.34,
+      "peak_target_lead_rad": 0.06195,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 100.014
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 97.444
+        },
+        {
+          "time_s": 24.54,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.14,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.94,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_48",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.24,
+      "first_flat_s": 22.36,
+      "elapsed_s": 24.72,
+      "peak_rate_dps": 17.369,
+      "peak_target_lead_rad": 0.06479,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.6,
+          "phase": "loading",
+          "tilt_deg": 91.497
+        },
+        {
+          "time_s": 11.24,
+          "phase": "descending",
+          "tilt_deg": 89.032
+        },
+        {
+          "time_s": 23.56,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.16,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.72,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_49",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.620000000000001,
+      "first_flat_s": 22.92,
+      "elapsed_s": 25.36,
+      "peak_rate_dps": 15.981,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.98,
+          "phase": "loading",
+          "tilt_deg": 95.262
+        },
+        {
+          "time_s": 11.62,
+          "phase": "descending",
+          "tilt_deg": 92.761
+        },
+        {
+          "time_s": 24.12,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.72,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.36,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_50",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.8,
+      "first_flat_s": 23.36,
+      "elapsed_s": 25.9,
+      "peak_rate_dps": 14.506,
+      "peak_target_lead_rad": 0.0634,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 99.965
+        },
+        {
+          "time_s": 11.8,
+          "phase": "descending",
+          "tilt_deg": 97.415
+        },
+        {
+          "time_s": 24.56,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.16,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.9,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_51",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.16,
+      "first_flat_s": 22.44,
+      "elapsed_s": 24.8,
+      "peak_rate_dps": 19.99,
+      "peak_target_lead_rad": 0.06432,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.52,
+          "phase": "loading",
+          "tilt_deg": 91.511
+        },
+        {
+          "time_s": 11.16,
+          "phase": "descending",
+          "tilt_deg": 89.03
+        },
+        {
+          "time_s": 23.64,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.24,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.8,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_52",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.5,
+      "first_flat_s": 23.04,
+      "elapsed_s": 25.44,
+      "peak_rate_dps": 18.928,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.86,
+          "phase": "loading",
+          "tilt_deg": 95.262
+        },
+        {
+          "time_s": 11.5,
+          "phase": "descending",
+          "tilt_deg": 92.759
+        },
+        {
+          "time_s": 24.24,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.84,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.44,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_53",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 23.66,
+      "elapsed_s": 26.12,
+      "peak_rate_dps": 18.184,
+      "peak_target_lead_rad": 0.06195,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 100.014
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 97.444
+        },
+        {
+          "time_s": 24.86,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.46,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.12,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_54",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.24,
+      "first_flat_s": 22.48,
+      "elapsed_s": 24.78,
+      "peak_rate_dps": 17.929,
+      "peak_target_lead_rad": 0.06479,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 9.6,
+          "phase": "loading",
+          "tilt_deg": 91.497
+        },
+        {
+          "time_s": 11.24,
+          "phase": "descending",
+          "tilt_deg": 89.032
+        },
+        {
+          "time_s": 23.68,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.28,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.78,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_55",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.620000000000001,
+      "first_flat_s": 23.12,
+      "elapsed_s": 25.46,
+      "peak_rate_dps": 16.678,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 9.98,
+          "phase": "loading",
+          "tilt_deg": 95.262
+        },
+        {
+          "time_s": 11.62,
+          "phase": "descending",
+          "tilt_deg": 92.761
+        },
+        {
+          "time_s": 24.32,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 24.92,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.46,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_56",
+      "model": {
+        "pivot": 0.12,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.8,
+      "first_flat_s": 23.64,
+      "elapsed_s": 26.02,
+      "peak_rate_dps": 14.788,
+      "peak_target_lead_rad": 0.0634,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.08,
+          "phase": "loading",
+          "tilt_deg": 99.965
+        },
+        {
+          "time_s": 11.8,
+          "phase": "descending",
+          "tilt_deg": 97.415
+        },
+        {
+          "time_s": 24.84,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.44,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.02,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_57",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 84.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 92.415
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 84.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_58",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 88.004,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.915
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.004
+        }
+      ]
+    },
+    {
+      "name": "sweep_59",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.415
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_60",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 84.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 92.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 84.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_61",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 88.132,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.808
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.132
+        }
+      ]
+    },
+    {
+      "name": "sweep_62",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_63",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 84.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 92.415
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 84.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_64",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 88.004,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.915
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.004
+        }
+      ]
+    },
+    {
+      "name": "sweep_65",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.01725,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.415
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_66",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 84.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 92.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 84.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_67",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 88.132,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 95.808
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 88.132
+        }
+      ]
+    },
+    {
+      "name": "sweep_68",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.28,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_69",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.88,
+      "first_flat_s": 23.78,
+      "elapsed_s": 26.32,
+      "peak_rate_dps": 18.47,
+      "peak_target_lead_rad": 0.06491,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.26,
+          "phase": "loading",
+          "tilt_deg": 92.091
+        },
+        {
+          "time_s": 11.88,
+          "phase": "descending",
+          "tilt_deg": 89.612
+        },
+        {
+          "time_s": 25.08,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.68,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.32,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_70",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.06,
+      "first_flat_s": 24.12,
+      "elapsed_s": 26.76,
+      "peak_rate_dps": 18.039,
+      "peak_target_lead_rad": 0.06379,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.38,
+          "phase": "loading",
+          "tilt_deg": 95.777
+        },
+        {
+          "time_s": 12.06,
+          "phase": "descending",
+          "tilt_deg": 93.234
+        },
+        {
+          "time_s": 25.42,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.02,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.76,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_71",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05102,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.403
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_72",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 23.7,
+      "elapsed_s": 26.18,
+      "peak_rate_dps": 17.299,
+      "peak_target_lead_rad": 0.06279,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.12,
+          "phase": "loading",
+          "tilt_deg": 92.002
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 89.543
+        },
+        {
+          "time_s": 25.0,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.6,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.18,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_73",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.1,
+      "first_flat_s": 24.18,
+      "elapsed_s": 26.76,
+      "peak_rate_dps": 15.663,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "loading",
+          "tilt_deg": 95.738
+        },
+        {
+          "time_s": 12.1,
+          "phase": "descending",
+          "tilt_deg": 93.204
+        },
+        {
+          "time_s": 25.48,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.08,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.76,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_74",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 160,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    },
+    {
+      "name": "sweep_75",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.88,
+      "first_flat_s": 23.96,
+      "elapsed_s": 26.44,
+      "peak_rate_dps": 19.833,
+      "peak_target_lead_rad": 0.06491,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.26,
+          "phase": "loading",
+          "tilt_deg": 92.091
+        },
+        {
+          "time_s": 11.88,
+          "phase": "descending",
+          "tilt_deg": 89.612
+        },
+        {
+          "time_s": 25.26,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.86,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.44,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_76",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.06,
+      "first_flat_s": 24.42,
+      "elapsed_s": 26.94,
+      "peak_rate_dps": 19.113,
+      "peak_target_lead_rad": 0.06379,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.38,
+          "phase": "loading",
+          "tilt_deg": 95.777
+        },
+        {
+          "time_s": 12.06,
+          "phase": "descending",
+          "tilt_deg": 93.234
+        },
+        {
+          "time_s": 25.72,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.32,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.94,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_77",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.04,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05102,
+      "final_tilt_deg": 92.504,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.403
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.504
+        }
+      ]
+    },
+    {
+      "name": "sweep_78",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 84,
+        "arm_eq_slope": -6.3,
+        "gravity": 6,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 11.78,
+      "first_flat_s": 23.82,
+      "elapsed_s": 26.24,
+      "peak_rate_dps": 17.467,
+      "peak_target_lead_rad": 0.06279,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 84
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 84.0
+        },
+        {
+          "time_s": 10.12,
+          "phase": "loading",
+          "tilt_deg": 92.002
+        },
+        {
+          "time_s": 11.78,
+          "phase": "descending",
+          "tilt_deg": 89.543
+        },
+        {
+          "time_s": 25.14,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 25.74,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.24,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_79",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 87.5,
+        "arm_eq_slope": -6.3,
+        "gravity": 8.82,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_complete",
+      "final_phase": "complete",
+      "contact_s": 12.1,
+      "first_flat_s": 24.42,
+      "elapsed_s": 26.88,
+      "peak_rate_dps": 16.405,
+      "peak_target_lead_rad": 0.06497,
+      "final_tilt_deg": 0.0,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 87.5
+        },
+        {
+          "time_s": 10.4,
+          "phase": "loading",
+          "tilt_deg": 95.738
+        },
+        {
+          "time_s": 12.1,
+          "phase": "descending",
+          "tilt_deg": 93.204
+        },
+        {
+          "time_s": 25.72,
+          "phase": "ground_hold",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.32,
+          "phase": "retracting",
+          "tilt_deg": 0.0
+        },
+        {
+          "time_s": 26.88,
+          "phase": "complete",
+          "tilt_deg": 0.0
+        }
+      ]
+    },
+    {
+      "name": "sweep_80",
+      "model": {
+        "pivot": 0.16,
+        "arm": 0.34,
+        "wheel_radius": 0.055,
+        "equilibrium": 92,
+        "arm_eq_slope": -6.3,
+        "gravity": 12,
+        "stiffness": 320,
+        "damping_ratio": 0.8,
+        "servo_tau": 0.16,
+        "servo_limit": 0.3,
+        "center_left": 1.77,
+        "center_right": -1.77,
+        "initial_speed": 0,
+        "floor": true,
+        "right_contact": true,
+        "stale_at": 1000000000.0,
+        "slip_at": 1000000000.0,
+        "jam": false
+      },
+      "outcome": "lower_no_support",
+      "final_phase": "complete",
+      "contact_s": null,
+      "first_flat_s": null,
+      "elapsed_s": 18.66,
+      "peak_rate_dps": 1.068,
+      "peak_target_lead_rad": 0.05324,
+      "final_tilt_deg": 92.632,
+      "transitions": [
+        {
+          "time_s": 0.0,
+          "phase": "stopping",
+          "tilt_deg": 92
+        },
+        {
+          "time_s": 0.48,
+          "phase": "reaching",
+          "tilt_deg": 92.0
+        },
+        {
+          "time_s": 10.4,
+          "phase": "canceling",
+          "tilt_deg": 100.308
+        },
+        {
+          "time_s": 18.66,
+          "phase": "complete",
+          "tilt_deg": 92.632
+        }
+      ]
+    }
+  ]
+}
