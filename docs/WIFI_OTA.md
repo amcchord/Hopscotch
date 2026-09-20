@@ -3,13 +3,12 @@
 Hopscotch joins the configured 2.4 GHz network as `hopscotch.local`. Open
 [hopscotch.local](http://hopscotch.local/) (or the address on the robot display) for live pose,
 motor feedback, RC link state, control timing, saved-run download and application
-updates. This is a LAN service. The September 19 device is configured for
-SvensHaus; its last tested DHCP address was [192.168.1.172](http://192.168.1.172/).
+updates. This is a LAN service. The last tested DHCP address was [192.168.1.172](http://192.168.1.172/).
 No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/lowering-v8-integration/README.md) records
+[latest deployment evidence](../evidence/lowering-v9-integration/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -182,13 +181,13 @@ package for recovery.
    it off remains an option when speed matters. The exact throughput cause is
    unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 lowering-v8/faster-return package, from the project root:
+   September 20 lowering-v9/bounded-catch package, from the project root:
 
    ```bash
    python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
      --secrets-file src/network_secrets.h ota \
-     worktrees/balance-lower/artifacts/lowering-v8-return/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v8-return/candidate/manifest.json
+     worktrees/balance-lower/artifacts/lowering-v9-catch/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v9-catch/candidate/manifest.json
    ```
 
    Use the current integration worktree helper and its frozen package as shown.
@@ -203,14 +202,17 @@ package for recovery.
    for the earlier unmonitored transmitter-on update, 250 seconds with
    acceptance monitoring/gap injection, 343 seconds for v6, 421.475 seconds to
    install the OTA progress/interlock, and 475.235 seconds for the first update
-   under that interlock. These are observations, not fixed upload deadlines. There is no separate
+   under that interlock. V9 took 392.262 seconds on retry after an initial
+   disconnect at 277,504 bytes. The old image and healthy idle state were verified
+   before retrying the identical file. These are observations, not fixed upload
+   deadlines. There is no separate
    manual status/log/download loop to repeat. Gap injection and concurrent status
    monitoring are acceptance tests, not routine deployment steps.
 3. Wait for the final verified report. The helper saves state, transfer outcome
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
    Preserve the record and update shared release state once. If the transmitter was off, turn it back on; observe both arm switches low before any authorized motion test.
-   Check [current trial status](progress/CURRENT.md) first; v8 lowering is ready
+   Check [current trial status](progress/CURRENT.md) first; v9 lowering is ready
    for a restrained manual trial and is not yet physically validated.
 
 After the progress/interlock firmware is installed, subsequent uploads show a
@@ -292,7 +294,7 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The [current combined deployment record](../evidence/lowering-v8-integration/README.md)
+The [current combined deployment record](../evidence/lowering-v9-integration/README.md)
 identifies the installed image and the verified transmitter-on update, including unchanged
 saved-run hashes. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
 retains the old transport's interrupted attempts and transmitter-off success.
@@ -351,7 +353,7 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/balance-lower/artifacts/lowering-v8-return/candidate/` from the project
+`worktrees/balance-lower/artifacts/lowering-v9-catch/candidate/` from the project
 root. The successful previous v7 image is retained at
 `worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/`, source `c442e12`.
 The older exact v6 image is retained at

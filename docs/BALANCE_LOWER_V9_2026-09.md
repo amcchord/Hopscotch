@@ -1,6 +1,6 @@
 # CH11 lowering v9 — bounded contact rebound
 
-Prepared for operator testing; [current state](progress/CURRENT.md) identifies
+Installed source `b9763c2` for operator testing; [current state](progress/CURRENT.md) identifies
 what is installed. The [v8 trial](../evidence/balance-lower/trial-v8-stop-20260920/README.md)
 confirmed another successful fast stand-up but stopped lowering on its arms.
 It never entered the faster supported return: a small loaded rebound reset
@@ -26,3 +26,5 @@ Follow the [existing test procedure](BALANCE_TESTING.md): one stand-up and
 CH11 attempt, then disarm and archive before another run. Check that contact
 leads to continued supported return and a level body with arms Forward.
 Physical acceptance remains pending; exact successful v7 recovery is retained.
+
+[Verified installation and recovery record](../evidence/lowering-v9-integration/README.md).

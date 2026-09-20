@@ -1,6 +1,6 @@
 # CH11 lowering v8 — faster supported return
 
-Installed source `47eb19a` for operator testing; [current state](progress/CURRENT.md) identifies
+Historical source `47eb19a`; [current state](progress/CURRENT.md) identifies
 what is installed. V7 has now completed an operator-confirmed successful
 lowering and a second successful fast stand-up. The [saved successful run](../evidence/balance-lower/trial-v7-success-20260920/README.md)
 provides a baseline worth preserving.
@@ -22,3 +22,11 @@ After installation, use the [existing test procedure](BALANCE_TESTING.md): one
 stand-up and CH11 lowering attempt, then disarm and archive before another run.
 Compare contact-to-flat duration and body rocking with v7. New telemetry schema8
 keeps 240-byte samples and preserves the previous run's exports byte-for-byte.
+
+## Subsequent physical trial
+
+The [v8 run](../evidence/balance-lower/trial-v8-stop-20260920/README.md) confirms
+another successful fast lift but stops during catch confirmation, before the
+faster supported return is used. It does not establish a speed regression.
+[V9](BALANCE_LOWER_V9_2026-09.md) retains the faster return and makes support
+confirmation tolerant of the measured small loaded rebound.

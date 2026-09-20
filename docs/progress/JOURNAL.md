@@ -557,3 +557,35 @@ exports verified. One in-flight snapshot confirmed active OTA, maintenance, disa
 No motion/settings/filesystem writes. Exact successful v7 rollback retained.
 [Release](../../evidence/lowering-v8-integration/README.md). Next: operator trial
 of faster supported return, disarm and archive before another attempt.
+
+## 2026-09-20 — Diagnose catch stop and install bounded confirmation v9
+
+Austin reported another excellent fast tip-up, but lowering stopped on its arms.
+Archived 662 rows / 13.290 s from v8 source 47eb19a; fast captures at 2.890 s.
+Both arms contact at 12.911 s. A less-than-one-degree loaded rebound peaks near
++17 degrees/s, repeatedly resetting the +12 confirmation gate. A second rebound
+outside the 300 ms grace ends lower_wrong_direction at 13.290 s. The faster
+supported return is never reached, so this run does not test its speed.
+
+Source `b9763c2f5e2d66dcc28da4b1bc568dac29751b17` adds a bounded qualification exception: at most +20 degrees/s,
+1.5 degrees above the impact minimum, within 300 ms, retaining both recent
+loads, measured arm-return velocities and full 80 ms dwell. All motion limits,
+support-loss/progress/time guards and 0.24-rad/s return remain. Fast, ordinary
+driving and OTA code unchanged; other checkouts untouched. Native regression
+covers the recorded six frames and rejects invalid support/rate/rise/age/arm
+motion. Combined 12 native/38 Python, syntax and pinned build pass once.
+Model 258/329 before/after with no outcome changes; recorded replay confirms
+support at 13.011 s but later old inputs still reject support loss after commands
+diverge. This is not hardware proof. Previous successful replay is unchanged.
+
+Frozen application 1,211,568 bytes; whole SHA
+6ca34f3ab58994b60c03e4db73b85540d5755909ba96fcb9aae3b1426d9cf3f8, ESP digest
+361386bf17396fa11b7086ef272e813b49ee7a195c4d94bc1e38d19596ce98e8. Installed in app0 at 2026-09-20T22:38:58.351613+00:00; transfer 392.262 s.
+The first upload disconnected after 277,504 bytes; read-only recovery verified
+the old image, released maintenance and healthy idle state before retrying
+the same frozen bytes. Exact identity, six powered healthy disabled motors, fresh IMU, disarmed and
+released maintenance verified. All 662 schema8 rows and wire export unchanged.
+No autonomous motion, settings/filesystem writes or other task edits.
+Known physically successful v7 and exact immediate v8 packages retained.
+[Release](../../evidence/lowering-v9-integration/README.md).
+Next: operator stand/CH11 attempt, disarm and archive before another run.

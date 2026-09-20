@@ -1,14 +1,16 @@
 # Balance Mode Test Guide
 
 **September 20 update:** [v7 completed fast standing and lowering](../evidence/balance-lower/trial-v7-success-20260920/README.md).
-[V8](BALANCE_LOWER_V8_2026-09.md) speeds supported arm return while preserving
-catch, final landing and motion guards. Check [current installed identity](progress/CURRENT.md)
-before testing. The faster return needs a manual trial; use CH6 LOW to isolate
-lowering, or retain CH6 HIGH when intentionally testing the successful fast lift.
+The latest v8 run again stood successfully but stopped during catch, before
+faster supported return. [V9](BALANCE_LOWER_V9_2026-09.md) permits the measured
+small loaded rebound during support confirmation and retains the faster return.
+Check [current installed identity](progress/CURRENT.md) before testing. Use CH6
+LOW to isolate lowering, or CH6 HIGH when intentionally testing the successful
+fast lift. One CH11 attempt, then disarm and archive before another run.
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH11 forward-fall/catch v8](BALANCE_LOWER_V8_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; v7 lowering and fast v2 have operator-confirmed success, while the faster v8 return is pending a physical trial.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH11 forward-fall/catch v9](BALANCE_LOWER_V9_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; v7 lowering and fast v2 have operator-confirmed success, while v9 catch confirmation and the faster supported return need physical acceptance.
 
 ## Safety and Test Area
 
@@ -31,7 +33,7 @@ Transport version 2 passed a full transmitter-on update with a four-second
 receive gap. The transmitter may stay on while disarmed; transmitter-off was
 faster in the recorded tests. Wait for the final verified report before testing.
 
-Use the current v8 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
+Use the current v9 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
