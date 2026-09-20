@@ -1,0 +1,44 @@
+{
+  "baseline": "081c118",
+  "status": "queued_not_installed",
+  "native_executables_passed": 11,
+  "python_tests_passed": 37,
+  "trajectory_cases_passed": 162,
+  "new_regressions": [
+    "stale post-setup feedback rejected by prior immediate gate",
+    "two asynchronous feedback requests per tick qualify within180ms",
+    "100ms quiet dwell and clock rollover",
+    "missing feedback and wrong/moving pose refuse by1s",
+    "explicit retry resets failed start",
+    "production MotorManager ping preserves timestamps/targets and handles mapped IDs/TX failure"
+  ],
+  "dashboard": "syntax and 8 SHA vectors passed",
+  "configured_build": "passed; existing private header included in place",
+  "build_warning": "Existing ARDUINO_EVENT_RUNNING_CORE redefinition",
+  "source_preservation": {
+    "inner_balance": true,
+    "standing_balance": true,
+    "lowering_return": true,
+    "saved_log_format": true,
+    "slow_motion": true,
+    "src/balance_lower.h": true,
+    "src/balance_drive.h": true,
+    "src/balance_pilot.h": true,
+    "src/arm_controller.cpp": true,
+    "src/drive_controller.cpp": true,
+    "src/robstride.cpp": true,
+    "src/settings.cpp": true,
+    "src/crsf.cpp": true,
+    "src/balance_telemetry.h": true,
+    "platformio.ini": true,
+    "active_trajectory_step": true,
+    "synthetic_motion_trace_unchanged": true
+  },
+  "input_sha256": {
+    "latest.csv": "083d7d6b8d4926de8b5e7cdecc4886531ab5b569fb6206a2b40c72693c7d8741",
+    "preflight.json": "aa68876cbc5b53ca36d212e5b64f41380ce0d7b3ea3181ab92fbf9aa83e8a819"
+  },
+  "exact_physical_refusal_reason": "not captured in prior firmware",
+  "hardware_actions": [],
+  "integration_owner": "codex/balance-lower"
+}

@@ -16,6 +16,9 @@ std::map<std::pair<uint8_t, uint16_t>, float> parameters;
 int acceleration_reads = 0, acceleration_writes = 0, current_reads = 0;
 int acceleration_tx_failures = 0, current_tx_failures = 0;
 int current_bad_replies = 0, stop_count = 0;
+int ping_count = 0;
+uint8_t ping_id = 0;
+bool ping_ok = true;
 bool acceleration_reply = true, current_reply = true;
 float bad_current = 5.0f;
 
@@ -47,7 +50,7 @@ bool Robstride::setRunMode(uint8_t, uint8_t, RobstrideRunMode) { return true; }
 bool Robstride::enableMotor(uint8_t, uint8_t) { return true; }
 bool Robstride::writeU32Param(uint8_t, uint8_t, uint16_t, uint32_t) { return true; }
 bool Robstride::sendPositionCommand(uint8_t, uint8_t, float, float) { return true; }
-bool Robstride::sendMotionPing(uint8_t) { return true; }
+bool Robstride::sendMotionPing(uint8_t id) { ++ping_count; ping_id=id; return ping_ok; }
 bool Robstride::changeMotorCanId(uint8_t, uint8_t, uint8_t) { return true; }
 
 bool Robstride::writeFloatParam(uint8_t id, uint8_t, uint16_t addr, float value) {
@@ -141,5 +144,18 @@ int main() {
     current_bad_replies = 2;
     assert(motors.setDriveRunMode(MotorRole::BackLeft, RobstrideRunMode::Speed, 100, 10));
     assert(current_reads == 3);
+    // Fast tip-up requests motion samples without manufacturing freshness or
+    // changing a target/run mode. It works for mapped IDs and propagates TX failure.
+    motors.setMotorId(MotorRole::ArmLeft, 17);
+    const auto last_sample=motors.getMotor(MotorRole::ArmLeft).last_feedback_ms;
+    const auto current_mode=motors.getMotor(MotorRole::ArmLeft).run_mode;
+    const auto writes=parameters;
+    ping_count=0;
+    assert(motors.requestMotionFeedback(MotorRole::ArmLeft) && ping_id==17 && ping_count==1);
+    assert(motors.getMotor(MotorRole::ArmLeft).last_feedback_ms==last_sample);
+    assert(motors.getMotor(MotorRole::ArmLeft).run_mode==current_mode && parameters==writes);
+    ping_ok=false;
+    assert(!motors.requestMotionFeedback(MotorRole::ArmLeft));
+    assert(!motors.requestMotionFeedback(static_cast<MotorRole>(NUM_MOTORS)));
     std::cout << "Motor setup checks passed: RS05 write-only acceleration, both rear motors, retry/failure paths, mandatory current readback\n";
 }

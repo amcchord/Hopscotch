@@ -394,17 +394,13 @@ bool BalanceController::armsAtGoal(float left, float right) const {
 
 void BalanceController::enterTippingUp(bool fast_tip) {
     if (!readyToStart()) {
+        _tip_start_status = "Start refused: arm groups / sensors / calibration";
         Serial.println("[Balance] Tip-up REFUSED: check calibration, armed motors, faults and fresh IMU/feedback");
         return;
     }
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) {
+        _tip_start_status = "Start refused: wait for previous log to save";
         Serial.println("[Balance] Tip-up REFUSED: telemetry is not ready (wait for idle save)");
-        return;
-    }
-    // Fast starts require the usual forward-arm, stationary flat pose. Refuse
-    // unsupported poses explicitly instead of silently changing to slow mode.
-    if (fast_tip && !_fast_tip.begin(millis(), tipInput(true))) {
-        Serial.printf("[Balance] Fast tip-up REFUSED: %s\n", _fast_tip.fault());
         return;
     }
 
@@ -422,19 +418,21 @@ void BalanceController::enterTippingUp(bool fast_tip) {
     if (!ok_l || !ok_r) {
         _motors->setDriveRunMode(MotorRole::BackLeft,  RobstrideRunMode::CSP);
         _motors->setDriveRunMode(MotorRole::BackRight, RobstrideRunMode::CSP);
+        _tip_start_status = "Start refused: wheel mode setup failed";
         Serial.println("[Balance] Tip-up REFUSED: speed mode switch failed");
         return;
     }
     _speed_mode_active = true;
     _last_speed_refresh_ms = millis();
 
-    // Motor-mode setup can block; start trajectory time from fresh feedback
-    // after it finishes. update() has already qualified the fresh neutral RC.
-    if (fast_tip && !_fast_tip.begin(millis(), tipInput(true))) {
-        exitSpeedMode();
-        Serial.printf("[Balance] Fast tip-up REFUSED after setup: %s\n", _fast_tip.fault());
-        return;
-    }
+    // setDriveRunMode blocks the same task that processes motor feedback, and
+    // synchronous parameter reads discard unrelated motion replies. Qualify
+    // the fast start on subsequent control ticks, after real feedback returns.
+    _fast_tip_pending = fast_tip;
+    _fast_tip_feedback_index = 0;
+    _fast_tip = balance_math::FastTipUp{};
+    if (fast_tip) _fast_tip_start.request(millis());
+    _tip_start_status = fast_tip ? _fast_tip_start.status() : "Slow tip-up started";
     _fast_tip_run = fast_tip;
 
     _state = BalanceState::TippingUp;
@@ -449,7 +447,7 @@ void BalanceController::enterTippingUp(bool fast_tip) {
     _arm_tip_right_goal = fwd_r + BALANCE_ARM_TIP_RIGHT;
     _arm_left_goal    = _arm_tip_left_goal;
     _arm_right_goal   = _arm_tip_right_goal;
-    _arm_ramp_speed   = fast_tip ? BALANCE_FAST_TIP_MOTOR_RAD_S : BALANCE_ARM_TIP_SPEED;
+    _arm_ramp_speed   = fast_tip ? 0.0f : BALANCE_ARM_TIP_SPEED; // parked until startup qualifies
     _arms_reached_tip = false;
 
     _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
@@ -458,6 +456,7 @@ void BalanceController::enterTippingUp(bool fast_tip) {
                   fast_tip ? "FAST experimental" : "SLOW", _arm_left_goal, _arm_right_goal);
 
     if (!startLog()) {
+        _tip_start_status = "Start refused: telemetry start failed";
         _state = BalanceState::Idle;
         _targets_initialized = false;
         exitSpeedMode();
@@ -649,6 +648,8 @@ void BalanceController::forceEngage() {
 void BalanceController::hardAbort(const char* reason) {
     BalanceState prev = _state;
     if (prev == BalanceState::Idle) return;
+    if (prev == BalanceState::TippingUp) _tip_start_status = reason;
+    _fast_tip_pending = false;
 
     // A run that balanced long enough has a converged equilibrium estimate
     // even if it ended in a fall -- keep the knowledge.
@@ -843,6 +844,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             if (fast_tip_selected && (!pilot_valid || !std::isfinite(pilot_forward)
                 || !std::isfinite(pilot_turn) || fabsf(pilot_forward) > BALANCE_PILOT_DEADBAND
                 || fabsf(pilot_turn) > BALANCE_PILOT_DEADBAND)) {
+                _tip_start_status = "Fast start refused: fresh RC and neutral CH1/CH2";
                 Serial.println("[Balance] Fast tip-up REFUSED: fresh RC and neutral CH1/CH2 required");
             } else {
                 enterTippingUp(fast_tip_selected);
@@ -852,16 +854,55 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
     case BalanceState::TippingUp: {
         if (_fast_tip_run) {
-            _fast_tip.step(millis(), dt, tipInput(pilot_valid));
+            // Ordinary discovery rotates over 8 slots (~160 ms), which cannot
+            // satisfy this maneuver's 100 ms all-motor freshness guard. Request
+            // two real samples per tick: every motor refreshed within ~60 ms.
+            for (int i = 0; i < 2; ++i) {
+                const auto role = static_cast<MotorRole>(_fast_tip_feedback_index);
+                _fast_tip_feedback_index = (_fast_tip_feedback_index + 1) % NUM_MOTORS;
+                if (!_motors->requestMotionFeedback(role)) {
+                    logSample(tilt, rate);
+                    hardAbort("Fast tip-up stopped: CAN feedback request failed");
+                    return;
+                }
+            }
+            const auto tip_input = tipInput(pilot_valid);
+            if (_fast_tip_pending) {
+                if (!pilot_valid || !std::isfinite(pilot_forward) || !std::isfinite(pilot_turn)
+                    || fabsf(pilot_forward) > BALANCE_PILOT_DEADBAND
+                    || fabsf(pilot_turn) > BALANCE_PILOT_DEADBAND) {
+                    logSample(tilt, rate);
+                    hardAbort("Fast start canceled: RC / arm switches / sticks");
+                    return;
+                }
+                const bool ready = _fast_tip_start.step(millis(), tip_input);
+                _tip_start_status = _fast_tip_start.status();
+                if (_fast_tip_start.failed()) {
+                    logSample(tilt, rate);
+                    hardAbort(_tip_start_status);
+                    return;
+                }
+                if (ready && _fast_tip.begin(millis(), tip_input)) {
+                    _fast_tip_pending = false;
+                    _arm_left_target = _arms->getForwardLeft() + tip_input.left;
+                    _arm_right_target = _arms->getForwardRight() + tip_input.right;
+                    _tip_start_status = "Fast tip-up started";
+                }
+                // Keep the existing measured-position hold through this tick,
+                // including the first qualified one. The ramp starts next tick.
+            } else {
+                _fast_tip.step(millis(), dt, tip_input);
+                _arm_left_target = _arms->getForwardLeft() + _fast_tip.left();
+                _arm_right_target = _arms->getForwardRight() + _fast_tip.right();
+            }
             if (_fast_tip.fault()) {
                 _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
                 logSample(tilt, rate);
                 hardAbort(_fast_tip.fault());
                 return;
             }
-            _arm_left_target = _arms->getForwardLeft() + _fast_tip.left();
-            _arm_right_target = _arms->getForwardRight() + _fast_tip.right();
-            _arms->setOverrideTargets(_arm_left_target, _arm_right_target, BALANCE_FAST_TIP_MOTOR_RAD_S);
+            _arms->setOverrideTargets(_arm_left_target, _arm_right_target,
+                                     _fast_tip_pending ? 0.0f : BALANCE_FAST_TIP_MOTOR_RAD_S);
         } else {
             float dist_l = fabsf(_arm_left_goal - _arm_left_target);
             float dist_r = fabsf(_arm_right_goal - _arm_right_target);
@@ -898,7 +939,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         float arm_err_r = fabsf(_arm_right_target - _arm_tip_right_goal);
         bool arms_done = (arm_err_l < 0.05f && arm_err_r < 0.05f)
                       && armsAtGoal(_arm_tip_left_goal, _arm_tip_right_goal);
-        if (now_tip - _log_start_ms > BALANCE_TIP_TIMEOUT_MS) {
+        if (now_tip - _log_start_ms > (_fast_tip_run ? BALANCE_FAST_TIP_TIMEOUT_MS : BALANCE_TIP_TIMEOUT_MS)) {
             _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
             logSample(tilt, rate);
             hardAbort("tip-up timeout / arm tracking");
@@ -907,7 +948,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
         float tip_expected = BALANCE_SETPOINT_ARMS_TIP;
         float tip_error = fabsf(tip_expected - tilt);
-        if ((_fast_tip_run ? _fast_tip.ready() : arms_done) &&
+        if ((_fast_tip_run ? (!_fast_tip_pending && _fast_tip.ready()) : arms_done) &&
             tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
             fabsf(rate) < BALANCE_ENGAGE_RATE_MAX_DPS) {
             enterBalancing(tilt);

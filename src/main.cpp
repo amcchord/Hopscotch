@@ -1191,6 +1191,7 @@ static void publishNetworkSnapshot(uint32_t now) {
     s.imu_age_us = micros() - balanceCtrl.getImuSampleUs();
     strlcpy(s.balance_state, balanceCtrl.getStateString(), sizeof(s.balance_state));
     strlcpy(s.end_reason, balanceCtrl.getLogEndReason(), sizeof(s.end_reason));
+    strlcpy(s.start_status, balanceCtrl.getStartStatus(), sizeof(s.start_status));
     s.voltage = motorMgr.getBusVoltage(); s.current = motorMgr.getTotalCurrent();
     s.voltage_fresh = motorMgr.busVoltageFresh(now); s.current_fresh = motorMgr.motorCurrentFresh(now);
     for (int i=0; i<16; ++i) s.channels[i] = crsfRx.getChannel(i);

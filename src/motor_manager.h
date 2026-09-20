@@ -145,6 +145,9 @@ public:
     // Process incoming CAN feedback (call frequently)
     void processFeedback();
 
+    // Request a real motion sample without changing targets or feedback age.
+    bool requestMotionFeedback(MotorRole role);
+
     // Mark motors offline if no feedback within timeout
     void checkTimeouts(uint32_t timeout_ms = 500);
 

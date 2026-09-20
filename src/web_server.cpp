@@ -280,6 +280,7 @@ void WebUI::refreshTelemetry() {
     b["state"] = s.balance_state; b["active"] = s.balance_active;
     b["tilt"] = s.tilt; b["rate"] = s.rate; b["setpoint"] = s.setpoint;
     b["imu_age_us"] = s.imu_age_us; b["fault"] = s.inner_fault; b["end_reason"] = s.end_reason;
+    b["start_status"] = s.start_status;
     auto p = d["power"].to<JsonObject>();
     p["voltage"] = s.voltage; p["current"] = s.current;
     p["voltage_fresh"] = s.voltage_fresh; p["current_fresh"] = s.current_fresh;
