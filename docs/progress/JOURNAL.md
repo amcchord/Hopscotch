@@ -80,3 +80,30 @@ CURRENT after actual integration/deployment. Their worktrees were untouched.
 Next operator step remains a disarmed powered feedback check, then supervised
 physical testing when RC is ready; use the Wi-Fi guide for subsequent updates
 and downloads.
+
+## 2026-09-19 — Checkpoint all local work for GitHub publication
+
+Austin explicitly authorized committing and publishing all current and past
+agent work, including work in progress. Inventoried the control checkout and
+all three worktrees, seven local branches, remote heads, stashes and reflog-only
+commits. The sole reflog-only radio commit is patch-identical to its reachable
+rebased commit; no unique past work is stranded there. GitHub repository
+`amcchord/Hopscotch` is public. Credential-bearing firmware/full-flash images,
+private radio backups, local secrets and generated caches remain ignored/local.
+
+The ground-drive owner committed implementation `b323220` and validation
+`1337c10`: nine native executables, 27 Python tests and PlatformIO build passed.
+The standing-drive owner committed `749e562` and `59895c7`: new physical v4 trial,
+analysis/model screens and an unwired braking prototype, explicitly WIP with no
+new firmware deployment. Raw `.wire` data is marked non-text on that branch and
+was checked byte-for-byte by its owner. Radio-display fix `c26027a`, root Wi-Fi
+implementation/docs, and earlier local branches are included in publication.
+
+Committed the previously untracked pre-radio-upgrade CSV and `.serial` pair:
+2,381 samples; transport/file validation passes and reconstructed CSV exactly
+matches the existing cleaned file. This is an archive of the pre-upgrade trial,
+not a new physical run. Scanned outgoing blobs and captures for known local
+passwords/token and common credential patterns; no new credentials found. The
+only heuristic match was an existing default already present on origin/main.
+No source integration or hardware action is part of this repository checkpoint.
+Publication results are recorded below after remote verification.
