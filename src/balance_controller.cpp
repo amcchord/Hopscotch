@@ -2012,6 +2012,7 @@ void BalanceController::dumpLog(Print* sink) {
         if (got != (int)chunk) break;
         checksum = fnv1aUpdate(checksum, verify_buf, chunk);
         remaining -= chunk;
+        out.cooperate();
     }
     bool checksum_valid = remaining == 0 && checksum == header.checksum
                        && f.size() == expected_size;

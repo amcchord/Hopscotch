@@ -173,11 +173,13 @@ def deploy(host, firmware, manifest_path=None, record_dir=None, secrets_file=Non
         before = json.loads(request(host, '/api/info', timeout=5))
         state = json.loads(request(host, '/api/telemetry', timeout=5))
         record.update(preflight_info=before, preflight_state=state)
+        save()
         powered_ids = [m['id'] for m in state.get('motors', []) if m.get('online')]
         require_idle(state, powered_ids)
         if len(image) > before.get('ota_capacity', 0) or before.get('running_slot') not in ('app0', 'app1'):
             raise ValueError('Application does not fit or current OTA slot is unavailable')
         already_installed = before.get('image_sha256') == identity['esp_image_digest']
+        print('Archiving saved run before upload', flush=True)
         record['saved_run_before'] = archive_log(host, directory, 'before', secrets_file)
         save()
         if already_installed:

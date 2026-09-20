@@ -85,5 +85,38 @@ int main() {
         assert(Serial.overflow_writes == 0 && Serial.connected);
     }
     assert(Serial.tx_timeout_ms == 1);
-    std::cout << "Native checks passed: 100000 wheel mixes, sensor validity/rollover, USB partial writes/stall/disconnect\n";
+    {
+        struct MemorySink : Print {
+            std::string bytes;
+            size_t write(uint8_t byte) override { bytes += char(byte); return 1; }
+            size_t write(const uint8_t* data, size_t size) override {
+                bytes.append(reinterpret_cast<const char*>(data), size); return size;
+            }
+        } sink;
+        fake_ms = UINT32_MAX - 4;
+        TelemetryTransport memory(&sink);
+        std::string expected;
+        uint32_t expected_hash = 2166136261u;
+        unsigned pauses = 0, work_since_pause = 0;
+        // A maximum-length export with simulated formatting work, including
+        // timer rollover: bounded scheduler pauses must not change any bytes.
+        for (int row = 0; row < 6000; ++row) {
+            const std::string data = std::to_string(row) + std::string(440, 'x') + '\n';
+            expected += data;
+            for (unsigned char byte : data) { expected_hash ^= byte; expected_hash *= 16777619u; }
+            fake_ms += 2;
+            work_since_pause += 2;
+            const uint32_t before = fake_ms;
+            assert(memory.write(reinterpret_cast<const uint8_t*>(data.data()), data.size()) == data.size());
+            if (fake_ms != before) { ++pauses; assert(work_since_pause <= 10); work_since_pause = 0; }
+            assert(work_since_pause < 10);
+        }
+        assert(pauses == 1200 && sink.bytes == expected && memory.checksum() == expected_hash);
+        fake_ms += 10;
+        const uint32_t before = fake_ms;
+        memory.cooperate(); // checksum-only work, without changing output/hash
+        assert(fake_ms == before + 1 && sink.bytes == expected && memory.checksum() == expected_hash);
+        assert(Serial.tx_timeout_ms == 1);
+    }
+    std::cout << "Native checks passed: wheel mixes, sensor validity, USB transport, 6000-row memory export yields/bytes/checksum/rollover\n";
 }

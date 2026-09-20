@@ -7,7 +7,7 @@
 // transfer. Restore the 1ms live-control timeout on every exit, including errors.
 class TelemetryTransport : public Print {
 public:
-    explicit TelemetryTransport(Print* sink = nullptr) : _sink(sink) { if (!_sink) Serial.setTxTimeoutMs(50); }
+    explicit TelemetryTransport(Print* sink = nullptr) : _sink(sink), _last_yield_ms(millis()) { if (!_sink) Serial.setTxTimeoutMs(50); }
     ~TelemetryTransport() { if (!_sink) Serial.setTxTimeoutMs(1); }
     TelemetryTransport(const TelemetryTransport&) = delete;
     TelemetryTransport& operator=(const TelemetryTransport&) = delete;
@@ -19,6 +19,7 @@ public:
             const size_t sent = _sink->write(data, size);
             for (size_t i = 0; i < sent; ++i) { _checksum ^= data[i]; _checksum *= 16777619u; }
             if (sent != size) _failed = true;
+            cooperate();
             return sent;
         }
         size_t sent = 0;
@@ -46,11 +47,22 @@ public:
         }
         return sent;
     }
+    // Disarmed export only: formatting thousands of rows into PSRAM has no
+    // serial backpressure. Let the network-core idle task run without disabling
+    // or feeding its watchdog. Also call between file-checksum chunks, before
+    // any formatted writes exist. Unsigned subtraction handles millis rollover.
+    void cooperate() {
+        if (millis() - _last_yield_ms >= 10) {
+            delay(1);
+            _last_yield_ms = millis();
+        }
+    }
     void resetChecksum() { _checksum = 2166136261u; }
     uint32_t checksum() const { return _checksum; }
     bool failed() const { return _failed; }
 private:
     Print* _sink;
+    uint32_t _last_yield_ms;
     uint32_t _checksum = 2166136261u;
     bool _failed = false;
 };

@@ -145,6 +145,10 @@ void WebUI::setupRoutes() {
         constexpr size_t capacity = 4 * 1024 * 1024;
         auto data = std::shared_ptr<uint8_t>(static_cast<uint8_t*>(heap_caps_malloc(capacity, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)), free);
         if (!data) { releaseMaintenance(); r->send(503, "text/plain", "Insufficient PSRAM"); return; }
+        // A full saved run can take seconds to format and drain. This applies
+        // only to an authenticated, disarmed download, not live control traffic.
+        r->client()->setRxTimeout(120);
+        r->client()->setAckTimeout(15000);
         r->client()->setNoDelay(true);
         BufferPrint out(data.get(), capacity);
         if (_export) _export(&out);
