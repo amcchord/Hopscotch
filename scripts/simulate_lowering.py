@@ -48,6 +48,8 @@ class Model:
     contact_velocity_fraction: float = 1.0
     servo_tau: float = .04
     servo_limit: float = 1.5
+    servo_accel: float = 1e6
+    servo_delay_ticks: int = 0
     joint_stiffness: float = 25
     torque_per_acceleration: float = .004
     center_left: float = 1.768
@@ -85,6 +87,8 @@ class Policy:
         self.lib.lower_step.argtypes = [C.c_void_p,C.c_uint32,C.c_float,C.POINTER(C.c_float),C.c_bool,C.POINTER(C.c_float)]
         self.lib.lower_reason.argtypes = [C.c_void_p]
         self.lib.lower_reason.restype = C.c_char_p
+        self.lib.lower_arm_speed.argtypes = [C.c_void_p]
+        self.lib.lower_arm_speed.restype = C.c_float
 
 
 def support_angle(q, m, floor_height=0.):
@@ -105,6 +109,7 @@ def simulate(policy,m,name):
     command = 0.
     old_q_rate = 0.
     joint_rates = [0.,0.]
+    target_history = []
     centers = [m.center_left,m.center_right]
     signs = [math.copysign(1,c) for c in centers]
     output = (C.c_float*7)()
@@ -124,6 +129,8 @@ def simulate(policy,m,name):
             targets = [output[0],output[1]]
             phase,supported,override = int(output[2]),bool(output[3]),bool(output[4])
             wheel_request,committed = output[5],bool(output[6])
+            target_history.append((targets[:],policy.lib.lower_arm_speed(handle)))
+            delayed_targets, arm_speed = target_history[max(0,len(target_history)-1-m.servo_delay_ticks)]
             if committed and commit_time is None: commit_time=t
             if supported and contact_time is None: contact_time=t
             if phase != previous_phase:
@@ -159,12 +166,14 @@ def simulate(policy,m,name):
                 position+=wheel*dt
                 prior_arms=arms[:]
                 for j in range(2):
-                    target=targets[j] if override else 0
+                    target=delayed_targets[j] if override else 0
                     # Loaded joint deflects away from the floor; no hard clamp
                     # of the arm and no omission of body reaction in preparation.
                     deflection=signs[j]*contact_torque[j]/m.joint_stiffness
-                    servo=clamp((target+deflection-arms[j])/m.servo_tau,-m.servo_limit,m.servo_limit)
+                    limit=min(m.servo_limit,arm_speed) if override else m.servo_limit
+                    servo=clamp((target+deflection-arms[j])/m.servo_tau,-limit,limit)
                     if j==1:servo*=m.right_servo_scale
+                    servo=clamp(servo,joint_rates[j]-m.servo_accel*dt,joint_rates[j]+m.servo_accel*dt)
                     arms[j]+=servo*dt
                     if m.jam and arms[j]*signs[j]<-1.6: arms[j]=-1.6*signs[j]
                 rates=[(a-b)/dt for a,b in zip(arms,prior_arms)]
@@ -262,10 +271,21 @@ def main():
                 [(.076,.28),(.086,.30),(.096,.32)],[18,24,27],[240,1200],[25,100],[.2,.8]):
             cases.append((f'impact_sweep_{len(cases)}',replace(rebound,pivot=geometry[0],arm=geometry[1],
                 gravity=gravity,stiffness=stiffness,joint_stiffness=joint,damping_ratio=damping)))
+        # V3 continued moving outward for at least the next 20ms after target
+        # reversal. Bound acceleration and delay commands rather than assuming
+        # instant velocity changes. Low inertia/high stiffness remains an
+        # unmeasured sensitivity, not a fitted proof of the physical maneuver.
+        delayed=replace(rebound,pivot=.066,equilibrium=87.16,servo_accel=30,
+                        servo_delay_ticks=1,torque_per_acceleration=.001)
+        cases.append(('trial_v3_delayed_impact',delayed))
+        for pivot,delay,acceleration,torque in itertools.product(
+                [.066,.086],[0,1,2],[30,80],[.001,.004]):
+            cases.append((f'impact_delay_{len(cases)}',replace(delayed,pivot=pivot,
+                servo_delay_ticks=delay,servo_accel=acceleration,torque_per_acceleration=torque)))
     results=[]
     for name,model in cases:
         result,trace=simulate(policy,model,name);results.append(result)
-        if not name.startswith(('sweep_','impact_sweep_')):
+        if not name.startswith(('sweep_','impact_sweep_','impact_delay_')):
             with (args.output/(name+'.csv')).open('w') as stream:
                 writer=csv.writer(stream);writer.writerow(['time_s','tilt_deg','rate_dps','arm_l','arm_r',
                     'target_l','target_r','torque_l','torque_r','phase','committed','wheel_rad_s','setpoint',
@@ -276,7 +296,7 @@ def main():
     assert results[0]['outcome']=='lower_complete',results[0]
     for r in results:
         assert r['peak_target_lead_rad']<=.1201,r
-        if r['name'] not in ('nominal','high_inertia_limit') and not r['name'].startswith(('sweep_','trial_','impact_sweep_')):
+        if r['name'] not in ('nominal','high_inertia_limit') and not r['name'].startswith(('sweep_','trial_','impact_sweep_','impact_delay_')):
             assert r['outcome']!='lower_complete',r
     if args.baseline_ref:
         folder=args.output/'baseline';folder.mkdir(exist_ok=True)
@@ -285,7 +305,7 @@ def main():
         baseline=Policy(folder);old=[]
         for name,model in cases:
             result,trace=simulate(baseline,model,name);old.append(result)
-            if name in ('nominal','trial_rebound_stress','trial_uneven_floor','trial_asymmetric_servo'):
+            if name in ('nominal','trial_rebound_stress','trial_uneven_floor','trial_asymmetric_servo','trial_v3_delayed_impact'):
                 with (folder/(name+'.csv')).open('w') as stream:
                     writer=csv.writer(stream);writer.writerow(['time_s','tilt_deg','rate_dps','arm_l','arm_r',
                         'target_l','target_r','torque_l','torque_r','phase','committed','wheel_rad_s','setpoint',

@@ -1,0 +1,1 @@
+Lowering checks passed: prepare, deliberate forward departure, measured catch, independent arm hold, missed/false catch, faults, deadlines/rollover, landing and fast sender gate

@@ -1,0 +1,185 @@
+{
+  "log": "telemetry_logs/bal_20260920_forward_catch_v3_wifi.csv",
+  "samples": 1908,
+  "csv_sha256": "45bc5962c7b41b094788be198724a5b9ddc51a7bcdc360a5a87f75bfbfac29d4",
+  "wire_sha256": "089ef134491e79f4e58d9f42e0dda40ef4c68dee4e560acc6c7d0e46b4844fb3",
+  "features": 16383,
+  "duration_s": 38.235,
+  "end_reason": "lower_wrong_direction",
+  "inferred_forward_rad": [
+    3.91,
+    3.553
+  ],
+  "operator": "After CH11 stopped, arms supported the still-upright robot. One CH12 press brought it flat. User requests automatic arm reversal at floor contact and final Forward pose.",
+  "transitions": [
+    {
+      "phase": "stopping",
+      "t_ms": 24426.0,
+      "roll": 87.399,
+      "roll_rate": 2.83,
+      "arm_l_torque": 0.245,
+      "arm_r_torque": -0.026,
+      "reach_l": 0.0,
+      "reach_r": -0.0009999999999998899,
+      "arm_l_vel": 0.062,
+      "arm_r_vel": 0.014,
+      "motor_vel": -0.137
+    },
+    {
+      "phase": "preparing",
+      "t_ms": 31961.0,
+      "roll": 87.259,
+      "roll_rate": -1.359,
+      "arm_l_torque": 0.224,
+      "arm_r_torque": -0.167,
+      "reach_l": 0.0,
+      "reach_r": -0.0009999999999998899,
+      "arm_l_vel": 0.005,
+      "arm_r_vel": -0.08,
+      "motor_vel": -0.133
+    },
+    {
+      "phase": "committing",
+      "t_ms": 37636.0,
+      "roll": 91.921,
+      "roll_rate": -0.119,
+      "arm_l_torque": 0.279,
+      "arm_r_torque": 0.07,
+      "reach_l": 1.2570000000000001,
+      "reach_r": 1.2489999999999997,
+      "arm_l_vel": 0.009,
+      "arm_r_vel": 0.02,
+      "motor_vel": -0.187
+    },
+    {
+      "phase": "catching",
+      "t_ms": 38155.0,
+      "roll": 87.476,
+      "roll_rate": -28.738,
+      "arm_l_torque": -0.008,
+      "arm_r_torque": 0.049,
+      "reach_l": 1.814,
+      "reach_r": 1.8040000000000003,
+      "arm_l_vel": -1.568,
+      "arm_r_vel": 1.514,
+      "motor_vel": -0.785
+    },
+    {
+      "phase": "fault",
+      "t_ms": 38235.0,
+      "roll": 86.223,
+      "roll_rate": 45.776,
+      "arm_l_torque": -0.918,
+      "arm_r_torque": 0.921,
+      "reach_l": 1.927,
+      "reach_r": 1.9180000000000001,
+      "arm_l_vel": -1.232,
+      "arm_r_vel": 1.295,
+      "motor_vel": -0.785
+    }
+  ],
+  "sweep_start": {
+    "t_ms": 37735.0,
+    "roll": 91.819,
+    "roll_rate": -1.574,
+    "arm_l_torque": 0.25,
+    "arm_r_torque": -0.004,
+    "reach_l": 1.2570000000000001,
+    "reach_r": 1.2489999999999997,
+    "arm_l_vel": 0.053,
+    "arm_r_vel": -0.043,
+    "motor_vel": -0.385
+  },
+  "sweep_start_drop_deg": 0.10200000000000387,
+  "first_load": {
+    "t_ms": 38215.0,
+    "roll": 85.665,
+    "roll_rate": -11.405,
+    "arm_l_torque": -0.454,
+    "arm_r_torque": 0.189,
+    "reach_l": 1.9020000000000001,
+    "reach_r": 1.8929999999999998,
+    "arm_l_vel": -1.272,
+    "arm_r_vel": 1.328,
+    "motor_vel": -0.785
+  },
+  "first_load_drop_deg": 6.256,
+  "minimum_forward_rate_dps": -34.987,
+  "supported_samples": 0,
+  "final_sample": {
+    "t_ms": 38235.0,
+    "roll": 86.223,
+    "roll_rate": 45.776,
+    "arm_l_torque": -0.918,
+    "arm_r_torque": 0.921,
+    "reach_l": 1.927,
+    "reach_r": 1.9180000000000001,
+    "arm_l_vel": -1.232,
+    "arm_r_vel": 1.295,
+    "motor_vel": -0.785
+  },
+  "timing_max": {
+    "sample_dt_ms": 24.0,
+    "inner_dt_max_us": 5452.0,
+    "update_age_ms": 24.0,
+    "imu_age_ms": 10.0,
+    "feedback_age_l_ms": 7.0,
+    "feedback_age_r_ms": 2.0
+  },
+  "replay": {
+    "source": "8449ddb (same policy as installed 8449ddb)",
+    "scope": "Measured inputs through pinned C++; not physical simulation",
+    "caveat": "Forward inferred from settled target; center sign from historical calibration. Export/control sampling can differ within a tick.",
+    "transitions": [
+      {
+        "phase": "stopping",
+        "t_ms": 24426,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "preparing",
+        "t_ms": 31961,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "committing",
+        "t_ms": 37636,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "catching",
+        "t_ms": 38155,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "fault",
+        "t_ms": 38235,
+        "reason": "lower_wrong_direction"
+      }
+    ],
+    "phase_mismatch_t_ms": [],
+    "final_reason": "lower_wrong_direction"
+  },
+  "committed_replay": {
+    "scope": "Seeded at observed commitment; only subsequent measured-input decisions",
+    "transitions": [
+      {
+        "phase": "committing",
+        "t_ms": 37636,
+        "initialization": "Observed committed posture"
+      },
+      {
+        "phase": "catching",
+        "t_ms": 38155,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "fault",
+        "t_ms": 38235,
+        "reason": "lower_wrong_direction"
+      }
+    ],
+    "phase_mismatch_t_ms": [],
+    "final_reason": "lower_wrong_direction"
+  }
+}

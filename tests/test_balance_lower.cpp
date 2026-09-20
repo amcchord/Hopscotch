@@ -117,6 +117,39 @@ int main() {
     { Rig r; r.commit(); r.in.tilt+=3; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.supported());
       assert(std::strcmp(r.lower.reason(),"lower_wrong_direction")==0); }
+    { // Recorded v3 impact and next frame. Loaded rebound must continue the
+      // return instead of freezing upright. It is NOT completed or supported
+      // until measured two-arm return and calm body support qualify.
+      Rig r; r.fall(); r.in.tilt=82; r.in.rate=-35; r.tick(false);
+      r.in.arm_left=-1.902f; r.in.arm_right=1.893f;
+      r.in.velocity_left=-1.272f; r.in.velocity_right=1.328f;
+      r.in.torque_left=-.454f; r.in.torque_right=.189f; r.in.rate=-11.405f;
+      r.tick(false); const float first=r.lower.left();
+      assert(first>r.in.arm_left && r.lower.right()<r.in.arm_right);
+      r.in.arm_left=-1.927f; r.in.arm_right=1.918f;
+      r.in.velocity_left=-1.232f; r.in.velocity_right=1.295f;
+      r.in.torque_left=-.918f; r.in.torque_right=.921f;
+      r.in.tilt=82.558f; r.in.rate=45.776f; r.tick(false);
+      assert(r.lower.active() && r.lower.left()>first && !r.lower.supported());
+      assert(r.lower.armSpeed()==.5f);
+      r.in.rate=0; r.in.velocity_left=.25f; r.in.velocity_right=-.25f;
+      for(int i=0;i<20 && r.lower.active();++i) r.tick();
+      assert(r.lower.supported() && r.lower.phase()==LowerPhase::Descending);
+      assert(r.lower.left()>first+.06f); // full return, not v3 capped retreat
+      assert(r.lower.phase()!=LowerPhase::Complete && r.in.tilt>80); }
+    { // Rebound without load, persistent rebound, and backwards travel still
+      // fault. Contact is no excuse to waive the global 65 deg/s limit.
+      for(int fault=0;fault<4;++fault) {
+        Rig r; r.fall(); r.in.torque_left=.8f; r.in.torque_right=-.8f;
+        r.in.rate=0; r.tick(false);
+        r.in.rate=45;
+        if(fault==0) r.in.torque_left=r.in.torque_right=0;
+        if(fault==1) r.now+=301;
+        if(fault==2) r.in.tilt=91;
+        if(fault==3) r.in.rate=66;
+        for(int i=0;i<4 && r.lower.active();++i) r.tick(false);
+        assert(r.lower.phase()==LowerPhase::Fault);
+      } }
     { Rig r; r.prepare(); r.in.wheel_left=-4.2f; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed());
       assert(std::strcmp(r.lower.reason(),"lower_prepare_disturbed")==0); }

@@ -27,7 +27,8 @@ struct LowerConfig {
     float prepare_rad = 1.25f, prepare_speed = .25f;
     float catch_rad = 2.40f, catch_speed = 1.5f;
     float lower_speed = .16f, retract_speed = .30f;
-    float catch_yield = .06f, catch_yield_speed = .5f;
+    float catch_return_speed = .50f;
+    float one_arm_return = .06f;
     float max_target_lead = .12f;
     float contact_torque = .40f;
     float launch_accel = 2.0f, launch_speed = 2.0f; // rear rad/s^2 and rad/s
@@ -40,6 +41,7 @@ struct LowerConfig {
     uint32_t calm_ms = 500, prepare_ms = 200, contact_ms = 80, flat_ms = 600;
     uint32_t stop_timeout_ms = 14000, prepare_timeout_ms = 16000;
     uint32_t launch_timeout_ms = 1800, catch_timeout_ms = 2500;
+    uint32_t impact_settle_ms = 300;
     uint32_t descent_timeout_ms = 20000, retract_timeout_ms = 6000;
     uint32_t progress_timeout_ms = 3000;
 };
@@ -64,7 +66,8 @@ public:
     float armSpeed() const {
         const LowerConfig c;
         return _phase == LowerPhase::Committing || _phase == LowerPhase::Catching
-            ? c.catch_speed : std::max(c.prepare_speed, c.retract_speed);
+            ? ((_left_touched || _right_touched) ? c.catch_return_speed : c.catch_speed)
+            : std::max(c.prepare_speed, c.retract_speed);
     }
     const char* reason() const { return _reason; }
     void reset() { *this = BalanceLower{}; }
@@ -140,9 +143,6 @@ public:
             // positions the catch. Stop accelerating once forward motion is
             // measured. Preserve that small wheel speed until support catches
             // the body instead of abruptly braking it back upright.
-            if (in.tilt > _launch_tilt + 2 || in.rate > 12) {
-                fail("lower_wrong_direction"); break;
-            }
             _peak_fall_rate = std::min(_peak_fall_rate, in.rate);
             if (!_catch_started && in.rate <= -1.f && in.tilt <= _launch_tilt - c.catch_start_drop) {
                 _catch_started = true; _catch_start_ms = now;
@@ -158,37 +158,64 @@ public:
             const bool seek_load = _catch_started && now - _catch_start_ms >= 100; // exclude the initial arm acceleration impulse
             const bool left_load = seek_load && loaded(in.arm_left, in.velocity_left, in.torque_left, _sign_left, c);
             const bool right_load = seek_load && loaded(in.arm_right, in.velocity_right, in.torque_right, _sign_right, c);
-            // V2 kept the other arm advancing after first impact and delayed
-            // yielding until both arms slowed. The measured rebound took one
-            // more frame. Stop BOTH strokes on first load, while retaining
-            // independent contact latches: one arm still cannot prove support.
+            // On first impact reverse BOTH arms toward calibrated Forward.
+            // V3 stopped after only 0.06 rad and waited for stationary arms;
+            // the physical robot instead needed this return to continue.
             if ((left_load || right_load) && !_left_touched && !_right_touched) {
-                _left = _touch_left = in.arm_left;
-                _right = _touch_right = in.arm_right;
+                _left = in.arm_left;
+                _right = in.arm_right;
+                _touch_left = in.arm_left; _touch_right = in.arm_right;
+                _impact_ms = now;
             }
             if (left_load) _left_touched = true;
             if (right_load) _right_touched = true;
+            if (_left_touched && std::fabs(in.torque_left) >= c.contact_torque*.5f) _left_support_ms = now;
+            if (_right_touched && std::fabs(in.torque_right) >= c.contact_torque*.5f) _right_support_ms = now;
+            if ((_left_touched || _right_touched) && _phase == LowerPhase::Committing
+                && in.tilt <= _launch_tilt-c.forward_drop*.5f && _peak_fall_rate < -c.forward_rate)
+                enter(LowerPhase::Catching, now); // real early contact need not reach 1.8 rad
             if (_catch_started && !_left_touched && !_right_touched) {
                 _left = approach(_left, -_sign_left*c.catch_rad, in.arm_left, c.catch_speed*dt, c.max_target_lead);
                 _right = approach(_right, -_sign_right*c.catch_rad, in.arm_right, c.catch_speed*dt, c.max_target_lead);
             }
-            // Absorb measured impact/deceleration immediately with a bounded
-            // retreat. Do not yield a still-accelerating unsupported fall, and
-            // never restart the travel budget when the second arm touches.
-            if ((_left_touched || _right_touched) && in.rate >= _peak_fall_rate + 1.f) {
-                _left = approach(_left, _touch_left + _sign_left*c.catch_yield,
-                                 in.arm_left, c.catch_yield_speed*dt, c.max_target_lead);
-                _right = approach(_right, _touch_right + _sign_right*c.catch_yield,
-                                  in.arm_right, c.catch_yield_speed*dt, c.max_target_lead);
-            }
-            const bool caught = _left_touched && _right_touched
+            const bool both_loaded = _left_touched && _right_touched
                 && std::fabs(in.torque_left) >= c.contact_torque*.5f
-                && std::fabs(in.torque_right) >= c.contact_torque*.5f
+                && std::fabs(in.torque_right) >= c.contact_torque*.5f;
+            // A measured loaded impact can briefly reverse body rate before
+            // the motor reverses. Keep returning rather than freeze upright.
+            // Never excuse an unsupported rebound, backward displacement, the
+            // global motion limits or an impact that does not settle promptly.
+            const bool recent_support = _left_touched && _right_touched
+                && now - _left_support_ms <= 60 && now - _right_support_ms <= 60;
+            const bool settling_impact = recent_support && now - _impact_ms <= c.impact_settle_ms
+                && _peak_fall_rate < -c.forward_rate && in.tilt < _launch_tilt-c.forward_drop*.5f;
+            if (in.tilt > _launch_tilt + 2 || (in.rate > 12 && !settling_impact)) {
+                fail("lower_wrong_direction"); break;
+            }
+            if (_left_touched || _right_touched) {
+                // Reverse immediately; subsequently ease off as forward fall
+                // approaches the descent-rate limit instead of withdrawing
+                // support faster than the body can follow.
+                const float scale = now == _impact_ms ? 1.f
+                    : std::max(0.f, std::min(1.f, (in.rate+c.descent_rate)/c.descent_rate));
+                const float step = c.catch_return_speed*scale*dt;
+                // One arm alone only permits the original small softening
+                // budget. Both independent contacts unlock the full return.
+                const bool both_touched = _left_touched && _right_touched;
+                _left = approach(_left, both_touched ? 0 : _touch_left+_sign_left*c.one_arm_return,
+                                 in.arm_left, step, c.max_target_lead);
+                _right = approach(_right, both_touched ? 0 : _touch_right+_sign_right*c.one_arm_return,
+                                  in.arm_right, step, c.max_target_lead);
+            }
+            // Return motion is intentional; requiring zero arm velocity here
+            // would prevent support confirmation throughout a successful return.
+            const bool caught = both_loaded
                 && in.tilt <= _launch_tilt-c.forward_drop*.5f
-                && std::fabs(in.velocity_left) <= .20f && std::fabs(in.velocity_right) <= .20f
+                && in.velocity_left*_sign_left >= -.10f && in.velocity_right*_sign_right >= -.10f
+                && in.velocity_left*_sign_left <= c.catch_return_speed+.20f
+                && in.velocity_right*_sign_right <= c.catch_return_speed+.20f
                 && in.rate >= -c.descent_rate && in.rate <= c.calm_rate
-                && _peak_fall_rate < -c.forward_rate
-                && in.rate >= _peak_fall_rate + 1.f;
+                && _peak_fall_rate < -c.forward_rate;
             if (confirmed(caught, dt, c.contact_ms)) {
                 _supported = true;
                 _left = in.arm_left; _right = in.arm_right;
@@ -241,8 +268,10 @@ private:
     bool _committed = false, _supported = false, _left_touched = false, _right_touched = false, _catch_started = false;
     float _left = 0, _right = 0, _sign_left = 0, _sign_right = 0, _wheel_command = 0;
     float _confirm_ms = 0, _progress_tilt = 0, _support_lost_ms = 0;
-    float _launch_tilt = 0, _peak_fall_rate = 0, _touch_left = 0, _touch_right = 0;
-    uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0;
+    float _launch_tilt = 0, _peak_fall_rate = 0;
+    float _touch_left = 0, _touch_right = 0;
+    uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0, _impact_ms = 0;
+    uint32_t _left_support_ms = 0, _right_support_ms = 0;
     const char* _reason = "lower_requested";
     static bool at(float a, float b) { return std::fabs(a-b) < .001f; }
     static bool valid(const LowerInput& i) {

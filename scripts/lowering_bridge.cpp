@@ -20,4 +20,5 @@ void lower_step(void* p, uint32_t now, float dt, const float* values, bool healt
     result[6] = lower.committed();
 }
 const char* lower_reason(void* p) { return static_cast<BalanceLower*>(p)->reason(); }
+float lower_arm_speed(void* p) { return static_cast<BalanceLower*>(p)->armSpeed(); }
 }

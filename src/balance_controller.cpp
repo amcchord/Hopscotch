@@ -1874,7 +1874,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 16383; // prior extensions plus first-impact yielding v3
+    header.reserved = 49151; // prior extensions plus continuous arm return v4 (32768)
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -2024,7 +2024,18 @@ void BalanceController::dumpLog(Print* sink) {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
-    if (header.reserved & 8192) {
+    if (header.reserved & 32768) {
+        out.println("# lowering=experimental_ch11_forward_catch_v4 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        out.println("# lowering_phases=0:idle 1:stopping 2:preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
+        out.println("# lowering_prepare=travel_rad:1.25 speed_rad_s:0.25 confirm_ms:200");
+        out.println("# lowering_launch=rear_accel_rad_s2:2 rear_speed_rad_s:-2 forward_drop_deg:1 forward_rate_dps:2 accel_pause_rate_dps:6 coast_min_arm_rad:1.8 timeout_ms:1800");
+        out.println("# lowering_catch=travel_rad:2.4 speed_rad_s:1.5 first_load_nm:0.4 sustained_load_nm:0.2 confirm_ms:80 timeout_ms:2500 arm_start_rate_dps:-1 arm_start_drop_deg:0.1 first_load_delay_ms:100");
+        out.println("# lowering_return=first_contact_reverse_both:1 speed_limit_rad_s:0.5 single_contact_limit_rad:0.06 both_contacts_goal:calibrated_forward rate_taper_limit_dps:12 loaded_rebound_ms:300 support_age_ms:60");
+        out.println("# lowering_support=both_arms measured_forward_fall_loaded_return required reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:4");
+        out.println("# lowering_rate=roll_rate_uses_fast_tau_s:0.006 while_pilot_phase_nonzero:1 ordinary_balance_filter_unchanged:1");
+        out.println("# lowering_limits=target_lead_rad:0.12 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:0.75 owner_timeout_ms:100 motor_feedback_ms:100 rate_filter_tau_s:0.006");
+        out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600 arms_measured_forward_rad:0.06");
+    } else if (header.reserved & 8192) {
         out.println("# lowering=experimental_ch11_forward_catch_v3 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
         out.println("# lowering_prepare=travel_rad:1.25 speed_rad_s:0.25 confirm_ms:200");
