@@ -1,4 +1,5 @@
 -- Execute the production script with EdgeTX API doubles and real C++ payloads.
+local loadRadio=dofile("tests/radio/edgetx_mono.lua")
 SMLSIZE, MIDSIZE, INVERS, SOLID, FORCE = 512, 768, 1, 0, 2
 EVT_VIRTUAL_NEXT, EVT_VIRTUAL_PREV, EVT_VIRTUAL_ENTER = 100,101,102
 LCD_W,LCD_H=128,64
@@ -35,7 +36,7 @@ local function save(name)
   end
   f:close()
 end
-local app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua")
+local app=loadRadio()
 app.run(0); assert(contains("BASIC TELEMETRY") and contains("Drive / arms UNKNOWN")); save("basic")
 -- Each Basic page has its own content; never infer motor state from FM.
 app.run(EVT_VIRTUAL_NEXT)
@@ -53,7 +54,8 @@ push(fixtures.drive); app.run(0)
 assert(contains("LIVE") and contains("DRIVE ON") and contains("ARMS  OFF")); save("drive")
 push(fixtures.balance); now=140; app.run(0)
 assert(contains("BALANCE") and contains("ARMS  ON"));save("balance")
-app.run(EVT_VIRTUAL_NEXT); assert(contains("+88.2deg") and contains("-0.5deg") and contains("MOTOR IQ 12.3A"));save("health")
+-- -0.45 lies on a decimal rounding boundary; binary32/binary64 land on opposite sides.
+app.run(EVT_VIRTUAL_NEXT); assert(contains("+88.2deg") and (contains("-0.5deg") or contains("-0.4deg")) and contains("MOTOR IQ 12.3A"));save("health")
 app.run(EVT_VIRTUAL_NEXT);assert(contains("FR  ON") and contains("RA  ON"));save("motors")
 push(fixtures.detail);app.run(EVT_VIRTUAL_NEXT);assert(contains("tilt out of range") and contains("(fallen)"));save("history")
 app.run(EVT_VIRTUAL_NEXT);assert(contains("CONTROL LQ 100%"));save("link")
@@ -97,7 +99,7 @@ push(wrap);now=600;app.run(EVT_VIRTUAL_PREV);assert(contains("TILT --") and cont
 save("unknown-values")
 
 -- Alternating sensor updates retain each value independently, then expire.
-queue={};now=2000;app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua")
+queue={};now=2000;app=loadRadio()
 values.FM={"READY",true,true};values.RxBt={25.2,true,true};app.run(0)
 values.FM={"",true,true};values.RxBt={0/0,true,true};now=2021;app.run(0)
 assert(contains("FM: READY") and contains("ROBOT 25.2V"))
@@ -112,7 +114,7 @@ values.RxBt={"invalid",true,true};now=2844;app.run(0);assert(contains("ROBOT 0.0
 values.RxBt={nil,false,false};now=1;app.run(0);assert(contains("ROBOT --")) -- clock wrap
 
 -- Missing numeric fields are held independently while flags update immediately.
-queue={};now=3000;app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua")
+queue={};now=3000;app=loadRadio()
 push(fixtures.balance);app.run(EVT_VIRTUAL_NEXT)
 local missing=copy(fixtures.balance);missing[8]=30;missing[9]=0;missing[10]=16
 missing[18]=255;missing[19]=128;missing[20]=0;missing[21]=128;missing[22]=0
@@ -141,7 +143,7 @@ function getSourceValue(id)
   end
   return sourceAPI(id)
 end
-now=4009;queue={};app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua");app.run(0)
+now=4009;queue={};app=loadRadio();app.run(0)
 assert(contains("ROBOT --"))
 for t=4010,5500 do
   now=t;app.background()

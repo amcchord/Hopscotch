@@ -54,8 +54,10 @@ local function str(d, first, last)
   return s
 end
 local function event(text, now)
-  table.insert(events, 1, {text=text, time=now})
-  if #events > 4 then table.remove(events) end
+  -- Monochrome EdgeTX omits the table library. Keep this bounded list using
+  -- language-level indexing (ordinary Lua tables themselves are supported).
+  for i=4,2,-1 do events[i] = events[i-1] end
+  events[1] = {text=text, time=now}
 end
 local function decode(command, d, now)
   if command ~= 0x7E or type(d) ~= "table" or #d < 8 or #d > 60 then return end
@@ -156,8 +158,10 @@ local function record(now)
     row[#row+1] = reading(sensors,name) ~= nil and 1 or 0
     if log.rows == 0 then header = header..","..name..","..name.."_age_ms,"..name.."_current,"..name.."_fresh,"..name.."_shown" end
   end
-  for i,v in ipairs(row) do row[i] = csv(v) end
-  local data = (log.rows == 0 and header.."\n" or "")..table.concat(row,",").."\n"
+  -- Assemble one bounded row without table.concat, absent on the GX12.
+  local data = log.rows == 0 and header.."\n" or ""
+  for i=1,#row do data = data..(i > 1 and "," or "")..csv(row[i]) end
+  data = data.."\n"
   local file
   local ok = pcall(function()
     file = io.open(log.file,"a") -- append only; never truncate existing logs
@@ -360,7 +364,7 @@ local function dataAge(time)
   return a < 99900 and string.format("%.1fs",a/100) or "--"
 end
 local function diagnostics()
-  text(0,12,"LUA v3  LOG "..log.state)
+  text(0,12,"LUA v3.1  LOG "..log.state)
   text(0,22,string.format("RX %d  HS %d",math.min(diag.rx,99999),math.min(diag.status,99999)))
   text(0,32,"Status age "..dataAge(received))
   text(0,42,"FM "..dataAge(sensors.FM and sensors.FM.time).." V "..dataAge(sensors.RxBt and sensors.RxBt.time))

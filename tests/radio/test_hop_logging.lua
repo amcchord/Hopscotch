@@ -1,5 +1,6 @@
 -- EdgeTX's simplified io API differs from desktop Lua: io.write(file,data),
 -- io.close(file) with no return value. Exercise it without touching an SD card.
+local loadRadio=dofile("tests/radio/edgetx_mono.lua")
 SMLSIZE,MIDSIZE,INVERS,SOLID,FORCE=512,768,1,0,2
 EVT_VIRTUAL_NEXT,EVT_VIRTUAL_PREV,EVT_VIRTUAL_ENTER,EVT_VIRTUAL_ENTER_LONG=100,101,102,103
 local now,draws,opens,writes,closes,killed,fail=100,{},0,0,0,0,nil
@@ -41,7 +42,7 @@ io={
   end
 }
 local function newApp()
-  local app=dofile('radio/SCRIPTS/TELEMETRY/hop.lua')
+  local app=loadRadio()
   app.run(0)
   for _=1,5 do app.run(EVT_VIRTUAL_NEXT) end
   assert(contains("LOG OFF"));return app

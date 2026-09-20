@@ -1,6 +1,37 @@
-# Radio telemetry — September 19, 2026
+# Radio telemetry — September 20, 2026
 
-## Installed — Lua v3, September 19 at 23:58 EDT
+## Crash fix ready — Lua v3.1, not installed
+
+Austin's GX12 photo shows `attempt to index a nil value (field 'table')`.
+Reproduced on v3 at `event()` when the first fresh FM value arrives. EdgeTX
+2.11 registers the `table` library only for color-LCD builds; the earlier host
+tests incorrectly exposed the desktop library to this monochrome script.
+
+- Removed all library dependencies on `table`: bounded four-entry event shift
+  and CSV construction now use core Lua indexing/concatenation. Ordinary Lua
+  tables are supported. Retained the page/freshness fixes and opt-in logger.
+- Both existing test suites now load production code into a restricted GX12
+  environment: no table/os/package/debug/coroutine, explicit supported APIs,
+  read-only math/string libraries and EdgeTX-style I/O. Harness helpers cannot
+  leak desktop libraries into the script. Old source failed before the fix;
+  corrected display and 600-record logging/error suites pass.
+- Additionally built official Lua 5.3.6 with 32-bit integers/floats, matching
+  EdgeTX 2.11's vendored version/numeric types; all radio tests pass there.
+  Accounted for binary32 versus binary64 rounding at the -0.45 display boundary
+  in the host assertion. Native fixture/transport, CSV integrity, syntax and
+  rendered-layout checks pass. This is not a full hardware VM/scheduler test.
+- Candidate `hop.lua`: 17,524 bytes, SHA-256
+  `d2674ebd99d1609c62ff9de6cf657e739c6eaa4653f8fcf490b659a9cd7bc995`.
+  Package/evidence: project-root `artifacts/radio-lua-v3.1-2026-09-20/`.
+- The radio is not attached. Installed v3 below remains faulty; replace its
+  Lua with v3.1 and remove generated hop.luac after a fresh backup on reconnect.
+  Page 6 will show LUA v3.1. Firmware/mappings and other worktrees are untouched.
+  Next: reconnect NO NAME, install/readback/eject, then verify on the handset.
+
+References: [EdgeTX library availability](https://luadoc.edgetx.org/overview/version-libraries),
+[2.11 library registration](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/thirdparty/Lua/src/linit.c).
+
+## Prior installation — Lua v3, September 19 at 23:58 EDT (crashes on GX12)
 
 Austin reported residual blanking and repeated Basic page content, and asked
 for an update prepared before reconnecting the radio. The candidate was prepared

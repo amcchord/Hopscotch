@@ -9,6 +9,10 @@ Target: GX12, 128×64 monochrome, EdgeTX 2.11 API. Roller / ENTER advances pages
 long RTN leaves telemetry. There are no command, mixer, or settings writes.
 Haptics can be disabled by setting `HAPTIC = false` near the top of the script.
 
+Use **v3.1 or newer** (shown on Diagnostics). v3 crashed on the GX12 because
+monochrome EdgeTX omits the `table` library; v3.1 removes those calls. Tests now
+restrict production code to the monochrome API environment, including logging.
+
 Readings hold their last valid value for five seconds to bridge intermittent
 telemetry. Robot status shows HOLD after 1.5 seconds without a new packet and
 UNKNOWN after three seconds. Received fault/arming changes remain immediate.

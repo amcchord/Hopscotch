@@ -291,6 +291,21 @@ backed-up model file only if needed and only after comparing newer user changes.
 Robot rollback: use the exact pre-install application image and existing
 project procedure, preserving settings, calibration, and saved run logs.
 
+**GX12 runtime correction (v3.1):** the v3 installation crashed on the first FM
+event because `table.insert` is unavailable on monochrome EdgeTX. Its logger
+also used unavailable `table.concat`. Both paths now use core Lua operations.
+The complete display and logger tests load production Lua in an isolated,
+restricted environment rather than inheriting desktop libraries. This also
+removes access to os/package/debug/coroutine and limits library/API exposure.
+The pre-fix script reproduces the photographed error in this environment.
+Both suites pass on desktop Lua and Lua 5.3.6 configured with 32-bit numeric
+types, matching EdgeTX 2.11's vendored version/configuration. Full handset
+runtime, heap and scheduler verification still requires the physical radio.
+Use `HOP_LUA_BIN` and `HOP_LUAC_BIN` to select a compatible local interpreter and
+compiler for the check script; never copy the host compiler's bytecode to SD.
+[Library availability](https://luadoc.edgetx.org/overview/version-libraries),
+[EdgeTX 2.11 Lua configuration](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/thirdparty/Lua/src/luaconf.h).
+
 Host validation: `bash scripts/check_radio_telemetry.sh`, the existing consolidated
 balance checks, and PlatformIO build. The new tests feed actual C++-encoded
 payloads to the production Lua, exercise malformed/stale/duplicate/unknown
