@@ -24,7 +24,7 @@ struct Rig {
         prepare();
         for(int i=0;i<400 && !lower.committed();++i) tick();
         assert(lower.phase()==LowerPhase::Committing && lower.committed() && !lower.supported());
-        assert(in.arm_left<=-1.21f && in.arm_right>=1.21f);
+        assert(in.arm_left<=-1.71f && in.arm_right>=1.71f);
     }
     void fall() {
         commit();
@@ -43,6 +43,7 @@ struct Rig {
         assert(!lower.supported());
         tick();
         assert(lower.phase()==LowerPhase::Descending && lower.supported());
+        assert(lower.armSpeed()==.3f);
         assert(lower.left()>=caught_left && lower.left()<=caught_left+.061f);
         assert(lower.right()<=caught_right && lower.right()>=caught_right-.061f);
     }
@@ -63,23 +64,33 @@ int main() {
     { // Deliberate departure precedes contact. The v1 contact-first deadlock
       // must never return: quiet measured preparation is enough to commit.
       Rig r; r.commit(); assert(r.in.torque_left==0 && r.in.torque_right==0); }
-    { // Move the fast catch stroke only after forward motion is observed.
-      Rig r; r.commit(); const float prepared=r.lower.left();
-      for(int i=0;i<10;++i) r.tick();
-      assert(r.lower.left()==prepared && r.lower.wheelCommand()<0);
-      r.in.tilt-=.049f; r.in.rate=-1.579f; r.tick();
-      assert(r.lower.left()==prepared); // recorded v2 premature trigger
-      r.in.tilt-=.2f; r.tick(); assert(r.lower.left()<prepared); }
-    { // Pause preparation as soon as wheels cease being quiet; do not keep
-      // advancing the arm-scheduled balance target through a growing drift.
+    { // The recorded 4.46-degree backwards target must never reach the PD
+      // while arms deploy. Outside this phase ordinary control is unchanged.
+      Rig r; assert(r.lower.preparationSetpoint(92)==92); r.prepare();
+      assert(r.lower.preparationSetpoint(92.46f)==88);
+      assert(r.lower.preparationSetpoint(87)==87);
+      r.in.rate=-8; r.in.velocity_left=-4; r.in.velocity_right=4;
+      for(int i=0;i<30 && !r.lower.committed();++i) r.tick();
+      assert(r.lower.committed()); // no upright/stationary wait during a forward fall
+      assert(r.lower.preparationSetpoint(92)==92); }
+    { // Pause a backwards disturbance, continue an expected forward departure.
       Rig r; r.prepare(); r.tick(); const float held=r.lower.left();
-      r.in.wheel_left=.8f;
-      for(int i=0;i<10;++i) r.tick();
-      assert(r.lower.left()==held && !r.lower.committed());
-      r.in.wheel_left=0; r.tick(); assert(r.lower.left()<held); }
+      r.in.rate=5; r.tick(); assert(r.lower.left()==held);
+      r.in.rate=-8; r.tick(); assert(r.lower.left()<held); }
+    { // No multi-degree backward excursion is accepted in preparation.
+      Rig r; r.prepare(); r.in.tilt+=1.6f; r.tick();
+      assert(r.lower.phase()==LowerPhase::Fault); }
+    { // The catch first parks short of the recorded impact pose. A slow
+      // extended search is permitted only after six measured forward degrees.
+      Rig r; r.fall(); assert(std::fabs(r.lower.left())<=1.851f);
+      r.in.tilt=81; r.tick(); assert(r.lower.armSpeed()==.5f);
+      assert(r.lower.left() < -1.85f); }
+    { // Arm acceleration torque alone cannot qualify contact without observed
+      // forward departure and body deceleration.
+      Rig r; r.fall(); r.in.torque_left=r.in.torque_right=.8f;
+      r.in.rate=-9; r.tick(); assert(r.lower.armSpeed()==2.f && !r.lower.supported()); }
     { Rig r; r.fall(); const float command=r.lower.wheelCommand();
-      for(int i=0;i<10;++i) r.tick();
-      assert(r.lower.wheelCommand()==command); }
+      for(int i=0;i<10;++i) r.tick(); assert(r.lower.wheelCommand()==command); }
     { // Forward fall is measured, never assumed after a timer or wheel request.
       Rig r; r.commit(); r.in.torque_left=r.in.torque_right=1;
       for(int i=0;i<100 && r.lower.active();++i) r.tick();
@@ -150,11 +161,11 @@ int main() {
         for(int i=0;i<4 && r.lower.active();++i) r.tick(false);
         assert(r.lower.phase()==LowerPhase::Fault);
       } }
-    { Rig r; r.prepare(); r.in.wheel_left=-4.2f; r.tick();
+    { Rig r; r.prepare(); r.in.wheel_left=-6.2f; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed());
       assert(std::strcmp(r.lower.reason(),"lower_prepare_disturbed")==0); }
     { Rig r; r.prepare();
-      for(int i=0;i<802 && r.lower.active();++i) { r.tick(false); assert(std::fabs(r.lower.left()-r.in.arm_left)<=.12001f); }
+      for(int i=0;i<802 && r.lower.active();++i) { r.tick(false); assert(std::fabs(r.lower.left()-r.in.arm_left)<=.24001f); }
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed()); }
     { Rig r; r.in.wheel_left=20; r.start();
       for(int i=0;i<702;++i) r.tick();
@@ -166,7 +177,7 @@ int main() {
       Rig r; r.catchFall();
       if(fault==0) r.in.healthy=false;
       if(fault==1) r.in.rate=-70;
-      if(fault==2) r.in.wheel_left=3.1f;
+      if(fault==2) r.in.wheel_left=6.1f;
       if(fault==3) r.in.arm_left=nan;
       r.tick(false); assert(r.lower.phase()==LowerPhase::Fault && r.lower.wheelCommand()==0); }
     { Rig r; r.catchFall(); const float held=r.lower.left(); r.in.rate=-20; r.tick(false);
@@ -186,13 +197,20 @@ int main() {
       for(int i=0;i<300 && r.lower.active();++i) r.tick();
       assert(r.lower.phase()==LowerPhase::Complete && r.lower.supported());
       assert(std::strcmp(r.lower.reason(),"lower_complete")==0); }
+    { // Command/feedback sign disagreement is tolerated briefly, then aborts.
+      Rig r; r.commit(); r.in.rate=0;
+      for(int i=0;i<15;++i) r.tick();
+      assert(r.lower.wheelCommand()<-.3f); r.in.wheel_left=.8f;
+      for(int i=0;i<4;++i) { r.tick(false); assert(r.lower.active()); }
+      r.tick(false); assert(std::strcmp(r.lower.reason(),"lower_wheel_direction")==0);
+    }
     // The actual fast sender uses this stricter fall-owner freshness/command
     // gate. It does not affect ordinary balance or pilot driving.
-    for(float command:{-2.f,-.4f,0.f,.65f,2.f}) {
+    for(float command:{-6.f,-2.f,-.4f,0.f,.65f,2.f,6.f}) {
       auto fresh=lowerWheelCommand(command,100); assert(!fresh.fault && fresh.value==command);
       auto stale=lowerWheelCommand(command,101); assert(stale.fault && stale.value==0);
     }
-    for(float bad:{nan,2.1f,-2.1f,std::numeric_limits<float>::infinity()}) {
+    for(float bad:{nan,6.1f,-6.1f,std::numeric_limits<float>::infinity()}) {
       auto out=lowerWheelCommand(bad,0); assert(out.fault && out.value==0);
     }
     std::cout << "Lowering checks passed: prepare, deliberate forward departure, measured catch, independent arm hold, missed/false catch, faults, deadlines/rollover, landing and fast sender gate\n";

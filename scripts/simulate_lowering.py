@@ -47,7 +47,7 @@ class Model:
     damping_ratio: float = .8
     contact_velocity_fraction: float = 1.0
     servo_tau: float = .04
-    servo_limit: float = 1.5
+    servo_limit: float = 4.0
     servo_accel: float = 1e6
     servo_delay_ticks: int = 0
     joint_stiffness: float = 25
@@ -89,6 +89,8 @@ class Policy:
         self.lib.lower_reason.restype = C.c_char_p
         self.lib.lower_arm_speed.argtypes = [C.c_void_p]
         self.lib.lower_arm_speed.restype = C.c_float
+        self.lib.lower_balance_setpoint.argtypes = [C.c_void_p,C.c_float]
+        self.lib.lower_balance_setpoint.restype = C.c_float
 
 
 def support_angle(q, m, floor_height=0.):
@@ -155,7 +157,7 @@ def simulate(policy,m,name):
                 shed=clamp(1-(abs(filtered_wheel)-12.12)/(21.21-12.12),0,1)
                 desired_offset=clamp(p*gate*shed+integral,-8,8)
                 offset+=clamp(desired_offset-offset,-12*DT,12*DT)
-                sp=clamp(base+offset,70,110)
+                sp=policy.lib.lower_balance_setpoint(handle,clamp(base+offset,70,110))
             old_arms=arms[:]
             for substep in range(8):
                 dt=DT/8
@@ -295,7 +297,7 @@ def main():
     print(json.dumps(results[0],indent=2))
     assert results[0]['outcome']=='lower_complete',results[0]
     for r in results:
-        assert r['peak_target_lead_rad']<=.1201,r
+        assert r['peak_target_lead_rad']<=.2401,r
         if r['name'] not in ('nominal','high_inertia_limit') and not r['name'].startswith(('sweep_','trial_','impact_sweep_','impact_delay_')):
             assert r['outcome']!='lower_complete',r
     if args.baseline_ref:

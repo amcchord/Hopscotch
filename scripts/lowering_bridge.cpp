@@ -22,3 +22,12 @@ void lower_step(void* p, uint32_t now, float dt, const float* values, bool healt
 const char* lower_reason(void* p) { return static_cast<BalanceLower*>(p)->reason(); }
 float lower_arm_speed(void* p) { return static_cast<BalanceLower*>(p)->armSpeed(); }
 }
+
+extern "C" float lower_balance_setpoint(void* p, float ordinary) {
+#ifdef BALANCE_LOWER_FORWARD_PREPARE_V5
+    return static_cast<balance_math::BalanceLower*>(p)->preparationSetpoint(ordinary);
+#else
+    (void)p;
+    return ordinary;
+#endif
+}

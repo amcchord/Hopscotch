@@ -134,7 +134,7 @@ static constexpr uint16_t V4_SAMPLE_BYTES = 240;
 inline bool supported(uint16_t schema, uint16_t bytes) {
     return (schema == 2 && bytes == V2_SAMPLE_BYTES)
         || (schema == 3 && bytes == V3_SAMPLE_BYTES)
-        || (schema == 4 && bytes == V4_SAMPLE_BYTES);
+        || ((schema == 4 || schema == 5) && bytes == V4_SAMPLE_BYTES); // v5 changes policy metadata only
 }
 }
 static_assert(offsetof(BalanceSample, pilot_forward) == balance_log::V2_SAMPLE_BYTES,
