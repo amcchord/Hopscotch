@@ -9,13 +9,51 @@ static const balance_math::PilotConfig config = {
     BALANCE_PILOT_DEADBAND, BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
     BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_TURN_ACCEL,
     BALANCE_PILOT_READY_MS, BALANCE_PILOT_STOP_MS,
-    BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU
+    BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU,
+    BALANCE_PILOT_FAST_DECEL, BALANCE_PILOT_BRAKE_START_SPEED,
+    BALANCE_PILOT_BRAKE_FULL_SPEED, BALANCE_PILOT_ARM_BRAKE_LIMIT
 };
 static void unlock(balance_math::BalancePilot& p) {
     for(int i=0;i<20;++i) p.update(true,true,0,0,.02f,config);
     assert(p.ready() && !p.moving());
 }
 int main() {
+    static_assert(BALANCE_PILOT_FAST_DECEL > BALANCE_PILOT_DECEL, "faster high-speed braking");
+    static_assert(BALANCE_PILOT_BRAKE_FULL_SPEED > BALANCE_PILOT_BRAKE_START_SPEED, "valid blend");
+    for (int sign : {-1,1}) {
+        balance_math::BalancePilot candidate, previous;
+        auto old=config;
+        old.fast_deceleration=old.deceleration;
+        old.arm_brake_limit=0;
+        // Low-speed motions, including reversals and their arm feedforward,
+        // remain bit-for-bit the same as the smooth v4 behavior.
+        for(int i=0;i<500;++i) {
+            float stick=i<25 ? 0 : i<125 ? sign*.15f : i<225 ? 0
+                         : i<325 ? -sign*.15f : 0;
+            candidate.update(true,true,stick,0,.02f,config);
+            previous.update(true,true,stick,0,.02f,old);
+            assert(candidate.velocity()==previous.velocity());
+            assert(candidate.armAssist()==previous.armAssist());
+            assert(!candidate.fastBraking());
+        }
+        candidate.reset();unlock(candidate);
+        for(int i=0;i<230;++i) candidate.update(true,false,sign,0,.02f,config);
+        int ticks=0;
+        while(candidate.velocity()!=0 && ticks<150) {
+            const float before=candidate.velocity();
+            candidate.update(true,false,0,0,.02f,config);
+            assert(sign*candidate.velocity()>=0);
+            assert(std::fabs(candidate.velocity()-before)<=config.fast_deceleration*.02f+.00001f);
+            assert(std::fabs(candidate.armAssist())<=BALANCE_PILOT_ARM_BRAKE_LIMIT+.00001f);
+            if(std::fabs(before)<=BALANCE_PILOT_BRAKE_START_SPEED) {
+                assert(!candidate.fastBraking());
+                assert(std::fabs(candidate.velocity()-before)<=config.deceleration*.02f+.00001f);
+            }
+            ++ticks;
+        }
+        assert(ticks>=65 && ticks<=75); // 20→0 reference: about 1.4 s, formerly 2.5 s
+        assert(candidate.moving()); // measured calm still required before hold
+    }
     balance_math::BalancePilot p;
     for(int i=0;i<500;++i) {
         p.update(false,true,1,1,.02f,config);
@@ -31,6 +69,7 @@ int main() {
     assert(!p.ready());
     unlock(p);
     assert(p.forwardStick()==0 && p.turnStick()==0);
+    assert(!p.fastBraking()); // an untouched standing robot never enters braking
     auto correction = [&](float error, bool ramp=true) {
         return p.velocityCorrection(error, BALANCE_VEL_SP_KP_LOW,
             BALANCE_VEL_SP_KP, BALANCE_VEL_SP_KNEE, BALANCE_PILOT_VEL_KP_LOW, ramp);
@@ -42,6 +81,7 @@ int main() {
         p.reset();unlock(p);
         p.update(true,false,sign,sign,.02f,config);
         assert(p.moving() && p.turning());
+        assert(!p.fastBraking());
         assert(sign*p.armAssist()<0); // start: shift opposite the braking swing
         assert(p.plannedArm(1)==0 && p.plannedArm(2)==0); // catch always wins
         assert(p.plannedArm(0)==p.armAssist() && p.plannedArm(3)==p.armAssist());
@@ -72,7 +112,8 @@ int main() {
         p.update(false,false,sign,sign,.02f,config); // fresh RC/feedback lost
         assert(sign*p.armAssist()>0); // brake: shift in the other direction
         assert(!p.ready() && p.moving());
-        assert(std::fabs(p.velocity()-sign*(config.max_velocity-config.deceleration*.02f))<.00001f);
+        assert(p.fastBraking()); // input loss uses the faster ramp at high speed
+        assert(std::fabs(p.velocity()-sign*(config.max_velocity-config.fast_deceleration*.02f))<.00001f);
         const int brake_ticks=static_cast<int>(std::ceil(config.max_velocity/(config.deceleration*.02f)))+1;
         for(int i=0;i<brake_ticks;++i) p.update(true,false,sign,sign,.02f,config);
         assert(!p.ready() && p.velocity()==0 && p.turn()==0);

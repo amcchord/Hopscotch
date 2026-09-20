@@ -1,0 +1,22 @@
+{
+  "v4": {
+    "falls": 16,
+    "new_falls": 0,
+    "common_cohort": 170,
+    "median_stop": 3.6400000000000006,
+    "median_calm": 4.200000000000001,
+    "calm_count": 123,
+    "median_reverse": 2.069397217785199,
+    "median_travel": 16.75716825969798
+  },
+  "candidate": {
+    "falls": 16,
+    "new_falls": 0,
+    "common_cohort": 170,
+    "median_stop": 3.6000000000000005,
+    "median_calm": 4.800000000000001,
+    "calm_count": 125,
+    "median_reverse": 2.012958181696159,
+    "median_travel": 14.102222780889234
+  }
+}

@@ -132,3 +132,35 @@ Agents may continue with new work after this snapshot.
 A new clean `codex/balance-lower` worktree appeared during final verification,
 starting at the already published `10766f7`. Published that branch as well,
 bringing this checkpoint to eight branches. This task did not change its files.
+
+## 2026-09-20 — Integrate the verified combined OTA release
+
+The release owner verified combined source `43b1967` on the robot and published
+release record `eb2bb23` on `codex/drive-braking`. Merged that branch into the root
+`codex/wifi-ota` checkout, preserving the previous documentation/publication
+commits and the complete append-only journal. Only CURRENT/JOURNAL conflicted;
+no source conflict or firmware modification was needed.
+
+CURRENT, README, operating/test guides and tuning history now describe progressive
+braking v5, ground-drive ownership gating, experimental supported CH11 lowering,
+feature flags 4095 and the verified app1 identity. The exact private package stays
+in the release owner's worktree; the previous Wi-Fi package remains available
+for rollback. Two failed upload attempts preserved the old image; the successful
+paced transfer, changed transmitter state and unresolved failure cause are
+recorded without assigning causality. Postflight confirms six disabled, healthy
+motors and preserved 2,981-row CSV/wire; physical motion tests remain pending.
+
+Independent root verification passed: 10 native executables, 27 Python tests,
+radio C++/Lua, dashboard syntax/eight SHA vectors, and full pinned ESP32 build.
+Production source/build/dashboard/radio files exactly match installed `43b1967`.
+Checked the private image size/both hashes and archived telemetry against the
+release manifest/postflight; current document links and whitespace pass. Evidence
+is under [integration-2026-09-20](../../evidence/integration-2026-09-20/README.md).
+No device requests, reflash, arming or motion occurred in this integration task.
+
+The radio branch also advanced with Lua v3 fix `9c5b88d` and verified SD-install
+record `c72d67b`; preserve/publish those commits on their own branch without
+changing this exact firmware-source snapshot. Push the root integration under
+Austin's existing publication authorization and verify remote hashes. Next:
+operator braking trial, then a separate restrained lowering trial, each followed
+by a disarmed wireless log download.

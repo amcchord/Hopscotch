@@ -1,0 +1,52 @@
+{
+  "v4": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 0,
+    "median_stop": 3.6400000000000006,
+    "median_calm": 4.200000000000001,
+    "calm_count": 123,
+    "median_reverse": 2.0693978215612585,
+    "median_travel": 16.75716728083067
+  },
+  "ramp": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 0,
+    "median_stop": 3.540000000000001,
+    "median_calm": 4.779999999999999,
+    "calm_count": 126,
+    "median_reverse": 2.1321947704457322,
+    "median_travel": 13.180780802936665
+  },
+  "boost3": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 0,
+    "median_stop": 3.2699999999999996,
+    "median_calm": 4.82,
+    "calm_count": 133,
+    "median_reverse": 2.194338439194446,
+    "median_travel": 11.660846930180039
+  },
+  "boost6": {
+    "falls": 20,
+    "new_falls": 4,
+    "captured": 0,
+    "median_stop": 2.76,
+    "median_calm": 4.779999999999999,
+    "calm_count": 135,
+    "median_reverse": 2.2426179623557694,
+    "median_travel": 11.635194131096199
+  },
+  "boost6soft": {
+    "falls": 20,
+    "new_falls": 4,
+    "captured": 0,
+    "median_stop": 2.63,
+    "median_calm": 4.200000000000001,
+    "calm_count": 131,
+    "median_reverse": 2.1332581583948347,
+    "median_travel": 12.099800369023344
+  }
+}

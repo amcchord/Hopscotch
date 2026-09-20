@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Current firmware:** Wi-Fi telemetry and application OTA are installed, retaining the [driving damping v4 controller](docs/BALANCE_DRIVE_DAMPING_2026-09.md) and existing calibration. Use the [Wi-Fi / OTA operating guide](docs/WIFI_OTA.md) for updates and wireless log downloads, and the [balance test guide](docs/BALANCE_TESTING.md) for physical trials. The [current state](docs/progress/CURRENT.md) and [release evidence](evidence/wifi-ota/README.md) identify the exact installed image and verification limits. Network tests passed with motor power off; powered balance on this combined release remains unverified.
+**Current firmware:** The combined Wi-Fi/OTA release includes [progressive braking v5](docs/BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](docs/GROUND_DRIVE_2026-09.md) and [experimental CH11 supported lowering](docs/BALANCE_LOWER_2026-09.md). Use the [Wi-Fi / OTA operating guide](docs/WIFI_OTA.md) for updates and wireless log downloads, and the [balance test guide](docs/BALANCE_TESTING.md) for physical trials. The [current state](docs/progress/CURRENT.md) and [release evidence](evidence/balance-drive-braking/README.md) identify the exact installed image and verification limits. OTA and powered disarmed feedback checks passed; the new motion behavior still needs supervised physical trials.
 
 Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
@@ -76,7 +76,7 @@ persisted robot mappings must be checked before a physical test.
 | Balance Select | CH7 | SC |
 | Arms Arm/Disarm | CH9 | SA |
 | Drive Arm/Disarm | CH10 | SD |
-| Execute / balance / calibration trigger | CH11 | SG |
+| Execute / stand-up / supported lowering / calibration trigger | CH11 | SG |
 | Arm-position cycle / balance event marker | CH12 | SH |
 | Left Arm setting | CH13 | P1; unused by sequential arm controller |
 | Right Arm setting | CH14 | P2; unused by sequential arm controller |

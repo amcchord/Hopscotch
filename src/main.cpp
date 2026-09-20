@@ -12,6 +12,7 @@
 #include "crsf.h"
 #include "radio_status.h"
 #include "drive_controller.h"
+#include "ground_drive_gate.h"
 #include "arm_controller.h"
 #include "balance_controller.h"
 #include "balance_math.h"
@@ -26,6 +27,7 @@ static Robstride        canBus;
 static MotorManager     motorMgr;
 static CrsfReceiver     crsfRx;
 static DriveController  driveCtrl;
+static GroundDriveGate  groundDriveGate;
 static ArmController    armCtrl;
 static BalanceController balanceCtrl;
 static Display          display;
@@ -1388,13 +1390,20 @@ static void controlTick() {
         const bool pilotValid = !simEnabled && crsfRx.isLinkUp()
             && crsfRx.timeSinceLastFrame() <= BALANCE_PILOT_RC_FRESH_MS
             && isSwitchActive(drive_arm_sw) && isSwitchActive(arm_arm_sw);
-        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt,
+        // A fresh CH11 edge while balancing requests a supported stand-down.
+        // Idle keeps the existing single/double-tap stand-up behavior.
+        const bool lowerEdge = calEdge && pilotValid && ch7Active
+            && balanceCtrl.getState() == BalanceState::Balancing;
+        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge || lowerEdge, dt,
                            crsfRx.getChannelNormalized(DEFAULT_CH_THROTTLE),
                            crsfRx.getChannelNormalized(DEFAULT_CH_STEERING), pilotValid);
         profRecord(PROF_BAL, prof_bal);
 
         bool balanceDriving = balanceCtrl.isControllingDrive();
         bool balanceActive  = balanceCtrl.isActive();
+        const bool groundDriveAllowed = groundDriveGate.update(
+            balanceActive, waitingForDoubleTap || balanceWantsEdge,
+            simEnabled || crsfRx.isLinkUp(), throttle, steering);
 
         // If balance just released drive control, re-sync drive controller
         if (prevBalanceWasActive && !balanceDriving) {
@@ -1494,10 +1503,11 @@ static void controlTick() {
             // 6. Drive control
             uint32_t prof_adrv = micros();
             if (motorMgr.isDriveArmed()) {
-                // CH7 selects standing control: do not let a held stick drive
-                // on the floor before tip-up or while balance releases the arms.
-                driveCtrl.update(ch7Active ? 0.0f : throttle,
-                                 ch7Active ? 0.0f : steering, dt);
+                // Idle permits ground drive even with CH7 selected. A pending
+                // start, active balance/arm return, or held stick at handoff
+                // keeps the ground targets stopped.
+                driveCtrl.update(groundDriveAllowed ? throttle : 0.0f,
+                                 groundDriveAllowed ? steering : 0.0f, dt);
             }
 
             // 7. Arm control (always called -- calibration works even when disarmed,

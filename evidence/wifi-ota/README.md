@@ -1,6 +1,8 @@
 # Wi-Fi / OTA release — September 19, 2026
 
-This is the release verification record. For routine updates, live telemetry,
+This is the initial networking release verification record. The later
+[combined release](../balance-drive-braking/README.md) is now installed; its
+identity supersedes the initial application below. For routine updates, live telemetry,
 saved-run download and recovery, use the [Wi-Fi / OTA operating guide](../../docs/WIFI_OTA.md).
 Check [current state](../../docs/progress/CURRENT.md) before deployment; slot
 addresses below record the verification session and can change with later OTA.

@@ -389,6 +389,10 @@ static constexpr float BALANCE_PILOT_MAX_VEL = 20.0f;
 static constexpr float BALANCE_PILOT_MAX_TURN = 4.5f;
 static constexpr float BALANCE_PILOT_ACCEL = 6.0f;
 static constexpr float BALANCE_PILOT_DECEL = 8.0f;
+// Faster braking while moving quickly; taper back to the proven rate near rest.
+static constexpr float BALANCE_PILOT_FAST_DECEL = 20.0f;
+static constexpr float BALANCE_PILOT_BRAKE_START_SPEED = 4.0f;
+static constexpr float BALANCE_PILOT_BRAKE_FULL_SPEED = 8.0f;
 static constexpr float BALANCE_PILOT_TURN_ACCEL = 18.0f;
 static constexpr float BALANCE_PILOT_VEL_KP_LOW = 1.0f; // historical v2 helper only
 static constexpr float BALANCE_PILOT_READY_MS = 400.0f;
@@ -418,6 +422,7 @@ static constexpr float BALANCE_DRIVE_HANDOFF_RATE = 30.0f; // command continuity
 static constexpr float BALANCE_DRIVE_LEARN_ERR = 1.0f;
 static constexpr float BALANCE_PILOT_ARM_GAIN = 0.008333333f; // center fraction per wheel rad/s^2
 static constexpr float BALANCE_PILOT_ARM_LIMIT = 0.10f; // about 10 degrees at each shoulder
+static constexpr float BALANCE_PILOT_ARM_BRAKE_LIMIT = BALANCE_PILOT_ARM_GAIN * 8.0f;
 static constexpr float BALANCE_PILOT_ARM_TAU = 0.08f;
 
 // Dynamic equilibrium learning. The velocity-PI integrator IS the equilibrium

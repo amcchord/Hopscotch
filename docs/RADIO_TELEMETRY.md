@@ -6,7 +6,7 @@ existing triggers working independently of Lua. Use the screen to make actual
 robot state legible, then add a named motion catalogue as the robot grows.
 
 **Current integration:** the installed [Wi-Fi/OTA firmware](progress/CURRENT.md)
-includes this structured radio payload and retains driving damping v4. Robot
+includes this structured radio payload along with progressive braking, ground drive and experimental supported lowering. Robot
 updates now use [application OTA](WIFI_OTA.md#update-the-firmware), and complete
 saved runs use the [Wi-Fi download workflow](WIFI_OTA.md#live-telemetry-and-saved-runs).
 The Lua script is installed on the GX12, but actual RF forwarding/screen behavior
@@ -182,7 +182,7 @@ linked, arms moving, rearm required, saving log, IMU fresh, simulation/test,
 voltage fresh, current fresh. Capabilities 0–2: status, run detail, motion IDs.
 Modes: 0 idle/disarmed, 1 ground, 2 balance, 3 calibration. Phases: 0 idle/hold,
 1 arm movement, 2 arming, 3 tipping up, 4 balancing, 5 returning arms,
-6 calibration. Motion IDs: 0 none, 1 forward, 2 center, 3 backward, 4 jump,
+6 calibration in mode 3 or supported lowering in mode 2. Motion IDs: 0 none, 1 forward, 2 center, 3 backward, 4 jump,
 0x0100 balance. Unknown modes/IDs display numerically without guessing behavior.
 
 Kind 2 uses the same eight-byte prefix, then a four-byte run-end uptime and

@@ -3,3 +3,6 @@
 # Raw USB captures must retain byte-exact newlines for transport checksums.
 *.serial -text
 evidence/balance-review/device/recovered-undated-log.csv -text
+
+# Preserve the checked over-the-air transfer exactly, including CRLF.
+*.wire -text

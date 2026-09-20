@@ -9,8 +9,10 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[release evidence](../evidence/wifi-ota/README.md) records the tested hashes and
-motor-power-off validation. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
+[combined release evidence](../evidence/balance-drive-braking/README.md) records
+the current image and powered disarmed verification. The [initial network
+validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
+load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
 physical trials. Older dated releases and their app0-only USB commands are
 historical records, not the update procedure for this firmware.
 
@@ -18,7 +20,8 @@ historical records, not the update procedure for this firmware.
 
 - The existing 200 Hz IMU/balance task remains on core 1 at priority 18; the
   control task remains on core 1 at priority 12. Balance gains, startup logic,
-  driving v4 dynamics, motor setup and CRSF mappings are retained.
+  motor setup and CRSF mappings remain under local control. Current driving and
+  lowering behavior is described in the [test guide](BALANCE_TESTING.md).
 - The control owner copies a fixed-size snapshot into a one-element FreeRTOS
   queue at 50 Hz. This does not allocate, format JSON, wait for a socket or
   perform filesystem I/O. The balance task separately publishes timing counters.
@@ -163,8 +166,9 @@ maintenance or web disarm before attempting to rearm.
    [firmware information](http://hopscotch.local/api/info). Keep the previous
    exact application package locally for recovery; a source rebuild can differ.
 2. Choose **one** application file. The frozen, bench-tested release on this
-   workstation is `artifacts/wifi-ota/release/firmware.bin`, identified by its
-   manifest and [release evidence](../evidence/wifi-ota/README.md). To prepare a
+   workstation is `worktrees/drive-braking/artifacts/drive-braking-v5/release/firmware.bin`
+   relative to the project root, identified by its
+   manifest and [release evidence](../evidence/balance-drive-braking/README.md). To prepare a
    changed source build with the existing local credentials:
 
    ```bash
@@ -184,7 +188,7 @@ maintenance or web disarm before attempting to rearm.
    .venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
    ```
 
-   Substitute `artifacts/wifi-ota/release/firmware.bin` to install the frozen
+   Substitute `worktrees/drive-braking/artifacts/drive-braking-v5/release/firmware.bin` to install the frozen
    release. Do not upload a filesystem, partition, bootloader or full-flash image.
    Alternatively, enter the token in the dashboard, select the same application
    file and use its update control; it calculates the required size and SHA-256.
@@ -225,6 +229,14 @@ and a separate 1.5 MiB filesystem; the partition table is unchanged.
 or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
+
+The September 19 combined release required a manually paced 1 KiB/50 ms upload
+with a 120-second socket timeout after two failed transfers. This pacing is not
+a CLI option in `robot_wifi.py`. The operator also switched the transmitter off
+near completion, so no single cause was isolated. See the [deployment
+record](BALANCE_DRIVE_BRAKING_2026-09.md#installed-combined-release). If a client
+times out, inspect the running digest/uptime and wait for maintenance to finish
+or abort before retrying; sending all bytes does not prove installation.
 
 ## HTTP and WebSocket API
 
@@ -272,8 +284,10 @@ maintenance request.
 The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
-The current frozen application package is `artifacts/wifi-ota/release/`;
-other package directories preserve earlier iterations. The full original backup
+The current frozen application package is
+`worktrees/drive-braking/artifacts/drive-braking-v5/release/` from the project
+root. The previous Wi-Fi application at `artifacts/wifi-ota/release/` is the
+known-good rollback package; other directories preserve earlier iterations. The full original backup
 contains the pre-Wi-Fi driving-v4 firmware. Restoring it removes Wi-Fi/OTA and
 reverts saved data to that backup's state.
 
