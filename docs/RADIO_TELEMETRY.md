@@ -97,7 +97,7 @@ which is currently arm speed) before considering any changes. Do not infer full
 ## Implemented display and firmware candidate
 
 `radio/SCRIPTS/TELEMETRY/hop.lua` is a receive-only EdgeTX telemetry script with
-five pages, navigated using the roller / ENTER:
+six pages, navigated using the roller / ENTER:
 
 1. **Overview:** prominent robot status, separate drive/arm ON/OFF/WAIT,
    six-motor schematic, battery voltage, control link quality, current motion.
@@ -107,6 +107,15 @@ five pages, navigated using the roller / ENTER:
 4. **Run + events:** last ended balance run's reason, plus recent observed
    state/arming changes. This is bounded session history, not a persistent log.
 5. **Radio:** control/return link quality, RSSI, transmit power, TX battery.
+6. **Diagnostics:** script version, accepted robot/total packet counts, status
+   and sensor ages, optional SD recording controlled by a long ENTER press.
+
+Without structured status, every Basic page has distinct content: overview
+(FM/voltage), standard roll/pitch/power, explicitly unavailable motor details,
+received run reports/recent FM changes, radio link, and diagnostics. Basic does
+not establish that firmware is old: it means this script has not accepted the
+structured packet, which may instead be a transport problem. `HS 0` on page 6
+confirms no accepted robot-status packets in this script session.
 
 The existing firmware can supply the basic fallback (FM and voltage). It cannot
 prove separate drive/arm state: its `DISARM` text was based only on the arms.
@@ -117,9 +126,14 @@ shown separately: `ON` is enabled, not proof that a wheel is physically moving.
 
 The Lua never writes model data, emits a CRSF command, arms, or changes channels.
 Each numeric reading and standard telemetry sensor keeps its last valid value
-for three seconds after the last accepted fresh sample. Missing, stale, invalid,
+for five seconds after the last accepted fresh sample. An asterisk marks a
+reading held longer than 0.5 seconds. Missing, stale, invalid,
 or unrelated updates do not refresh that value's hold. Standard telemetry uses
 EdgeTX's individual current/fresh flags, not cached `getValue()` results.
+Sampling runs every 50 ms. The previous 200 ms poll could completely miss the
+160–320 ms `isFresh()` window in EdgeTX 2.11; a regression test reproduces that
+phase alignment using unchanged sensor values and background callbacks.
+[EdgeTX 2.11 freshness implementation](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/telemetry/telemetry_sensors.h).
 After 1.5 seconds without a new valid status sequence the header says **HOLD**;
 after three seconds it hides motor / arming / motion values and says
 **ROBOT DATA LOST / UNKNOWN**. Duplicate status or run-detail packets cannot
@@ -133,9 +147,35 @@ Do not display battery percentage, remaining runtime, or consumed mAh: existing
 firmware sends zero placeholders for capacity and percentage. `Curr` is the sum
 of absolute motor IQ measurements, not battery input current. The dashboard
 labels it **MOTOR IQ**. Voltage expires after two seconds without a valid VBUS
-reply at the sender; the Lua then applies its three-second display hold. Current
+reply at the sender; the Lua then applies its five-second display hold. Current
 requires fresh replies from all six online motors. Tilt is the
 balance controller's actual filtered angle, not a presumed chassis orientation.
+Basic roll/pitch instead use standard CRSF attitude, converting the sensor's
+radian unit to degrees. They are not the controller's filtered balance tilt.
+
+### Optional SD diagnostics
+
+Logging starts OFF on every script load. On page 6, hold ENTER to start/stop.
+The script appends one CSV row per second to `/LOGS/hop-<date-time-tick>.csv`,
+closing the file each time. It stops at 600 total rows per script load, or on a
+reported I/O error. Pause/resume does not reset the cap or truncate existing data.
+The LOGS directory must already exist; the update installer checks it.
+
+Rows contain radio uptime, page, received/custom/accepted/duplicate packet
+counts, sequence/status age, maximum sampling gap, robot flags/masks, and each
+standard sensor's last accepted value, age, current/fresh flags, and whether the
+value is still displayed. This diagnoses polling gaps and packet delivery; it
+does not replace the robot's high-rate onboard motion logs. Recording works in
+the script's background callback while EdgeTX schedules it, and cannot capture
+packets the radio never received. Hardware storage latency/runtime remain to be
+checked on the GX12. A diagnostic CSV is not proof of control-loop timing.
+
+EdgeTX provides a restricted `io.open/write/close` API; the host tests emulate
+its actual calling convention and no-return `close`. EdgeTX's separate built-in
+**SD Logs** function can also record configured sensors and radio controls;
+this update does not alter that function or any model configuration.
+[Lua file I/O](https://luadoc.edgetx.org/overview/version-libraries/io-library),
+[SD Logs](https://manual.edgetx.org/bw-radios/model-select/special-functions).
 
 ### Wire contract v1
 

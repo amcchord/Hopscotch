@@ -6,3 +6,4 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_radio_st
 output/test_radio_status
 luac -p radio/SCRIPTS/TELEMETRY/hop.lua
 lua tests/radio/test_hop.lua
+lua tests/radio/test_hop_logging.lua

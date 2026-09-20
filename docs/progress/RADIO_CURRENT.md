@@ -1,6 +1,37 @@
 # Radio telemetry — September 19, 2026
 
-## Current Lua update — 22:31 EDT
+## Ready to install — Lua v3
+
+Austin reported residual blanking and repeated Basic page content, and asked
+for an update prepared before reconnecting the radio. The candidate is ready
+in the radio worktree. No radio or robot was accessed during this change.
+
+- Fixed the Basic fallback routing: overview, standard pose/power, unavailable
+  motor details, observed events/run report, radio link and diagnostics each
+  have their own content. Motor states are never inferred from FM text.
+- Reproduced lost updates with EdgeTX 2.11's 160–320 ms freshness window and the
+  old 200 ms sampler. Poll at 50 ms; hold individual values five seconds, mark
+  cached readings with `*`, expire them independently. Robot arming/motion still
+  becomes unknown after three seconds; explicit state/fault updates are immediate.
+- Added opt-in diagnostics on page 6: long ENTER toggles 1 Hz CSV under LOGS,
+  default OFF, 600 rows per script load, append/close each row, stop on I/O error.
+  Captures ages, freshness, sample gaps, packet counts and status flags.
+- Native radio tests, actual C++→Lua fixtures, six Basic pages, phase-aligned
+  missed-update regression, expiry/recovery, unknown/schema/duplicate handling,
+  logger lifecycle/error/limit tests, CSV parser and rendered layouts passed.
+  Radio runtime/storage timing and the physical RF path remain unverified.
+- Candidate `hop.lua`: 17,299 bytes, SHA-256
+  `db6ca509d52780358728b18b4a59186e862c4e1195aed939415d566269e1da7f`.
+  Prepared package: project-root `artifacts/radio-lua-v3-2026-09-19/`.
+- Last installed script remains the prior `c26027a` version below. When Austin
+  reconnects NO NAME, back up the currently installed Lua/bytecode, verify the
+  selected model still references hop, replace only hop.lua and remove hop.luac,
+  confirm LOGS exists, compare all MODELS/RADIO bytes, sync/readback/eject.
+- Worktree remains `codex/radio-telemetry`; no edits to other branches, firmware,
+  SD/model configuration or channel mappings. Root integration belongs to its
+  current task owner. Next: invite radio attachment, then install this candidate.
+
+## Previous installed Lua update — 22:31 EDT
 
 Austin reported flickering readings and requested a Lua-only fix. Installed
 three-second holds for each standard sensor and numeric robot reading; fresh

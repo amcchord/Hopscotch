@@ -4,9 +4,9 @@ EVT_VIRTUAL_NEXT, EVT_VIRTUAL_PREV, EVT_VIRTUAL_ENTER = 100,101,102
 LCD_W,LCD_H=128,64
 local now,queue,draws,buzzes,pops=100,{}, {},0,0
 local values={FM={"DISARM",true,true},RxBt={25.2,true,true},RQly={100,true,true},
-  TQly={99,true,true},["1RSS"]={-63,true,true},TPWR={100,true,true},["tx-voltage"]={7.8,true,true}}
+  TQly={99,true,true},["1RSS"]={-63,true,true},TPWR={100,true,true},Roll={1.5,true,true},Ptch={-0.2,true,true},Curr={1.2,true,true},["tx-voltage"]={7.8,true,true}}
 function getTime() return now end
-function getFieldInfo(name) if values[name] then return {id=name} end end
+function getFieldInfo(name) if values[name] then return {id=name,unit=(name=="Roll" or name=="Ptch") and 21 or nil} end end
 function getSourceValue(id) return table.unpack(values[id]) end
 function crossfireTelemetryPop()
   pops=pops+1
@@ -37,6 +37,16 @@ local function save(name)
 end
 local app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua")
 app.run(0); assert(contains("BASIC TELEMETRY") and contains("Drive / arms UNKNOWN")); save("basic")
+-- Each Basic page has its own content; never infer motor state from FM.
+app.run(EVT_VIRTUAL_NEXT)
+assert(contains("ROLL  +85.9deg") and contains("PITCH -11.5deg") and contains("MOTOR IQ 1.2A") and not contains("BASIC TELEMETRY"));save("basic-health")
+app.run(EVT_VIRTUAL_NEXT)
+assert(contains("FR  --") and contains("RA  --") and contains("MOTOR DETAILS UNAVAILABLE") and not contains("FM:"));save("basic-motors")
+app.run(EVT_VIRTUAL_NEXT)
+assert(contains("NO RUN REPORT RECEIVED") and contains("FM DISARM"));save("basic-history")
+app.run(EVT_VIRTUAL_NEXT);assert(contains("CONTROL LQ 100%"));save("basic-link")
+app.run(EVT_VIRTUAL_NEXT);assert(contains("RX 0  HS 0"));save("basic-diagnostics")
+app.run(EVT_VIRTUAL_NEXT);assert(contains("BASIC TELEMETRY"))
 values.FM={"BALANCE",false,false};values.RxBt={25.2,false,false};now=121
 app.run(0);assert(contains("FM: DISARM") and contains("ROBOT 25.2V"))
 push(fixtures.drive); app.run(0)
@@ -47,6 +57,7 @@ app.run(EVT_VIRTUAL_NEXT); assert(contains("+88.2deg") and contains("-0.5deg") a
 app.run(EVT_VIRTUAL_NEXT);assert(contains("FR  ON") and contains("RA  ON"));save("motors")
 push(fixtures.detail);app.run(EVT_VIRTUAL_NEXT);assert(contains("tilt out of range") and contains("(fallen)"));save("history")
 app.run(EVT_VIRTUAL_NEXT);assert(contains("CONTROL LQ 100%"));save("link")
+app.run(EVT_VIRTUAL_NEXT);assert(contains("LUA v3"));save("diagnostics")
 app.run(EVT_VIRTUAL_NEXT);now=291;app.run(0)
 assert(contains("HOLD") and contains("DRIVE ON") and buzzes==1);save("hold")
 now=441;app.run(0)
@@ -82,7 +93,7 @@ assert(contains("ROBOT DATA LOST") and not contains("FR  ON"))
 -- Long labels and signed sentinel rendering exercised for bounds previews.
 wrap[8]=2;wrap[9]=13;wrap[10]=19;wrap[19]=128;wrap[20]=0;wrap[21]=128;wrap[22]=0
 for i=33,48 do wrap[i]=string.byte("W") end
-push(wrap);now=400;app.run(EVT_VIRTUAL_PREV);assert(contains("TILT --") and contains("ERROR --"))
+push(wrap);now=600;app.run(EVT_VIRTUAL_PREV);assert(contains("TILT --") and contains("ERROR --"))
 save("unknown-values")
 
 -- Alternating sensor updates retain each value independently, then expire.
@@ -92,12 +103,12 @@ values.FM={"",true,true};values.RxBt={0/0,true,true};now=2021;app.run(0)
 assert(contains("FM: READY") and contains("ROBOT 25.2V"))
 values.FM={nil,false,false};values.RxBt={25.1,true,true};now=2280;app.run(0)
 assert(contains("FM: READY") and contains("ROBOT 25.1V"))
-values.RxBt={999,true,false};now=2301;app.run(0)
+values.RxBt={999,true,false};now=2501;app.run(0)
 assert(contains("FM: --") and contains("ROBOT 25.1V")) -- voltage did not renew FM
-now=2581;app.run(0);assert(contains("ROBOT --")) -- stale value cannot renew voltage
-values.RxBt={0,true,true};now=2602;app.run(0);assert(contains("ROBOT 0.0V"))
-values.RxBt={math.huge,true,true};now=2623;app.run(0);assert(contains("ROBOT 0.0V"))
-values.RxBt={"invalid",true,true};now=2644;app.run(0);assert(contains("ROBOT 0.0V"))
+now=2781;app.run(0);assert(contains("ROBOT --")) -- stale value cannot renew voltage
+values.RxBt={0,true,true};now=2802;app.run(0);assert(contains("ROBOT 0.0V"))
+values.RxBt={math.huge,true,true};now=2823;app.run(0);assert(contains("ROBOT 0.0V"))
+values.RxBt={"invalid",true,true};now=2844;app.run(0);assert(contains("ROBOT 0.0V"))
 values.RxBt={nil,false,false};now=1;app.run(0);assert(contains("ROBOT --")) -- clock wrap
 
 -- Missing numeric fields are held independently while flags update immediately.
@@ -109,13 +120,40 @@ now=3200;push(missing);app.run(0)
 assert(contains("TILT +88.2deg") and contains("MOTOR IQ 12.3A") and contains("MAX TEMP 43C") and contains("IMU STALE"))
 app.run(EVT_VIRTUAL_PREV);assert(contains("DRIVE OFF") and contains("ARMS  OFF"))
 app.run(EVT_VIRTUAL_NEXT)
-now=3300;missing[8]=31;push(missing);app.run(0);assert(contains("MOTOR IQ 12.3A"))
-now=3301;app.run(0)
+now=3500;missing[8]=31;push(missing);app.run(0);assert(contains("MOTOR IQ 12.3A"))
+now=3501;app.run(0)
 assert(contains("TILT --") and contains("ERROR --") and contains("MOTOR IQ --") and contains("MAX TEMP --"))
 app.run(EVT_VIRTUAL_PREV);assert(contains("DRIVE OFF") and contains("ARMS  OFF"))
-local restored=copy(fixtures.balance);restored[8]=32;now=3320;push(restored);app.run(0)
+local restored=copy(fixtures.balance);restored[8]=32;now=3520;push(restored);app.run(0)
 assert(contains("25.2V") and contains("DRIVE ON"))
-now=3471;app.run(0);assert(contains("HOLD") and contains("25.2V"))
-push(restored);push(fixtures.detail);now=3621;app.run(0)
+now=3671;app.run(0);assert(contains("HOLD") and contains("25.2V"))
+push(restored);push(fixtures.detail);now=3821;app.run(0)
 assert(contains("ROBOT DATA LOST") and not contains("DRIVE ON")) -- neither renews hold
-print("Lua tests passed: C++ fixtures, independent three-second holds/expiry, recovery, clock wrap, lifecycle, schemas, malformed data, queue bounds, navigation, alerts")
+
+-- Reproduce the hardware freshness window: unchanged values arrive just after
+-- each old 200 ms polling boundary and are fresh for only 160 ms. The old
+-- sampler missed EVERY update. Exercise foreground and background operation.
+local sourceAPI=getSourceValue
+function getSourceValue(id)
+  if id=="FM" or id=="RxBt" then
+    local fresh=now>=4010 and (now-4010)%40<16
+    return id=="FM" and "READY" or 24.9,true,fresh
+  end
+  return sourceAPI(id)
+end
+now=4009;queue={};app=dofile("radio/SCRIPTS/TELEMETRY/hop.lua");app.run(0)
+assert(contains("ROBOT --"))
+for t=4010,5500 do
+  now=t;app.background()
+  if t>=4019 and t%10==9 then
+    app.run(0);assert(contains("ROBOT 24.9V") and contains("FM: READY"),"Blank at "..t)
+  end
+end
+function getSourceValue(id)
+  if id=="FM" or id=="RxBt" then return id=="FM" and "READY" or 24.9,true,false end
+  return sourceAPI(id)
+end
+now=5800;app.run(0);assert(contains("ROBOT 24.9V*"));save("basic-held")
+now=6010;app.run(0);assert(contains("ROBOT --") and contains("FM: --"));save("basic-expired")
+getSourceValue=sourceAPI
+print("Lua tests passed: C++ fixtures, independent five-second readings/three-second status expiry, recovery, clock wrap, lifecycle, schemas, malformed data, queue bounds, navigation, alerts")
