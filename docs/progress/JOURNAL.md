@@ -107,3 +107,14 @@ passwords/token and common credential patterns; no new credentials found. The
 only heuristic match was an existing default already present on origin/main.
 No source integration or hardware action is part of this repository checkpoint.
 Publication results are recorded below after remote verification.
+
+Publication verified: an atomic push created/updated all seven branch refs on
+GitHub, and `git ls-remote` matched every captured commit exactly. This includes
+`main` (`2ffed40`), `agent/balance-telemetry-sync` (`e8b1280`),
+`codex/balance-review-ready` (`112e7e7`), `codex/radio-telemetry` (`c26027a`),
+`codex/ground-drive` (`1337c10`), `codex/drive-braking` (`10766f7`, including
+its owner's docs/ground-drive cherry-picks), and `codex/wifi-ota` (`0cac989`
+at the initial publication). No force push, branch merge into main, or device
+action was performed by this publication task. Root archival CSV and raw serial
+bytes were also compared with their committed blobs. Subsequent commits on the
+active braking branch are additional WIP checkpoints, not release validation.
