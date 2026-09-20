@@ -14,6 +14,7 @@ struct NetworkSnapshot {
     bool drive_armed = false, arm_armed = false, arming = false;
     bool link_up = false, balance_active = false, saving_log = false;
     bool rearm_required = true, maintenance = false, safe = false;
+    bool calibration = false, test = false, simulation = false;
     int8_t rssi = 0;
     uint8_t lq = 0;
     uint16_t inner_fault = 0, channels[16] = {};

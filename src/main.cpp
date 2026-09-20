@@ -1183,6 +1183,7 @@ static void publishNetworkSnapshot(uint32_t now) {
     s.rearm_required = rcRearmRequired; s.balance_active = balanceCtrl.isActive();
     s.saving_log = balanceCtrl.isLogPendingFlush(); s.maintenance = webUI.maintenance.busy();
     s.safe = maintenanceAllowed();
+    s.calibration = armCtrl.isInCalMode(); s.test = testModeActive; s.simulation = simEnabled;
     s.tilt = balanceCtrl.getTiltAngle(); s.rate = balanceCtrl.getGyroRate();
     s.setpoint = balanceCtrl.getEffectiveSetpoint(); s.inner_fault = balanceCtrl.getInnerFault();
     s.imu_age_us = micros() - balanceCtrl.getImuSampleUs();

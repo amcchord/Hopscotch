@@ -250,6 +250,7 @@ void WebUI::refreshTelemetry() {
     d["link_up"] = s.link_up; d["rssi"] = s.rssi; d["lq"] = s.lq; d["rc_age_ms"] = s.rc_age_ms;
     d["rearm_required"] = s.rearm_required; d["maintenance"] = maintenance.busy();
     d["maintenance_allowed"] = s.safe; d["saving_log"] = s.saving_log;
+    d["calibration"] = s.calibration; d["test_mode"] = s.test; d["simulation"] = s.simulation;
     auto b = d["balance"].to<JsonObject>();
     b["state"] = s.balance_state; b["active"] = s.balance_active;
     b["tilt"] = s.tilt; b["rate"] = s.rate; b["setpoint"] = s.setpoint;
