@@ -59,49 +59,24 @@ private:
     float _qualifying_ms=0, _direction=0;
 };
 
-struct DriveStopConfig {
-    float speed, angle, rate, confirm_ms;
-};
-// A centered stop may hand back to stationary PD once slow and upright,
-// before the longer hold-position calm gate finishes. New throttle resets it.
-class DriveStopCapture {
-public:
-    void reset() { _captured=false; _confirm_ms=0; }
-    bool update(bool moving, bool neutral, bool target_zero, float speed,
-                float error, float rate, float dt, const DriveStopConfig& c) {
-        if (!moving || !neutral || !std::isfinite(speed) || !std::isfinite(error)
-            || !std::isfinite(rate) || !std::isfinite(dt) || dt<=0 || dt>.1f) {
-            reset(); return false;
-        }
-        if (_captured) return true;
-        const bool slow=target_zero && std::fabs(speed)<c.speed
-            && std::fabs(error)<c.angle && std::fabs(rate)<c.rate;
-        _confirm_ms=slow ? _confirm_ms+dt*1000 : 0;
-        _captured=_confirm_ms+.001f>=c.confirm_ms;
-        return _captured;
-    }
-    bool captured() const { return _captured; }
-private:
-    bool _captured=false;
-    float _confirm_ms=0;
-};
-
 struct DriveConfig {
     float angle_gain, rate_gain, speed_gain, speed_error_limit;
     float acceleration_limit, handoff_rate;
+    float brake_gain=0, brake_accel_limit=0, brake_fade_start=1, brake_fade_full=4;
+    float brake_tau=.08f;
 };
-struct DriveResult { float raw, speed, acceleration; bool active; };
+struct DriveResult { float raw, speed, acceleration; bool active; float brake_acceleration=0; };
 
 // While driving, turn tilt/rate/speed error into wheel ACCELERATION, then
 // integrate the motor velocity reference. This actuator state is not a second
 // equilibrium estimator; the existing outer integral remains the learned bias.
 class BalanceDrive {
 public:
-    void reset() { _speed=0; _active=false; _handoff=false; }
+    void reset() { _speed=0; _brake_acceleration=0; _active=false; _handoff=false; }
     DriveResult step(bool enabled, float angle_error, float body_rate,
                      float measured_speed, float target_speed, float pd_command,
                      float previous_command, float dt, float max_speed,
-                     const DriveConfig& c) {
+                     const DriveConfig& c, bool stopping=false) {
         if (!std::isfinite(dt) || dt <= 0 || dt > .02f
             || !std::isfinite(angle_error) || !std::isfinite(body_rate)
             || !std::isfinite(measured_speed) || !std::isfinite(target_speed)
@@ -113,14 +88,28 @@ public:
             _active=true; _handoff=false;
             // Bound the travel demand separately; balance still has the full
             // configured acceleration and common-speed authority to catch lean.
-            float acceleration = c.angle_gain*angle_error-c.rate_gain*body_rate
+            // Centered throttle / input-loss braking only. Add bounded speed
+            // feedback while rolling faster than the ramped target, then fade
+            // it out near zero to avoid a strong opposite correction at rest.
+            const float speed_error=measured_speed-target_speed;
+            float brake_target=0;
+            if (stopping && measured_speed*speed_error>0) {
+                const float fade=clamp((std::fabs(measured_speed)-c.brake_fade_start)
+                    / (c.brake_fade_full-c.brake_fade_start),0,1);
+                brake_target=clamp(c.brake_gain*speed_error*fade,
+                    -c.brake_accel_limit,c.brake_accel_limit);
+            }
+            if (!stopping) _brake_acceleration=0;
+            else _brake_acceleration+=dt/(c.brake_tau+dt)*(brake_target-_brake_acceleration);
+            float acceleration = _brake_acceleration+c.angle_gain*angle_error-c.rate_gain*body_rate
                 + c.speed_gain*clamp(measured_speed-target_speed,
                                      -c.speed_error_limit,c.speed_error_limit);
             acceleration=clamp(acceleration,-c.acceleration_limit,c.acceleration_limit);
             const float raw=_speed+acceleration*dt;
             _speed=clamp(raw,-max_speed,max_speed); // actuator anti-windup
-            return {raw,_speed,acceleration,true};
+            return {raw,_speed,acceleration,true,_brake_acceleration};
         }
+        _brake_acceleration=0;
         if (_active) { _active=false; _handoff=true; }
         if (_handoff) {
             const float target=clamp(pd_command,-max_speed,max_speed);
@@ -132,7 +121,7 @@ public:
         return {pd_command,_speed,0,false};
     }
 private:
-    float _speed=0;
+    float _speed=0, _brake_acceleration=0;
     bool _active=false, _handoff=false;
 };
 }

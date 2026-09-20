@@ -14,6 +14,7 @@ sim=importlib.util.module_from_spec(spec);sys.modules[spec.name]=sim;spec.loader
 subprocess.run(['clang++','-std=c++17','-shared','-fPIC','-O2','-Isrc','-Itests/stubs',str(OUT/'pilot_bridge.cpp'),'-o',str(TMP/'pilot.dylib')],cwd=ROOT,check=True)
 lib=ct.CDLL(str(TMP/'pilot.dylib'))
 lib.pilot_create.restype=ct.c_void_p;lib.pilot_destroy.argtypes=[ct.c_void_p]
+lib.pilot_brake_params.argtypes=[ct.c_void_p]+[ct.c_float]*5
 lib.pilot_stop_params.argtypes=[ct.c_void_p,ct.c_int]+[ct.c_float]*4
 lib.pilot_params.argtypes=[ct.c_void_p,ct.POINTER(ct.c_float)]
 lib.pilot_tick.argtypes=[ct.c_void_p,ct.c_int,ct.c_int]+[ct.c_float]*6+[ct.POINTER(ct.c_float)]
@@ -25,10 +26,11 @@ lib.pilot_arm_demand.argtypes=[ct.c_void_p,ct.c_float];lib.pilot_arm_demand.rest
 lib.pilot_emergency.argtypes=[ct.c_void_p,ct.c_int]+[ct.c_float]*6+[ct.c_int]
 OLD=[8.8,3.1,3,.06,12,16,1,.45,0]
 class Pilot:
- def __init__(self,params,profile,capture=(True,1,2.5,8,60)):
+ def __init__(self,params,profile,capture=(False,1,2.5,8,60),brake=(0,0,1,4,.08)):
   self.governed_motion=True;self.ptr=lib.pilot_create();self.profile=profile
   if params is not None:lib.pilot_params(self.ptr,(ct.c_float*9)(*params))
   lib.pilot_stop_params(self.ptr,*capture)
+  lib.pilot_brake_params(self.ptr,*brake)
   self.drive_active=False;self.moving=False;self.velocity=0.;self.arm=0.;self.rows=[];self.emergencies=0
  def __del__(self):lib.pilot_destroy(self.ptr)
  def update(self,now,phase,speed,rate,err,dt):
@@ -58,8 +60,8 @@ profiles={
  'loss':lambda t:(1 if 2<=t<12 else 0,0,not(6<=t<7)),
  'turn':lambda t:(0,.5 if 2<=t<5 else -.5 if 8<=t<11 else 0,True),
 }
-def run(params=None,profile='small',p=plant,duration=36,pushes=None,seed=1,capture=(True,1,2.5,8,60)):
- pilot=Pilot(params,profiles[profile] if isinstance(profile,str) else profile,capture)
+def run(params=None,profile='small',p=plant,duration=36,pushes=None,seed=1,capture=(False,1,2.5,8,60),brake=(0,0,1,4,.08)):
+ pilot=Pilot(params,profiles[profile] if isinstance(profile,str) else profile,capture,brake)
  r=sim.simulate(cfg,p,engage_offset_deg=0,duration_s=duration,seed=seed,pilot_factory=lambda:pilot,settled_start=True,pushes=pushes)
  return r,pilot
 
