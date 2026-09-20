@@ -5,6 +5,7 @@
 #include <mbedtls/sha256.h>
 #include <memory>
 #include "network_snapshot.h"
+#include "ota_progress.h"
 
 class WebUI {
 public:
@@ -16,10 +17,13 @@ public:
     MaintenanceGate maintenance;
     bool connected() const { return _connected.load(); }
     void copyIp(char* out, size_t size);
+    OtaProgress otaProgress() const;
 private:
     AsyncWebServer _server{80};
     AsyncWebSocket _ws{"/ws"};
     QueueHandle_t _snapshots = nullptr;
+    QueueHandle_t _otaProgress = nullptr;
+    OtaProgress _ota_progress;
     SemaphoreHandle_t _mutex = nullptr;
     ExportCallback _export = nullptr;
     DisarmCallback _disarm = nullptr;
@@ -41,8 +45,9 @@ private:
     void setupRoutes();
     void refreshTelemetry();
     bool authorized(AsyncWebServerRequest* request);
-    bool acquireMaintenance();
+    bool acquireMaintenance(bool ota = false);
     void releaseMaintenance();
+    void publishOta(OtaPhase phase);
     void failOta();
     void upload(AsyncWebServerRequest* request, size_t index, uint8_t* data, size_t len, bool final);
 };

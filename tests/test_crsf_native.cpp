@@ -108,5 +108,49 @@ int main() {
     assert(uart.bulk_calls == calls + 1); // Empty read exits immediately.
     assert(uart.single_calls == 0 && uart.available_calls == 0);
     assert(receiver.maxUpdateUs() == 2400);
+
+    // OTA shuts down RX interrupts/TX and discards both buffered frames and a
+    // partial parser frame. A live transmitter cannot create work while paused.
+    uart.max_chunk = 128;
+    uart.read_cost_us = 40;
+    uart.feed({valid.begin(), valid.begin() + 13});
+    receiver.update();
+    uart.feed({valid.begin() + 13, valid.end()});
+    receiver.suspend();
+    receiver.suspend(); // Repeated maintenance ticks do not tear down twice.
+    assert(receiver.suspended() && !uart.begun && uart.end_calls == 1);
+    assert(!receiver.isLinkUp() && receiver.timeSinceLastFrame() == UINT32_MAX);
+    assert(receiver.getLinkQuality() == 0 && receiver.getRssi() == 0);
+    for (int i = 0; i < 16; ++i) assert(receiver.getChannel(i) == CRSF_CHANNEL_MID);
+    const auto paused_calls = uart.bulk_calls;
+    const auto paused_bytes = receiver.receivedBytes();
+    const auto paused_tx = uart.tx.size();
+    uart.storm = true;
+    uart.feed(valid);
+    receiver.update();
+    receiver.sendFlightMode("OTA");
+    receiver.sendBatteryTelemetry(24, 0);
+    receiver.sendAttitudeTelemetry(0, 0, 0);
+    const uint8_t payload[6] = {};
+    assert(!receiver.sendRobotTelemetry(payload, sizeof(payload)));
+    assert(uart.bulk_calls == paused_calls && receiver.receivedBytes() == paused_bytes);
+    assert(uart.tx.size() == paused_tx);
+    uart.storm = false;
+
+    // Failed OTA resumes only an empty UART. Cached LOW switches cannot clear
+    // the control task's rearm latch; new RC channel frames are required.
+    receiver.resume(); receiver.resume();
+    assert(!receiver.suspended() && uart.begun && uart.begin_calls == 2);
+    receiver.update();
+    assert(!receiver.isLinkUp() && uart.rx.empty());
+    uart.feed(frame(CRSF_FRAMETYPE_LINK_STATISTICS, {60,60,99,0,0,0,0,0,0,0}));
+    receiver.update();
+    assert(!receiver.isLinkUp());
+    fake_ms = 900;
+    uart.feed(channels(values));
+    receiver.update();
+    assert(receiver.isLinkUp() && receiver.getChannel(10) == 1792);
+    receiver.sendFlightMode("DISARM");
+    assert(uart.tx.size() > paused_tx);
     std::cout << "CRSF production parser/timing tests passed\n";
 }

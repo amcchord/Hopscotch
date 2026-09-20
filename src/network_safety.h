@@ -13,15 +13,27 @@ struct MaintenanceConditions {
 // a stale telemetry sample. Granted stays latched until the operation ends.
 class MaintenanceGate {
 public:
-    enum State : uint8_t { Idle, Requested, Granted, Denied };
-    bool request() { State s = Idle; return _state.compare_exchange_strong(s, Requested); }
-    void service(bool safe) {
-        State s = Requested;
-        _state.compare_exchange_strong(s, safe ? Granted : Denied);
+    enum State : uint8_t { Idle, Requested, Granted, Denied, OtaRequested, OtaGranted };
+    bool request(bool ota = false) {
+        State s = Idle;
+        return _state.compare_exchange_strong(s, ota ? OtaRequested : Requested);
     }
+    // Preparation runs on the control owner before permission becomes visible
+    // to networking. CAS retains the original request kind across cancellation.
+    template <typename Prepare>
+    void service(bool safe, Prepare prepare) {
+        State s = state();
+        if (s != Requested && s != OtaRequested) return;
+        const State grantedState = s == OtaRequested ? OtaGranted : Granted;
+        if (safe) prepare(s == OtaRequested);
+        _state.compare_exchange_strong(s, safe ? grantedState : Denied);
+    }
+    void service(bool safe) { service(safe, [](bool) {}); }
     State state() const { return _state.load(); }
+    bool pending() const { const auto s = state(); return s == Requested || s == OtaRequested; }
     bool busy() const { return state() != Idle; }
-    bool granted() const { return state() == Granted; }
+    bool granted() const { const auto s = state(); return s == Granted || s == OtaGranted; }
+    bool ota() const { const auto s = state(); return s == OtaRequested || s == OtaGranted; }
     void release() { _state.store(Idle); }
 private:
     std::atomic<State> _state{Idle};

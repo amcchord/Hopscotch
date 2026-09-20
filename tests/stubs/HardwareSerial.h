@@ -12,10 +12,12 @@ struct HardwareSerial {
     uint32_t read_cost_us = 40;
     bool storm = false;
     bool begun = false;
+    size_t begin_calls = 0, end_calls = 0;
     int tx_space = 128;
     int availableForWrite() { return tx_space; }
     size_t setRxBufferSize(size_t n) { buffer_size = begun ? 0 : n; return buffer_size; }
-    void begin(uint32_t, int, int, int) { begun = true; }
+    void begin(uint32_t, int, int, int) { begun = true; ++begin_calls; rx.clear(); }
+    void end() { begun = false; ++end_calls; rx.clear(); }
     int available() { ++available_calls; return storm ? 2048 : rx.size(); }
     int read() {
         ++single_calls;
@@ -35,5 +37,5 @@ struct HardwareSerial {
         return n;
     }
     size_t write(const uint8_t* data, size_t n) { tx.insert(tx.end(), data, data + n); return n; }
-    void feed(const std::vector<uint8_t>& bytes) { rx.insert(rx.end(), bytes.begin(), bytes.end()); }
+    void feed(const std::vector<uint8_t>& bytes) { if (begun) rx.insert(rx.end(), bytes.begin(), bytes.end()); }
 };

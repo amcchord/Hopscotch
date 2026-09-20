@@ -25,6 +25,8 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Isrc tests/test_balance_lower.cpp -o o
 output/test_balance_lower
 clang++ -std=c++17 -Wall -Wextra -Werror -pthread -Isrc tests/test_network_safety.cpp -o output/test_network_safety
 output/test_network_safety
+clang++ -std=c++17 -Wall -Wextra -Werror -Isrc tests/test_ota_progress.cpp -o output/test_ota_progress
+output/test_ota_progress
 "$PYTHON_BIN" -m unittest discover -s tests -v
 "$PYTHON_BIN" -m py_compile scripts/*.py
 bash -n scripts/*.sh
