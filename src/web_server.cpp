@@ -102,6 +102,7 @@ void WebUI::setupRoutes() {
         d["free_heap"] = ESP.getFreeHeap(); d["min_free_heap"] = ESP.getMinFreeHeap();
         d["free_psram"] = ESP.getFreePsram();
         d["automatic_boot_rollback"] = false;
+        d["reset_reason"] = static_cast<int>(esp_reset_reason());
         d["network_core"] = _networkCore; d["http_core"] = xPortGetCoreID();
         d["wifi_event_core"] = _eventCore;
         String json; serializeJson(d, json); r->send(200, "application/json", json);
