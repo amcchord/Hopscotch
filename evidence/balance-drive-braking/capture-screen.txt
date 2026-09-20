@@ -1,0 +1,52 @@
+{
+  "v4": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 0,
+    "median_stop": 3.6400000000000006,
+    "median_calm": 4.200000000000001,
+    "calm_count": 123,
+    "median_reverse": 2.069397217785199,
+    "median_travel": 16.75716825969798
+  },
+  "ramp": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 0,
+    "median_stop": 3.540000000000001,
+    "median_calm": 4.779999999999999,
+    "calm_count": 126,
+    "median_reverse": 2.132193630193405,
+    "median_travel": 13.180781931277943
+  },
+  "capture": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 138,
+    "median_stop": 2.460000000000001,
+    "median_calm": 5.220000000000001,
+    "calm_count": 78,
+    "median_reverse": 1.912438965056802,
+    "median_travel": 14.983861160040139
+  },
+  "capture15": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 140,
+    "median_stop": 2.3599999999999994,
+    "median_calm": 7.7700000000000005,
+    "calm_count": 68,
+    "median_reverse": 1.9352127035277875,
+    "median_travel": 16.05640497614798
+  },
+  "capture05": {
+    "falls": 16,
+    "new_falls": 0,
+    "captured": 138,
+    "median_stop": 3.5300000000000002,
+    "median_calm": 5.220000000000001,
+    "calm_count": 92,
+    "median_reverse": 2.111509060729963,
+    "median_travel": 13.534278519656928
+  }
+}

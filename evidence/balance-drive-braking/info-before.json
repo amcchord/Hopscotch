@@ -1,0 +1,17 @@
+{
+  "firmware": "hopscotch-wifi-ota-1",
+  "build": "Sep 19 2026 22:28:57",
+  "running_slot": "app0",
+  "image_sha256": "08f5faeb998e090cb1d1a4cb339814817149975e8eb83b9210f58007a92e14cd",
+  "ota_capacity": 3342336,
+  "flash_bytes": 8388608,
+  "psram_bytes": 8385719,
+  "free_heap": 159980,
+  "min_free_heap": 159236,
+  "free_psram": 2731483,
+  "automatic_boot_rollback": false,
+  "reset_reason": 1,
+  "network_core": 0,
+  "http_core": 0,
+  "wifi_event_core": 0
+}

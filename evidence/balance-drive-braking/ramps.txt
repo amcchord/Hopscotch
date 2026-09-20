@@ -1,0 +1,34 @@
+{
+  "8": {
+    "falls": 16,
+    "new_falls": 0,
+    "commanded": 184,
+    "median_stop": 3.6400000000000006,
+    "median_reverse": 2.069397217785199,
+    "median_travel": 16.75716825969798
+  },
+  "16": {
+    "falls": 16,
+    "new_falls": 0,
+    "commanded": 184,
+    "median_stop": 3.6400000000000006,
+    "median_reverse": 2.1863309059823663,
+    "median_travel": 13.702889441176007
+  },
+  "20": {
+    "falls": 16,
+    "new_falls": 0,
+    "commanded": 184,
+    "median_stop": 3.540000000000001,
+    "median_reverse": 2.132193630193405,
+    "median_travel": 13.180781931277943
+  },
+  "24": {
+    "falls": 16,
+    "new_falls": 0,
+    "commanded": 184,
+    "median_stop": 3.5,
+    "median_reverse": 2.1405372498245687,
+    "median_travel": 12.800115661072875
+  }
+}
