@@ -1,0 +1,203 @@
+{
+  "log": "telemetry_logs/bal_20260920_forward_catch_v2_wifi.csv",
+  "samples": 1984,
+  "csv_sha256": "808538a68be977d0e6ccc90da526b400c63fd845b8f4cc2f2794006b7c25929f",
+  "wire_sha256": "73e03c16c94eba309a6e113a636c72ca3d07523f712ac494a93a128d3f3cc546",
+  "features": 8191,
+  "duration_s": 39.76,
+  "end_reason": "lower_wrong_direction",
+  "inferred_forward_rad": [
+    3.929,
+    3.528
+  ],
+  "operator": "Arms seemed too far forward before lean; almost bounced off the arms and fell backward.",
+  "transitions": [
+    {
+      "phase": "stopping",
+      "t_ms": 33196.0,
+      "roll": 84.623,
+      "roll_rate": 0.292,
+      "arm_l_torque": 0.189,
+      "arm_r_torque": -0.189,
+      "reach_l": 0.0,
+      "reach_r": 0.0,
+      "arm_l_vel": 0.019,
+      "arm_r_vel": 0.023,
+      "motor_vel": -0.076
+    },
+    {
+      "phase": "preparing",
+      "t_ms": 33685.0,
+      "roll": 84.607,
+      "roll_rate": 0.242,
+      "arm_l_torque": -0.125,
+      "arm_r_torque": -0.142,
+      "reach_l": -0.001000000000000334,
+      "reach_r": 0.0,
+      "arm_l_vel": 0.06,
+      "arm_r_vel": -0.058,
+      "motor_vel": -0.016
+    },
+    {
+      "phase": "committing",
+      "t_ms": 39220.0,
+      "roll": 89.23,
+      "roll_rate": 0.454,
+      "arm_l_torque": 0.13,
+      "arm_r_torque": 0.032,
+      "reach_l": 1.3059999999999996,
+      "reach_r": 1.3000000000000003,
+      "arm_l_vel": 0.118,
+      "arm_r_vel": 0.012,
+      "motor_vel": -0.127
+    },
+    {
+      "phase": "catching",
+      "t_ms": 39680.0,
+      "roll": 84.667,
+      "roll_rate": -27.824,
+      "arm_l_torque": -0.134,
+      "arm_r_torque": 0.151,
+      "reach_l": 1.835,
+      "reach_r": 1.8240000000000003,
+      "arm_l_vel": -1.531,
+      "arm_r_vel": 1.478,
+      "motor_vel": -0.918
+    },
+    {
+      "phase": "fault",
+      "t_ms": 39760.0,
+      "roll": 82.862,
+      "roll_rate": 42.163,
+      "arm_l_torque": -1.018,
+      "arm_r_torque": 0.833,
+      "reach_l": 1.9459999999999997,
+      "reach_r": 1.9380000000000002,
+      "arm_l_vel": -1.183,
+      "arm_r_vel": 1.377,
+      "motor_vel": -0.918
+    }
+  ],
+  "sweep_start": {
+    "t_ms": 39280.0,
+    "roll": 89.181,
+    "roll_rate": -1.579,
+    "arm_l_torque": -0.068,
+    "arm_r_torque": -0.079,
+    "reach_l": 1.3059999999999996,
+    "reach_r": 1.3000000000000003,
+    "arm_l_vel": -0.126,
+    "arm_r_vel": -0.022,
+    "motor_vel": -0.278
+  },
+  "sweep_start_drop_deg": 0.049000000000006594,
+  "first_load": {
+    "t_ms": 39740.0,
+    "roll": 82.511,
+    "roll_rate": -28.789,
+    "arm_l_torque": -0.525,
+    "arm_r_torque": 0.385,
+    "reach_l": 1.9219999999999997,
+    "reach_r": 1.9120000000000004,
+    "arm_l_vel": -1.31,
+    "arm_r_vel": 1.349,
+    "motor_vel": -0.918
+  },
+  "first_load_drop_deg": 6.719000000000008,
+  "minimum_forward_rate_dps": -38.43,
+  "supported_samples": 0,
+  "final_sample": {
+    "t_ms": 39760.0,
+    "roll": 82.862,
+    "roll_rate": 42.163,
+    "arm_l_torque": -1.018,
+    "arm_r_torque": 0.833,
+    "reach_l": 1.9459999999999997,
+    "reach_r": 1.9380000000000002,
+    "arm_l_vel": -1.183,
+    "arm_r_vel": 1.377,
+    "motor_vel": -0.918
+  },
+  "timing_max": {
+    "sample_dt_ms": 24.0,
+    "inner_dt_max_us": 5503.0,
+    "update_age_ms": 24.0,
+    "imu_age_ms": 10.0,
+    "feedback_age_l_ms": 8.0,
+    "feedback_age_r_ms": 2.0
+  },
+  "replay": {
+    "source": "13d4ee2 (same policy as installed dd74154)",
+    "scope": "Measured inputs through pinned C++; not physical simulation",
+    "caveat": "Forward inferred from settled target; center sign from historical calibration. Export/control sampling can differ within a tick.",
+    "transitions": [
+      {
+        "phase": "stopping",
+        "t_ms": 33196,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "preparing",
+        "t_ms": 33685,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "fault",
+        "t_ms": 39240,
+        "reason": "lower_prepare_disturbed"
+      }
+    ],
+    "phase_mismatch_t_ms": [
+      39220,
+      39240,
+      39260,
+      39280,
+      39300,
+      39320,
+      39340,
+      39360,
+      39380,
+      39400,
+      39420,
+      39440,
+      39460,
+      39480,
+      39500,
+      39520,
+      39540,
+      39560,
+      39580,
+      39601,
+      39620,
+      39640,
+      39660,
+      39680,
+      39700,
+      39720,
+      39740
+    ],
+    "final_reason": "lower_prepare_disturbed"
+  },
+  "committed_replay": {
+    "scope": "Seeded at observed commitment; only subsequent measured-input decisions",
+    "transitions": [
+      {
+        "phase": "committing",
+        "t_ms": 39220,
+        "initialization": "Observed committed posture"
+      },
+      {
+        "phase": "catching",
+        "t_ms": 39680,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "fault",
+        "t_ms": 39760,
+        "reason": "lower_wrong_direction"
+      }
+    ],
+    "phase_mismatch_t_ms": [],
+    "final_reason": "lower_wrong_direction"
+  }
+}
