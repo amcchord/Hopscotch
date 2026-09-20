@@ -1,6 +1,6 @@
 # Balance Mode Tuning History
 
-**Current workflow:** use the [Wi-Fi / OTA guide](../docs/WIFI_OTA.md) for firmware updates and validated `.csv`/`.wire` downloads, and the [balance test guide](../docs/BALANCE_TESTING.md) for physical trials. The installed combined release retains driving damping v4; [current state](../docs/progress/CURRENT.md) identifies the exact image and pending powered checks. The architecture, packages, USB commands and per-session “next” actions below are historical records, not current deployment instructions. Later entries record corrections without rewriting earlier observations.
+**Current workflow:** use the [Wi-Fi / OTA guide](../docs/WIFI_OTA.md) for firmware updates and validated `.csv`/`.wire` downloads, and the [balance test guide](../docs/BALANCE_TESTING.md) for physical trials. The installed combined release adds progressive braking v5, ground-drive gating and experimental CH11 lowering; [current state](../docs/progress/CURRENT.md) identifies the exact image and pending powered checks. The architecture, packages, USB commands and per-session “next” actions below are historical records, not current deployment instructions. Later entries record corrections without rewriting earlier observations.
 
 ## July Architecture (v14: Control-Core Split + Forensic Flight Recorder, July 2026)
 
@@ -1541,3 +1541,35 @@ Installed combined firmware source `6018cd4` with driving damping v4 control mat
 Motor-power-off bench checks verified update/reboot, image/checksum/authentication rejection, interrupted upload, reconnect and concurrent telemetry traffic without new 200 Hz intervals above 7.5 ms in the final runs. The saved pre-upgrade v3 trial (schema 4, 2,381 samples) exported wirelessly with matching original rows; it is a compatibility copy, not a new physical test. RC-link quality was excluded from final network tests at Austin's request. No powered balance/drive validation of the combined release has occurred. See [release evidence](../evidence/wifi-ota/README.md) for measurements and limits.
 
 Documentation now defaults to `scripts/robot_wifi.py log` for validated `.csv`/`.wire` archives and `scripts/robot_wifi.py ota` for updates. Analyze the downloaded CSV separately; use CH12 for untethered markers and keep local operator notes. Only the latest run is stored, so retrieve it after every disarmed test. [Operating guide](../docs/WIFI_OTA.md) and [test procedure](../docs/BALANCE_TESTING.md) supersede historical upload/download instructions above. This documentation pass did not change firmware or device state. Next: operator stationary motor-feedback check while disarmed, then supervised RC-ready physical trials.
+
+
+### September 19 — progressive braking, ground drive and CH11 lowering deployed
+
+The release task downloaded Austin's 2,981-sample physical v4 run over Wi-Fi. It showed mostly smooth driving with slow centered-stick stops, no recorded saturation/IMU/CAN-TX fault, and a maximum inner interval of 5.244 ms. New progressive braking retains 8 rad/s² near rest and rises to 20 above 8 rad/s; v4 planned braking-arm amplitude is retained. Extra feedback and early PD capture were rejected after broader model failures. Final screening retained 324 identical startup/neutral traces and added no falls in 672 paired drive and 192 stop cases, though the same extreme baseline failures remain. Median modeled post-center travel improved about 16%; complete settling was not uniformly faster.
+
+Combined source `43b1967` includes the ground-drive gate and reviewed lowering source `f26ece6`. Ten native executables, 27 Python tests, pinned build, radio/dashboard checks and 81 lowering model cases passed. New logs remain schema 4/240 bytes with feature flags 4095. CH11 now requests supported lowering during settled balance; its reach, contact inference and mechanics require a separate restrained first physical trial. See [braking findings](../docs/BALANCE_DRIVE_BRAKING_2026-09.md) and [lowering limits](../docs/BALANCE_LOWER_2026-09.md).
+
+Application-only OTA verified app1 with whole-file SHA-256 `a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982`, 1,194,224 bytes, embedded digest `bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3`. Two aborted transfers preserved the old image; a 1 KiB/50 ms paced transfer with 120-second timeout succeeded in 62.8 seconds. Transmitter state also changed, so the cause remains unisolated. Postflight at 03:56:33 UTC September 20: six fresh, disabled, fault-free motors, both groups disarmed, 23.65 V, no IMU fault and maintenance released; transmitter off/rearm required. Both CSV and wire re-download match the retained 2,981-sample run byte-for-byte. No movement was initiated by the release task. Calibration was not re-read through the web API. Physical braking, ground driving and lowering trials remain pending.
+
+
+### September 20 — forward-fall/catch v2 deployed; physical impact/rebound recorded
+
+Installed the frozen source `dd74154` package in app0: 1,196,112 bytes, full
+SHA-256 `71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72`,
+ESP digest `7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190`.
+[Deployment evidence](../evidence/ota-lowering-v2/README.md) confirms powered
+but disarmed health and unchanged prior 2,371-row CSV/wire. Two paced
+transmitter-on uploads aborted; identical pacing succeeded after transmitter
+off. Cause remains unconfirmed; a separate OTA task owns transport reliability.
+
+Austin reports arms too far forward, apparent bounce and backward fall. The
+[archived v2 run](../evidence/balance-lower/trial-v2-20260920/README.md) contains
+1,984 samples/39.760 seconds, schema 4/features 8191. Fast sweep began only
+0.049° into forward departure. At inferred first contact the arms were still
+moving about 1.3 rad/s; in the final 20 ms measured body rate reversed from
+−28.789 to +42.163°/s, ending `lower_wrong_direction` before support qualified.
+The log ends at that fault and does not measure the later fall. Inner cadence
+remained healthy (maximum 5,503 µs). Seeded post-commitment replay matches;
+full preparation replay does not. Hold further v2 lowering trials while the
+owner revises moving-arm contact modeling and departure timing. Successful
+ground/standing driving code remains unchanged.

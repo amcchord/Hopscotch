@@ -195,6 +195,13 @@ Use USB `bal note <text>` before a run, or keep operator observations alongside 
 
 ## Software Architecture
 
+The current application also includes [progressive reference braking](BALANCE_DRIVE_BRAKING_2026-09.md),
+[ground-drive ownership gating](GROUND_DRIVE_2026-09.md) and
+[experimental CH11 forward-fall/catch v2](BALANCE_LOWER_2026-09.md). New captures
+use schema 4 with feature flags 8191; the sample layout remains 240 bytes.
+Further lowering trials are on hold after the failed v2 attempt; see
+[current state](progress/CURRENT.md).
+
 ### Timing
 
 | Task | Rate | Period |
@@ -235,17 +242,14 @@ maintenance because they can affect both cores; see [control isolation](WIFI_OTA
 
 PlatformIO environment `m5stack-atoms3r` targets `esp32-s3-devkitc-1` with
 Arduino 2.0.16 / espressif32 6.7.0 and an 8 MiB partition table. Configure the
-ignored `src/network_secrets.h` before building. From the project root:
+ignored `src/network_secrets.h` before a source build. Run `./scripts/build.sh`
+while developing; at release freeze the consolidated checks include the build.
+Reuse the resulting validated package for deployment without rebuilding it.
 
-```bash
-./scripts/build.sh
-# After the guide's candidate checks, disarm and download the previous run:
-.venv/bin/python scripts/robot_wifi.py log
-.venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
-```
-
-Use the [complete update procedure](WIFI_OTA.md#update-the-firmware), including
-post-reboot verification. OTA writes only the inactive application slot; it also
+Use the [single-command update procedure](WIFI_OTA.md#update-the-firmware). The
+host helper checks the manifest, backs up the run, uploads with pacing, and
+verifies the running image, disarmed health and saved-run preservation. OTA
+writes only the inactive application slot; it also
 updates the dashboard. **Do not run `uploadfs`**: LittleFS contains settings,
 calibration and the saved run. USB remains available for console work and
 [recovery](WIFI_OTA.md#recovery); legacy app0-only upload scripts are not general

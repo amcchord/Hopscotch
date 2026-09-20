@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[combined release evidence](../evidence/balance-drive-braking/README.md) records
+[latest deployment evidence](../evidence/ota-lowering-v2/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -191,7 +191,9 @@ package for recovery.
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
    Preserve the record and update shared release state once. Turn the transmitter
-   back on, observe both arm switches low, then perform the supervised trial.
+   back on and observe both arm switches low before any authorized motion test.
+   Check [current trial status](progress/CURRENT.md) first; further CH11 lowering
+   attempts are on hold after the failed v2 trial.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.
 An isolated worktree can use `--secrets-file /absolute/project/src/network_secrets.h`

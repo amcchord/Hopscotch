@@ -2,13 +2,15 @@
 
 **September 20 update:** ground/standing driving worked well; the first v1
 lowering attempt tipped backward. Forward-fall/catch v2 is now installed and
-verified ([deployment record](../evidence/ota-lowering-v2/README.md)). Its physical
-catch remains unvalidated. Follow the [v2 trial guide](BALANCE_LOWER_2026-09.md)
-for a restrained first attempt.
+verified ([deployment record](../evidence/ota-lowering-v2/README.md)). Austin's
+subsequent v2 trial staged the arms too far forward, nearly bounced off them and
+fell backward. Hold further lowering attempts while the lowering task preserves
+and analyzes that run; its cause is not yet established. See the
+[v2 guide](BALANCE_LOWER_2026-09.md) for implemented behavior.
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 supported lowering](BALANCE_LOWER_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; new motion behavior remains physically unverified.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 forward-fall/catch v2](BALANCE_LOWER_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; the lowering trial failed.
 
 ## Safety and Test Area
 
@@ -29,6 +31,8 @@ comparison automatically. Reuse completed release validation. Supported,
 disarmed motor power may remain on; leave both arm switches low and CH11 released.
 The current transport needs the transmitter off for the demonstrated reliable
 path. Wait for the final verified report before turning it back on and testing.
+
+OTA success does not clear the current hold on CH11 lowering tests.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -76,6 +80,9 @@ After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 reque
 A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. When the controller is Idle, CH1/CH2 can now drive on the ground even with CH7 HIGH; pending stand-up, active balance/lowering and arm return own the wheels exclusively. Center both sticks after a balance handoff before ground drive resumes. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [progressive braking findings](BALANCE_DRIVE_BRAKING_2026-09.md) for behavior, evidence and limits.
 
 ## Supported return to flat
+
+**Further CH11 trials are on hold after the failed v2 attempt.** The following
+describes the installed behavior for diagnosis.
 
 A fresh CH11 pulse after stand-up and arm return have settled now requests an
 experimental supported descent. It is not a disturbance marker. Test this
@@ -212,7 +219,7 @@ moving/braking=2, turning=4, fresh input=8, and acceleration/handoff=16 on schem
 Schema 4 appends `pilot_arm` (240 bytes; feature bit 256). Driving v4 retains
 that layout and adds versioned damping/recovery metadata under feature bit 512,
 for total flags 1023. It does not separately sample the fast driving-rate filter.
-The combined release adds braking feature bit 1024 and lowering bit 2048 (total
+The first combined release added braking feature bit 1024 and lowering bit 2048 (total
 4095). Pilot flag 32 identifies accelerated reference braking; bit 64 identifies
 active lowering, with its phase in bits 8–11. Forward-fall/catch v2 adds feature
 bit 4096 (total 8191); the lowering guide documents its changed phases/rate field.

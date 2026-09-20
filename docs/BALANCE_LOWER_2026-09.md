@@ -1,6 +1,11 @@
 # Experimental CH11 forward fall and arm catch — v2
 
-**Installed September 20; physical catch remains unvalidated.**
+**Installed September 20; further lowering trials are on hold.** Austin reports
+the subsequent v2 attempt staged the arms too far forward, nearly bounced off
+them and fell backward. The lowering task owns the new log and diagnosis; this
+operator report does not establish the cause. The sequence below documents the
+installed behavior, not a request to repeat the failed trial.
+
 See the [verified OTA record](../evidence/ota-lowering-v2/README.md). Austin's first physical v1 trial
 failed: the robot leaned backward, never qualified arm contact, canceled the
 reach and tipped backward on its own. Ground and standing driving worked very
@@ -79,7 +84,7 @@ private configured package. This task installed those exact bytes; the previous
 v5/v1 application remains available for rollback. Ground/standing-driving code
 is unchanged. This worktree's public-example credential build is compile-only.
 
-For the next **restrained, supervised** trial, verify the forward arm direction
+After diagnosis and approval of a new **restrained, supervised** trial, verify the forward arm direction
 and clearance, stand up normally with neutral sticks, then pulse CH11. Expect a
 slow preparation followed by a deliberate forward departure, arm catch and
 supported lowering. Keep the existing disarm control available. Record actual

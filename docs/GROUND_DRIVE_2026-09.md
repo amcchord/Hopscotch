@@ -1,5 +1,10 @@
 # Flat-ground drive — September 19, 2026
 
+**Integration update:** this feature is included in installed combined source
+`43b1967`. See [current state](progress/CURRENT.md) and the [combined release
+record](BALANCE_DRIVE_BRAKING_2026-09.md#installed-combined-release). The isolated
+build/handoff details below are historical; physical evaluation remains pending.
+
 ## Behavior
 
 CH1 steering and CH2 throttle (the existing default ground-drive mapping) can
