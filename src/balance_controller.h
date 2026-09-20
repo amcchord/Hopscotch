@@ -10,6 +10,7 @@
 #include "balance_math.h"
 #include "balance_pilot.h"
 #include "balance_drive.h"
+#include "balance_lower.h"
 #include "balance_telemetry.h"
 
 enum class BalanceState : uint8_t {
@@ -17,6 +18,7 @@ enum class BalanceState : uint8_t {
     TippingUp      = 1,
     Balancing      = 2,
     ReturningArms  = 3,
+    Lowering       = 4, // Append-only telemetry ID: arms support descent.
 };
 
 struct RawImuData {
@@ -61,7 +63,8 @@ public:
     BalanceState getState() const { return _state; }
     bool isActive() const { return _state != BalanceState::Idle; }
     bool isControllingDrive() const {
-        return _state == BalanceState::TippingUp || _state == BalanceState::Balancing;
+        return _state == BalanceState::TippingUp || _state == BalanceState::Balancing
+            || _state == BalanceState::Lowering;
     }
 
     const char* getStateString() const;
@@ -178,6 +181,9 @@ private:
     balance_math::StartupRecovery _startup_recovery;
     balance_math::RecoilUnwind _recoil_unwind;
     balance_math::BalancePilot _pilot;
+    balance_math::BalanceLower _lowering; // control-task owned; prepare while balancing
+    float _lower_lean_offset = 0;
+    balance_math::LowerInput lowerInput(bool pilot_valid) const;
     bool _pilot_input_valid = false;
     volatile float _pilot_velocity_ff = 0; // requested speed for the 200 Hz driving controller
     volatile float _pilot_measured_vel = 0; // 50 Hz filtered feedback snapshot

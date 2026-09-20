@@ -1390,7 +1390,11 @@ static void controlTick() {
         const bool pilotValid = !simEnabled && crsfRx.isLinkUp()
             && crsfRx.timeSinceLastFrame() <= BALANCE_PILOT_RC_FRESH_MS
             && isSwitchActive(drive_arm_sw) && isSwitchActive(arm_arm_sw);
-        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge, dt,
+        // A fresh CH11 edge while balancing requests a supported stand-down.
+        // Idle keeps the existing single/double-tap stand-up behavior.
+        const bool lowerEdge = calEdge && pilotValid && ch7Active
+            && balanceCtrl.getState() == BalanceState::Balancing;
+        balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge || lowerEdge, dt,
                            crsfRx.getChannelNormalized(DEFAULT_CH_THROTTLE),
                            crsfRx.getChannelNormalized(DEFAULT_CH_STEERING), pilotValid);
         profRecord(PROF_BAL, prof_bal);

@@ -21,6 +21,8 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -Itests/stubs -Is
 output/test_motor_feedback
 clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -Itests/stubs -Isrc tests/test_ground_drive.cpp src/drive_controller.cpp src/robstride.cpp src/motor_manager.cpp -o output/test_ground_drive
 output/test_ground_drive
+clang++ -std=c++17 -Wall -Wextra -Werror -Isrc tests/test_balance_lower.cpp -o output/test_balance_lower
+output/test_balance_lower
 clang++ -std=c++17 -Wall -Wextra -Werror -pthread -Isrc tests/test_network_safety.cpp -o output/test_network_safety
 output/test_network_safety
 "$PYTHON_BIN" -m unittest discover -s tests -v
