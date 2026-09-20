@@ -1,5 +1,10 @@
 # Balance Mode Test Guide
 
+**September 20 operator follow-up:** driving is reported to work very well, but
+the first CH11 lowering attempt failed with apparent backward lean. Preserve
+that run and hold further lowering attempts while the lowering task diagnoses
+the telemetry. The cause is not yet established; see [current state](progress/CURRENT.md).
+
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
 The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 supported lowering](BALANCE_LOWER_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; new motion behavior remains physically unverified.

@@ -164,3 +164,14 @@ changing this exact firmware-source snapshot. Push the root integration under
 Austin's existing publication authorization and verify remote hashes. Next:
 operator braking trial, then a separate restrained lowering trial, each followed
 by a disarmed wireless log download.
+
+## 2026-09-20 — First combined trial report; lowering diagnosis handoff
+
+The lowering task relayed Austin's first combined physical-test report: ground
+and standing driving worked very well, while CH11 lowering failed and appeared
+to lean backward rather than forward. This is an operator observation pending
+telemetry analysis; no cause is inferred here. That task owns preservation and
+diagnosis of the latest onboard run in its isolated lowering worktree. Updated
+CURRENT and the active lowering/test guides to hold further lowering trials.
+No new source change, device request, log download or flash was performed by
+the root integration task; the deployed source remains `43b1967`.

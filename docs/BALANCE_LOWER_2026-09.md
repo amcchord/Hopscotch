@@ -1,5 +1,10 @@
 # Experimental CH11 return to flat
 
+**September 20 operator follow-up:** driving is reported to work very well, but
+the first CH11 lowering attempt failed with apparent backward lean. Preserve
+that run and hold further lowering attempts while the lowering task diagnoses
+the telemetry. The cause is not yet established; see [current state](progress/CURRENT.md).
+
 **Integration update:** this feature is included in installed combined source
 `43b1967`. See [current state](progress/CURRENT.md) and the [combined release
 record](BALANCE_DRIVE_BRAKING_2026-09.md#installed-combined-release). The isolated
