@@ -202,3 +202,31 @@ retries of v1. The release owner has the integration handoff; no unrequested OTA
 is part of this task. Root changes are documentation only, with no device
 requests, settings writes or motion. Additional radio fix `605c66d` is preserved
 and published on its existing branch, separate from the firmware snapshot.
+
+## 2026-09-20 — Record verified, packaged lowering candidate; still not installed
+
+The release owner published integration record `e9e1c65` on `codex/drive-braking`.
+Trial archive `f011ce6` was imported as `7a98037` and candidate `13d4ee2` as
+`dd74154aa3f534f95506b5c0dd66e1c6d901e091`. All 10 native executables, 27 Python
+tests, syntax/whitespace, pinned build, radio and dashboard checks passed. The
+existing event-core macro redefinition warning remains. The owner's independent
+229-case simulation and 2,371-row physical replay reproduce the archived results
+exactly, with unchanged model limitations and possible sharp catches.
+[Verification](https://github.com/amcchord/Hopscotch/blob/e9e1c65996c5f6539a704447516834f2ce12527c/evidence/lowering-v2-integration/verification.json).
+
+A separate private credentialed package is queued at
+`worktrees/drive-braking/artifacts/lowering-v2/candidate/`: 1,196,112 bytes, full
+SHA-256 `71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72`,
+ESP digest `7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190`.
+The [manifest](https://github.com/amcchord/Hopscotch/blob/e9e1c65996c5f6539a704447516834f2ce12527c/evidence/lowering-v2-integration/candidate-manifest.json) explicitly marks it
+`queued_not_installed`, schema 4/240 bytes/features 8191. Root independently
+checked the candidate size/digests, preservation of the installed package, and
+that only the three reported lowering files differ from deployed `eb2bb23`,
+with those files identical to the upstream handoff.
+
+Updated CURRENT/JOURNAL only. Root firmware remains byte-identical to installed
+`43b1967` and its verified app1 identity; no candidate source was merged here.
+No device requests, restart, OTA, configuration, arming or movement occurred.
+Did not repeat the unchanged build/model checks for this records-only update.
+Next step remains separately authorized deployment with fresh preflight followed
+by a restrained operator trial. Hold further trials of installed lowering v1.
