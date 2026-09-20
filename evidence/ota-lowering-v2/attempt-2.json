@@ -1,0 +1,210 @@
+{
+  "started_utc": "2026-09-20T18:08:20.559936+00:00",
+  "motion_initiated": false,
+  "candidate": {
+    "status": "queued_not_installed",
+    "prepared_utc": "2026-09-20T04:56:27.373335+00:00",
+    "source_commit": "dd74154aa3f534f95506b5c0dd66e1c6d901e091",
+    "branch": "codex/drive-braking",
+    "upstream_candidate": "13d4ee2aa51afe7e5ab7aebf32b711da403a1fb1",
+    "application_bytes": 1196112,
+    "application_sha256": "71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72",
+    "esp_image_digest": "7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190",
+    "features": 8191,
+    "schema": 4,
+    "sample_bytes": 240,
+    "partition_capacity": 3342336,
+    "private_configuration_verified": true,
+    "secret_header_copied": false,
+    "configuration_source": "Existing private project header referenced through an include path; not copied",
+    "package_path": "worktrees/drive-braking/artifacts/lowering-v2/candidate/",
+    "installed_source_commit": "43b1967dd03d26d8b2ccf6a698901c56272039d2",
+    "installed_application_sha256": "a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982",
+    "installed_esp_image_digest": "bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3",
+    "installed_package_preserved": "worktrees/drive-braking/artifacts/drive-braking-v5/release/",
+    "device_requests": false,
+    "ota_attempted": false,
+    "motion_initiated": false,
+    "validation": "verification.json; validation-combined.txt; validation-radio.txt; validation-dashboard.txt",
+    "limits": "Software/model validation only; no physical v2 catch validated. Completed model variants peak at 55.151 deg/s. Separate authorized deployment and restrained trial remain pending."
+  },
+  "preflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 19 2026 23:44:38",
+    "running_slot": "app1",
+    "image_sha256": "bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 168952,
+    "min_free_heap": 147876,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "reset_reason": 1,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "preflight_state": {
+    "schema": 1,
+    "sequence": 28867,
+    "uptime_ms": 489205,
+    "age_ms": 7,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -80,
+    "lq": 100,
+    "rc_age_ms": 0,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -4.948194,
+      "rate": -0.027889,
+      "setpoint": 82.1,
+      "imu_age_us": 5682,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 23.36941,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": -0.040436,
+        "torque": -8.4e-05,
+        "temp": 24,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0.029755,
+        "torque": -8.4e-05,
+        "temp": 24,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 30,
+        "pos": -0.000383,
+        "vel": -0.028229,
+        "torque": 8.4e-05,
+        "temp": 24,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0.016022,
+        "torque": 8.4e-05,
+        "temp": 24,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 155
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0.08107,
+        "torque": -0.000214,
+        "temp": 23,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 135
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0.022659,
+        "torque": -0.000214,
+        "temp": 23,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 115
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      917
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 17507,
+        "max_us": 5503,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 17507,
+        "max_us": 5975,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 165240,
+    "min_free_heap": 147876,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -51,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 1129
+  },
+  "saved_run_before": {
+    "samples": 2371,
+    "csv_sha256": "3083a00737288438466b1d0bbd71f337d433d349e85f7d1b2b3266d4a74b2368",
+    "wire_sha256": "5c14a7f3df11dc7b1a14a242d79eb2d3f8e4838cdb81403d9d3142fe21f09ab6"
+  },
+  "existing_trial_archive_matches": true,
+  "transfer": {
+    "chunk_bytes": 1024,
+    "interval_seconds": 0.05,
+    "timeout_seconds": 120,
+    "tcp_nodelay": true,
+    "transport_error": "[Errno 32] Broken pipe",
+    "sent_offset": 167936,
+    "response_error": "[Errno 54] Connection reset by peer",
+    "seconds": 9.944
+  }
+}

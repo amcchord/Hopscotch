@@ -1,6 +1,7 @@
-# Experimental CH11 forward fall and arm catch — v2 candidate
+# Experimental CH11 forward fall and arm catch — v2
 
-**Candidate only; not installed by this task.** Austin's first physical v1 trial
+**Installed September 20; physical catch remains unvalidated.**
+See the [verified OTA record](../evidence/ota-lowering-v2/README.md). Austin's first physical v1 trial
 failed: the robot leaned backward, never qualified arm contact, canceled the
 reach and tipped backward on its own. Ground and standing driving worked very
 well. The [archived 2,371-sample run and diagnosis](../evidence/balance-lower/trial-20260920/README.md)
@@ -73,11 +74,10 @@ Some completed variants catch at up to **55.15°/s**: software completion alone
 does not demonstrate a graceful catch. Peak model torque is not a hardware
 load rating. Arm clearance and actual catch severity require physical checks.
 
-The release owner should integrate the candidate and preserve the successful
-v5 driving release as rollback. Build with the existing private network
-configuration, run combined checks and record an actual installed identity
-before testing. This worktree's public-example credential build is compile-only.
-No firmware was flashed by this task.
+The release owner integrated and checked source `dd74154`, then prepared a
+private configured package. This task installed those exact bytes; the previous
+v5/v1 application remains available for rollback. Ground/standing-driving code
+is unchanged. This worktree's public-example credential build is compile-only.
 
 For the next **restrained, supervised** trial, verify the forward arm direction
 and clearance, stand up normally with neutral sticks, then pulse CH11. Expect a
@@ -85,8 +85,8 @@ slow preparation followed by a deliberate forward departure, arm catch and
 supported lowering. Keep the existing disarm control available. Record actual
 arm/floor contact, any asymmetry, impact severity and intervention. After
 supporting/disarming, allow the log to save and download both CSV and exact wire
-before another attempt. The current installed v1 maneuver has already failed;
-do not mistake it for this candidate.
+before another attempt. The previous v1 maneuver failed; the installed ESP digest in the deployment
+record identifies v2 even though the cached build-date string is unchanged.
 
 ## Integration and telemetry
 

@@ -1,8 +1,14 @@
 # Balance Mode Test Guide
 
+**September 20 update:** ground/standing driving worked well; the first v1
+lowering attempt tipped backward. Forward-fall/catch v2 is now installed and
+verified ([deployment record](../evidence/ota-lowering-v2/README.md)). Its physical
+catch remains unvalidated. Follow the [v2 trial guide](BALANCE_LOWER_2026-09.md)
+for a restrained first attempt.
+
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release retains [driving damping v4](BALANCE_DRIVE_DAMPING_2026-09.md), startup/stationary control and calibration. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. Motor-power-off network validation does not establish powered balance reliability.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 supported lowering](BALANCE_LOWER_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; new motion behavior remains physically unverified.
 
 ## Safety and Test Area
 
@@ -16,29 +22,13 @@ Record any mechanical variables that changed: floor surface, tire condition, bat
 
 ## Updating the Test Firmware
 
-Normal updates and test captures do not require USB. Join the same LAN and open
-[hopscotch.local](http://hopscotch.local/) or the IP on the display (last tested:
-[192.168.1.172](http://192.168.1.172/)). Support the robot, lower both arm switches,
-release CH11 and keep motor power off for the update. Download the previous run
-before changing firmware. The CLI reads the device token from the ignored local
-header or `HOPSCOTCH_API_TOKEN`; browser maintenance controls require entering it.
-
-The frozen, bench-tested Wi-Fi release is in `artifacts/wifi-ota/release/` on this
-workstation. Its [release record](../evidence/wifi-ota/README.md) identifies the
-source and hashes. From the project root, if installing that release:
-
-```bash
-.venv/bin/python scripts/robot_wifi.py status
-.venv/bin/python scripts/robot_wifi.py log
-.venv/bin/python scripts/robot_wifi.py ota artifacts/wifi-ota/release/firmware.bin
-```
-
-Use `python3` if `.venv` is absent; the Wi-Fi helper needs only the standard
-library. An IP override goes before the subcommand, for example
-`python3 scripts/robot_wifi.py --host http://192.168.1.172 status`. For a changed source
-build, follow the [candidate checks and OTA procedure](WIFI_OTA.md#update-the-firmware).
-The dashboard can upload the same `firmware.bin`. Wait for verified reboot,
-matching image identity and both groups disarmed before proceeding.
+Normal updates and test captures do not require USB. Use the single-command
+[frozen-package OTA procedure](WIFI_OTA.md#update-the-firmware). It performs fresh
+preflight, saved-run backup, paced upload, image/health verification and saved-run
+comparison automatically. Reuse completed release validation. Supported,
+disarmed motor power may remain on; leave both arm switches low and CH11 released.
+The current transport needs the transmitter off for the demonstrated reliable
+path. Wait for the final verified report before turning it back on and testing.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -81,9 +71,18 @@ Allow at least two seconds after raising the arm switches and confirm both group
 
 ## Driving while standing
 
-After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 requests forward/back travel and CH1 steers; keep CH7/CH9/CH10 HIGH. Begin with small, separate forward, backward and steering inputs. Center the sticks between each and wait for a stop. Driving v4 limits are 20 rad/s average wheel request and 4.5 rad/s per-wheel differential turn, with 6/8 rad/s² acceleration/braking reference ramps. Start around 10% stick (about 0.85 rad/s forward request after deadband). Planned arm movements assist acceleration/braking; confirm clean starts/stops before increasing input. The controller holds the new position/heading after stopping. Physical stopping distance remains unverified for v4.
+After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 requests forward/back travel and CH1 steers; keep CH7/CH9/CH10 HIGH. Begin with small, separate forward, backward and steering inputs. Center the sticks between each and wait for a stop. Driving limits remain 20 rad/s average wheel request and 4.5 rad/s per-wheel differential turn. Acceleration stays 6 rad/s²; v5 braking stays 8 rad/s² below 4 rad/s, rises smoothly to 20 between 4 and 8 rad/s, then stays at 20. Start around 10% stick (about 0.85 rad/s forward request after deadband). Planned arm movements assist acceleration/braking; confirm clean starts/stops before increasing input. The controller holds the new position/heading after stopping. Physical stopping distance with v5 remains unverified.
 
-A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. CH7 HIGH also inhibits ground-drive stick commands before tip-up. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [driving damping v4 findings](BALANCE_DRIVE_DAMPING_2026-09.md) for behavior, evidence and limits.
+A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. When the controller is Idle, CH1/CH2 can now drive on the ground even with CH7 HIGH; pending stand-up, active balance/lowering and arm return own the wheels exclusively. Center both sticks after a balance handoff before ground drive resumes. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [progressive braking findings](BALANCE_DRIVE_BRAKING_2026-09.md) for behavior, evidence and limits.
+
+## Supported return to flat
+
+A fresh CH11 pulse after stand-up and arm return have settled now requests an
+experimental supported descent. It is not a disturbance marker. Test this
+separately from braking, with a catch restraint and verified arm sweep/reach;
+follow the full [CH11 lowering procedure](BALANCE_LOWER_2026-09.md). CH12 remains
+the balance event marker. V2 intentionally leaves upright balance to fall forward and catch on the arms;
+physical support and graceful landing are not established by simulation.
 
 ## Commands and RC Markers
 
@@ -152,7 +151,7 @@ Override its port or timeout only when needed:
 
 ## What the Log Captures
 
-New captures use **schema 4, 240 bytes/sample, feature flags 1023** and a
+New captures use **schema 4, 240 bytes/sample, feature flags 8191** and a
 1,440,000-byte buffer for 6,000 samples. The CSV contains the full 50 Hz
 state-machine/outer-loop stream plus aggregates from every 200 Hz inner-loop
 tick. Live Wi-Fi JSON schema 1 is a separate snapshot format, offered at 10 Hz;
@@ -213,6 +212,10 @@ moving/braking=2, turning=4, fresh input=8, and acceleration/handoff=16 on schem
 Schema 4 appends `pilot_arm` (240 bytes; feature bit 256). Driving v4 retains
 that layout and adds versioned damping/recovery metadata under feature bit 512,
 for total flags 1023. It does not separately sample the fast driving-rate filter.
+The combined release adds braking feature bit 1024 and lowering bit 2048 (total
+4095). Pilot flag 32 identifies accelerated reference braking; bit 64 identifies
+active lowering, with its phase in bits 8–11. Forward-fall/catch v2 adds feature
+bit 4096 (total 8191); the lowering guide documents its changed phases/rate field.
 Old files retain their original version/configuration and export unknown new
 fields as blank. Download new logs before restoring an older reader.
 
