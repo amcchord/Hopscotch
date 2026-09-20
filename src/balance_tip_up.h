@@ -94,6 +94,8 @@ public:
             && std::fabs(in.right - BALANCE_ARM_TIP_RIGHT) <= BALANCE_ARM_REACHED_RAD
             && std::fabs(in.left_velocity) <= BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S
             && std::fabs(in.right_velocity) <= BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S
+            && std::fabs(in.wheel_left) <= BALANCE_FAST_TIP_START_WHEEL_RAD_S
+            && std::fabs(in.wheel_right) <= BALANCE_FAST_TIP_START_WHEEL_RAD_S
             && std::fabs(in.tilt - BALANCE_SETPOINT_ARMS_TIP) < BALANCE_ENGAGE_THRESHOLD_DEG
             && std::fabs(in.rate) <= BALANCE_FAST_TIP_CAPTURE_RATE_DPS;
         if (quiet) {
@@ -135,6 +137,24 @@ private:
     float _left = 0, _right = 0;
     float _distance_l = 0, _distance_r = 0, _distance = 0, _elapsed = 0;
     const char* _fault = nullptr;
+};
+
+// Fade a supported capture only as the measured arms return. Latch progress so
+// feedback noise, a paused return or an arm rebound cannot restore old support
+// bias after release. The controller retains its existing base slew limiter.
+class FastTipRelease {
+public:
+    void reset() { _weight = 1; }
+    float weight(bool returning, bool returned, float engage_fraction, float fraction) {
+        if (returned) _weight = 0;
+        else if (returning && std::isfinite(engage_fraction) && std::isfinite(fraction)) {
+            const float progress = (engage_fraction - fraction) / BALANCE_FAST_TIP_RELEASE_FRACTION;
+            _weight = std::fmin(_weight, std::fmax(0.0f, std::fmin(1.0f, 1 - progress)));
+        }
+        return _weight;
+    }
+private:
+    float _weight = 1;
 };
 
 // Wheel mode setup temporarily blocks feedback processing. Return to the normal

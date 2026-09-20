@@ -14,6 +14,15 @@ inline float captureCurveShift(float tilt, float scheduled, float stored_trim,
                                float absolute_limit) {
     return clamp(tilt - scheduled, -absolute_limit, absolute_limit) - stored_trim;
 }
+struct CaptureOffsets { float curve, transient; };
+inline CaptureOffsets captureOffsets(bool supported_fast_capture, float tilt,
+                                     float scheduled, float stored_trim,
+                                     float absolute_limit, float engage_shift) {
+    // Quiet arms can still carry chassis weight. Such a fast capture supplies
+    // a continuous initial reference, not a new free-standing equilibrium.
+    return supported_fast_capture ? CaptureOffsets{0, engage_shift}
+        : CaptureOffsets{captureCurveShift(tilt, scheduled, stored_trim, absolute_limit), 0};
+}
 struct RunawayConfig {
     float minimum_speed, unconditional_speed, minimum_acceleration, acceleration_tau;
     uint32_t confirm_ms;

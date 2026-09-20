@@ -240,6 +240,7 @@ private:
     // Arm ramp state (control task only)
     balance_math::FastTipUp _fast_tip;
     balance_math::FastTipStart _fast_tip_start;
+    balance_math::FastTipRelease _fast_tip_release;
     bool _fast_tip_pending = false;
     uint8_t _fast_tip_feedback_index = 0;
     const char* _tip_start_status = ""; // control-owned, bounded literal copied into network snapshot
