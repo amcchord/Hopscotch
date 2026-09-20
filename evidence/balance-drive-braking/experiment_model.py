@@ -27,7 +27,7 @@ lib.pilot_arm_demand.argtypes=[ct.c_void_p,ct.c_float];lib.pilot_arm_demand.rest
 lib.pilot_emergency.argtypes=[ct.c_void_p,ct.c_int]+[ct.c_float]*6+[ct.c_int]
 OLD=[8.8,3.1,3,.06,12,16,1,.45,0]
 class Pilot:
- def __init__(self,params,profile,capture=(False,1,2.5,8,60),brake=None,api=lib,arm_cap=None):
+ def __init__(self,params,profile,capture=(False,1,2.5,8,60),brake=(0,0,1,4,.08),api=lib,arm_cap=None):
   self.api=api
   self.governed_motion=True;self.ptr=self.api.pilot_create();self.profile=profile
   if arm_cap is not None:self.api.pilot_arm_cap(self.ptr,arm_cap)
@@ -63,7 +63,7 @@ profiles={
  'loss':lambda t:(1 if 2<=t<12 else 0,0,not(6<=t<7)),
  'turn':lambda t:(0,.5 if 2<=t<5 else -.5 if 8<=t<11 else 0,True),
 }
-def run(params=None,profile='small',p=plant,duration=36,pushes=None,seed=1,capture=(False,1,2.5,8,60),brake=None,arm_cap=None):
+def run(params=None,profile='small',p=plant,duration=36,pushes=None,seed=1,capture=(False,1,2.5,8,60),brake=(0,0,1,4,.08),arm_cap=None):
  pilot=Pilot(params,profiles[profile] if isinstance(profile,str) else profile,capture,brake,arm_cap=arm_cap)
  r=sim.simulate(cfg,p,engage_offset_deg=0,duration_s=duration,seed=seed,pilot_factory=lambda:pilot,settled_start=True,pushes=pushes)
  return r,pilot
