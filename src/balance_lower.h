@@ -26,6 +26,7 @@ struct LowerInput {
 
 struct LowerConfig {
     float prepare_rad = 1.75f, prepare_speed = 4.0f;
+    float moving_handoff_rad = 1.60f;
     float catch_rad = 1.85f, catch_speed = 2.0f;
     float lower_speed = .16f, retract_speed = .30f;
     float catch_return_speed = .50f;
@@ -142,7 +143,19 @@ public:
             }
             const bool ready = std::fabs(in.arm_left + _sign_left*c.prepare_rad) < .04f
                 && std::fabs(in.arm_right + _sign_right*c.prepare_rad) < .04f;
-            if (ready) {
+            // The v5 trial was already falling forward while upright PD drove
+            // a wheel past 6 rad/s waiting for the final arm travel.
+            // Once both arms provide useful reach and departure is measured,
+            // release upright control; finish placing the catch during flight.
+            const bool departing = in.arm_left*_sign_left <= -c.moving_handoff_rad
+                && in.arm_right*_sign_right <= -c.moving_handoff_rad
+                && in.velocity_left*_sign_left <= -.30f
+                && in.velocity_right*_sign_right <= -.30f
+                && std::fabs(in.torque_left) < c.contact_torque
+                && std::fabs(in.torque_right) < c.contact_torque
+                && in.tilt <= _prepare_tilt-c.forward_drop*.5f
+                && in.rate <= -c.forward_rate;
+            if (ready || departing) {
                 _launch_tilt = in.tilt;
                 _wheel_command = (in.wheel_left + in.wheel_right)*.5f;
                 _committed = true; _committed_ms = now;

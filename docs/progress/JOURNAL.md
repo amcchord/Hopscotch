@@ -446,3 +446,30 @@ cause. Notified the fast owner of installation; it independently confirmed its
 owned source matches and retained no device actions. Next: CH6 LOW ordinary
 stand-up, one CH11 lowering trial, disarm and archive before another run. Test
 CH6 HIGH separately afterward; both revised motions await physical acceptance.
+
+## 2026-09-20 — Diagnose v5 supported stop and prepare earlier handoff
+
+Austin reports that v5 reliably leans forward but stops supported on the arms;
+fast standing separately rolls forward. Preserved the newest slow/lowering run
+(1,219 rows / 24.365 s, source17c499c) after Wi-Fi became reachable. The run ends
+lower_prepare_disturbed before commitment: right rear wheel6.094rad/s exceeds
+the6rad/s bound while the last arm reaches preparation tolerance. Forward body
+movement2.766° and the effective setpoint ceiling are confirmed; no actual
+catch/return samples exist. The reported support follows the recorded abort.
+
+V6 adds a moving, unloaded two-arm handoff at1.6rad plus measured forward
+motion, preserving all prior limits and return logic. Native replay reproduces
+the old fault and reaches commitment39ms earlier with wheels1.695/4.490rad/s.
+Replay stops at divergence. The paired329-case model gives253→255 completions,
+9 improvements/7 regressions; all72 trial-informed contact cases complete and
+all11 injected faults reject completion. Wider1.35rad departure and a version
+without load qualification were rejected. Native contact continuation and
+blocked-handoff regressions passed. Combined validation/build is pending the
+other owner's fast correction; no v6 OTA has occurred.
+
+Requested one separate fast trial and immediately archived236 rows/4.750s,
+fast bit128 set, ending bailout_angle_error. Supplied read-only paths to the
+fast owner without copying logs between worktrees. Its initial analysis finds
+quiet capture, then a support-biased equilibrium shift during arm return.
+The owner is investigating a bounded fast-only correction; this task retains
+all robot operations, combined schema6 metadata and final release ownership.

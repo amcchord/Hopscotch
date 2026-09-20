@@ -80,6 +80,50 @@ int main() {
     { // No multi-degree backward excursion is accepted in preparation.
       Rig r; r.prepare(); r.in.tilt+=1.6f; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault); }
+    { // Physical v5 stopped before contact: the final preparation sample was
+      // falling forward with one wheel already over 6 rad/s. Hand off at the
+      // earlier measured moving-arm frame, without widening that wheel limit.
+      Rig r; r.in.tilt=87.885f; r.prepare();
+      r.in.tilt=85.721f; r.in.rate=-19.553f; r.in.error=2.163f;
+      r.in.arm_left=-1.671f; r.in.arm_right=1.639f;
+      r.in.velocity_left=-3.096f; r.in.velocity_right=3.163f;
+      r.in.wheel_left=1.695f; r.in.wheel_right=4.490f;
+      r.tick(false);
+      assert(r.lower.committed() && !r.lower.supported());
+      assert(std::fabs(r.lower.wheelCommand()-3.0925f)<.001f);
+      // A subsequent qualified two-arm impact must enter continuous return,
+      // not finish or hold merely because the arms are supporting the body.
+      r.in.wheel_left=r.in.wheel_right=r.lower.wheelCommand();
+      r.in.arm_left=-1.85f; r.in.arm_right=1.85f;
+      r.in.tilt=82; r.in.rate=-30;
+      for(int i=0;i<6;++i) r.tick(false);
+      r.in.tilt=80; r.in.rate=-6;
+      r.in.torque_left=.6f; r.in.torque_right=-.6f;
+      r.in.velocity_left=.3f; r.in.velocity_right=-.3f;
+      for(int i=0;i<4;++i) r.tick();
+      assert(r.lower.supported() && r.lower.phase()==LowerPhase::Descending);
+      const float first=r.lower.left();
+      for(int i=0;i<40;++i) { r.in.tilt-=.1f; r.tick(); }
+      assert(r.lower.active() && r.lower.left()>first+.1f);
+      assert(r.lower.right()<-first-.1f);
+    }
+    { // The early route needs two moving, sufficiently deployed arms plus
+      // measured forward departure. A jam, one late arm, upright stillness or
+      // a backward disturbance cannot unlock it.
+      for(int missing=0;missing<7;++missing) {
+        Rig r; r.prepare(); r.in.tilt=86; r.in.rate=-10;
+        r.in.arm_left=-1.65f; r.in.arm_right=1.65f;
+        r.in.velocity_left=-1; r.in.velocity_right=1;
+        if(missing==0) r.in.arm_right=1.5f;
+        if(missing==1) r.in.velocity_left=0;
+        if(missing==2) r.in.velocity_right=0;
+        if(missing==3) r.in.tilt=88;
+        if(missing==4) r.in.rate=3;
+        if(missing==5) r.in.torque_left=.8f;
+        if(missing==6) r.in.torque_right=-.8f;
+        r.tick(false); assert(!r.lower.committed());
+      }
+    }
     { // The catch first parks short of the recorded impact pose. A slow
       // extended search is permitted only after six measured forward degrees.
       Rig r; r.fall(); assert(std::fabs(r.lower.left())<=1.851f);

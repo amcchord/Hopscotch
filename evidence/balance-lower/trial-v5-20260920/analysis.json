@@ -1,0 +1,140 @@
+{
+  "samples": 1219,
+  "duration_s": 24.365,
+  "csv_sha256": "4d0227e2a5cb76fa0bf426746c40c45668fc34b281304c21a48842bc80929849",
+  "wire_sha256": "c8897564e23c0427d48fe82d82a636056a56256cccb84c3fb0438e29dfbb716f",
+  "installed_source": "17c499c06b57d8e6d82ffaee3fbf289b722aa8b6",
+  "candidate_policy_sha256": "52b96de56f1cd25e2aee11fee01197d85bc15f158225be4d18e02b01a2efdff6",
+  "fast_selected": false,
+  "end_reason": "lower_prepare_disturbed",
+  "inferred_forward_rad": [
+    3.937,
+    3.536
+  ],
+  "preparation_duration_s": 0.619,
+  "preparation_body_change_deg": -2.7660000000000053,
+  "maximum_preparation_setpoint": 87.885,
+  "final_sample": {
+    "t_ms": 24365.0,
+    "roll": 85.119,
+    "roll_rate": -17.269,
+    "setpoint": 87.885,
+    "base_sp": 88.038,
+    "bl_vel": 2.486,
+    "br_vel": 6.094,
+    "cmd_left": 7.268,
+    "cmd_right": 6.401,
+    "arm_l": 2.201,
+    "arm_r": 5.256,
+    "arm_l_tgt": 2.187,
+    "arm_r_tgt": 5.286,
+    "arm_l_vel": -0.677,
+    "arm_r_vel": 0.971,
+    "arm_l_torque": 0.187,
+    "arm_r_torque": -0.038
+  },
+  "recorded_committed_or_supported_samples": 0,
+  "installed_replay": {
+    "transitions": [
+      {
+        "t_ms": 23266.0,
+        "phase": 1,
+        "tilt": 87.792,
+        "rate": -0.477,
+        "wheels": [
+          -0.039,
+          0.013
+        ],
+        "arms": [
+          0.0,
+          0.0009999999999998899
+        ],
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 23746.0,
+        "phase": 2,
+        "tilt": 87.885,
+        "rate": -0.935,
+        "wheels": [
+          -0.179,
+          -0.289
+        ],
+        "arms": [
+          0.0,
+          0.0
+        ],
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 24365.0,
+        "phase": 8,
+        "tilt": 85.119,
+        "rate": -17.269,
+        "wheels": [
+          2.486,
+          6.094
+        ],
+        "arms": [
+          -1.7359999999999998,
+          1.7200000000000002
+        ],
+        "wheel_command": 0.0
+      }
+    ],
+    "reason": "lower_prepare_disturbed",
+    "stops_at_first_commit_or_fault": true
+  },
+  "candidate_replay": {
+    "transitions": [
+      {
+        "t_ms": 23266.0,
+        "phase": 1,
+        "tilt": 87.792,
+        "rate": -0.477,
+        "wheels": [
+          -0.039,
+          0.013
+        ],
+        "arms": [
+          0.0,
+          0.0009999999999998899
+        ],
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 23746.0,
+        "phase": 2,
+        "tilt": 87.885,
+        "rate": -0.935,
+        "wheels": [
+          -0.179,
+          -0.289
+        ],
+        "arms": [
+          0.0,
+          0.0
+        ],
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 24326.0,
+        "phase": 9,
+        "tilt": 85.721,
+        "rate": -19.553,
+        "wheels": [
+          1.695,
+          4.49
+        ],
+        "arms": [
+          -1.6709999999999998,
+          1.6389999999999998
+        ],
+        "wheel_command": 3.0924999713897705
+      }
+    ],
+    "reason": "lower_requested",
+    "stops_at_first_commit_or_fault": true
+  },
+  "limitation": "Capture stops before contact/return; operator observed supported arms afterward. Replay validates the earlier handoff only, not subsequent physical success."
+}

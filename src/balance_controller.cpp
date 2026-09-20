@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 5;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 6;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -2138,11 +2138,15 @@ void BalanceController::dumpLog(Print* sink) {
             out.println("# fast_tip_startup=wait_ms:1000 quiet_ms:100 post_setup_feedback:real requests_per_tick:2 feedback_cycle_ms:60 parked_during_wait:1 total_timeout_ms:4500");
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
-        // Schema 5 keeps the 240-byte samples/header; all 16 feature bits were
-        // allocated. Historical schema-4 exports keep their exact v4 literals.
-        out.println("# lowering=experimental_ch11_forward_catch_v5 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        // Metadata-only policy revisions retain historical exports exactly.
+        if (header.schema_version >= 6)
+            out.println("# lowering=experimental_ch11_forward_catch_v6 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else
+            out.println("# lowering=experimental_ch11_forward_catch_v5 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:forward_preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
         out.println("# lowering_prepare=travel_rad:1.75 speed_rad_s:4 setpoint_ceiling:measured_start_tilt moving_handoff:1 timeout_ms:2000 backward_limit_deg:1.5 rate_min_dps:-35 rate_max_dps:15 wheel_limit_rad_s:6");
+        if (header.schema_version >= 6)
+            out.println("# lowering_departure=early_reach_rad:1.6 both_outward_speed_min_rad_s:0.3 both_load_below_nm:0.4 forward_drop_deg:0.5 forward_rate_min_dps:2 measured_wheel_handoff:1");
         out.println("# lowering_launch=rear_accel_rad_s2:2 rear_speed_rad_s:-2 forward_drop_deg:1 forward_rate_dps:2 accel_pause_rate_dps:6 coast_min_arm_rad:1.8 timeout_ms:1800 initial_coast:measured_wheel_speed");
         out.println("# lowering_catch=park_rad:1.85 speed_rad_s:2 probe_after_forward_deg:6 probe_rad:2.4 probe_speed_rad_s:0.5 first_load_nm:0.4 first_load_deceleration_dps:1 first_load_delay_ms:100 sustained_load_nm:0.2 confirm_ms:80 timeout_ms:2500");
         out.println("# lowering_return=first_contact_reverse_both:1 speed_limit_rad_s:0.5 single_contact_limit_rad:0.06 both_contacts_goal:calibrated_forward rate_taper_limit_dps:12 loaded_rebound_ms:300 support_age_ms:60");
