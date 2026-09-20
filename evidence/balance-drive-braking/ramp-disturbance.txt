@@ -1,0 +1,42 @@
+{
+  "v4": {
+    "push": {
+      "falls": 9,
+      "new_falls": 0
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  },
+  "ramp12": {
+    "push": {
+      "falls": 9,
+      "new_falls": 1
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  },
+  "ramp16": {
+    "push": {
+      "falls": 10,
+      "new_falls": 2
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  },
+  "ramp20": {
+    "push": {
+      "falls": 9,
+      "new_falls": 1
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  }
+}

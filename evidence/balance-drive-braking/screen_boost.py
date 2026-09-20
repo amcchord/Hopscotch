@@ -5,9 +5,9 @@ for A,B,wn,z,delay,sign in itertools.product((8,25,45),(4,7,13,16),(40,60),(.35,
  p=replace(plant,A=A,B=B,motor_omega=wn,motor_zeta=z,motor_delay_s=delay,sensor_delay_s=.005)
  profile=lambda t:(sign*.53 if 2<=t<6 else 0,0,True)
  pair={}
- for label,dec,capture in [('v4',8,(False,1,2.5,8,60)),('ramp',20,(False,1,2.5,8,60)),('capture',20,(True,1,2.5,8,60)),('capture15',20,(True,1.5,3,10,60)),('capture05',20,(True,.5,1.5,6,60))]:
+ for label,dec,brake in [('v4',8,(0,0,1,4,.08)),('ramp',20,(0,0,1,4,.08)),('boost12',20,(3,12,1,4,.08)),('boost18',20,(3,18,1,4,.08)),('boost12soft',20,(3,12,2,6,.08))]:
   params=[8.8,1.5,3,.006,6,dec,.3,.12,1]
-  r,pp=run(params,profile,p,duration=18,capture=capture);t=np.array(r.t);v=np.array(r.wheel_vel);pos=np.array(r.drift)
+  r,pp=run(params,profile,p,duration=18,brake=brake);t=np.array(r.t);v=np.array(r.wheel_vel);pos=np.array(r.drift)
   ii=np.flatnonzero((t>=6)&(abs(v)<.3));calm=None
   for i in ii:
    if i+20<len(v) and max(abs(v[i:i+21]))<.3:calm=float(t[i]-6);break
@@ -18,4 +18,4 @@ summary={}
 for label in pair:
  c=[r for r in rows if r[label]['commanded'] and r['v4']['commanded'] and not r[label]['fell'] and not r['v4']['fell']]
  summary[label]=dict(falls=sum(r[label]['fell'] for r in rows),new_falls=sum(r[label]['fell'] and not r['v4']['fell'] for r in rows),captured=sum(r[label]['captured'] for r in rows),median_stop=float(np.median([r[label]['first_stop'] for r in c if r[label]['first_stop'] is not None])),median_calm=float(np.median([r[label]['calm_stop'] for r in c if r[label]['calm_stop'] is not None])),calm_count=sum(r[label]['calm_stop'] is not None for r in c),median_reverse=float(np.median([r[label]['peak_reverse'] for r in c])),median_travel=float(np.median([r[label]['travel'] for r in c])))
-print(json.dumps(summary,indent=2),flush=True);(OUT/'capture-screen.json').write_text(json.dumps(dict(summary=summary,cases=rows),indent=2)+'\n')
+print(json.dumps(summary,indent=2),flush=True);(OUT/'boost-screen.json').write_text(json.dumps(dict(summary=summary,cases=rows),indent=2)+'\n')

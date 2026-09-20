@@ -1,0 +1,5402 @@
+{
+  "summary": {
+    "v4": {
+      "push": {
+        "falls": 9,
+        "new_falls": 0
+      },
+      "replay": {
+        "falls": 10,
+        "new_falls": 0
+      }
+    },
+    "arm_capped20": {
+      "push": {
+        "falls": 10,
+        "new_falls": 1
+      },
+      "replay": {
+        "falls": 10,
+        "new_falls": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 6.095051879066249,
+        "tilt_span": 4.39094112470751,
+        "final_rms": 0.9201014303050117,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.5012097134674205,
+        "tilt_span": 5.358459093325848,
+        "final_rms": 2.8063981858333653,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.073078682389822,
+        "tilt_span": 5.6974326119576375,
+        "final_rms": 1.147532656692214,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.197884784411173,
+        "tilt_span": 6.970767795877919,
+        "final_rms": 1.0407747091033397,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 30.24964150307222,
+        "tilt_span": 18.294653693579335,
+        "final_rms": 18.334785177789694,
+        "requested": 1.914893627166748,
+        "ready_samples": 1632,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.459714053849411,
+        "tilt_span": 3.5762882609860327,
+        "final_rms": 0.6556471880330486,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.016620024512607,
+        "tilt_span": 5.730961679395648,
+        "final_rms": 1.2550933193112808,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.080831723792873,
+        "tilt_span": 6.834060581303504,
+        "final_rms": 1.473077346166768,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 6.4240951951627085,
+        "tilt_span": 4.683122447365363,
+        "final_rms": 2.511242758294314,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.0155804709982075,
+        "tilt_span": 5.420100836025526,
+        "final_rms": 1.0460285092267017,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.012751901709382,
+        "tilt_span": 5.741851219822294,
+        "final_rms": 0.6559800503850038,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.054914452085566,
+        "tilt_span": 6.9331725048504325,
+        "final_rms": 1.141529513221789,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.9546389831982154,
+        "tilt_span": 3.8135310168195815,
+        "final_rms": 1.4257558818988532,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.7506655454718345,
+        "tilt_span": 5.241314942164465,
+        "final_rms": 2.778496727503824,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.90953090486497,
+        "tilt_span": 5.82750990432983,
+        "final_rms": 1.7124151123361535,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.123558447841557,
+        "tilt_span": 7.204601907976624,
+        "final_rms": 1.1573606933903664,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.443752967079659,
+        "tilt_span": 3.18217232419029,
+        "final_rms": 1.4489475729949437,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.425460274044899,
+        "tilt_span": 3.0792371429028265,
+        "final_rms": 0.561829310977381,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.099429208960665,
+        "tilt_span": 5.676578893676634,
+        "final_rms": 1.1171354261914412,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.136177662587645,
+        "tilt_span": 6.57654116000721,
+        "final_rms": 1.436138294530095,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.998449353504028,
+        "tilt_span": 4.645671964620519,
+        "final_rms": 2.150650680796829,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 30.28,
+        "peak_velocity": 30.25104432439874,
+        "tilt_span": 40.7688848045707,
+        "final_rms": 21.4323948079612,
+        "requested": 1.914893627166748,
+        "ready_samples": 1394,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.070628321394814,
+        "tilt_span": 5.709018492394478,
+        "final_rms": 1.8133605283960381,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.09360657390323,
+        "tilt_span": 6.759992043828305,
+        "final_rms": 1.0388048301982988,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.398243523378899,
+        "tilt_span": 3.24673955932235,
+        "final_rms": 1.5755744927054087,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.314109934504713,
+        "tilt_span": 3.2303898042119954,
+        "final_rms": 1.7080285764397136,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.07119275582288,
+        "tilt_span": 5.705983203071128,
+        "final_rms": 1.5078218052078745,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.17126839989931,
+        "tilt_span": 7.01015488367841,
+        "final_rms": 1.5668470620211763,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 30.86,
+        "peak_velocity": 30.05407927728363,
+        "tilt_span": 42.02684584636056,
+        "final_rms": 20.342702236946938,
+        "requested": 1.914893627166748,
+        "ready_samples": 1418,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 33.7,
+        "peak_velocity": 30.06423843901741,
+        "tilt_span": 52.39987524459974,
+        "final_rms": 20.649985722147562,
+        "requested": 1.914893627166748,
+        "ready_samples": 1585,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.018131742171374,
+        "tilt_span": 5.739382300683701,
+        "final_rms": 0.6182712611883346,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.064020527121873,
+        "tilt_span": 6.925683155130102,
+        "final_rms": 1.2046550975884032,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.7870399987174155,
+        "tilt_span": 2.508050822247725,
+        "final_rms": 1.2223559953899943,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6894052369421844,
+        "tilt_span": 1.9617932763178487,
+        "final_rms": 0.6238918260970143,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.91333116678539,
+        "tilt_span": 6.436837097170468,
+        "final_rms": 1.069758442961237,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.753761693294738,
+        "tilt_span": 6.003684385998909,
+        "final_rms": 0.784810113588996,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.637841938760459,
+        "tilt_span": 2.709663810764326,
+        "final_rms": 0.9732973930730126,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.5438558267281315,
+        "tilt_span": 2.1063309995683426,
+        "final_rms": 1.1727917819539446,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.886034575430124,
+        "tilt_span": 6.44380233138601,
+        "final_rms": 0.7019206610261751,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.730307607973558,
+        "tilt_span": 5.988292427561603,
+        "final_rms": 0.8333607538807767,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6896029165201316,
+        "tilt_span": 2.6066018038123246,
+        "final_rms": 0.6830215875959385,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.196613089089846,
+        "tilt_span": 2.1493076866343017,
+        "final_rms": 0.7788487861111139,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.846792370429679,
+        "tilt_span": 6.434337239866565,
+        "final_rms": 1.0797520026565486,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.674826129908402,
+        "tilt_span": 5.957947151360983,
+        "final_rms": 0.8307864445900569,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.5416105097556825,
+        "tilt_span": 2.9551823868008427,
+        "final_rms": 0.9257330757369402,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.1137627058621304,
+        "tilt_span": 1.8266910073369615,
+        "final_rms": 0.5509488798254111,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.797058934769092,
+        "tilt_span": 6.442424533900393,
+        "final_rms": 1.3664783539131176,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.625413479533007,
+        "tilt_span": 5.914881113528992,
+        "final_rms": 0.8467707329825734,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.699746200165767,
+        "tilt_span": 2.6041854692706607,
+        "final_rms": 0.9113942382604109,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.4059229719609743,
+        "tilt_span": 2.0097386601071463,
+        "final_rms": 1.2404086545874284,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.9077796228485,
+        "tilt_span": 6.43280030581775,
+        "final_rms": 1.0688235284979752,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.712000856041456,
+        "tilt_span": 6.001453766975885,
+        "final_rms": 0.8493615326379439,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.5179754564783057,
+        "tilt_span": 2.3442620703036425,
+        "final_rms": 1.2179991099612855,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.584212062666492,
+        "tilt_span": 2.0925757213016993,
+        "final_rms": 1.2033450776597008,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.9045778041778,
+        "tilt_span": 6.441950460657367,
+        "final_rms": 0.8065774209528429,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.75128901593182,
+        "tilt_span": 6.001471869784552,
+        "final_rms": 0.680991534142192,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.8033448063194895,
+        "tilt_span": 2.6278248335033965,
+        "final_rms": 0.9367596578247886,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.7774323462839936,
+        "tilt_span": 2.674574096008598,
+        "final_rms": 0.9608259077078741,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.88761835560268,
+        "tilt_span": 6.42986721975025,
+        "final_rms": 0.9938537936655891,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.70854709859052,
+        "tilt_span": 5.992244063514647,
+        "final_rms": 0.6495793691134684,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.575162016284452,
+        "tilt_span": 2.398392533476269,
+        "final_rms": 0.8789605857735684,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.212313829950995,
+        "tilt_span": 2.04590101146988,
+        "final_rms": 0.8417251007673617,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.868225695562627,
+        "tilt_span": 6.439966938212066,
+        "final_rms": 1.060147642327955,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 9.710957012998247,
+        "tilt_span": 5.980858289102429,
+        "final_rms": 0.8550412674185842,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9540379204342857,
+        "tilt_span": 1.4658479877828512,
+        "final_rms": 1.2278839401316282,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9877286423727987,
+        "tilt_span": 1.4904019108562068,
+        "final_rms": 1.3479478995390222,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.03649229987037,
+        "tilt_span": 6.604599764167958,
+        "final_rms": 1.2868231335978377,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.675498479365416,
+        "tilt_span": 6.2918781711941705,
+        "final_rms": 1.1716539559414645,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.970888974422702,
+        "tilt_span": 4.2876939720933365,
+        "final_rms": 2.3235901957317924,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.03292101054549,
+        "tilt_span": 3.9477330595273656,
+        "final_rms": 2.314297755135124,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.074312637424906,
+        "tilt_span": 6.640778838472897,
+        "final_rms": 2.303750523179763,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.598900095815021,
+        "tilt_span": 6.342722636449153,
+        "final_rms": 1.1514949644906647,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0332571397952157,
+        "tilt_span": 1.4839682532069816,
+        "final_rms": 1.3374182673820982,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0087431613745688,
+        "tilt_span": 1.475920121836964,
+        "final_rms": 1.3131739224198484,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.007336418866348,
+        "tilt_span": 6.601892911525809,
+        "final_rms": 0.3809571827645519,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.618203406160564,
+        "tilt_span": 6.297067529764931,
+        "final_rms": 1.125802156121479,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0825026468836634,
+        "tilt_span": 1.5296990564099247,
+        "final_rms": 1.3419512084212184,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0410607220133348,
+        "tilt_span": 1.5114726863916133,
+        "final_rms": 1.299609732143494,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.0141043994050545,
+        "tilt_span": 6.629158309735146,
+        "final_rms": 0.3863044711356913,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.634525108023547,
+        "tilt_span": 6.304435439733112,
+        "final_rms": 1.062574442993489,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.035230192510045,
+        "tilt_span": 1.4789661851144018,
+        "final_rms": 1.420217737759055,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9962774431667665,
+        "tilt_span": 1.4604790481753867,
+        "final_rms": 1.3936874602373532,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.004026157205203,
+        "tilt_span": 6.573652989137798,
+        "final_rms": 0.3925157262338404,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.5718062008483,
+        "tilt_span": 6.294633767501011,
+        "final_rms": 1.102424212069195,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.01729536005316,
+        "tilt_span": 1.4827057439967888,
+        "final_rms": 1.3813337597066455,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0055325213932282,
+        "tilt_span": 1.4835148204991953,
+        "final_rms": 1.3992803482053071,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.022528650373582,
+        "tilt_span": 6.585631290444894,
+        "final_rms": 0.4242179685970608,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.491610379944081,
+        "tilt_span": 6.277222912370519,
+        "final_rms": 0.8904074055891646,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0170843330643176,
+        "tilt_span": 1.473801859562215,
+        "final_rms": 1.4025340170693747,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9795045694118922,
+        "tilt_span": 1.4564376717714396,
+        "final_rms": 1.3782801356819505,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.003918968930866,
+        "tilt_span": 6.577321994569573,
+        "final_rms": 0.37903103751571526,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.641571331146693,
+        "tilt_span": 6.297411337635964,
+        "final_rms": 1.165198536015936,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0072784843818052,
+        "tilt_span": 1.4784162057668766,
+        "final_rms": 1.346698229729974,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9828064263539995,
+        "tilt_span": 1.4703528391888057,
+        "final_rms": 1.3442166356718004,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.012613774855812,
+        "tilt_span": 6.599001576331034,
+        "final_rms": 0.38518013733678447,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.617476838961635,
+        "tilt_span": 6.306397763871743,
+        "final_rms": 1.11461042307168,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.6692724143227897,
+        "tilt_span": 3.930854462764117,
+        "final_rms": 1.4860964860364372,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.6692724143227897,
+        "tilt_span": 4.268027473989193,
+        "final_rms": 1.1286876419359209,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.879383578704291,
+        "tilt_span": 7.608336406834354,
+        "final_rms": 2.011767608704538,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 6.019195177150885,
+        "tilt_span": 7.161800269908127,
+        "final_rms": 0.46707452959854034,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.778621318847443,
+        "tilt_span": 6.790935769008101,
+        "final_rms": 3.173508708646268,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.778621318847443,
+        "tilt_span": 6.790935769008101,
+        "final_rms": 3.173508708646268,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.622601709893556,
+        "tilt_span": 6.510596853917278,
+        "final_rms": 3.263303590869177,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.622601709893556,
+        "tilt_span": 6.510596853917278,
+        "final_rms": 3.263303590869177,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9339759016816276,
+        "tilt_span": 1.633152137700577,
+        "final_rms": 1.5344187368021889,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.959748696869163,
+        "tilt_span": 1.6366999277207697,
+        "final_rms": 1.6207861037995337,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.416788321824517,
+        "tilt_span": 6.586946358389881,
+        "final_rms": 0.15868416232748878,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.078124515942419,
+        "tilt_span": 6.431619445959825,
+        "final_rms": 1.3236140078229388,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.1054779280405844,
+        "tilt_span": 1.8346373884966027,
+        "final_rms": 1.6225315686233057,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.0704511200434688,
+        "tilt_span": 2.2952068214184465,
+        "final_rms": 1.5982423246483397,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.618386039214767,
+        "tilt_span": 6.7161678383541386,
+        "final_rms": 1.5194572206462504,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 3.87947473558454,
+        "tilt_span": 6.211218957588528,
+        "final_rms": 1.5772879332868248,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9627238747761422,
+        "tilt_span": 1.584299999980118,
+        "final_rms": 1.616899293617116,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9570191371068628,
+        "tilt_span": 1.5694286569355143,
+        "final_rms": 1.6354034121063188,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.387089291438652,
+        "tilt_span": 6.540678357494016,
+        "final_rms": 0.24136984886989266,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.0694819882522335,
+        "tilt_span": 6.419472565750041,
+        "final_rms": 1.3251436293955046,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.9875018280691266,
+        "tilt_span": 2.7072349328176415,
+        "final_rms": 1.6038147407004961,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.490272780579134,
+        "tilt_span": 3.3082804536459207,
+        "final_rms": 1.7274982923126274,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.565267086406345,
+        "tilt_span": 6.579978810917822,
+        "final_rms": 1.7015806189274303,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 3.910366337049751,
+        "tilt_span": 6.079777139431243,
+        "final_rms": 1.6841902498878731,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9382591048800026,
+        "tilt_span": 1.5690340438432742,
+        "final_rms": 1.5876247882233254,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9366188912944065,
+        "tilt_span": 1.5594756874095452,
+        "final_rms": 1.6199560718784534,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.380304082924502,
+        "tilt_span": 6.538752524913775,
+        "final_rms": 0.1359599888911092,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.055629380748633,
+        "tilt_span": 6.40917698376856,
+        "final_rms": 1.3007096763189248,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9175032997873593,
+        "tilt_span": 1.5971409356999402,
+        "final_rms": 1.560048334628561,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 1.9222816867358392,
+        "tilt_span": 1.5938332628368528,
+        "final_rms": 1.602788753082349,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 8,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 4.425432582880609,
+        "tilt_span": 6.565496160611062,
+        "final_rms": 0.16904041541248485,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 5.081193775454575,
+        "tilt_span": 6.442918777918209,
+        "final_rms": 1.3135511779119005,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 24.005417076693284,
+        "tilt_span": 16.66060439365924,
+        "final_rms": 15.592982798513281,
+        "requested": 1.914893627166748,
+        "ready_samples": 197,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 23.986435302440032,
+        "tilt_span": 16.711094135720387,
+        "final_rms": 15.632007148621556,
+        "requested": 1.914893627166748,
+        "ready_samples": 197,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.02153463266321,
+        "tilt_span": 15.88859042388276,
+        "final_rms": 16.627286916173485,
+        "requested": 1.6799999475479126,
+        "ready_samples": 250,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.022769438550743,
+        "tilt_span": 15.888744116243913,
+        "final_rms": 16.627537661045068,
+        "requested": 1.6799999475479126,
+        "ready_samples": 250,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 25.612194288230487,
+        "tilt_span": 17.664538712483946,
+        "final_rms": 17.065116319461318,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 25.453029011446997,
+        "tilt_span": 17.615390258919163,
+        "final_rms": 17.037000514258967,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.76571803974332,
+        "tilt_span": 17.16560313132372,
+        "final_rms": 16.29277809130925,
+        "requested": 4.55999755859375,
+        "ready_samples": 274,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.698033270231875,
+        "tilt_span": 17.137336739288457,
+        "final_rms": 16.248395842037258,
+        "requested": 4.55999755859375,
+        "ready_samples": 274,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 27.510579230310796,
+        "tilt_span": 17.48094467935985,
+        "final_rms": 15.89508838705568,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 27.346101458510955,
+        "tilt_span": 17.494146277789298,
+        "final_rms": 15.864073292229575,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 30.064481560823747,
+        "tilt_span": 17.220710900539004,
+        "final_rms": 16.084703498607507,
+        "requested": 4.079998016357422,
+        "ready_samples": 270,
+        "emergency_samples": 1
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 30.055154571116688,
+        "tilt_span": 17.18873548773665,
+        "final_rms": 16.231581962581636,
+        "requested": 4.079998016357422,
+        "ready_samples": 270,
+        "emergency_samples": 1
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 29.592577546458667,
+        "tilt_span": 18.241011154080866,
+        "final_rms": 17.285208194630258,
+        "requested": 1.914893627166748,
+        "ready_samples": 150,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 29.602992123802085,
+        "tilt_span": 18.31720736881293,
+        "final_rms": 17.25838123240265,
+        "requested": 1.914893627166748,
+        "ready_samples": 150,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.65129618343738,
+        "tilt_span": 18.28351091223665,
+        "final_rms": 17.312575441520483,
+        "requested": 5.75999641418457,
+        "ready_samples": 284,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.423654481543206,
+        "tilt_span": 18.18448126758379,
+        "final_rms": 17.668684999993204,
+        "requested": 5.75999641418457,
+        "ready_samples": 284,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 23.504302792900724,
+        "tilt_span": 15.817114391581597,
+        "final_rms": 14.801333069578787,
+        "requested": 1.914893627166748,
+        "ready_samples": 203,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 23.509587595637058,
+        "tilt_span": 15.835352968019734,
+        "final_rms": 14.79970802864522,
+        "requested": 1.914893627166748,
+        "ready_samples": 203,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 26.16496398937557,
+        "tilt_span": 15.35355068079663,
+        "final_rms": 14.409498913738764,
+        "requested": 11.219999313354492,
+        "ready_samples": 361,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 25.443826869460842,
+        "tilt_span": 15.512207301122473,
+        "final_rms": 14.491616163446405,
+        "requested": 11.219999313354492,
+        "ready_samples": 361,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 24.725683516427495,
+        "tilt_span": 16.99529723343953,
+        "final_rms": 16.035930202799026,
+        "requested": 1.914893627166748,
+        "ready_samples": 196,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 24.727061860854953,
+        "tilt_span": 17.04045836205114,
+        "final_rms": 16.06659072242037,
+        "requested": 1.914893627166748,
+        "ready_samples": 196,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 26.72570665423092,
+        "tilt_span": 16.7342188082243,
+        "final_rms": 15.551446758758864,
+        "requested": 7.919994354248047,
+        "ready_samples": 302,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 26.510020326158525,
+        "tilt_span": 16.73782544849618,
+        "final_rms": 15.535767901405569,
+        "requested": 7.919994354248047,
+        "ready_samples": 302,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 24.598600096918943,
+        "tilt_span": 16.80299321038528,
+        "final_rms": 15.714264603652031,
+        "requested": 1.914893627166748,
+        "ready_samples": 197,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 24.56328345168955,
+        "tilt_span": 16.857892223956924,
+        "final_rms": 15.750239300980168,
+        "requested": 1.914893627166748,
+        "ready_samples": 197,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 26.667794797883484,
+        "tilt_span": 16.06289808285443,
+        "final_rms": 15.12873059314581,
+        "requested": 10.199992179870605,
+        "ready_samples": 321,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 25.694959409243186,
+        "tilt_span": 16.077688531335014,
+        "final_rms": 15.189446129854787,
+        "requested": 10.199992179870605,
+        "ready_samples": 321,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 27.44454525640174,
+        "tilt_span": 17.502699148769096,
+        "final_rms": 15.850038795318701,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 27.306129561379134,
+        "tilt_span": 17.511055651794067,
+        "final_rms": 15.832868219830617,
+        "requested": 1.914893627166748,
+        "ready_samples": 153,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 28.941431027908113,
+        "tilt_span": 16.95587607044095,
+        "final_rms": 15.626103011870143,
+        "requested": 11.219999313354492,
+        "ready_samples": 364,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 27.332054025615726,
+        "tilt_span": 16.931348189478655,
+        "final_rms": 15.646996107813147,
+        "requested": 11.219999313354492,
+        "ready_samples": 364,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.024080448946545,
+        "tilt_span": 2.325772029822417,
+        "final_rms": 1.0668763853380858,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.137727739531802,
+        "tilt_span": 2.180188074121247,
+        "final_rms": 0.46077061847385803,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.94188521165139,
+        "tilt_span": 4.204958975030593,
+        "final_rms": 0.8837415288159677,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.385956120304716,
+        "tilt_span": 7.791261677989141,
+        "final_rms": 0.8464245059603667,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.406404629808942,
+        "tilt_span": 2.3821613241726993,
+        "final_rms": 1.152042370930762,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.3174857657333603,
+        "tilt_span": 2.315474251009462,
+        "final_rms": 0.9130790900308591,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.949062210311087,
+        "tilt_span": 4.1661455888673515,
+        "final_rms": 1.2856536893243316,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.445015958356617,
+        "tilt_span": 7.817884933442812,
+        "final_rms": 0.783045952065277,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.1202881142490515,
+        "tilt_span": 2.408629674376641,
+        "final_rms": 1.1144934739389034,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.4106684642524514,
+        "tilt_span": 2.467170927716893,
+        "final_rms": 0.6947101983820737,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.92693053379823,
+        "tilt_span": 4.167968876601904,
+        "final_rms": 1.065747914231824,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.28959042193326,
+        "tilt_span": 8.24914997444246,
+        "final_rms": 0.9711558101246767,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.070404918394696,
+        "tilt_span": 2.6159834266910877,
+        "final_rms": 1.118972748239622,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.1135318343089855,
+        "tilt_span": 2.5742815475129532,
+        "final_rms": 1.0371316756241393,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.919604530521305,
+        "tilt_span": 4.113475529957427,
+        "final_rms": 0.9970368712763483,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.503924324777522,
+        "tilt_span": 8.194816487507595,
+        "final_rms": 1.267851213990133,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.118398300788983,
+        "tilt_span": 1.9659372541897966,
+        "final_rms": 0.931618593916242,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.8228420904259046,
+        "tilt_span": 1.985290789180823,
+        "final_rms": 0.930553336743236,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.922517182077748,
+        "tilt_span": 4.241156147774603,
+        "final_rms": 0.8896290295057911,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.36332206314534,
+        "tilt_span": 8.06530889366006,
+        "final_rms": 0.935080324259143,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.2335395209287165,
+        "tilt_span": 2.2112762737021825,
+        "final_rms": 1.0219386248226259,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.0917811255558605,
+        "tilt_span": 2.20089096391591,
+        "final_rms": 0.6366636457754162,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.9359473690769,
+        "tilt_span": 4.200282621239083,
+        "final_rms": 1.0104997087841026,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.41291821212187,
+        "tilt_span": 7.806824373793148,
+        "final_rms": 1.1948946618683347,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.1950718305387094,
+        "tilt_span": 2.203039629813091,
+        "final_rms": 0.8496038100137249,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.0327991905605134,
+        "tilt_span": 2.103437238409299,
+        "final_rms": 0.8467765180521301,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.915072941658863,
+        "tilt_span": 4.216893905874215,
+        "final_rms": 0.9515456823333881,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.396531634623226,
+        "tilt_span": 7.801125461829415,
+        "final_rms": 0.9045017278103057,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.4979132308963226,
+        "tilt_span": 2.501077451475709,
+        "final_rms": 0.9135292836494294,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.010622036722646,
+        "tilt_span": 2.194387487743313,
+        "final_rms": 0.99866366077279,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.92682778288356,
+        "tilt_span": 4.173109282887097,
+        "final_rms": 1.1989370248603595,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.293755818035724,
+        "tilt_span": 8.248047724928384,
+        "final_rms": 0.9540492035083404,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.54233393523517,
+        "tilt_span": 2.504171354575064,
+        "final_rms": 1.1036944411075378,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.472314786815657,
+        "tilt_span": 2.694861008489795,
+        "final_rms": 1.1318254275899475,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.148029228193808,
+        "tilt_span": 5.663730492191377,
+        "final_rms": 1.3870242361131293,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.761804157413854,
+        "tilt_span": 5.9210257422357415,
+        "final_rms": 1.3071404157583075,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.600214191170081,
+        "tilt_span": 4.17671840849701,
+        "final_rms": 2.421535435177637,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.664705645507008,
+        "tilt_span": 3.9971188672999602,
+        "final_rms": 2.375085611546643,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.736200625933547,
+        "tilt_span": 5.753139715353228,
+        "final_rms": 2.395078865791479,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.532132151581513,
+        "tilt_span": 5.70210509080718,
+        "final_rms": 2.353011038980936,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.477461504454071,
+        "tilt_span": 2.1986998923504615,
+        "final_rms": 1.039849121302118,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.3227518210880556,
+        "tilt_span": 2.1585233782286792,
+        "final_rms": 1.144397879400258,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.187355514032356,
+        "tilt_span": 5.643127772378236,
+        "final_rms": 1.3691269761980622,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.752594549284927,
+        "tilt_span": 5.628851556030085,
+        "final_rms": 1.304636214603866,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.841039216889472,
+        "tilt_span": 2.354902564508407,
+        "final_rms": 1.1382650384228659,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.8212071611263805,
+        "tilt_span": 2.5205233110168876,
+        "final_rms": 1.203713913529236,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.255860741238509,
+        "tilt_span": 5.6478345443262015,
+        "final_rms": 1.386602543819163,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.788087423781773,
+        "tilt_span": 5.9098203469523725,
+        "final_rms": 1.3865992673372034,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.174524778291791,
+        "tilt_span": 1.5906300005789689,
+        "final_rms": 1.1202180555272603,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.311478110307609,
+        "tilt_span": 2.0953334513070416,
+        "final_rms": 1.1249093196652844,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.167030563367492,
+        "tilt_span": 5.632063044248042,
+        "final_rms": 1.381832601979044,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.730447322045508,
+        "tilt_span": 5.900682545342207,
+        "final_rms": 1.3007878833126487,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.2003677012558023,
+        "tilt_span": 1.6477085097072006,
+        "final_rms": 1.0986847039370953,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.331101381181486,
+        "tilt_span": 2.1440005192561955,
+        "final_rms": 1.1890157368419332,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.180264970830386,
+        "tilt_span": 5.6268727313898665,
+        "final_rms": 1.3440802569188453,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.76124117598338,
+        "tilt_span": 5.902110172306934,
+        "final_rms": 1.2874785386947294,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.1637314576152997,
+        "tilt_span": 1.5424908674922335,
+        "final_rms": 1.0634299905014153,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.297312539674552,
+        "tilt_span": 2.296277252360724,
+        "final_rms": 1.1257925149316168,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.150136729684998,
+        "tilt_span": 5.639374577648994,
+        "final_rms": 1.3545224858637095,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.745838958418375,
+        "tilt_span": 5.9027654109567465,
+        "final_rms": 1.3497527873838047,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.617162731468695,
+        "tilt_span": 2.0960613684645466,
+        "final_rms": 1.0361798617300986,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.4299875682393672,
+        "tilt_span": 2.1822571712507823,
+        "final_rms": 1.1759361810128641,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 14.175018664370612,
+        "tilt_span": 5.641010520881281,
+        "final_rms": 1.3653050816988448,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.76107825998542,
+        "tilt_span": 5.901673749540507,
+        "final_rms": 1.293308607502497,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.166724385271622,
+        "tilt_span": 4.918932605339677,
+        "final_rms": 2.028577684763821,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.665006555356371,
+        "tilt_span": 5.09195187586235,
+        "final_rms": 2.2238893108502786,
+        "requested": 1.914893627166748,
+        "ready_samples": 1475,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.172252677267192,
+        "tilt_span": 5.993909086294153,
+        "final_rms": 2.334859081388868,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 11.808876069029667,
+        "tilt_span": 6.073430126203718,
+        "final_rms": 2.255461667249559,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 7.807625226446799,
+        "tilt_span": 7.698458117874267,
+        "final_rms": 3.619309037328157,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 7.807625226446799,
+        "tilt_span": 7.698458117874267,
+        "final_rms": 3.619309037328157,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 7.335801198344916,
+        "tilt_span": 7.569837748985094,
+        "final_rms": 3.3262792618182093,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 7.335801198344916,
+        "tilt_span": 7.569837748985094,
+        "final_rms": 3.3262792618182093,
+        "requested": 0.0,
+        "ready_samples": 40,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.2894221079248793,
+        "tilt_span": 2.3567484329686295,
+        "final_rms": 1.4396652456458532,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.369231532037928,
+        "tilt_span": 2.359909126146917,
+        "final_rms": 1.4812295164748888,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.697117603330339,
+        "tilt_span": 6.080226153824981,
+        "final_rms": 1.0966699034389489,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.176286009264187,
+        "tilt_span": 6.0570522704729655,
+        "final_rms": 1.0489082129927807,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.87621551975887,
+        "tilt_span": 3.4029990879401026,
+        "final_rms": 0.9587743452944844,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.9473944600446385,
+        "tilt_span": 3.419613649095311,
+        "final_rms": 0.9219448372099908,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.707550071228274,
+        "tilt_span": 6.144357406199902,
+        "final_rms": 1.3610413237207417,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.204688457389652,
+        "tilt_span": 6.091677273308264,
+        "final_rms": 1.326629626236434,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.244027835543644,
+        "tilt_span": 2.492964028658477,
+        "final_rms": 1.1168238187226294,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.2570265872718798,
+        "tilt_span": 2.4428053275627377,
+        "final_rms": 1.2102984725863195,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.827512466472559,
+        "tilt_span": 6.062999785422917,
+        "final_rms": 1.0985431781934403,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.214165693425182,
+        "tilt_span": 6.031733549137883,
+        "final_rms": 1.0613826601969663,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.7120603433284116,
+        "tilt_span": 3.4120416837243823,
+        "final_rms": 1.9265499636387875,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.5276800927539598,
+        "tilt_span": 3.005754167321328,
+        "final_rms": 1.8475818482977933,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 13.039451567119231,
+        "tilt_span": 6.082647364659081,
+        "final_rms": 2.0295995042674924,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.343375259827965,
+        "tilt_span": 6.095480062763741,
+        "final_rms": 1.9166772541274868,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.250066333575381,
+        "tilt_span": 2.337299353498338,
+        "final_rms": 1.274558701414483,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.2454688795821336,
+        "tilt_span": 2.332258237861282,
+        "final_rms": 1.2756568821642749,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.745697282195907,
+        "tilt_span": 6.06544608000695,
+        "final_rms": 1.0959870411847747,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.17262384728557,
+        "tilt_span": 6.032783231352155,
+        "final_rms": 1.0889134093433779,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.206055282320496,
+        "tilt_span": 2.3579527340098423,
+        "final_rms": 1.4226843688873072,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.588188052557594,
+        "tilt_span": 2.711516052283315,
+        "final_rms": 1.2033827595303617,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 25,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.743908917995336,
+        "tilt_span": 6.07505600107703,
+        "final_rms": 1.0748296271537816,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 12.19010853598167,
+        "tilt_span": 6.047842327687263,
+        "final_rms": 1.0836566657163647,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.66,
+        "peak_velocity": 30.157967018492673,
+        "tilt_span": 45.748866351625935,
+        "final_rms": 18.037382016125715,
+        "requested": 1.914893627166748,
+        "ready_samples": 139,
+        "emergency_samples": 22
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.66,
+        "peak_velocity": 30.157967018492673,
+        "tilt_span": 45.748866351625935,
+        "final_rms": 18.037382016125715,
+        "requested": 1.914893627166748,
+        "ready_samples": 139,
+        "emergency_samples": 22
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.56,
+        "peak_velocity": 31.06105246069848,
+        "tilt_span": 44.963015822342314,
+        "final_rms": 13.750668817368762,
+        "requested": 0.0,
+        "ready_samples": 121,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.56,
+        "peak_velocity": 31.06105246069848,
+        "tilt_span": 44.963015822342314,
+        "final_rms": 13.750668817368762,
+        "requested": 0.0,
+        "ready_samples": 121,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.594089984627082,
+        "tilt_span": 50.13664272118645,
+        "final_rms": 15.095188368586118,
+        "requested": 1.914893627166748,
+        "ready_samples": 129,
+        "emergency_samples": 20
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.594089984627082,
+        "tilt_span": 50.13664272118645,
+        "final_rms": 15.095188368586118,
+        "requested": 1.914893627166748,
+        "ready_samples": 129,
+        "emergency_samples": 20
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.68,
+        "peak_velocity": 31.148846769556517,
+        "tilt_span": 49.63269268609001,
+        "final_rms": 14.014554000045903,
+        "requested": 0.0,
+        "ready_samples": 127,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.68,
+        "peak_velocity": 31.148846769556517,
+        "tilt_span": 49.63269268609001,
+        "final_rms": 14.014554000045903,
+        "requested": 0.0,
+        "ready_samples": 127,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.48,
+        "peak_velocity": 30.144217620358326,
+        "tilt_span": 48.107022906745655,
+        "final_rms": 13.983012667664719,
+        "requested": 1.914893627166748,
+        "ready_samples": 128,
+        "emergency_samples": 19
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.48,
+        "peak_velocity": 30.144217620358326,
+        "tilt_span": 48.107022906745655,
+        "final_rms": 13.983012667664719,
+        "requested": 1.914893627166748,
+        "ready_samples": 128,
+        "emergency_samples": 19
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.31422722982952,
+        "tilt_span": 47.26897912007469,
+        "final_rms": 13.609198251018437,
+        "requested": 0.0,
+        "ready_samples": 122,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.31422722982952,
+        "tilt_span": 47.26897912007469,
+        "final_rms": 13.609198251018437,
+        "requested": 0.0,
+        "ready_samples": 122,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 2.2600000000000002,
+        "peak_velocity": 30.350258948122136,
+        "tilt_span": 46.518248984542794,
+        "final_rms": 12.592086974367644,
+        "requested": 0.0,
+        "ready_samples": 63,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 2.2600000000000002,
+        "peak_velocity": 30.350258948122136,
+        "tilt_span": 46.518248984542794,
+        "final_rms": 12.592086974367644,
+        "requested": 0.0,
+        "ready_samples": 63,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 2.2600000000000002,
+        "peak_velocity": 30.350258948122136,
+        "tilt_span": 46.518248984542794,
+        "final_rms": 12.592086974367644,
+        "requested": 0.0,
+        "ready_samples": 63,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 2.2600000000000002,
+        "peak_velocity": 30.350258948122136,
+        "tilt_span": 46.518248984542794,
+        "final_rms": 12.592086974367644,
+        "requested": 0.0,
+        "ready_samples": 63,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.16,
+        "peak_velocity": 30.371998838291166,
+        "tilt_span": 36.46944676726522,
+        "final_rms": 16.96042725205575,
+        "requested": 1.914893627166748,
+        "ready_samples": 103,
+        "emergency_samples": 18
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.14,
+        "peak_velocity": 30.361598258003195,
+        "tilt_span": 34.98826505321877,
+        "final_rms": 16.616345371136564,
+        "requested": 1.914893627166748,
+        "ready_samples": 103,
+        "emergency_samples": 18
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.7600000000000002,
+        "peak_velocity": 30.611936356397628,
+        "tilt_span": 44.4567201826076,
+        "final_rms": 14.153015702145348,
+        "requested": 0.0,
+        "ready_samples": 124,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.7600000000000002,
+        "peak_velocity": 30.611936356397628,
+        "tilt_span": 44.4567201826076,
+        "final_rms": 14.153015702145348,
+        "requested": 0.0,
+        "ready_samples": 124,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.44,
+        "peak_velocity": 30.198968954253903,
+        "tilt_span": 36.754336050541596,
+        "final_rms": 20.463038146032048,
+        "requested": 1.914893627166748,
+        "ready_samples": 102,
+        "emergency_samples": 22
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.44,
+        "peak_velocity": 30.198968954253903,
+        "tilt_span": 36.754336050541596,
+        "final_rms": 20.463038146032048,
+        "requested": 1.914893627166748,
+        "ready_samples": 102,
+        "emergency_samples": 22
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.652252909369555,
+        "tilt_span": 49.09132500442213,
+        "final_rms": 13.837117355529397,
+        "requested": 0.0,
+        "ready_samples": 120,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.652252909369555,
+        "tilt_span": 49.09132500442213,
+        "final_rms": 13.837117355529397,
+        "requested": 0.0,
+        "ready_samples": 120,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.058951740036346,
+        "tilt_span": 37.59369973872468,
+        "final_rms": 21.206063072696143,
+        "requested": 1.914893627166748,
+        "ready_samples": 102,
+        "emergency_samples": 22
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.52,
+        "peak_velocity": 30.058951740036346,
+        "tilt_span": 37.59369973872468,
+        "final_rms": 21.206063072696143,
+        "requested": 1.914893627166748,
+        "ready_samples": 102,
+        "emergency_samples": 22
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.54,
+        "peak_velocity": 30.173284927117866,
+        "tilt_span": 46.43393086206565,
+        "final_rms": 13.678262192336458,
+        "requested": 0.0,
+        "ready_samples": 121,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.54,
+        "peak_velocity": 30.173284927117866,
+        "tilt_span": 46.43393086206565,
+        "final_rms": 13.678262192336458,
+        "requested": 0.0,
+        "ready_samples": 121,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": true,
+        "end": 3.2600000000000002,
+        "peak_velocity": 30.146547487103845,
+        "tilt_span": 49.81631645905168,
+        "final_rms": 13.15752779616576,
+        "requested": 1.914893627166748,
+        "ready_samples": 113,
+        "emergency_samples": 24
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.24,
+        "peak_velocity": 30.158244158104477,
+        "tilt_span": 46.108700122402325,
+        "final_rms": 12.776538513522635,
+        "requested": 1.914893627166748,
+        "ready_samples": 113,
+        "emergency_samples": 23
+      }
+    },
+    {
+      "A": 45,
+      "B": 4,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 3.4,
+        "peak_velocity": 30.1784884866083,
+        "tilt_span": 46.66475414866213,
+        "final_rms": 13.485192682230705,
+        "requested": 0.0,
+        "ready_samples": 118,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 3.4,
+        "peak_velocity": 30.1784884866083,
+        "tilt_span": 46.66475414866213,
+        "final_rms": 13.485192682230705,
+        "requested": 0.0,
+        "ready_samples": 118,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 15.635059327157848,
+        "tilt_span": 13.064784180741654,
+        "final_rms": 9.256722012825637,
+        "requested": 1.914893627166748,
+        "ready_samples": 339,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 15.653934486052503,
+        "tilt_span": 13.080087215813933,
+        "final_rms": 9.309166625430475,
+        "requested": 1.914893627166748,
+        "ready_samples": 340,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.659072487229626,
+        "tilt_span": 11.886668544719214,
+        "final_rms": 10.071123222388378,
+        "requested": 11.219999313354492,
+        "ready_samples": 457,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.659072487229626,
+        "tilt_span": 12.633150145626303,
+        "final_rms": 10.588376001269856,
+        "requested": 11.219999313354492,
+        "ready_samples": 547,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.50818676591548,
+        "tilt_span": 13.961625825496228,
+        "final_rms": 9.8793749933045,
+        "requested": 1.914893627166748,
+        "ready_samples": 223,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.504843926002323,
+        "tilt_span": 13.965448402818794,
+        "final_rms": 9.992789793946505,
+        "requested": 1.914893627166748,
+        "ready_samples": 223,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 20.291844085525224,
+        "tilt_span": 13.10940737378722,
+        "final_rms": 9.782680157735896,
+        "requested": 11.219999313354492,
+        "ready_samples": 373,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 20.291844085525224,
+        "tilt_span": 13.658357224402224,
+        "final_rms": 9.916984228405271,
+        "requested": 11.219999313354492,
+        "ready_samples": 373,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.75799877408751,
+        "tilt_span": 14.188419560572626,
+        "final_rms": 10.734588761858804,
+        "requested": 1.914893627166748,
+        "ready_samples": 222,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.673611906219246,
+        "tilt_span": 14.162145866056989,
+        "final_rms": 10.821328510981402,
+        "requested": 1.914893627166748,
+        "ready_samples": 222,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.309611920058725,
+        "tilt_span": 13.077237394344081,
+        "final_rms": 9.912778975997536,
+        "requested": 11.219999313354492,
+        "ready_samples": 442,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 18.65585308319917,
+        "tilt_span": 13.86699069293826,
+        "final_rms": 10.725648497524295,
+        "requested": 11.219999313354492,
+        "ready_samples": 497,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 17.39121538637614,
+        "tilt_span": 14.773917136547553,
+        "final_rms": 11.01096690939797,
+        "requested": 1.914893627166748,
+        "ready_samples": 180,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 17.376371593411772,
+        "tilt_span": 14.734237811881925,
+        "final_rms": 11.169173227277419,
+        "requested": 1.914893627166748,
+        "ready_samples": 180,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 6.0,
+        "peak_velocity": 30.240085779179893,
+        "tilt_span": 41.05872659245964,
+        "final_rms": 15.565690538094952,
+        "requested": 0.0,
+        "ready_samples": 204,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 6.0,
+        "peak_velocity": 30.240085779179893,
+        "tilt_span": 41.05872659245964,
+        "final_rms": 15.565690538094952,
+        "requested": 0.0,
+        "ready_samples": 204,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 14.86061711552453,
+        "tilt_span": 12.6877828656134,
+        "final_rms": 10.032712359769938,
+        "requested": 1.914893627166748,
+        "ready_samples": 346,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 14.663468762049128,
+        "tilt_span": 12.645720008666345,
+        "final_rms": 10.028319320074479,
+        "requested": 1.914893627166748,
+        "ready_samples": 347,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 19.68767082849463,
+        "tilt_span": 12.611902518088101,
+        "final_rms": 9.99991719278989,
+        "requested": 11.219999313354492,
+        "ready_samples": 465,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 19.68767082849463,
+        "tilt_span": 12.562430059029666,
+        "final_rms": 10.290705143764761,
+        "requested": 11.219999313354492,
+        "ready_samples": 390,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.050546222507577,
+        "tilt_span": 13.53853538953365,
+        "final_rms": 10.309590525525559,
+        "requested": 1.914893627166748,
+        "ready_samples": 299,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.018518504129972,
+        "tilt_span": 13.533666199265866,
+        "final_rms": 10.34225409273151,
+        "requested": 1.914893627166748,
+        "ready_samples": 300,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.93212221468495,
+        "tilt_span": 12.592176654634244,
+        "final_rms": 9.393527166542244,
+        "requested": 11.219999313354492,
+        "ready_samples": 441,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.93212221468495,
+        "tilt_span": 12.352537472764212,
+        "final_rms": 10.253761844966046,
+        "requested": 11.219999313354492,
+        "ready_samples": 466,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 15.424620092978499,
+        "tilt_span": 13.325298494308228,
+        "final_rms": 10.362699756189096,
+        "requested": 1.914893627166748,
+        "ready_samples": 266,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 15.407764202104236,
+        "tilt_span": 13.323375373642861,
+        "final_rms": 10.297972387972283,
+        "requested": 1.914893627166748,
+        "ready_samples": 267,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 18.437323719995526,
+        "tilt_span": 12.352707866600056,
+        "final_rms": 9.469324987421736,
+        "requested": 11.219999313354492,
+        "ready_samples": 450,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 24.982479834485193,
+        "tilt_span": 13.279705787742557,
+        "final_rms": 9.168065187133282,
+        "requested": 16.079986572265625,
+        "ready_samples": 714,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.743831341488754,
+        "tilt_span": 14.167495144550728,
+        "final_rms": 10.89506721513301,
+        "requested": 1.914893627166748,
+        "ready_samples": 222,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 16.67213473635897,
+        "tilt_span": 14.143828558606415,
+        "final_rms": 10.970307685365254,
+        "requested": 1.914893627166748,
+        "ready_samples": 222,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 7,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.79643654950036,
+        "tilt_span": 13.457796481414164,
+        "final_rms": 9.646802111289933,
+        "requested": 11.219999313354492,
+        "ready_samples": 434,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 17.79643654950036,
+        "tilt_span": 13.003029725540188,
+        "final_rms": 10.351433164446563,
+        "requested": 11.219999313354492,
+        "ready_samples": 427,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.5699438322769246,
+        "tilt_span": 2.1743060488213786,
+        "final_rms": 1.0882224302682204,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.7474665073126077,
+        "tilt_span": 2.3118121488883503,
+        "final_rms": 1.060584834349273,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.391581743606558,
+        "tilt_span": 4.161629201733319,
+        "final_rms": 1.1261294713675039,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.540698258329865,
+        "tilt_span": 7.581882061988111,
+        "final_rms": 1.040331379051935,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 6.335039132560914,
+        "tilt_span": 4.929330815253067,
+        "final_rms": 2.878422887370993,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 6.070380495528565,
+        "tilt_span": 5.042698048818323,
+        "final_rms": 2.63271230374198,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.48409610745905,
+        "tilt_span": 4.204973083084454,
+        "final_rms": 2.428752029599336,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.451819682298243,
+        "tilt_span": 7.652070376588895,
+        "final_rms": 2.584521255675702,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.7648575898264447,
+        "tilt_span": 2.092856633741434,
+        "final_rms": 1.132459263731887,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6789673924001294,
+        "tilt_span": 2.123370413692683,
+        "final_rms": 1.0579270090004265,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.37021356538348,
+        "tilt_span": 4.131248005627171,
+        "final_rms": 1.0378395497717352,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.539619112871694,
+        "tilt_span": 7.568924711222792,
+        "final_rms": 0.9990802061231703,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.714646720368311,
+        "tilt_span": 2.138466631463487,
+        "final_rms": 0.9441967705854333,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.973092735675839,
+        "tilt_span": 2.2546140117108138,
+        "final_rms": 1.065367699910765,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.351161137210706,
+        "tilt_span": 4.129161415463486,
+        "final_rms": 0.9814698744492901,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.571693452602386,
+        "tilt_span": 7.5768722146569445,
+        "final_rms": 1.0387512962378578,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.415524590968725,
+        "tilt_span": 2.003352861230667,
+        "final_rms": 1.077998184308407,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.553289234936898,
+        "tilt_span": 2.037862952099516,
+        "final_rms": 1.0816083254248756,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.395094305035606,
+        "tilt_span": 4.154905435964594,
+        "final_rms": 0.9572787215632889,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.547659599331933,
+        "tilt_span": 7.68490964966449,
+        "final_rms": 1.0395345083626764,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6266023819469835,
+        "tilt_span": 1.9991068239620802,
+        "final_rms": 1.0075651693064753,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.586561540979668,
+        "tilt_span": 1.8364437543689434,
+        "final_rms": 0.888478754711707,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.39244999562115,
+        "tilt_span": 4.130049664209579,
+        "final_rms": 1.0195903211256068,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.543519826503925,
+        "tilt_span": 7.737178556669463,
+        "final_rms": 0.9488170542594332,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.583014669895721,
+        "tilt_span": 2.071954316653276,
+        "final_rms": 1.084021530913236,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.5363298766507616,
+        "tilt_span": 1.8120460311113362,
+        "final_rms": 1.081276785839486,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.37621805555902,
+        "tilt_span": 4.1286431085612065,
+        "final_rms": 1.0742751222138547,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.54182728628361,
+        "tilt_span": 7.719816306568845,
+        "final_rms": 0.9859501004507396,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6038192798073143,
+        "tilt_span": 1.91135569729407,
+        "final_rms": 0.9429553530945821,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6492669864075293,
+        "tilt_span": 2.186853188866621,
+        "final_rms": 1.1083259957562694,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 13,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.370779122976543,
+        "tilt_span": 4.124004676023077,
+        "final_rms": 1.0117893634232538,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 16.540842941831794,
+        "tilt_span": 7.574937110345928,
+        "final_rms": 1.148704147358608,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.264723834003617,
+        "tilt_span": 4.411279790247022,
+        "final_rms": 2.2430520258762243,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.231273988416259,
+        "tilt_span": 4.28236923853126,
+        "final_rms": 2.3765118772514042,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.502520596298995,
+        "tilt_span": 4.849359788285781,
+        "final_rms": 2.1143081095358705,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.532394784850526,
+        "tilt_span": 6.360107411884755,
+        "final_rms": 2.1969724461893656,
+        "requested": 17.8799991607666,
+        "ready_samples": 945,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.86640252642236,
+        "tilt_span": 7.137020839076797,
+        "final_rms": 3.0511915913166225,
+        "requested": 0.0,
+        "ready_samples": 45,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 5.86640252642236,
+        "tilt_span": 7.137020839076797,
+        "final_rms": 3.0511915913166225,
+        "requested": 0.0,
+        "ready_samples": 45,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": true,
+        "end": 56.800000000000004,
+        "peak_velocity": 31.112824194061524,
+        "tilt_span": 40.982012068709544,
+        "final_rms": 16.94376548364265,
+        "requested": 0.0,
+        "ready_samples": 45,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": true,
+        "end": 56.800000000000004,
+        "peak_velocity": 31.112824194061524,
+        "tilt_span": 40.982012068709544,
+        "final_rms": 16.94376548364265,
+        "requested": 0.0,
+        "ready_samples": 45,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.384645386018106,
+        "tilt_span": 2.255067888920891,
+        "final_rms": 1.1800585693116334,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.384645386018106,
+        "tilt_span": 2.0484598167287658,
+        "final_rms": 1.125854488735162,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.548697063648406,
+        "tilt_span": 4.748163410077225,
+        "final_rms": 1.1527621078287769,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.33653021653048,
+        "tilt_span": 7.213695842441169,
+        "final_rms": 1.1489115667207142,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.445410283960843,
+        "tilt_span": 2.89123579880183,
+        "final_rms": 1.2032406387982182,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.6979765934601265,
+        "tilt_span": 2.9512317851538086,
+        "final_rms": 1.1468320277430661,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 40,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.549317175264449,
+        "tilt_span": 4.818904756070339,
+        "final_rms": 1.017111477306116,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.375327738231134,
+        "tilt_span": 7.0139938826512775,
+        "final_rms": 1.109795471639955,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.336926611012517,
+        "tilt_span": 1.720886946379153,
+        "final_rms": 1.193837734941085,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.336926611012517,
+        "tilt_span": 1.9061568534892643,
+        "final_rms": 1.1410228272623986,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.51682293872025,
+        "tilt_span": 4.774792770227052,
+        "final_rms": 1.1363935204527424,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.301112211576896,
+        "tilt_span": 6.91600689106447,
+        "final_rms": 1.1531774209804726,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 4.364261380725638,
+        "tilt_span": 3.2557788855183105,
+        "final_rms": 1.3533395523606213,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 3.8387746953730364,
+        "tilt_span": 3.2983230876547083,
+        "final_rms": 1.2027672384578867,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.35,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.443193574843361,
+        "tilt_span": 4.775586309268704,
+        "final_rms": 1.6190280447466665,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.545721335012296,
+        "tilt_span": 6.347254616954217,
+        "final_rms": 1.6635967505476668,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.334748330256001,
+        "tilt_span": 1.7014203470278915,
+        "final_rms": 1.040822864184743,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.334748330256001,
+        "tilt_span": 1.772372046255228,
+        "final_rms": 1.108466181217394,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.483738996315335,
+        "tilt_span": 4.767224100370711,
+        "final_rms": 1.11686793091935,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.294688933660927,
+        "tilt_span": 6.913961261034402,
+        "final_rms": 1.1164263226029965,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "push",
+      "v4": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.455553574298443,
+        "tilt_span": 1.9897805360009073,
+        "final_rms": 1.2107605783611934,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 35.980000000000004,
+        "peak_velocity": 2.4834356229181873,
+        "tilt_span": 2.1581833379266584,
+        "final_rms": 1.1218479908011931,
+        "requested": 1.914893627166748,
+        "ready_samples": 1781,
+        "emergency_samples": 0
+      }
+    },
+    {
+      "A": 45,
+      "B": 16,
+      "wn": 60,
+      "z": 0.6,
+      "delay": 0.01,
+      "profile": "replay",
+      "v4": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.525737017011586,
+        "tilt_span": 4.756535830758054,
+        "final_rms": 1.0975821436788056,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      },
+      "arm_capped20": {
+        "fell": false,
+        "end": 57.980000000000004,
+        "peak_velocity": 15.33923597187569,
+        "tilt_span": 7.210126613206924,
+        "final_rms": 1.083835607270167,
+        "requested": 17.8799991607666,
+        "ready_samples": 2881,
+        "emergency_samples": 0
+      }
+    }
+  ]
+}

@@ -6,8 +6,7 @@ struct PilotConfig {
     float deadband, max_velocity, max_turn, acceleration, deceleration, turn_acceleration;
     float ready_ms, stop_ms;
     float arm_gain, arm_limit, arm_tau;
-    float fast_deceleration, brake_start_speed, brake_full_speed;
-    float arm_brake_limit; // zero retains arm_limit for older offline bridges
+    float arm_brake_limit; // optional later experiment; zero preserves original
 };
 
 // CH2 commands average wheel velocity through the balance cascade. CH1 commands
@@ -44,22 +43,12 @@ public:
         const float step_dt = timing_ok ? dt : .02f;
         const bool braking = _velocity * requested_velocity < 0
                           || std::fabs(requested_velocity) < std::fabs(_velocity);
-        float brake_rate = c.deceleration;
-        if (c.fast_deceleration > c.deceleration && c.brake_full_speed > c.brake_start_speed) {
-            brake_rate += (c.fast_deceleration-c.deceleration)
-                * clamp((std::fabs(_velocity)-c.brake_start_speed)
-                        / (c.brake_full_speed-c.brake_start_speed),0,1);
-        }
-        _fast_braking = braking && brake_rate > c.deceleration;
         const float previous_velocity = _velocity;
         _velocity = approach(_velocity, requested_velocity,
-                             braking ? brake_rate : c.acceleration, step_dt);
-        // Faster reference braking must not make a larger shoulder swing than
-        // the smooth v4 release. Keep the tested braking-arm amplitude.
-        const float arm_limit = _fast_braking && c.arm_brake_limit > 0
-                              ? std::fmin(c.arm_limit,c.arm_brake_limit) : c.arm_limit;
+                             braking ? c.deceleration : c.acceleration, step_dt);
+        const float limit = braking && c.arm_brake_limit>0 ? std::fmin(c.arm_limit,c.arm_brake_limit) : c.arm_limit;
         const float arm_target = clamp(-c.arm_gain*(_velocity-previous_velocity)/step_dt,
-                                       -arm_limit,arm_limit);
+                                       -limit,limit);
         _arm += step_dt/(c.arm_tau+step_dt)*(arm_target-_arm);
         _turn = approach(_turn, requested_turn, c.turn_acceleration, step_dt);
         const bool was_turning = _turning;
@@ -76,7 +65,7 @@ public:
     }
     bool ready() const { return _ready; }
     bool moving() const { return _moving; } // includes braking until calm
-    bool fastBraking() const { return _fast_braking; }
+    bool stopping() const { return _moving && (!_ready || _forward_stick == 0); }
     bool turning() const { return _turning; }
     bool captureHeading() const { return _capture_heading; }
     float velocity() const { return _velocity; }
@@ -108,7 +97,6 @@ private:
     float _velocity=0, _turn=0, _neutral_ms=0, _stop_ms=0;
     float _forward_stick=0, _turn_stick=0;
     float _arm=0;
-    bool _fast_braking=false;
     bool _ready=false, _moving=false, _turning=false, _capture_heading=false;
 };
 }  // namespace balance_math

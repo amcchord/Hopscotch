@@ -1200,7 +1200,9 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             BALANCE_PILOT_DEADBAND, BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
             BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_TURN_ACCEL,
             BALANCE_PILOT_READY_MS, BALANCE_PILOT_STOP_MS,
-            BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU
+            BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU,
+            BALANCE_PILOT_FAST_DECEL, BALANCE_PILOT_BRAKE_START_SPEED,
+            BALANCE_PILOT_BRAKE_FULL_SPEED, BALANCE_PILOT_ARM_BRAKE_LIMIT
         };
         _pilot_input_valid = pilot_valid;
         const bool pilot_allowed = pilot_valid && _ramp_complete && !recovering
@@ -1839,7 +1841,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.pilot_turn = _pilot.turn();
     s.pilot_flags = (_pilot.ready() ? 1 : 0) | (_pilot.moving() ? 2 : 0)
                   | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0)
-                  | (_pilot_drive_active ? 16 : 0)
+                  | (_pilot_drive_active ? 16 : 0) | (_pilot.fastBraking() ? 32 : 0)
                   | (_lowering.active() ? 64 : 0)
                   | (static_cast<uint32_t>(_lowering.phase()) << 8);
     s.pilot_arm = _pilot_arm_applied;
@@ -1868,7 +1870,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 1023 | 2048; // prior extensions plus experimental supported lowering
+    header.reserved = 4095; // prior extensions plus progressive braking and supported lowering
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -2028,8 +2030,14 @@ void BalanceController::dumpLog(Print* sink) {
     if (header.reserved & 64) {
         // Decode the stored version; exporting an older log must retain its limits.
         if (header.reserved & 512) {
-            out.println("# standing_drive=ch1_ch2_damped_acceleration_arms_v4");
-            out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
+            if (header.reserved & 1024) {
+                out.println("# standing_drive=ch1_ch2_progressive_braking_v5");
+                out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
+                out.println("# standing_drive_brake=fast_decel:20 start_reference_rad_s:4 full_reference_rad_s:8 low_speed_decel:8 arm_brake_limit_fraction:0.0666667 active_flag:32");
+            } else {
+                out.println("# standing_drive=ch1_ch2_damped_acceleration_arms_v4");
+                out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
+            }
             out.println("# standing_drive_acceleration=angle_k:8.8 rate_k:1.5 speed_k:3 speed_error_limit:8 accel_limit:100 handoff_rate:30");
             out.println("# standing_drive_rate_filter=tau_s:0.006 fresh_sample_dt:1 stationary_filter_unchanged:1");
             out.println("# standing_drive_learning=max_abs_velocity_error:1 velocity_p:0");
@@ -2283,9 +2291,9 @@ void BalanceController::printStatus() {
     Serial.printf("  Standing drive: CH1 steer / CH2 speed, limit %.2f rad/s, turn %.2f rad/s, %s\n",
                   BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
                   _state == BalanceState::Balancing && _pilot.ready() ? "READY" : "waiting for centered calm balance");
-    Serial.printf("  Driving v4: rate_tau=%.3fs rate_k=%.2f accel=%.1f brake=%.1f graded_arms=YES\n",
+    Serial.printf("  Driving v5: rate_tau=%.3fs rate_k=%.2f accel=%.1f brake=%.1f..%.1f progressive_arms=YES\n",
                   BALANCE_DRIVE_RATE_TAU, BALANCE_DRIVE_RATE_K,
-                  BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL);
+                  BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_FAST_DECEL);
 
     if (_state == BalanceState::Balancing) {
         Serial.printf("  Setpoint: %.2f  (base + offset=%+.2f)\n",

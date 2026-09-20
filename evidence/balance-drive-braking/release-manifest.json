@@ -1,0 +1,21 @@
+{
+  "source_commit": "43b1967dd03d26d8b2ccf6a698901c56272039d2",
+  "branch": "codex/drive-braking",
+  "build_utc": "2026-09-20T03:45:52Z",
+  "application_bytes": 1194224,
+  "application_sha256": "a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982",
+  "esp_image_digest": "bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3",
+  "features": 4095,
+  "partition_capacity": 3342336,
+  "private_configuration_verified": true,
+  "secret_header_copied": false,
+  "update_method": "authenticated application-only OTA",
+  "rollback_application": "/Users/austinmcchord/Development/Hopscotch/artifacts/wifi-ota/release/firmware.bin",
+  "rollback_sha256": "3bd85bfdd26f48df86c5d87b76797282f4c2479a7e96b2838217f479553171cf",
+  "components": [
+    "progressive braking v5",
+    "ground-drive gate",
+    "supported CH11 lowering v1",
+    "existing radio/Wi-Fi/OTA"
+  ]
+}
