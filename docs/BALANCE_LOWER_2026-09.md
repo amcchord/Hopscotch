@@ -1,9 +1,11 @@
 # Experimental CH11 return to flat
 
-**September 20 operator follow-up:** driving is reported to work very well, but
-the first CH11 lowering attempt failed with apparent backward lean. Preserve
-that run and hold further lowering attempts while the lowering task diagnoses
-the telemetry. The cause is not yet established; see [current state](progress/CURRENT.md).
+**September 20 operator follow-up:** driving worked very well, but installed v1
+lowering tipped backward without intervention. The failed run is archived and
+replayed. A forward-fall/catch v2 candidate is queued, **not installed**; hold
+further v1 lowering attempts. See [current state](progress/CURRENT.md) for the
+candidate evidence and release status. The v1 procedure below is retained as
+installed-behavior documentation, not an instruction to repeat the failed trial.
 
 **Integration update:** this feature is included in installed combined source
 `43b1967`. See [current state](progress/CURRENT.md) and the [combined release

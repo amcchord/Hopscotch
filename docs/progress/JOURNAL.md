@@ -175,3 +175,30 @@ diagnosis of the latest onboard run in its isolated lowering worktree. Updated
 CURRENT and the active lowering/test guides to hold further lowering trials.
 No new source change, device request, log download or flash was performed by
 the root integration task; the deployed source remains `43b1967`.
+
+## 2026-09-20 — Queue forward-fall/catch lowering v2; no deployment
+
+The lowering owner published physical-trial archive `f011ce6` and candidate
+`13d4ee2` on `codex/balance-lower`, based on deployed release `eb2bb23`. Austin
+confirmed v1 tipped backward on its own and clarified forward fall followed by
+an arm catch. The validated 2,371-row CSV/wire and historical C++ replay match
+all recorded phases: reaching never qualified support, canceled, then exceeded
+the motion limit. [Trial diagnosis](https://github.com/amcchord/Hopscotch/blob/13d4ee2aa51afe7e5ab7aebf32b711da403a1fb1/evidence/balance-lower/trial-20260920/README.md).
+
+The new candidate deliberately transfers out of upright control, initiates
+forward rotation, holds each arm at first load and requires two-arm support plus
+measured falling/deceleration before supported descent. Ten native executables,
+27 Python tests and full pinned build passed in the owner's worktree. The 229
+coupled model cases include 216 variants (180 complete, 36 preparation faults),
+11 failures with no false success, nominal and high-inertia cases. Nominal is
+19.90 seconds; completed variants can catch at 55.15°/s, so physical grace and
+impact safety remain unverified. [Candidate evidence](https://github.com/amcchord/Hopscotch/blob/13d4ee2aa51afe7e5ab7aebf32b711da403a1fb1/evidence/balance-lower/forward-catch-v2/README.md).
+
+Independently compared all 11 listed production-preservation files with deployed
+`eb2bb23`; they are byte-identical. Root firmware remains exactly installed
+`43b1967`, app1; candidate flags 8191 do not describe the installed 4095 image.
+Updated CURRENT and the trial notices to identify the queued candidate and hold
+retries of v1. The release owner has the integration handoff; no unrequested OTA
+is part of this task. Root changes are documentation only, with no device
+requests, settings writes or motion. Additional radio fix `605c66d` is preserved
+and published on its existing branch, separate from the firmware snapshot.
