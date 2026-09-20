@@ -128,3 +128,7 @@ was considered but unnecessary because the owner's commit arrived first; no
 extra branch was created and no other worktree/index was modified here.
 All seven branch checkpoints, including the final braking work, are published.
 Agents may continue with new work after this snapshot.
+
+A new clean `codex/balance-lower` worktree appeared during final verification,
+starting at the already published `10766f7`. Published that branch as well,
+bringing this checkpoint to eight branches. This task did not change its files.
