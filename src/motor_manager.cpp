@@ -464,6 +464,12 @@ bool MotorManager::sendArmPosition(MotorRole role, float position_rad, float spe
     return _can->sendPositionCommand(m.can_id, CAN_HOST_ID, position_rad, speed_limit_rad_s);
 }
 
+bool MotorManager::requestMotionFeedback(MotorRole role) {
+    const int idx = static_cast<int>(role);
+    return _can && idx >= 0 && idx < NUM_MOTORS
+        && _can->sendMotionPing(_motors[idx].can_id);
+}
+
 void MotorManager::processFeedback() {
     if (!_can) return;
 

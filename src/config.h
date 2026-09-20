@@ -184,6 +184,8 @@ static constexpr float    BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S = 0.30f;
 static constexpr uint32_t BALANCE_FAST_TIP_CAPTURE_MS = 120;
 static constexpr uint32_t BALANCE_FAST_TIP_STALL_MS = 400;
 static constexpr uint32_t BALANCE_FAST_TIP_TIMEOUT_MS = 4500;
+static constexpr uint32_t BALANCE_FAST_TIP_START_TIMEOUT_MS = 1000;
+static constexpr uint32_t BALANCE_FAST_TIP_START_QUIET_MS = 100;
 static constexpr float    BALANCE_ARM_RETURN_SPEED      = 1.5f;    // rad/s. 2.5 was dynamically infeasible: the equilibrium
                                                                    // moved 3 deg in 1s while the robot's tilt never budged --
                                                                    // velocity-mode PD chases a moving equilibrium with

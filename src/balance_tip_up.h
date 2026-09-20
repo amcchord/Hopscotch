@@ -23,19 +23,26 @@ struct TipInput {
 // approach both endpoints smoothly instead of its minimum-speed tail.
 class FastTipUp {
 public:
-    bool begin(uint32_t now, const TipInput& in) {
-        *this = FastTipUp{};
-        if (!valid(in) || std::fabs(in.tilt) > BALANCE_FAST_TIP_START_TILT_DEG
-            || std::fabs(in.rate) > BALANCE_FAST_TIP_CAPTURE_RATE_DPS
-            || std::fabs(in.left) > BALANCE_ARM_REACHED_RAD
-            || std::fabs(in.right) > BALANCE_ARM_REACHED_RAD
+    static const char* startIssue(const TipInput& in) {
+        if (!valid(in)) return "Fast start blocked: motor/IMU feedback";
+        if (std::fabs(in.tilt) > BALANCE_FAST_TIP_START_TILT_DEG)
+            return "Fast start blocked: robot not flat";
+        if (std::fabs(in.left) > BALANCE_ARM_REACHED_RAD
+            || std::fabs(in.right) > BALANCE_ARM_REACHED_RAD)
+            return "Fast start blocked: arms not at Forward";
+        if (std::fabs(in.rate) > BALANCE_FAST_TIP_CAPTURE_RATE_DPS
             || std::fabs(in.left_velocity) > BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S
             || std::fabs(in.right_velocity) > BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S
             || std::fabs(in.wheel_left) > BALANCE_FAST_TIP_START_WHEEL_RAD_S
-            || std::fabs(in.wheel_right) > BALANCE_FAST_TIP_START_WHEEL_RAD_S) {
-            _fault = "fast_tip_start_pose";
-            return false;
-        }
+            || std::fabs(in.wheel_right) > BALANCE_FAST_TIP_START_WHEEL_RAD_S)
+            return "Fast start blocked: robot moving";
+        return nullptr;
+    }
+
+    bool begin(uint32_t now, const TipInput& in) {
+        *this = FastTipUp{};
+        _fault = startIssue(in);
+        if (_fault) return false;
         _start_ms = _last_step_ms = now;
         _left = in.left;
         _right = in.right;
@@ -101,7 +108,7 @@ public:
     const char* fault() const { return _fault; }
 
 private:
-    bool valid(const TipInput& in) const {
+    static bool valid(const TipInput& in) {
         return in.healthy && std::isfinite(in.tilt) && std::isfinite(in.rate)
             && std::isfinite(in.left) && std::isfinite(in.right)
             && std::isfinite(in.left_velocity) && std::isfinite(in.right_velocity)
@@ -128,6 +135,38 @@ private:
     float _left = 0, _right = 0;
     float _distance_l = 0, _distance_r = 0, _distance = 0, _elapsed = 0;
     const char* _fault = nullptr;
+};
+
+// Wheel mode setup temporarily blocks feedback processing. Return to the normal
+// control loop before qualifying a start; hold the current targets throughout.
+// This does not relax the fresh-feedback or physical starting-pose requirements.
+class FastTipStart {
+public:
+    void request(uint32_t now) {
+        *this = FastTipStart{};
+        _started = now;
+    }
+    bool step(uint32_t now, const TipInput& in) {
+        if (_failed) return false;
+        const char* issue = FastTipUp::startIssue(in);
+        if (issue) { _status = issue; _quiet = false; }
+        else {
+            _status = "Fast start: confirming stationary pose";
+            if (!_quiet) { _quiet = true; _quiet_since = now; }
+        }
+        if (now - _started >= BALANCE_FAST_TIP_START_TIMEOUT_MS) {
+            if (!issue) _status = "Fast start blocked: pose did not stay quiet";
+            _failed = true;
+            return false;
+        }
+        return _quiet && now - _quiet_since >= BALANCE_FAST_TIP_START_QUIET_MS;
+    }
+    bool failed() const { return _failed; }
+    const char* status() const { return _status; }
+private:
+    uint32_t _started = 0, _quiet_since = 0;
+    bool _quiet = false, _failed = false;
+    const char* _status = "Fast start blocked: motor/IMU feedback";
 };
 
 } // namespace balance_math

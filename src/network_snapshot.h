@@ -21,6 +21,7 @@ struct NetworkSnapshot {
     float tilt = 0, rate = 0, setpoint = 0, voltage = 0, current = 0;
     bool voltage_fresh = false, current_fresh = false;
     char balance_state[24] = {}, end_reason[48] = {};
+    char start_status[64] = {};
     NetworkMotor motors[6];
     LoopTiming balance_timing, control_timing;
 };

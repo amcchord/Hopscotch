@@ -79,6 +79,7 @@ public:
     uint32_t getImuSampleUs() const { return _last_imu_sample_us; }
     uint16_t getInnerFault() const { return _inner_fault; }
     const char* getLogEndReason() const { return _log_end_reason; }
+    const char* getStartStatus() const { return _tip_start_status; }
 
     // Gain setters for serial tuning
     void setKp(float v) { _kp = v; }
@@ -238,6 +239,10 @@ private:
 
     // Arm ramp state (control task only)
     balance_math::FastTipUp _fast_tip;
+    balance_math::FastTipStart _fast_tip_start;
+    bool _fast_tip_pending = false;
+    uint8_t _fast_tip_feedback_index = 0;
+    const char* _tip_start_status = ""; // control-owned, bounded literal copied into network snapshot
     bool _fast_tip_run = false; // latched until the next new run, also saved per sample
     balance_math::TipInput tipInput(bool pilot_valid) const;
     float _arm_left_target  = 0.0f;

@@ -43,6 +43,55 @@ int main(int argc, char** argv) {
     assert(balance_math::fastTipSelected(.501f));
     assert(balance_math::fastTipSelected(1));
 
+    // Integration regression: wheel setup blocked the feedback owner long
+    // enough that the old immediate begin() rejected a healthy stationary pose.
+    // Resume the owner, poll two motors/tick, then require continuously fresh
+    // real samples and a quiet pose before the first trajectory command.
+    for (uint32_t origin : {0U, UINT32_MAX-300U}) {
+        FastTipUp old_attempt; auto measured=flat(); measured.healthy=false;
+        assert(!old_attempt.begin(origin+140,measured));
+        balance_math::FastTipStart start; start.request(origin+140);
+        uint32_t sampled[6]={origin,origin,origin,origin,origin,origin};
+        bool ready=false;
+        for (uint32_t elapsed=20;elapsed<=240;elapsed+=20) {
+            const uint32_t now=origin+140+elapsed;
+            measured.healthy=true;
+            for (uint32_t sample : sampled) measured.healthy &= uint32_t(now-sample)<=100;
+            ready=start.step(now,measured);
+            if (elapsed<180) assert(!ready);
+            assert(!start.failed());
+            // Replies are processed AFTER this iteration, not fabricated when
+            // the request is enqueued. The next tick sees these samples.
+            const int first=((elapsed/20-1)*2)%6;
+            sampled[first]=sampled[first+1]=now;
+        }
+        assert(ready);
+        FastTipUp restarted;
+        assert(restarted.begin(origin+380,measured));
+        assert(restarted.left()==0 && restarted.right()==0 && !restarted.ready());
+    }
+
+    // Never proceed with absent feedback, wrong pose or unstable motion, and
+    // do not remain pending forever. A new request explicitly resets failure.
+    for(int failure=0;failure<5;++failure) {
+        balance_math::FastTipStart start; start.request(0); auto measured=flat();
+        for(uint32_t now=20;now<=1000;now+=20) {
+            measured=flat();
+            if(failure==0) measured.healthy=false;
+            if(failure==1) measured.tilt=14;
+            if(failure==2) measured.left=.2f;
+            if(failure==3) measured.left_velocity=.4f;
+            if(failure==4 && (now/20)%3==0) measured.right_velocity=.4f;
+            assert(!start.step(now,measured));
+        }
+        assert(start.failed());
+        assert(std::strstr(start.status(), "blocked") != nullptr);
+        assert(!start.step(1020,flat()));
+        start.request(1100);
+        for(uint32_t now=1120;now<1220;now+=20) assert(!start.step(now,flat()));
+        assert(start.step(1220,flat()));
+    }
+
     // The fast mode refuses partial/manual arm poses and movement at startup.
     for (int kind=0; kind<10; ++kind) {
         FastTipUp tip; auto in=flat();
