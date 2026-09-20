@@ -182,8 +182,6 @@ private:
     volatile float _pilot_velocity_ff = 0; // requested speed for the 200 Hz driving controller
     volatile float _pilot_measured_vel = 0; // 50 Hz filtered feedback snapshot
     volatile bool _pilot_driving = false;
-    volatile bool _pilot_stopping = false;
-    volatile bool _pilot_brake_active = false;
     balance_math::BalanceDrive _pilot_drive;
     balance_math::DriveArmRecovery _drive_arm_recovery; // control-task owned
     volatile bool _pilot_drive_active = false;

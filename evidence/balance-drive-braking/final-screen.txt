@@ -1,0 +1,85 @@
+Neutral identical: 324
+CSV columns ['t_ms', 'sample_dt_ms', 'inner_dt_max_us', 'inner_ticks', 'inner_sat_ticks', 'state', 'flags', 'diag_flags']
+Completed driving conditions: 168
+Completed driving conditions: 336
+Completed driving conditions: 504
+Completed driving conditions: 672
+{
+  "small": {
+    "cases": 96,
+    "v4_falls": 8,
+    "candidate_falls": 8,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 85,
+    "v4_ring_median": 0.00034042692238222817,
+    "candidate_ring_median": 0.00034042692238222817
+  },
+  "full": {
+    "cases": 96,
+    "v4_falls": 8,
+    "candidate_falls": 8,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 85,
+    "v4_ring_median": 0.0001967216631034417,
+    "candidate_ring_median": 0.00027908066947951655
+  },
+  "reverse": {
+    "cases": 96,
+    "v4_falls": 8,
+    "candidate_falls": 8,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 85,
+    "v4_ring_median": 0.0001879732154863053,
+    "candidate_ring_median": 0.00017847024475173
+  },
+  "loss": {
+    "cases": 96,
+    "v4_falls": 8,
+    "candidate_falls": 8,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 85,
+    "v4_ring_median": 0.0003390579530302873,
+    "candidate_ring_median": 0.00042803839179978386
+  },
+  "turn": {
+    "cases": 96,
+    "v4_falls": 8,
+    "candidate_falls": 8,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 85,
+    "v4_ring_median": 0.0005387953275987913,
+    "candidate_ring_median": 0.0005387953275987913
+  },
+  "push": {
+    "cases": 96,
+    "v4_falls": 9,
+    "candidate_falls": 9,
+    "new_falls": 0,
+    "v4_commanded": 92,
+    "candidate_commanded": 92,
+    "common_standing_commanded": 84,
+    "v4_ring_median": 0.0004177233584017104,
+    "candidate_ring_median": 0.0004177233584017104
+  },
+  "replay": {
+    "cases": 96,
+    "v4_falls": 10,
+    "candidate_falls": 10,
+    "new_falls": 0,
+    "v4_commanded": 84,
+    "candidate_commanded": 84,
+    "common_standing_commanded": 84,
+    "v4_ring_median": 0.0002194316043350169,
+    "candidate_ring_median": 0.00029115664997297213
+  }
+}

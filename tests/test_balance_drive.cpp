@@ -6,43 +6,9 @@
 
 static const balance_math::DriveConfig c = {
     BALANCE_DRIVE_ANGLE_K, BALANCE_DRIVE_RATE_K, BALANCE_DRIVE_SPEED_K,
-    BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE,
-        BALANCE_DRIVE_BRAKE_K, BALANCE_DRIVE_BRAKE_LIMIT,
-        BALANCE_DRIVE_BRAKE_FADE_START, BALANCE_DRIVE_BRAKE_FADE_FULL,
-        BALANCE_DRIVE_BRAKE_TAU
+    BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE
 };
 int main() {
-    static_assert(BALANCE_DRIVE_BRAKE_FADE_FULL > BALANCE_DRIVE_BRAKE_FADE_START);
-    static_assert(BALANCE_DRIVE_BRAKE_TAU > 0 && BALANCE_DRIVE_BRAKE_LIMIT > 0);
-    for (int sign : {-1,1}) {
-        balance_math::BalanceDrive brake;
-        auto stop=[&](float speed,float target,bool stopping=true,bool enabled=true) {
-            return brake.step(enabled,0,0,speed,target,0,0,.005f,30,c,stopping);
-        };
-        // Centering changes feedback immediately, but the extra term is
-        // bounded and filtered. The balance acceleration limit still wins.
-        auto r=stop(sign*15,0);
-        assert(sign*r.brake_acceleration>0 && std::fabs(r.brake_acceleration)<.2f);
-        for(int i=0;i<200;++i) r=stop(sign*15,0);
-        assert(std::fabs(r.brake_acceleration-c.brake_accel_limit*sign)<.0001f);
-        assert(std::fabs(r.acceleration)<=c.acceleration_limit);
-        for(int i=0;i<200;++i) r=stop(sign*.5f,0);
-        assert(std::fabs(r.brake_acceleration)<.0001f); // fade near rest
-        brake.reset();
-        r=stop(sign*3,sign*8);
-        assert(r.brake_acceleration==0); // do not boost if below ramped target
-        r=stop(sign*15,0,false);
-        assert(r.brake_acceleration==0); // normal throttle exactly unchanged
-        stop(sign*15,0);
-        r=stop(sign*15,0,false);
-        assert(r.brake_acceleration==0); // new throttle clears stored brake
-        stop(sign*15,0);
-        r=stop(sign*15,0,true,false);
-        assert(r.brake_acceleration==0); // stationary PD / handoff unaffected
-        brake.reset();
-        r=stop(sign*15,0,false);
-        assert(r.brake_acceleration==0);
-    }
     balance_math::BalanceDrive drive;
     auto tick=[&](bool enabled,float err,float rate,float speed,float target,
                   float pd=0,float previous=0,float dt=.005f,float limit=30) {

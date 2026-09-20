@@ -1,0 +1,2 @@
+Radio encoding, full-frame TX backpressure, CRC and C++/Lua fixtures passed
+Lua tests passed: actual C++ fixtures, legacy mode, lifecycle, staleness, schemas, malformed data, queue bounds, navigation, alerts

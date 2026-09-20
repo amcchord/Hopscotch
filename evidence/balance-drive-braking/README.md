@@ -1,9 +1,17 @@
-# Braking investigation — work in progress
+# Progressive braking v5 evidence
 
-This worktree is based on Wi-Fi/OTA release `aa9ae13`, with unchanged installed driving-v4 control. User reports mostly smooth driving, but slow stops with CH2 centered. Downloaded the complete 2,981-row onboard log using authenticated Wi-Fi, validated binary/transport checksums, preserved cleaned CSV and byte-exact `.wire` export in `telemetry_logs/bal_20260919_wifi_v4_slow_stop.*`.
+See [findings and candidate behavior](../../docs/BALANCE_DRIVE_BRAKING_2026-09.md). The installed v4 run was downloaded and both checksums validated; `info-before.json` identifies that firmware. Braking native/software/model checks and the pinned credentialed build pass. No firmware has yet been deployed by this worktree.
 
-The saved run covers 59.611 seconds (50.785 in BALANCE), ends by drive disarm, features1023, binary0xEAFD0F41/transport0xCB02414A. Six CH2 neutral intervals show requested speed reaching zero in0.52–2.08s. Five sufficiently long intervals first cross below0.3rad/s after1.38–2.121s; recoil extends settling, up to7.10rad/s in a turning interval. No contact/intervention timestamps were supplied. No emergency-arm events, IMU/CAN-TX faults or saturation ticks. Maximum BALANCE inner interval5.244ms. Broader live cumulative timing counters contain delays outside this recorded BALANCE interval; do not attribute them to powered balancing or Wi-Fi from those counters alone.
+![Recorded physical stops](physical-v4-stops.png)
 
-`analyze.py` reproduces metrics/plot. `screen_ramps.py` compares8/16/20/24rad/s² reference braking. `model.py`, `pilot_bridge.cpp`, `screen_capture.py` prototype earlier bounded handoff to stationary control near a centered stop, using the actual C++ helper added to `balance_drive.h`. That helper is **not wired into firmware yet**. Experiments are incomplete and are not flashable release approval. Root firmware/device have not been changed by this worktree.
+![Illustrative source-backed model comparison](final-model-stop.png)
 
-The candidate must preserve OTA/radio and integrate the concurrent ground-drive fix plus docs-only `a1e24b9` before the final gate. Use a compiler include path to the existing private `network_secrets.h`; never copy or commit those secrets. Current recorded image identity is in `info-before.json`. No deployment or motor motion was performed. Pending: finish model comparison, select/reject capture, implement/test/build a reviewed firmware candidate, then follow the authorized deployment boundary.
+- `analyze.py`, `physical-v4-*`: 2,981-row physical run analysis and plots.
+- `ramps.*` / `screen_ramps.py`: ramp-only deceleration screen.
+- `capture-screen.*` / `screen_capture.py` / `rejected_stop_capture.h`: rejected early PD handoff; it is absent from production code.
+- `boost-screen.*` / `screen_boost.py`: rejected strong additional braking.
+- `mild-boost-screen.*` / `screen_mild_boost.py`: milder candidates; gain0.5/limit3 subsequently rejected by the broader disturbance screen.
+- `model.py` / `pilot_bridge.cpp`: actual C++ helper bridge, parameter overrides for experiments; defaults use current source. Rejected boost/capture paths are absent from this production bridge.
+- `final_screen.py`: exact frozen installed source versus candidate, including neutral/startup regression, forward/reverse, input loss, pushes, and recorded stick replay.
+
+The final candidate uses progressive 8–20rad/s² reference braking and unchanged inner control. `final-stops.*` records the paired 192-case stop comparison. Archived `experiment_model.py`/`experiment_bridge.cpp` and `rejected-*.h` preserve rejected options outside production. The ground-drive fix is integrated. Preserve private Wi-Fi credentials and application-only OTA; never copy the credential file between worktrees or deploy a build using example credentials. This worktree builds with an ignored configuration that adds an include path to the existing private root header. Credentialed binaries, build trees, caches, and that machine-specific configuration are not committed.

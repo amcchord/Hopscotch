@@ -1,0 +1,22 @@
+{
+  "v4": {
+    "push": {
+      "falls": 9,
+      "new_falls": 0
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  },
+  "arm_capped20": {
+    "push": {
+      "falls": 10,
+      "new_falls": 1
+    },
+    "replay": {
+      "falls": 10,
+      "new_falls": 0
+    }
+  }
+}

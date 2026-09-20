@@ -1,4 +1,4 @@
-from model import *
+from experiment_model import *
 import itertools,json
 rows=[]
 for A,B,wn,z,delay,sign in itertools.product((8,25,45),(4,7,13,16),(40,60),(.35,.6),(0,.01),(-1,1)):

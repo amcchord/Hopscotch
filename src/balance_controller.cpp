@@ -292,16 +292,12 @@ void BalanceController::balanceTick(const RawImuData& imu, float dt) {
     const float pd_command = _kp * angle_err - _kd * _gyro_rate;
     const balance_math::DriveConfig drive_config = {
         BALANCE_DRIVE_ANGLE_K, BALANCE_DRIVE_RATE_K, BALANCE_DRIVE_SPEED_K,
-        BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE,
-        BALANCE_DRIVE_BRAKE_K, BALANCE_DRIVE_BRAKE_LIMIT,
-        BALANCE_DRIVE_BRAKE_FADE_START, BALANCE_DRIVE_BRAKE_FADE_FULL,
-        BALANCE_DRIVE_BRAKE_TAU
+        BALANCE_DRIVE_ERROR_LIMIT, BALANCE_DRIVE_ACCEL_LIMIT, BALANCE_DRIVE_HANDOFF_RATE
     };
     const auto drive = _pilot_drive.step(_pilot_driving, angle_err, _drive_gyro_rate,
         _pilot_measured_vel, _pilot_velocity_ff, pd_command, _last_motor_vel,
-        dt, cmd_max, drive_config, _pilot_stopping);
+        dt, cmd_max, drive_config);
     _pilot_drive_active = drive.active;
-    _pilot_brake_active = fabsf(drive.brake_acceleration) > .01f;
     float motor_vel_raw = drive.raw;
     float motor_vel = motor_vel_raw;
 
@@ -486,8 +482,6 @@ void BalanceController::enterBalancing(float current_roll) {
     _pilot_velocity_ff = 0;
     _pilot_measured_vel = 0;
     _pilot_driving = false;
-    _pilot_stopping = false;
-    _pilot_brake_active = false;
     _pilot_arm_applied = 0;
     _hold_drift = 0.0f;
     _vel_sp_integral    = 0.0f;
@@ -1115,7 +1109,9 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             BALANCE_PILOT_DEADBAND, BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
             BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_TURN_ACCEL,
             BALANCE_PILOT_READY_MS, BALANCE_PILOT_STOP_MS,
-            BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU
+            BALANCE_PILOT_ARM_GAIN, BALANCE_PILOT_ARM_LIMIT, BALANCE_PILOT_ARM_TAU,
+            BALANCE_PILOT_FAST_DECEL, BALANCE_PILOT_BRAKE_START_SPEED,
+            BALANCE_PILOT_BRAKE_FULL_SPEED, BALANCE_PILOT_ARM_BRAKE_LIMIT
         };
         _pilot_input_valid = pilot_valid;
         const bool pilot_allowed = pilot_valid && _ramp_complete && !recovering
@@ -1132,7 +1128,6 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         _pilot_velocity_ff = _pilot.moving() ? _pilot.velocity() : 0;
         _pilot_measured_vel = _filtered_wheel_vel;
         _pilot_driving = _pilot.moving();
-        _pilot_stopping = _pilot.stopping();
         if (_pilot.ready() && !pilot_was_ready)
             Serial.println("[Balance] Standing drive READY: CH1 steer, CH2 speed");
         // Move the eventual hold point with the robot while driving/braking.
@@ -1731,7 +1726,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.pilot_turn = _pilot.turn();
     s.pilot_flags = (_pilot.ready() ? 1 : 0) | (_pilot.moving() ? 2 : 0)
                   | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0)
-                  | (_pilot_drive_active ? 16 : 0) | (_pilot_brake_active ? 32 : 0);
+                  | (_pilot_drive_active ? 16 : 0) | (_pilot.fastBraking() ? 32 : 0);
     s.pilot_arm = _pilot_arm_applied;
     _log_count++;
     _last_log_sample_ms = now;
@@ -1758,7 +1753,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 2047; // prior extensions plus centered-stick braking v5
+    header.reserved = 2047; // prior extensions plus progressive reference braking v5
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -1911,9 +1906,9 @@ void BalanceController::dumpLog(Print* sink) {
         // Decode the stored version; exporting an older log must retain its limits.
         if (header.reserved & 512) {
             if (header.reserved & 1024) {
-                out.println("# standing_drive=ch1_ch2_centered_braking_v5");
-                out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:20 turn_accel:18");
-                out.println("# standing_drive_brake=neutral_or_input_loss:1 gain:0.5 accel_limit:3 fade_start_rad_s:1 fade_full_rad_s:4 tau_s:0.08 active_flag:32");
+                out.println("# standing_drive=ch1_ch2_progressive_braking_v5");
+                out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
+                out.println("# standing_drive_brake=fast_decel:20 start_reference_rad_s:4 full_reference_rad_s:8 low_speed_decel:8 arm_brake_limit_fraction:0.0666667 active_flag:32");
             } else {
                 out.println("# standing_drive=ch1_ch2_damped_acceleration_arms_v4");
                 out.println("# standing_drive_limits=velocity_rad_s:20 turn_rad_s:4.5 accel:6 decel:8 turn_accel:18");
@@ -2163,9 +2158,9 @@ void BalanceController::printStatus() {
     Serial.printf("  Standing drive: CH1 steer / CH2 speed, limit %.2f rad/s, turn %.2f rad/s, %s\n",
                   BALANCE_PILOT_MAX_VEL, BALANCE_PILOT_MAX_TURN,
                   _state == BalanceState::Balancing && _pilot.ready() ? "READY" : "waiting for centered calm balance");
-    Serial.printf("  Driving v5: rate_tau=%.3fs rate_k=%.2f accel=%.1f brake=%.1f graded_arms=YES\n",
+    Serial.printf("  Driving v5: rate_tau=%.3fs rate_k=%.2f accel=%.1f brake=%.1f..%.1f progressive_arms=YES\n",
                   BALANCE_DRIVE_RATE_TAU, BALANCE_DRIVE_RATE_K,
-                  BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL);
+                  BALANCE_PILOT_ACCEL, BALANCE_PILOT_DECEL, BALANCE_PILOT_FAST_DECEL);
 
     if (_state == BalanceState::Balancing) {
         Serial.printf("  Setpoint: %.2f  (base + offset=%+.2f)\n",
