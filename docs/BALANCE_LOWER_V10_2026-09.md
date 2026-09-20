@@ -1,6 +1,6 @@
 # CH6 fast laydown v10
 
-Prepared for operator testing; [current state](progress/CURRENT.md) identifies
+Installed source `7917543` for operator testing; [current state](progress/CURRENT.md) identifies
 the installed image. [V9 succeeded](../evidence/balance-lower/trial-v9-success-20260920/README.md),
 with 9.900 seconds of supported arm return in a 12.009-second laydown.
 
@@ -23,8 +23,10 @@ preserve normal mode exactly on three recordings and all 329 modeled cases.
 Fast simulation retains 258 completions and all fault outcomes, saving a median
 2.04 seconds among common successes. This is an approximate model result;
 physical speed and reliability need testing. Schema10 retains 240-byte samples
-and records the independently latched fast-lowering choice in pilot flag4096.
+and records the independently latched fast-lowering choice in pilot flag 4096.
 
 For the next [manual trial](BALANCE_TESTING.md), stand normally, select CH6 HIGH,
 pulse CH11 to lower, then disarm and archive before another run. Verify continued
 arm return, a gentle final landing and arms Forward. No autonomous motion.
+
+[Verified release and recovery](../evidence/lowering-v10-integration/README.md).

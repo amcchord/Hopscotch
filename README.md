@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Current firmware:** Installed source `b9763c2` improves [CH11 contact confirmation](docs/BALANCE_LOWER_V9_2026-09.md) after the latest run stopped during a small loaded rebound. It retains the faster supported arm return and the successful fast stand-up. [Saved diagnosis](evidence/balance-lower/trial-v8-stop-20260920/README.md), [installed evidence](evidence/lowering-v9-integration/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md). Manual acceptance of v9 is pending.
+**Current firmware:** Installed source `7917543` adds [CH6-selected fast laydown](docs/BALANCE_LOWER_V10_2026-09.md). CH6 HIGH selects fast; LOW/center retain the [successful v9 laydown](evidence/balance-lower/trial-v9-success-20260920/README.md). Speed is selected independently at each CH11 maneuver request. Fast standing is unchanged. [Installed evidence](evidence/lowering-v10-integration/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md). Fast laydown needs a manual trial.
 
 Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
@@ -72,7 +72,7 @@ persisted robot mappings must be checked before a physical test.
 | Throttle | CH2 | Right stick Y |
 | Arm Speed | CH5 | SE |
 | Arm Nudge | CH4 | Input Rud |
-| Tip-up speed | CH6 | SB; high = experimental fast, center/low = regular slow |
+| Stand-up / laydown speed | CH6 | SB; HIGH = fast, center/LOW = normal; latched per CH11 maneuver |
 | Balance Select | CH7 | SC |
 | Arms Arm/Disarm | CH9 | SA |
 | Drive Arm/Disarm | CH10 | SD |
@@ -153,7 +153,7 @@ The firmware splits the two ESP32-S3 cores into a **control core** and a **comms
 
 Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
 
-Balance telemetry schema v9 (same 240-byte samples as v4–v8) records up to 120 seconds at 50 Hz, including tip-up, in a 1,440,000-byte PSRAM buffer. It includes 200 Hz timing/saturation aggregates, raw and filtered IMU signals, setpoints, commands, CAN feedback, wheel/arm motion and torque, pilot intent/planned arm assistance, power, safety-exit reason and event markers. It is persisted as a checksummed binary only after balance ends and both groups are disarmed. `scripts/robot_wifi.py log` exports validated CSV over Wi-Fi; `scripts/save_telemetry.sh` remains the USB fallback. Live dashboard JSON schema 1 is separate from the saved-log schema.
+Balance telemetry schema v10 (same 240-byte samples as v4–v9) records up to 120 seconds at 50 Hz, including tip-up, in a 1,440,000-byte PSRAM buffer. It includes 200 Hz timing/saturation aggregates, raw and filtered IMU signals, setpoints, commands, CAN feedback, wheel/arm motion and torque, pilot intent/planned arm assistance, power, safety-exit reason and event markers. It is persisted as a checksummed binary only after balance ends and both groups are disarmed. `scripts/robot_wifi.py log` exports validated CSV over Wi-Fi; `scripts/save_telemetry.sh` remains the USB fallback. Live dashboard JSON schema 1 is separate from the saved-log schema.
 
 ### Module Map
 

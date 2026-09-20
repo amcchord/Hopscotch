@@ -589,3 +589,30 @@ No autonomous motion, settings/filesystem writes or other task edits.
 Known physically successful v7 and exact immediate v8 packages retained.
 [Release](../../evidence/lowering-v9-integration/README.md).
 Next: operator stand/CH11 attempt, disarm and archive before another run.
+
+## 2026-09-20 — Successful v9 trial and CH6 fast laydown v10
+
+Archived the operator-confirmed successful v9 run: 1,462 rows / 29.750 s,
+lower_complete, fast capture 3.026 s. Laydown 12.009 s, supported descent 9.900 s,
+final retraction 0.139 s, final tilt -2.368 degrees and Forward errors -0.025/+0.005 rad.
+Close tracking and frequent body-rate pauses informed a separate fast schedule.
+
+Source `7917543beedaf4902d1661461f18380959ad100a` latches CH6 at each accepted CH11 lowering request. HIGH
+selects fast supported return; LOW/center retain normal v9. After support,
+600 ms blend toward 0.60 rad/s target, 0.75 motor cap and 20 degrees/s descent
+pause; floor taper 35 to 15 degrees. Initial fall/catch, final landing and all
+support-loss/global/time/progress guards remain. Fast standing, driving and
+OTA source unchanged; no other checkout edited. Combined 12 native/38 Python,
+syntax and pinned build passed once. Model retains all 329 outcomes, 258 complete;
+normal outputs exact, common fast successes median 2.04 s quicker. Three normal
+recorded replays identical to v9; fast divergence only after support. Physical
+fast acceptance pending; model is approximate.
+
+Frozen application 1,212,352 bytes, whole SHA
+cf873cee0c52614dd179924c41c2466cc39ba1704fc5b1f449212bc25cb18234, ESP digest
+42ed3918122860f6902ae0a1c8915ab771dd353b403de1de6d40fcf2d3cad4fe. App-only OTA 90.96 s, verified app1 at 2026-09-20T22:51:48.370997+00:00.
+Six powered healthy disabled motors, fresh IMU, disarmed/released maintenance
+and exact successful CSV/wire retention verified. No autonomous motion or
+settings/filesystem writes. Successful v9 recovery and older packages retained.
+[Release](../../evidence/lowering-v10-integration/README.md). Next: operator
+CH6 HIGH / CH11 trial, disarm and archive before another run.

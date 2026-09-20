@@ -28,3 +28,10 @@ leads to continued supported return and a level body with arms Forward.
 Physical acceptance remains pending; exact successful v7 recovery is retained.
 
 [Verified installation and recovery record](../evidence/lowering-v9-integration/README.md).
+
+## Physical acceptance and successor
+
+Austin confirmed [successful v9 lowering and fast standing](../evidence/balance-lower/trial-v9-success-20260920/README.md).
+[V10](BALANCE_LOWER_V10_2026-09.md) retains this normal laydown and adds a
+separately latched CH6 HIGH fast supported return. Earlier pending statements
+above describe the pre-trial state.
