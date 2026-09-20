@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 8;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 9;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -2157,7 +2157,9 @@ void BalanceController::dumpLog(Print* sink) {
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
         // Metadata-only policy revisions retain historical exports exactly.
-        if (header.schema_version >= 8)
+        if (header.schema_version >= 9)
+            out.println("# lowering=experimental_ch11_forward_catch_v9 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 8)
             out.println("# lowering=experimental_ch11_forward_catch_v8 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         else if (header.schema_version >= 7)
             out.println("# lowering=experimental_ch11_forward_catch_v7 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
@@ -2175,6 +2177,8 @@ void BalanceController::dumpLog(Print* sink) {
         if (header.schema_version >= 7) {
             out.println("# lowering_stop=drive_handoff:after_reference_zero pd_handoff_slew:existing prepare_calm_ms:500");
             out.println("# lowering_support=both_arms measured_forward_fall_loaded_return support_age_ms:60 confirm_ms:80 min_elapsed_from_both_contacts_ms:80 reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:12 wheel_stop:after_both_contacts");
+            if (header.schema_version >= 9)
+                out.println("# lowering_support_rebound=within_first_impact_ms:300 body_rate_max_dps:20 max_rise_from_impact_min_deg:1.5 requires_recent_both_support:1 unchanged_dwell_and_arm_velocity:1");
         } else {
         out.println("# lowering_support=both_arms measured_forward_fall_loaded_return required reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:4");
         }

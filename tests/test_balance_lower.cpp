@@ -243,6 +243,49 @@ int main() {
       for(int i=0;i<40;++i) { r.in.tilt-=.1f;r.tick(); }
       assert(r.lower.left()>first+.1f && r.lower.phase()!=LowerPhase::Complete);
     }
+    { // V8 physical catch: reversal inertia delays qualification, then a
+      // small loaded rebound reaches 17deg/s and resets the old 12deg/s dwell.
+      Rig r; r.fall(); r.in.tilt=83.572f; r.in.rate=-39.388f;
+      r.in.arm_left=-1.827f; r.in.arm_right=1.817f;
+      r.tick(false);
+      struct Contact { float tilt,rate,left,right,lv,rv,lt,rt; };
+      const Contact samples[]={
+        {82.387f,-8.689f,-1.848f,1.839f,-.289f,.216f,-.453f,.421f},
+        {82.231f,7.501f,-1.852f,1.843f,-.170f,.158f,-.527f,.406f},
+        {82.390f,8.517f,-1.851f,1.837f,.006f,-.213f,-.179f,-.102f},
+        {82.297f,4.400f,-1.846f,1.830f,.247f,-.253f,.095f,-.371f},
+        {82.786f,16.999f,-1.838f,1.822f,.295f,-.499f,.290f,-.268f},
+        {83.129f,13.180f,-1.829f,1.812f,.422f,-.425f,.146f,-.249f}
+      };
+      for(unsigned i=0;i<sizeof(samples)/sizeof(samples[0]);++i) {
+        const auto& x=samples[i];r.in.tilt=x.tilt;r.in.rate=x.rate;
+        r.in.arm_left=x.left;r.in.arm_right=x.right;
+        r.in.velocity_left=x.lv;r.in.velocity_right=x.rv;
+        r.in.torque_left=x.lt;r.in.torque_right=x.rt;r.tick(false);
+        assert(r.lower.active());
+        if(i<5) assert(!r.lower.supported());
+      }
+      assert(r.lower.supported() && r.lower.phase()==LowerPhase::Descending);
+      assert(r.lower.armSpeed()==.30f); // Exit the faster impact-softening path.
+    }
+    { // The wider confirmation window is only for bounded, recently loaded
+      // rocking. It cannot turn missing support or a large/high/late rebound
+      // into a catch, nor waive the measured arm-return velocity requirements.
+      for(int missing=0;missing<7;++missing) {
+        Rig r;r.fall();r.in.tilt=82;r.in.rate=-6;
+        r.in.velocity_left=.2f;r.in.velocity_right=-.2f;
+        r.in.torque_left=.6f;r.in.torque_right=-.6f;r.tick();
+        r.in.rate=17;
+        if(missing==1) r.in.torque_left=0;
+        if(missing==2) r.in.rate=20.01f;
+        if(missing==3) r.in.tilt=83.51f;
+        if(missing==4) r.now+=301;
+        if(missing==5) r.in.velocity_left=.71f;
+        if(missing==6) r.in.velocity_right=.11f;
+        for(int i=0;i<4 && r.lower.active();++i) r.tick();
+        assert(r.lower.supported()==(missing==0));
+      }
+    }
     { // A single two-arm impact followed by complete unloading cannot
       // qualify an 80ms support dwell using the 60ms observation grace.
       Rig r;r.fall();r.in.rate=0;r.in.velocity_left=r.in.velocity_right=0;

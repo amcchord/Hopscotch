@@ -45,6 +45,7 @@ struct LowerConfig {
     uint32_t stop_timeout_ms = 14000, prepare_timeout_ms = 2000;
     uint32_t launch_timeout_ms = 1800, catch_timeout_ms = 2500;
     uint32_t impact_settle_ms = 300;
+    float impact_confirm_rate = 20.f, impact_confirm_rebound = 1.5f;
     uint32_t descent_timeout_ms = 20000, retract_timeout_ms = 6000;
     uint32_t progress_timeout_ms = 3000;
 };
@@ -199,7 +200,10 @@ public:
                 _right = in.arm_right;
                 _touch_left = in.arm_left; _touch_right = in.arm_right;
                 _impact_ms = now;
+                _impact_min_tilt = in.tilt;
             }
+            if (_left_touched || _right_touched)
+                _impact_min_tilt = std::min(_impact_min_tilt, in.tilt);
             const bool had_both_contacts = _left_touched && _right_touched;
             if (left_load) _left_touched = true;
             if (right_load) _right_touched = true;
@@ -255,12 +259,19 @@ public:
             // Rocking contact briefly unloads either arm during reversal.
             // Require each independent support observation within 60 ms over
             // the full dwell; a one-off impact cannot pass an 80 ms dwell.
+            // V8 caught both arms, but a 17deg/s, <1deg loaded rebound
+            // repeatedly reset the 80ms dwell. Permit that brief rocking only
+            // inside the existing impact window and measured excursion bound.
+            // High/large/late rebounds cannot use this confirmation path.
+            const bool bounded_rebound = settling_impact
+                && in.rate <= c.impact_confirm_rate
+                && in.tilt <= _impact_min_tilt+c.impact_confirm_rebound;
             const bool caught = recent_support
                 && in.tilt <= _launch_tilt-c.forward_drop*.5f
                 && in.velocity_left*_sign_left >= -.10f && in.velocity_right*_sign_right >= -.10f
                 && in.velocity_left*_sign_left <= c.catch_return_speed+.20f
                 && in.velocity_right*_sign_right <= c.catch_return_speed+.20f
-                && in.rate >= -c.descent_rate && in.rate <= 12.f
+                && in.rate >= -c.descent_rate && (in.rate <= 12.f || bounded_rebound)
                 && _peak_fall_rate < -c.forward_rate;
             if (confirmed(caught, dt, c.contact_ms)
                 && now - _both_contact_ms >= c.contact_ms) {
@@ -318,7 +329,7 @@ private:
     float _wheel_opposite_ms = 0;
     float _confirm_ms = 0, _progress_tilt = 0, _support_lost_ms = 0;
     float _prepare_tilt = 0, _launch_tilt = 0, _peak_fall_rate = 0;
-    float _touch_left = 0, _touch_right = 0;
+    float _touch_left = 0, _touch_right = 0, _impact_min_tilt = 0;
     uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0, _impact_ms = 0;
     uint32_t _left_support_ms = 0, _right_support_ms = 0, _both_contact_ms = 0;
     const char* _reason = "lower_requested";

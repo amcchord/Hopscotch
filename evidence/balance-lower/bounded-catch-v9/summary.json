@@ -1,0 +1,17 @@
+{
+  "cases": 329,
+  "before_complete": 258,
+  "after_complete": 258,
+  "changed_outcomes": [],
+  "contact_complete": 72,
+  "delayed_contact_complete": 15,
+  "native_bounds": [
+    "Recent support on both arms",
+    "80ms dwell and real elapsed time",
+    "300ms initial impact window",
+    "20deg/s rate maximum for extended qualification",
+    "1.5deg maximum rise from impact minimum for extended qualification",
+    "Existing arm velocity and global limits"
+  ],
+  "limitation": "Approximate model does not reproduce the exact recorded rocking/contact transient; native replay locates the new qualification and command divergence."
+}

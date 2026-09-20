@@ -1,0 +1,14 @@
+{
+  "baseline_source": "47eb19a2ce57f51eeea368c4c6469edd1cc51a96",
+  "changed_production_files": [
+    "src/balance_controller.cpp",
+    "src/balance_lower.h",
+    "src/balance_telemetry.h"
+  ],
+  "policy_change": "Permit support confirmation through a recent two-arm rebound limited to 20 deg/s, 1.5 degrees above impact minimum, within 300 ms. Existing dwell, arm velocities and motion limits retained.",
+  "controller_runtime_unchanged_except_schema": true,
+  "fast_normal_driving_ota_crsf_unchanged": true,
+  "other_worktrees_modified": false,
+  "header_sha256": "76e2d14aefd2ccd150cf8a2aed3ee61b2985862deca7bda4f43ce8e88d6fd1c0",
+  "reused_checks": "Radio/dashboard/pinned TCP checks from c442e12; all affected source byte-identical. Consolidated includes actual OTA lifecycle and helper tests."
+}

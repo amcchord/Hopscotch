@@ -1,0 +1,101 @@
+{
+  "source": "telemetry_logs/bal_20260920_forward_catch_v8_stop_wifi.csv",
+  "installed_source": "47eb19a2ce57f51eeea368c4c6469edd1cc51a96",
+  "samples": 662,
+  "duration_s": 13.29,
+  "end_reason": "lower_wrong_direction",
+  "csv_sha256": "e5c895675fed9a21d01b7bc1dc6f3b2ce6114dafc6e8aaf7b72e2399cba7650d",
+  "wire_sha256": "c1277305aef0a8b3d9cc2fa4a28d1e47f9b001fb6163715f368b5d4a057a99d1",
+  "faster_return_reached": false,
+  "first_two_arm_impact": {
+    "t_ms": 12911.0,
+    "roll": 82.387,
+    "roll_rate": -8.689,
+    "arm_l_torque": -0.453,
+    "arm_r_torque": 0.421
+  },
+  "installed_replay": {
+    "events": [
+      {
+        "t_ms": 11636.0,
+        "phase": 1,
+        "tilt": 87.365,
+        "rate": -0.546
+      },
+      {
+        "t_ms": 12121.0,
+        "phase": 2,
+        "tilt": 87.39,
+        "rate": 0.226
+      },
+      {
+        "t_ms": 12770.0,
+        "phase": 9,
+        "tilt": 85.882,
+        "rate": -15.572
+      },
+      {
+        "t_ms": 12870.0,
+        "phase": 10,
+        "tilt": 83.572,
+        "rate": -39.388
+      },
+      {
+        "t_ms": 13290.0,
+        "phase": 8,
+        "tilt": 76.939,
+        "rate": 15.508
+      }
+    ],
+    "reason": "lower_wrong_direction"
+  },
+  "candidate_fixed_sensor_replay": {
+    "events": [
+      {
+        "t_ms": 11636.0,
+        "phase": 1,
+        "tilt": 87.365,
+        "rate": -0.546
+      },
+      {
+        "t_ms": 12121.0,
+        "phase": 2,
+        "tilt": 87.39,
+        "rate": 0.226
+      },
+      {
+        "t_ms": 12770.0,
+        "phase": 9,
+        "tilt": 85.882,
+        "rate": -15.572
+      },
+      {
+        "t_ms": 12870.0,
+        "phase": 10,
+        "tilt": 83.572,
+        "rate": -39.388
+      },
+      {
+        "t_ms": 13011.0,
+        "phase": 3,
+        "tilt": 83.129,
+        "rate": 13.18
+      },
+      {
+        "t_ms": 13210.0,
+        "phase": 8,
+        "tilt": 78.692,
+        "rate": -56.304
+      }
+    ],
+    "reason": "lower_support_lost"
+  },
+  "first_command_divergence_ms": 13011.0,
+  "prior_success_v8_v9_command_replays_identical": true,
+  "candidate_header_sha256": "76e2d14aefd2ccd150cf8a2aed3ee61b2985862deca7bda4f43ce8e88d6fd1c0",
+  "limits": [
+    "Fixed recorded inputs reproduce the installed fault and locate command divergence.",
+    "After divergence the candidate would change physics. Its later lower_support_lost on old inputs is not a physical prediction.",
+    "The earlier successful trace produces identical v8/v9 command replay, not a prediction of duration."
+  ]
+}
