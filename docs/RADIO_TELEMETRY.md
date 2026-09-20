@@ -213,11 +213,13 @@ instead of delaying control. Existing control loops and mappings are unchanged.
 
 ## Installation, verification, and rollback
 
-Prepared locally only. Neither radio files nor robot firmware were changed on
-hardware. This branch must be integrated with the latest balance work before
-flashing; do not deploy an older control snapshot just to get telemetry.
+Update after authorization: `hop.lua` is installed on the radio and selected in
+telemetry screen 2 (index 1). Original Values screen and all mappings are intact.
+The SD files passed readback verification and the volume was safely ejected.
+The robot firmware candidate remains unflashed. This branch must be integrated
+with the latest balance work before flashing.
 
-After installation is authorized:
+Installation procedure (SD steps completed; robot firmware steps remain):
 
 1. Preserve a fresh model/radio backup if either has changed since this audit.
 2. Copy `radio/SCRIPTS/TELEMETRY/hop.lua` to `/SCRIPTS/TELEMETRY/hop.lua` on the
