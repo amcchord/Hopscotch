@@ -31,7 +31,7 @@ handoff. The standing-drive task owns the next combined release in
 `worktrees/drive-braking`. Shared root docs and other agents' checkouts were
 not edited. No robot commands, uploads, or physical motion tests were performed.
 
-## Validation checkpoint
+## Validation
 
 - Nine native test executables and 27 Python tests passed, including existing
   balance/startup/motor/CRSF/network regressions; Python/shell syntax and
@@ -41,12 +41,17 @@ not edited. No robot commands, uploads, or physical motion tests were performed.
   clipping and left-side reversal, neutral stop, unarmed suppression, pending
   start cancellation, balance ownership, arm return, hard abort, radio loss,
   and neutral handoff before resuming.
-- The full PlatformIO build is pending at this checkpoint. The checkout uses
-  example network credentials for compile validation only; its firmware image
-  must not be deployed. Release integration must build with the release owner's
-  own configured credentials and record the actual installed image identity.
+- Full PlatformIO build passed with the pinned environment/dependencies:
+  53,288 bytes RAM and 1,187,389 bytes flash. The checkout uses example network
+  credentials for compile validation only; its firmware image must not be
+  deployed. Release integration must build with the release owner's own
+  configured credentials and record the actual installed image identity.
+- Local command evidence is in `output/validation.log` (native/Python/syntax)
+  and `output/build.log` (successful full compile). The first build attempt used
+  unsupported Python 3.14; the isolated PlatformIO environment was recreated
+  with Python 3.13 and the pinned PlatformIO 6.1.19 before the successful build.
 
-Next action: finish the compile check, send the tested commit to the release
-owner, and integrate with the standing-drive braking change and documentation
-commit `a1e24b9`. Physical ground-drive behavior remains unverified until Austin
-tests the combined firmware.
+Next action: integrate implementation `b323220` and this validation record with
+the standing-drive braking change and documentation commit `a1e24b9`, then run
+the combined release checks. Physical ground-drive behavior remains unverified
+until Austin tests the combined firmware.
