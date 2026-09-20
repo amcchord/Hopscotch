@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/ota-lowering-v2/README.md) records
+[latest deployment evidence](../evidence/ota-lowering-v3/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -118,7 +118,9 @@ fresh status showing both groups disarmed, `saving_log: false`,
 latest run is stored; retrieve it before the next test or firmware downgrade.
 
 A log export first copies a checksummed CSV into a bounded 4 MiB PSRAM buffer
-under maintenance, then releases the interlock and sends that immutable copy.
+under maintenance, yielding every 10 ms of work so long exports do not starve
+the network-core idle task. The authenticated download has a 120-second receive
+timeout. It then releases the interlock and sends that immutable copy.
 One download can be in flight; a second gets 429. A slow client cannot cause
 filesystem reads while the robot is subsequently armed. The CLI validates row
 count, schema, sample values, timestamps and transport/device checksums before
@@ -168,16 +170,17 @@ package for recovery.
 1. Support the robot, disarm both groups, lower both arm switches and release
    CH11. Motor power may stay on when the robot is safely supported and all
    motors are disabled; cycling power is not a routine OTA requirement. For the
-   currently installed transport, switch the transmitter off during upload:
-   repeated transmitter-on transfers broke, while the same paced transfer
-   succeeded with it off. The precise RF/transport cause remains unconfirmed.
+   bootstrap from old transport, switch the transmitter off during upload.
+   Installed source `8449ddb` includes transport version 2; transmitter-on
+   hardware acceptance is still pending. Use transmitter-off until that record
+   is complete.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 forward-fall/catch v2 package, from the project root:
+   September 20 lowering-v3/export-fix package, from the project root:
 
    ```bash
    python3 scripts/robot_wifi.py --host http://192.168.1.172 ota \
-     worktrees/drive-braking/artifacts/lowering-v2/candidate/firmware.bin \
-     --manifest worktrees/drive-braking/artifacts/lowering-v2/candidate/manifest.json
+     worktrees/balance-lower/artifacts/lowering-v3-export/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v3-export/candidate/manifest.json
    ```
 
    The helper verifies file size, whole-file hash and ESP digest, checks fresh
@@ -192,8 +195,8 @@ package for recovery.
    startup. `--record-dir <new-directory>` selects a durable evidence location.
    Preserve the record and update shared release state once. Turn the transmitter
    back on and observe both arm switches low before any authorized motion test.
-   Check [current trial status](progress/CURRENT.md) first; further CH11 lowering
-   attempts are on hold after the failed v2 trial.
+   Check [current trial status](progress/CURRENT.md) first; v3 lowering is ready
+   for a restrained manual trial and is not yet physically validated.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.
 An isolated worktree can use `--secrets-file /absolute/project/src/network_secrets.h`
@@ -314,7 +317,7 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/drive-braking/artifacts/lowering-v2/candidate/` from the project
+`worktrees/balance-lower/artifacts/lowering-v3-export/candidate/` from the project
 root. The previous combined driving/v1-lowering application remains at
 `worktrees/drive-braking/artifacts/drive-braking-v5/release/`; its driving was
 reported good, but its lowering failed. The older Wi-Fi application at `artifacts/wifi-ota/release/` is the

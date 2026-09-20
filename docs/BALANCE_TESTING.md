@@ -1,16 +1,15 @@
 # Balance Mode Test Guide
 
-**September 20 update:** ground/standing driving worked well; the first v1
-lowering attempt tipped backward. Forward-fall/catch v2 is now installed and
-verified ([deployment record](../evidence/ota-lowering-v2/README.md)). Austin's
-subsequent v2 trial staged the arms too far forward, nearly bounced off them and
-fell backward. Hold further lowering attempts while the lowering task preserves
-and analyzes that run; its cause is not yet established. See the
-[v2 guide](BALANCE_LOWER_2026-09.md) for implemented behavior.
+**September 20 update:** ground/standing driving worked well. Lowering v1/v2
+failed physical trials; the v2 impact trace drove the new
+[v3 first-contact yielding behavior](BALANCE_LOWER_V3_2026-09.md). Source
+`8449ddb` is installed and verified with OTA transport version 2 and a fix for
+long-log export watchdog resets ([deployment](../evidence/ota-lowering-v3/README.md)).
+V3 needs a restrained manual trial; simulation has four retained regressions.
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 forward-fall/catch v2](BALANCE_LOWER_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; the lowering trial failed.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 forward-fall/catch v3](BALANCE_LOWER_V3_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; physical lowering v3 is pending.
 
 ## Safety and Test Area
 
@@ -32,7 +31,7 @@ disarmed motor power may remain on; leave both arm switches low and CH11 release
 The current transport needs the transmitter off for the demonstrated reliable
 path. Wait for the final verified report before turning it back on and testing.
 
-OTA success does not clear the current hold on CH11 lowering tests.
+Use the v3 procedure for the next restrained lowering trial; stop further attempts on a fault and retrieve the log.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -81,14 +80,13 @@ A held stick through startup cannot unlock standing drive. If control pauses aft
 
 ## Supported return to flat
 
-**Further CH11 trials are on hold after the failed v2 attempt.** The following
-describes the installed behavior for diagnosis.
+**V3 is ready for a restrained supervised trial, not validated for an unsupported fall.**
 
 A fresh CH11 pulse after stand-up and arm return have settled now requests an
 experimental supported descent. It is not a disturbance marker. Test this
 separately from braking, with a catch restraint and verified arm sweep/reach;
-follow the full [CH11 lowering procedure](BALANCE_LOWER_2026-09.md). CH12 remains
-the balance event marker. V2 intentionally leaves upright balance to fall forward and catch on the arms;
+follow the full [CH11 lowering procedure](BALANCE_LOWER_V3_2026-09.md). CH12 remains
+the balance event marker. V3 intentionally leaves upright balance to fall forward and catch on the arms;
 physical support and graceful landing are not established by simulation.
 
 ## Commands and RC Markers

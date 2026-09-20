@@ -291,3 +291,45 @@ identity and both archived CSV/wire pairs passed; see
 [handoff checks](../../evidence/integration-2026-09-20/ota-v2-handoff.json).
 Publication scans found no local credentials or private keys in the reviewed
 outgoing/index blobs. No robot operations occurred in this publication task.
+
+## 2026-09-20 — Install v3 first-contact yielding, OTA transport 2 and long-log export fix
+
+Austin reported v2 contacted with its arms too far forward, rebounded and fell
+backward. Forked the transmitter-on OTA work into its own contained
+`worktrees/ota-reliability`; kept motion work in `worktrees/balance-lower`.
+Integrated completed OTA checkpoints `67f3746`/`50dfdf2` and root history
+`045e956` without editing their checkouts. Their tasks were subsequently
+archived; this task retains coordinated device ownership.
+
+V3 source `86f921e` stops both advancing targets on first contact, yields a
+bounded amount on measured deceleration and makes small preparation/launch
+adjustments. Moving-arm contact damping was added to the paired simulation.
+304 cases improve from 231 to 248 completions, with four retained regressions;
+asymmetry/impact speed remain limits. Combined source `d8613e6` passed native,
+Python, radio/dashboard, transport and pinned build checks. Source preservation
+confirms ordinary ground/standing drive, startup, radio and dashboard unchanged.
+
+The first normal updater's preflight GET log timed out and the old v2 image
+rebooted with task-watchdog reset reason 6. No upload occurred. A newer long run
+had replaced the archived rebound run. Source `8449ddb` makes checksum/CSV work
+yield every 10 ms, without disabling/feeding watchdogs, and extends eligible
+log-download timeouts. Native maximum-row/rollover/checksum tests and updater
+host tests passed, followed by a final configured pinned build; unchanged motion
+models and other checks were reused.
+
+A documented one-time application-only recovery installed `8449ddb` into app1
+in 62.842 seconds with the transmitter off. Exact image/slot and powered disarmed
+health passed. The latest run could not be backed up through the old exporter;
+filesystem preservation allowed the new exporter to recover its valid 4,789
+samples / 96.010 seconds immediately afterward without another reset. Austin
+also explicitly allowed discarding the log, but no deletion was necessary.
+This later run ends `bailout_angle_error` without entering forward commitment
+or catching. The earlier rebound trace remains the v3 design input.
+
+[Release evidence](../../evidence/ota-lowering-v3/README.md) records both the
+failed preflight and successful recovery, exact package/digests, old rollback
+packages, tests and limits. Documentation now points to installed v3 and retains
+a single-command, frozen-package fast update path. No autonomous motion,
+calibration/settings write, filesystem upload, secret copying or changes to
+other agents' checkouts. Next: transmitter-on disarmed gap/reinstall acceptance,
+then a restrained operator v3 trial with telemetry.

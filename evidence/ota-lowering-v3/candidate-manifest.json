@@ -1,0 +1,19 @@
+{
+  "status": "queued_not_installed",
+  "prepared_utc": "2026-09-20T19:00:03.156746+00:00",
+  "source_commit": "8449ddb5758d60d6b3b3e84702bef4d386b06791",
+  "application_bytes": 1197808,
+  "application_sha256": "53a574a75a0122b0aa3a16567c79bd282631b232c72184c7c3e836c53f51e0f7",
+  "esp_image_digest": "45e7a83cd649e4a1e5182058e3cfb9e4cc80fad4cda27be4a2c9f4465451ab11",
+  "features": 16383,
+  "schema": 4,
+  "sample_bytes": 240,
+  "private_configuration_verified": true,
+  "secret_header_copied": false,
+  "package_path": "worktrees/balance-lower/artifacts/lowering-v3-export/candidate/",
+  "installed_source_commit": "dd74154aa3f534f95506b5c0dd66e1c6d901e091",
+  "installed_package_preserved": "worktrees/drive-braking/artifacts/lowering-v2/candidate/",
+  "installed_application_sha256": "71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72",
+  "installed_esp_image_digest": "7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190",
+  "log_export_cooperative_yield_ms": 10
+}

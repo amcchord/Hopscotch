@@ -1,0 +1,14 @@
+{
+  "compared_to_installed_v2": "dd74154aa3f534f95506b5c0dd66e1c6d901e091",
+  "installed_source": "8449ddb5758d60d6b3b3e84702bef4d386b06791",
+  "production_files_checked": 40,
+  "changed_files": [
+    "src/balance_controller.cpp",
+    "src/balance_lower.h",
+    "src/telemetry_transport.h",
+    "src/web_server.cpp",
+    "src/web_server.h"
+  ],
+  "other_production_files_byte_identical": true,
+  "lowering_policy_and_model_unchanged_since_validated_v3": true
+}

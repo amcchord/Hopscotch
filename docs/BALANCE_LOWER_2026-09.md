@@ -1,6 +1,6 @@
 # Experimental CH11 forward fall and arm catch — v2
 
-**Installed September 20; further lowering trials are on hold.** Austin reports
+**Historical v2; superseded by [installed v3](BALANCE_LOWER_V3_2026-09.md).** Austin reports
 the subsequent v2 attempt staged the arms too far forward, nearly bounced off
 them and fell backward. The lowering task owns the new log and diagnosis; this
 operator report does not establish the cause. The sequence below documents the

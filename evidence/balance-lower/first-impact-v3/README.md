@@ -66,7 +66,11 @@ Files: [candidate cases](simulation.json), [same-model v2 cases](baseline-simula
 v1/v2 data and metadata remain unchanged. New captures use schema 4/240 bytes,
 feature flags 16383 (new bit 8192). Ground/standing drive and startup are untouched.
 
-The next release can include the separately tested OTA networking fix. Before
-publication as an installable package, run the combined integration checks/build
-once on that frozen source. The next physical lowering attempt must be a
+The combined integration passed 10 native executables, 37 Python tests, the
+pinned configured build, radio/dashboard and OTA transport checks; retained
+`validation-*` logs record that source freeze. The initial `d8613e6` package was
+not installed: a longer saved-run export exposed a watchdog reset during
+preflight. Source `8449ddb` adds cooperative export and was subsequently
+[installed and verified](../../ota-lowering-v3/README.md). Motion code and this
+model screen are unchanged. The next physical lowering attempt must be a
 restrained supervised trial; archive the log before another attempt.
