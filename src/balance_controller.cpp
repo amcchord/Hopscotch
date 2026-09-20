@@ -1615,9 +1615,10 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, arm_speed);
 
-        _effective_setpoint = base_effective_setpoint + _sp_offset;
+        // Publish once: the 200 Hz reader must never observe an intermediate
+        // arm-scheduled target above the lowering preparation ceiling.
         _effective_setpoint = _lowering.preparationSetpoint(
-            clampf(_effective_setpoint, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX));
+            clampf(base_effective_setpoint + _sp_offset, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX));
 
         // ---------------------------------------------------------------
         // Yaw sync: hold the L/R wheel position difference at its engage
