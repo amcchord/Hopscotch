@@ -1,0 +1,325 @@
+{
+  "source": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260920_forward_catch_v9_success_wifi.csv",
+  "installed_source": "b9763c2f5e2d66dcc28da4b1bc568dac29751b17",
+  "csv_sha256": "2aa0e23d3d25633bedf29f8655c84b9fea765772e8bb22d42d690a1bd1eaaa71",
+  "wire_sha256": "a4a4347329062c70b9b868175363fb078c073619b08b88d6da919820dbaf0e35",
+  "samples": 1462,
+  "schema": 9,
+  "end_reason": "lower_complete",
+  "duration_s": 29.75,
+  "forward_rad": [
+    3.939,
+    3.542
+  ],
+  "events": [
+    {
+      "phase": 1,
+      "t_ms": 17741.0,
+      "roll": 87.696,
+      "roll_rate": -0.38,
+      "arm_l": 3.939,
+      "arm_r": 3.541,
+      "arm_l_tgt": 3.939,
+      "arm_r_tgt": 3.541,
+      "bl_vel": -0.022,
+      "br_vel": -0.04
+    },
+    {
+      "phase": 2,
+      "t_ms": 18226.0,
+      "roll": 87.723,
+      "roll_rate": -0.276,
+      "arm_l": 3.939,
+      "arm_r": 3.541,
+      "arm_l_tgt": 3.939,
+      "arm_r_tgt": 3.541,
+      "bl_vel": 0.037,
+      "br_vel": 0.022
+    },
+    {
+      "phase": 9,
+      "t_ms": 18856.0,
+      "roll": 85.877,
+      "roll_rate": -19.83,
+      "arm_l": 2.292,
+      "arm_r": 5.168,
+      "arm_l_tgt": 2.188,
+      "arm_r_tgt": 5.292,
+      "bl_vel": 3.585,
+      "br_vel": 3.837
+    },
+    {
+      "phase": 10,
+      "t_ms": 18956.0,
+      "roll": 83.221,
+      "roll_rate": -47.574,
+      "arm_l": 2.113,
+      "arm_r": 5.355,
+      "arm_l_tgt": 2.088,
+      "arm_r_tgt": 5.392,
+      "bl_vel": 3.774,
+      "br_vel": 3.567
+    },
+    {
+      "phase": 3,
+      "t_ms": 19101.0,
+      "roll": 82.729,
+      "roll_rate": 8.569,
+      "arm_l": 2.111,
+      "arm_r": 5.35,
+      "arm_l_tgt": 2.111,
+      "arm_r_tgt": 5.35,
+      "bl_vel": 3.661,
+      "br_vel": 3.495
+    },
+    {
+      "phase": 4,
+      "t_ms": 29001.0,
+      "roll": -2.238,
+      "roll_rate": -1.955,
+      "arm_l": 3.886,
+      "arm_r": 3.575,
+      "arm_l_tgt": 3.896,
+      "arm_r_tgt": 3.565,
+      "bl_vel": 0.005,
+      "br_vel": -0.022
+    },
+    {
+      "phase": 5,
+      "t_ms": 29611.0,
+      "roll": -2.298,
+      "roll_rate": -0.071,
+      "arm_l": 3.896,
+      "arm_r": 3.564,
+      "arm_l_tgt": 3.896,
+      "arm_r_tgt": 3.565,
+      "bl_vel": 0.039,
+      "br_vel": 0.001
+    },
+    {
+      "phase": 7,
+      "t_ms": 29750.0,
+      "roll": -2.368,
+      "roll_rate": -0.396,
+      "arm_l": 3.914,
+      "arm_r": 3.547,
+      "arm_l_tgt": 3.932,
+      "arm_r_tgt": 3.542,
+      "bl_vel": 0.018,
+      "br_vel": -0.021
+    }
+  ],
+  "timing": {
+    "request_to_prepare_s": 0.485,
+    "prepare_to_commit_s": 0.63,
+    "commit_to_support_s": 0.245,
+    "support_to_first_flat_s": 9.9,
+    "first_flat_to_retract_s": 0.61,
+    "final_retract_s": 0.139,
+    "total_lower_s": 12.009
+  },
+  "phase_metrics": {
+    "1": {
+      "samples": 24,
+      "sampled_duration_s": 0.485,
+      "tilt_range_deg": [
+        87.673,
+        87.728
+      ],
+      "rate_range_dps": [
+        -0.747,
+        0.796
+      ],
+      "median_rate_dps": -0.089,
+      "max_target_error_rad": [
+        0.0009999999999998899,
+        0.0
+      ],
+      "max_abs_torque_nm": [
+        0.218,
+        0.091
+      ],
+      "rate_gate_pause_samples": 0
+    },
+    "2": {
+      "samples": 31,
+      "sampled_duration_s": 0.63,
+      "tilt_range_deg": [
+        86.208,
+        88.163
+      ],
+      "rate_range_dps": [
+        -19.161,
+        10.792
+      ],
+      "median_rate_dps": -2.881,
+      "max_target_error_rad": [
+        0.2400000000000002,
+        0.2400000000000002
+      ],
+      "max_abs_torque_nm": [
+        0.266,
+        0.185
+      ],
+      "rate_gate_pause_samples": 14
+    },
+    "9": {
+      "samples": 5,
+      "sampled_duration_s": 0.1,
+      "tilt_range_deg": [
+        84.088,
+        85.877
+      ],
+      "rate_range_dps": [
+        -40.494,
+        -16.43
+      ],
+      "median_rate_dps": -19.83,
+      "max_target_error_rad": [
+        0.10399999999999965,
+        0.12399999999999967
+      ],
+      "max_abs_torque_nm": [
+        0.216,
+        0.125
+      ],
+      "rate_gate_pause_samples": 5
+    },
+    "10": {
+      "samples": 7,
+      "sampled_duration_s": 0.145,
+      "tilt_range_deg": [
+        81.693,
+        83.221
+      ],
+      "rate_range_dps": [
+        -47.574,
+        15.101
+      ],
+      "median_rate_dps": 7.179,
+      "max_target_error_rad": [
+        0.039000000000000146,
+        0.03699999999999992
+      ],
+      "max_abs_torque_nm": [
+        0.545,
+        0.674
+      ],
+      "rate_gate_pause_samples": 6
+    },
+    "3": {
+      "samples": 488,
+      "sampled_duration_s": 9.9,
+      "tilt_range_deg": [
+        -2.194,
+        82.814
+      ],
+      "rate_range_dps": [
+        -34.209,
+        8.569
+      ],
+      "median_rate_dps": -9.231,
+      "max_target_error_rad": [
+        0.02499999999999991,
+        0.016000000000000014
+      ],
+      "max_abs_torque_nm": [
+        0.718,
+        0.572
+      ],
+      "rate_gate_pause_samples": 116
+    },
+    "4": {
+      "samples": 30,
+      "sampled_duration_s": 0.61,
+      "tilt_range_deg": [
+        -2.297,
+        -2.238
+      ],
+      "rate_range_dps": [
+        -2.006,
+        -0.005
+      ],
+      "median_rate_dps": -0.135,
+      "max_target_error_rad": [
+        0.009999999999999787,
+        0.010000000000000231
+      ],
+      "max_abs_torque_nm": [
+        0.582,
+        0.363
+      ],
+      "rate_gate_pause_samples": 0
+    },
+    "5": {
+      "samples": 7,
+      "sampled_duration_s": 0.14,
+      "tilt_range_deg": [
+        -2.366,
+        -2.297
+      ],
+      "rate_range_dps": [
+        -1.426,
+        -0.071
+      ],
+      "median_rate_dps": -0.644,
+      "max_target_error_rad": [
+        0.020999999999999908,
+        0.017000000000000348
+      ],
+      "max_abs_torque_nm": [
+        0.496,
+        0.233
+      ],
+      "rate_gate_pause_samples": 0
+    }
+  },
+  "fast_selected": true,
+  "fast_events": {
+    "capture": {
+      "t_ms": 3026.0,
+      "roll": 83.061,
+      "roll_rate": -0.403,
+      "capture_shift": 0.0,
+      "run_curve_shift": 0.0
+    },
+    "arm_return": {
+      "t_ms": 3457.0,
+      "roll": 83.08,
+      "roll_rate": -0.187,
+      "capture_shift": -2.253,
+      "run_curve_shift": 0.0
+    },
+    "ramp_complete": {
+      "t_ms": 5296.0,
+      "roll": 90.309,
+      "roll_rate": 3.332,
+      "capture_shift": -0.0,
+      "run_curve_shift": 0.0
+    },
+    "recovery_settled": {
+      "t_ms": 9086.0,
+      "roll": 87.915,
+      "roll_rate": 0.434,
+      "capture_shift": -0.0,
+      "run_curve_shift": 0.0
+    }
+  },
+  "final": {
+    "tilt_deg": -2.368,
+    "rate_dps": -0.396,
+    "measured_forward_error_rad": [
+      -0.02499999999999991,
+      0.0050000000000003375
+    ],
+    "wheel_rad_s": [
+      0.018,
+      -0.021
+    ]
+  },
+  "limits": [
+    "One successful physical trial does not establish a reliability rate.",
+    "Measured torque and target tracking do not establish mechanical load ratings.",
+    "A faster return changes body/contact dynamics; recorded-input replay cannot predict it."
+  ]
+}

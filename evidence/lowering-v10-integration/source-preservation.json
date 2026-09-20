@@ -1,0 +1,14 @@
+{
+  "baseline_source": "b9763c2f5e2d66dcc28da4b1bc568dac29751b17",
+  "changed_production_files": [
+    "src/balance_controller.cpp",
+    "src/balance_lower.h",
+    "src/balance_telemetry.h"
+  ],
+  "policy_change": "CH6 latches normal/fast independently at accepted lowering request. Only supported return accelerates, with blend and floor taper.",
+  "controller_changes": "Pass existing CH6 selection into lower request; report selected profile; add fast-lower sample flag4096 and schema10 metadata.",
+  "fast_normal_driving_ota_crsf_unchanged": true,
+  "other_worktrees_modified": false,
+  "header_sha256": "546f8cd74b20ee4be7e51da6be5a8e9acbefbec9306c91b66cf28a0ad7861791",
+  "reused_checks": "Radio/dashboard/pinned TCP checks from c442e12; corresponding source unchanged. Consolidated includes actual OTA lifecycle and helper tests."
+}

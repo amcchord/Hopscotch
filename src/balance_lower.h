@@ -1,5 +1,6 @@
 #pragma once
 #define BALANCE_LOWER_FORWARD_PREPARE_V5 1
+#define BALANCE_LOWER_FAST_RETURN_V10 1
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -28,9 +29,11 @@ struct LowerConfig {
     float prepare_rad = 1.75f, prepare_speed = 4.0f;
     float moving_handoff_rad = 1.60f;
     float catch_rad = 1.85f, catch_speed = 2.0f;
-    // V7 completed with close target tracking; speed up only supported return.
-    // The existing body-rate pause and 0.30 rad/s motor cap still apply.
+    // Normal mode preserves the successful v9 supported return and landing.
     float lower_speed = .24f, retract_speed = .30f;
+    // CH6 fast mode accelerates only confirmed support, then tapers near floor.
+    float fast_lower_speed = .60f, fast_motor_speed = .75f, fast_descent_rate = 20.f;
+    uint32_t fast_blend_ms = 600;
     float catch_return_speed = .50f;
     float one_arm_return = .06f;
     float max_target_lead = .24f;
@@ -62,6 +65,7 @@ public:
     LowerPhase phase() const { return _phase; }
     bool active() const { return _phase != LowerPhase::Idle && _phase != LowerPhase::Complete && _phase != LowerPhase::Fault; }
     bool committed() const { return _committed; } // owns wheels, even before catch
+    bool fast() const { return _fast; }
     bool supported() const { return _supported; } // catch observed, not just commanded
     bool overridesArms() const { return active() && _phase != LowerPhase::Stopping; }
     float left() const { return _left; }
@@ -73,6 +77,8 @@ public:
     float armSpeed() const {
         const LowerConfig c;
         if (_phase == LowerPhase::Reaching) return c.prepare_speed;
+        if (_phase == LowerPhase::Descending)
+            return c.retract_speed + _return_blend*(c.fast_motor_speed-c.retract_speed);
         return _phase == LowerPhase::Committing || _phase == LowerPhase::Catching
             ? ((_left_touched || _right_touched) ? c.catch_return_speed : (_probing ? .5f : c.catch_speed))
             : c.retract_speed;
@@ -80,7 +86,7 @@ public:
     const char* reason() const { return _reason; }
     void reset() { *this = BalanceLower{}; }
 
-    bool request(uint32_t now, const LowerInput& in, float center_left, float center_right) {
+    bool request(uint32_t now, const LowerInput& in, float center_left, float center_right, bool fast = false) {
         if (active() || !valid(in) || !in.healthy
             || !std::isfinite(center_left) || !std::isfinite(center_right)
             || center_left * center_right >= 0
@@ -88,6 +94,7 @@ public:
             || std::fabs(center_right) < 1 || std::fabs(center_right) > 2.5f
             || in.tilt < 65 || in.tilt > 105) return false;
         reset();
+        _fast = fast; // Latched only on an accepted request; RC changes cannot alter a fall.
         _sign_left = std::copysign(1.f, center_left);
         _sign_right = std::copysign(1.f, center_right);
         _left = in.arm_left; _right = in.arm_right;
@@ -284,7 +291,15 @@ public:
             }
             break;
         }
-        case LowerPhase::Descending:
+        case LowerPhase::Descending: {
+            // Keep the demonstrated catch unchanged. Build speed over 600 ms
+            // after support, then return to normal between 35 and 15 degrees.
+            _return_blend = _fast
+                ? std::min(1.f, float(elapsed)/c.fast_blend_ms)
+                    * std::max(0.f, std::min(1.f, (in.tilt-15.f)/20.f))
+                : 0.f;
+            const float return_speed = c.lower_speed + _return_blend*(c.fast_lower_speed-c.lower_speed);
+            const float descent_rate = c.descent_rate + _return_blend*(c.fast_descent_rate-c.descent_rate);
             _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             if (flat) { enter(LowerPhase::GroundHold, now); break; }
             _support_lost_ms = in.tilt > 15 && in.rate < -25
@@ -295,11 +310,12 @@ public:
             if (now - _committed_ms > c.descent_timeout_ms || now - _progress_ms > c.progress_timeout_ms) {
                 fail("lower_descent_timeout"); break;
             }
-            if (in.rate >= -c.descent_rate && in.rate <= c.calm_rate) {
-                _left = approach(_left, 0, in.arm_left, c.lower_speed*dt, c.max_target_lead);
-                _right = approach(_right, 0, in.arm_right, c.lower_speed*dt, c.max_target_lead);
+            if (in.rate >= -descent_rate && in.rate <= c.calm_rate) {
+                _left = approach(_left, 0, in.arm_left, return_speed*dt, c.max_target_lead);
+                _right = approach(_right, 0, in.arm_right, return_speed*dt, c.max_target_lead);
             }
             break;
+        }
         case LowerPhase::GroundHold:
             _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             if (now - _committed_ms > c.descent_timeout_ms) { fail("lower_descent_timeout"); break; }
@@ -323,7 +339,8 @@ public:
 
 private:
     volatile LowerPhase _phase = LowerPhase::Idle;
-    bool _probing = false;
+    bool _probing = false, _fast = false;
+    float _return_blend = 0;
     bool _committed = false, _supported = false, _left_touched = false, _right_touched = false, _catch_started = false;
     float _left = 0, _right = 0, _sign_left = 0, _sign_right = 0, _wheel_command = 0;
     float _wheel_opposite_ms = 0;

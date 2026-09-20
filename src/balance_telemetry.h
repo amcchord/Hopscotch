@@ -64,7 +64,7 @@ struct BalanceSample {
     float    pilot_forward;
     float    pilot_steering;
     float    pilot_turn;
-    uint32_t pilot_flags; // ready=1, moving/braking=2, turning=4, fresh RC=8, accel/handoff=16
+    uint32_t pilot_flags; // ready=1, moving/braking=2, turning=4, fresh RC=8, accel/handoff=16; fast lowering=4096 (schema10)
     // Schema 4 preserves the complete schema-3 prefix.
     float    pilot_arm; // planned center fraction after recovery priority, before arm output filter
 };
@@ -134,7 +134,7 @@ static constexpr uint16_t V4_SAMPLE_BYTES = 240;
 inline bool supported(uint16_t schema, uint16_t bytes) {
     return (schema == 2 && bytes == V2_SAMPLE_BYTES)
         || (schema == 3 && bytes == V3_SAMPLE_BYTES)
-        || ((schema == 4 || schema == 5 || schema == 6 || schema == 7 || schema == 8 || schema == 9) && bytes == V4_SAMPLE_BYTES); // v5-v9 change policy metadata only
+        || ((schema == 4 || schema == 5 || schema == 6 || schema == 7 || schema == 8 || schema == 9 || schema == 10) && bytes == V4_SAMPLE_BYTES); // v5-v10 change policy metadata/flags, not layout
 }
 }
 static_assert(offsetof(BalanceSample, pilot_forward) == balance_log::V2_SAMPLE_BYTES,

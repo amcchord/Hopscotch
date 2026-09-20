@@ -1,0 +1,17 @@
+{
+  "cases": 329,
+  "before_complete": 258,
+  "after_complete": 258,
+  "changed_outcomes": [],
+  "normal_model_results_identical": true,
+  "normal_results_sha256": "a525c63ef8350ac12eda6251a7c66d13eaa848f52e386ad2c6e6a86f76dcbb77",
+  "all_common_successes_faster": true,
+  "median_seconds_saved": 2.04,
+  "nominal_seconds": {
+    "normal": 10.14,
+    "fast": 8.08
+  },
+  "contact_complete": 72,
+  "delayed_contact_complete": 15,
+  "limitation": "Approximate model; faster supported motion needs physical acceptance. No calibrated load ratings or timing guarantee."
+}

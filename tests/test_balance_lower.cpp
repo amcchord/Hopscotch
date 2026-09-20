@@ -8,13 +8,14 @@ using namespace balance_math;
 struct Rig {
     BalanceLower lower;
     LowerInput in{88,0,0,0,0,0,0,0,0,0,0,true};
+    bool fast_selected = false;
     uint32_t now = UINT32_MAX-1000; // Run confirmation/deadlines through rollover.
     void tick(bool follow=true) {
         now+=20;
         lower.step(now,.02f,in);
         if (follow && lower.overridesArms()) { in.arm_left=lower.left(); in.arm_right=lower.right(); }
     }
-    void start() { assert(lower.request(now,in,1.768f,-1.767f)); }
+    void start() { assert(lower.request(now,in,1.768f,-1.767f,fast_selected)); }
     void prepare() {
         start();
         for(int i=0;i<25;++i) tick();
@@ -50,6 +51,55 @@ struct Rig {
 };
 
 int main() {
+    { // CH6 mode is latched only on accepted request, independently per maneuver.
+      Rig r; r.fast_selected=true; r.start(); assert(r.lower.fast());
+      assert(!r.lower.request(r.now,r.in,1.768f,-1.767f,false));
+      assert(r.lower.fast()); r.lower.reset(); assert(!r.lower.fast());
+      r.in.healthy=false;
+      assert(!r.lower.request(r.now,r.in,1.768f,-1.767f,true));
+      assert(!r.lower.fast()); r.in.healthy=true; r.fast_selected=false;
+      r.start(); assert(!r.lower.fast());
+    }
+    { // Fast selection leaves preparation/catch untouched; acceleration starts
+      // only after confirmed support and normal speed returns near the floor.
+      Rig normal, fast; fast.fast_selected=true;
+      normal.catchFall(); fast.catchFall();
+      assert(normal.now==fast.now && normal.lower.left()==fast.lower.left());
+      assert(normal.lower.right()==fast.lower.right());
+      assert(normal.lower.wheelCommand()==fast.lower.wheelCommand());
+      assert(fast.lower.armSpeed()==normal.lower.armSpeed());
+      for(int i=0;i<30;++i) { normal.in.tilt-=.1f;fast.in.tilt-=.1f;normal.tick();fast.tick(); }
+      assert(std::fabs(fast.lower.armSpeed()-.75f)<.0001f);
+      assert(fast.lower.left()>normal.lower.left()+.10f);
+      normal.in.rate=fast.in.rate=-15;
+      float a=normal.lower.left(),b=fast.lower.left(); normal.tick();fast.tick();
+      assert(normal.lower.left()==a && std::fabs(fast.lower.left()-b-.012f)<.0001f);
+      for(float rate:{-20.01f,4.01f}) {
+        fast.in.rate=rate;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
+      }
+      fast.in.tilt=25;fast.in.rate=-8;b=fast.lower.left();fast.tick();
+      assert(std::fabs(fast.lower.armSpeed()-.525f)<.0001f);
+      assert(std::fabs(fast.lower.left()-b-.0084f)<.0001f);
+      fast.in.tilt=15;b=fast.lower.left();fast.tick();
+      assert(fast.lower.armSpeed()==.30f);
+      assert(std::fabs(fast.lower.left()-b-.0048f)<.0001f);
+      fast.in.rate=-12.01f;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
+      fast.in.tilt=0;fast.in.rate=0;fast.in.wheel_left=fast.in.wheel_right=0;
+      fast.tick(); assert(fast.lower.phase()==LowerPhase::GroundHold);
+      for(int i=0;i<29;++i)fast.tick();
+      assert(fast.lower.phase()==LowerPhase::GroundHold);fast.tick();
+      assert(fast.lower.phase()==LowerPhase::Retracting && fast.lower.armSpeed()==.30f);
+    }
+    { // Fast return does not waive feedback, support-loss or global rate guards.
+      for(int fault=0;fault<3;++fault) {
+        Rig r;r.fast_selected=true;r.catchFall();
+        if(fault==0)r.in.healthy=false;
+        if(fault==1){r.in.rate=-26;r.in.torque_left=0;}
+        if(fault==2)r.in.rate=65.01f;
+        for(int i=0;i<5 && r.lower.active();++i)r.tick();
+        assert(r.lower.phase()==LowerPhase::Fault);
+      }
+    }
     const float nan=std::numeric_limits<float>::quiet_NaN();
     { Rig r; r.in.healthy=false; assert(!r.lower.request(r.now,r.in,1.77f,-1.77f)); }
     for(float bad:{0.f,.5f,4.f,nan}) { Rig r; assert(!r.lower.request(r.now,r.in,bad,-1.77f)); }

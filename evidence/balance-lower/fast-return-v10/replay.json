@@ -1,0 +1,31 @@
+{
+  "baseline_source": "b9763c2f5e2d66dcc28da4b1bc568dac29751b17",
+  "header_sha256": "546f8cd74b20ee4be7e51da6be5a8e9acbefbec9306c91b66cf28a0ad7861791",
+  "runs": [
+    {
+      "capture": "telemetry_logs/bal_20260920_forward_catch_v7_success_wifi.csv",
+      "normal_commands_identical": true,
+      "support_ms": 22445.0,
+      "fast_first_command_divergence_ms": 22465.0,
+      "normal_replay_end": "lower_complete",
+      "fast_fixed_sensor_replay_end": "lower_complete"
+    },
+    {
+      "capture": "telemetry_logs/bal_20260920_forward_catch_v8_stop_wifi.csv",
+      "normal_commands_identical": true,
+      "support_ms": 13011.0,
+      "fast_first_command_divergence_ms": 13030.0,
+      "normal_replay_end": "lower_support_lost",
+      "fast_fixed_sensor_replay_end": "lower_support_lost"
+    },
+    {
+      "capture": "telemetry_logs/bal_20260920_forward_catch_v9_success_wifi.csv",
+      "normal_commands_identical": true,
+      "support_ms": 19101.0,
+      "fast_first_command_divergence_ms": 19121.0,
+      "normal_replay_end": "lower_complete",
+      "fast_fixed_sensor_replay_end": "lower_complete"
+    }
+  ],
+  "limitation": "Old recorded sensors cannot predict the physical trajectory after fast commands diverge. This verifies normal equivalence and unchanged preparation/catch, not fast hardware acceptance."
+}

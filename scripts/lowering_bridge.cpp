@@ -31,3 +31,13 @@ extern "C" float lower_balance_setpoint(void* p, float ordinary) {
     return ordinary;
 #endif
 }
+
+extern "C" bool lower_request_mode(void* p, uint32_t now, const float* values, bool healthy,
+                                   float left, float right, bool fast) {
+#ifdef BALANCE_LOWER_FAST_RETURN_V10
+    return static_cast<BalanceLower*>(p)->request(now,input(values,healthy),left,right,fast);
+#else
+    (void)fast; // Historical policies supply the normal comparison.
+    return static_cast<BalanceLower*>(p)->request(now,input(values,healthy),left,right);
+#endif
+}
