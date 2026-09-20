@@ -1,5 +1,7 @@
 # Startup recovery evidence
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The selected implementation is **early wheel-feedback learning**, in production source and `final-*` results. All prior arm/fixed-angle alternatives were unflashed development experiments.
 
 - `final-validation.txt`: consolidated five native suites, 19 Python tests, syntax/diff and firmware build.

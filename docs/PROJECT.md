@@ -2,7 +2,9 @@
 
 ## What This Is
 
-Hopscotch is firmware for a remote-controlled 4-wheeled robot with two arms. It runs on an M5Stack AtomS3R (ESP32-S3) and controls 6 Robstride brushless motors over CAN bus. The robot is driven via an ELRS radio receiver and exposes a web dashboard for diagnostics and configuration.
+Hopscotch is firmware for a remote-controlled 4-wheeled robot with two arms. It runs on an M5Stack AtomS3R (ESP32-S3) and controls 6 Robstride brushless motors over CAN bus. ELRS remains the motion-control link. The LAN dashboard provides live telemetry, saved-run downloads, disarm requests and application OTA; tuning and calibration use the USB console.
+
+Start with the [Wi-Fi / OTA operating guide](WIFI_OTA.md), [balance test procedure](BALANCE_TESTING.md) and [current installed release](progress/CURRENT.md). Dated balance reports describe historical releases, not current upload instructions.
 
 ## Hardware
 
@@ -168,14 +170,14 @@ Arms are controlled in rate mode: the RC stick input is integrated into a positi
 
 ## ELRS / CRSF
 
-The CRSF protocol provides 16 channels of 11-bit data (raw range 172–1811, center 992). The channel-to-function mapping is configurable via the web UI. Defaults:
+The CRSF protocol provides 16 channels of 11-bit data (raw range 172–1811, center 992). Ground-drive and several trigger mappings are stored in settings; standing-drive CH1/CH2 and arm-speed/nudge CH5/CH4 are fixed. Web settings routes are disabled. Source defaults below use zero-based indices; operator docs use CH1–CH16. The [GX12 audit](RADIO_TELEMETRY.md) records the saved handset sources, which may differ after radio adjustments.
 
 | Function | Channel (0-indexed) |
 |----------|-------------------|
 | Steering | 0 |
 | Throttle | 1 |
 | Drive Arm/Disarm | 9 |
-| Arms Arm/Disarm | 4 |
+| Arms Arm/Disarm | 8 |
 | Left Arm | 12 |
 | Right Arm | 13 |
 
@@ -185,11 +187,11 @@ Signal loss is detected if no valid CRSF frame arrives within 500 ms.
 
 Balance mode automatically records one 120-second run at 50 Hz. The PSRAM sample contains the state-machine and outer-loop values plus windowed evidence from all 200 Hz PD ticks, including maximum inner-loop interval, tick count, saturation count, raw accelerometer angle/gyro/acceleration norm, unclamped and applied wheel commands, every setpoint component, CAN feedback age, rear-wheel torque, arm-assist state and torque, yaw correction, and cached power data.
 
-The run also captures its actual live-tuned gains, stored trim at entry, compile-time control constants, firmware build time, operator note, numbered event markers, end reason, sample count, and checksum. The file is written to `/bal_log.bin` only after balance mode and arm return are fully idle. Learned-trim persistence is deferred to the same idle service; neither flash operation can stall a live balance loop.
+The run also captures its actual live-tuned gains, stored trim at entry, compile-time control constants, firmware build time, operator note, numbered event markers, end reason, sample count, and checksum. Schema v4 adds pilot intent and planned arm assistance to the earlier layout: 6,000 samples × 240 bytes = 1,440,000 bytes in PSRAM. The file is written to `/bal_log.bin` only after balance and arm return are idle and both motor groups are disarmed. Learned-trim persistence is deferred to the same safe service.
 
-`bal log` is refused while balance mode is active. While idle it validates the binary file and exports CSV. `scripts/save_telemetry.sh` accepts that download only when the schema-v2 checksum and received row count are valid. The loop/stall profiler is run-scoped and frozen at balance exit, so serial download activity is excluded from its results.
+`scripts/robot_wifi.py log` is the default download path. With the control-owned maintenance gate granted, the device validates the saved binary and copies its CSV export into bounded PSRAM, then releases the gate before sending it. The host verifies schema, checksums, row count and samples and retains cleaned `.csv` plus original `.wire` data. Earlier stored schemas keep their original metadata. `bal log` and `scripts/save_telemetry.sh` provide the USB fallback. The run-scoped profiler freezes at balance exit; transfer activity is excluded.
 
-Use `bal note <text>` before a run to record physical conditions. While balancing, CH12 is repurposed as a non-actuating event marker and its normal arm-home trigger is suppressed. The full safety, flashing, test-ladder, capture, schema, flag, and analysis procedure is in [`BALANCE_TESTING.md`](BALANCE_TESTING.md).
+Use USB `bal note <text>` before a run, or keep operator observations alongside the downloaded CSV when untethered. While balancing, CH12 is a non-actuating event marker and its normal arm-position trigger is suppressed. Wi-Fi has no note, gain or motion command endpoint. Live telemetry is best-effort JSON schema 1, offered at 10 Hz; it does not replace the complete 50 Hz capture. The full test, capture and analysis procedure is in [BALANCE_TESTING.md](BALANCE_TESTING.md).
 
 ## Software Architecture
 
@@ -197,16 +199,23 @@ Use `bal note <text>` before a run to record physical conditions. While balancin
 
 | Task | Rate | Period |
 |------|------|--------|
-| Control loop | 50 Hz | 20 ms |
+| Control task / state-machine updates | 200 Hz / 50 Hz | 5 ms / 20 ms |
 | Balance PD loop | 200 Hz | 5 ms |
-| Display refresh | 25 fps | 40 ms |
-| WebSocket telemetry | 10 Hz | 100 ms |
+| Display refresh | 25 fps; 5 fps balancing | 40 ms; 200 ms balancing |
+| WebSocket telemetry | 10 Hz offered; best-effort delivery | 100 ms offer interval |
+
+Balance (priority 18), control (12), stall sentinel (24), and display/debug (1)
+run on core 1. Wi-Fi/lwIP, Arduino network events, async TCP (3), and the network
+task (2) run on core 0. Control publishes a fixed-size snapshot through a
+one-element overwrite queue. Networking does not allocate or format on the
+control core. Flash access and Wi-Fi association still require disarmed
+maintenance because they can affect both cores; see [control isolation](WIFI_OTA.md#control-isolation).
 
 ### Module Map
 
 | File | Responsibility |
 |------|---------------|
-| `main.cpp` | Setup, 50 Hz loop, arming logic, failsafe, debug telemetry |
+| `main.cpp` | Task setup, control owner, arming logic, failsafe, debug telemetry |
 | `config.h` | Pin definitions, timing constants, motor specs |
 | `settings.h/.cpp` | Persistent JSON config on LittleFS |
 | `robstride.h/.cpp` | Low-level CAN protocol driver (TWAI) |
@@ -214,35 +223,46 @@ Use `bal note <text>` before a run to record physical conditions. While balancin
 | `crsf.h/.cpp` | CRSF packet parser, channel extraction, link detection |
 | `drive_controller.h/.cpp` | Arcade mixing, closed-loop rolling horizon, braking state machine |
 | `arm_controller.h/.cpp` | Rate-mode arm control |
+| `balance_controller.h/.cpp` | Balance state machine, 200 Hz controller and saved run |
 | `display.h/.cpp` | 128x128 sprite-based status display |
-| `web_server.h/.cpp` | AsyncWebServer + WebSocket |
-| `data/` | Web UI files (HTML/CSS/JS) served from LittleFS |
+| `web_server.h/.cpp` | Core-0 HTTP/WebSocket, saved-log export, Wi-Fi and OTA |
+| `network_snapshot.h` / `network_safety.h` | RAM snapshot contract and maintenance request/grant interlock |
+| `data/network.html` | Active dashboard embedded in `firmware.bin`; other `data/` assets are legacy |
+| `scripts/robot_wifi.py` | Host status, validated log download and application OTA |
+| `scripts/patch_asynctcp.py` | Source-hash-checked fixes for the pinned TCP library |
 
-### Build
+### Build and OTA Update
 
-This is a PlatformIO project targeting `esp32-s3-devkitc-1` with Arduino framework.
+PlatformIO environment `m5stack-atoms3r` targets `esp32-s3-devkitc-1` with
+Arduino 2.0.16 / espressif32 6.7.0 and an 8 MiB partition table. Configure the
+ignored `src/network_secrets.h` before building. From the project root:
 
 ```bash
-pio run                      # Build
-pio run --target upload      # Upload firmware (uses esp-builtin JTAG)
-pio run --target uploadfs    # Upload web UI to LittleFS
-pio device monitor           # Serial monitor at 115200
+./scripts/build.sh
+# After the guide's candidate checks, disarm and download the previous run:
+.venv/bin/python scripts/robot_wifi.py log
+.venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
 ```
 
-Upload protocol is `esp-builtin` (JTAG), not esptool, because the AtomS3R's USB-JTAG serial port is unreliable with esptool baud rate changes while firmware is running.
+Use the [complete update procedure](WIFI_OTA.md#update-the-firmware), including
+post-reboot verification. OTA writes only the inactive application slot; it also
+updates the dashboard. **Do not run `uploadfs`**: LittleFS contains settings,
+calibration and the saved run. USB remains available for console work and
+[recovery](WIFI_OTA.md#recovery); legacy app0-only upload scripts are not general
+recovery tools after OTA. A boot-broken image has no automatic rollback.
 
 ## Web UI
 
-Served on port 80 at the device's WiFi IP address.
+Open [hopscotch.local](http://hopscotch.local/) on the configured LAN, or use the
+IP on the display. The embedded UI shows pose, motors, RC channels, timing,
+memory and maintenance blockers. Read-only telemetry and firmware information
+are public on the trusted LAN; log export, disarm, reconnect and OTA require the
+device bearer token. The browser holds it only in the current page.
 
-**REST API:**
-- `GET /api/settings` — current settings JSON
-- `POST /api/settings` — update settings
-- `POST /api/disarm` — emergency disarm all motors
-- `POST /api/change-can-id` — change a motor's CAN ID (`{"oldId": N, "newId": M}`)
-- `POST /api/reset-settings` — factory reset
-
-**WebSocket** (`/ws`): 10 Hz JSON telemetry with motor positions/velocities/torques/temps, all 16 RC channels, arming state, link quality, and WiFi status.
+The [API reference](WIFI_OTA.md#http-and-websocket-api) is authoritative.
+`/api/settings`, `/api/change-can-id` and `/api/reset-settings` return **410**,
+including the old settings GET/export. There is no Wi-Fi arm, steering, balance,
+calibration or tuning endpoint. Use USB for supported console operations.
 
 ## Key Lessons Learned
 
@@ -252,6 +272,6 @@ Served on port 80 at the device's WiFi IP address.
 
 3. **The Atomic CAN Base has no termination resistor.** You must add 120 Ω between CAN_H and CAN_L at the bus endpoints.
 
-4. **AtomS3R upload protocol.** Use `upload_protocol = esp-builtin` (JTAG) in `platformio.ini`. The default esptool protocol fails to change baud rate reliably when firmware is already running on the USB-JTAG port.
+4. **AtomS3R recovery transport.** Normal updates use OTA. The configured USB upload transport is `esp-builtin` (JTAG); esptool baud-rate changes have been unreliable while firmware runs on the USB-JTAG port. Determine the selected OTA slot before any USB recovery write.
 
 5. **Partition table.** The AtomS3R has 8 MB flash. Use `default_8MB.csv`, not `default_16MB.csv`.

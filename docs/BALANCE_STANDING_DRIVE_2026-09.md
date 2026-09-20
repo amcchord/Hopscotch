@@ -1,5 +1,7 @@
 # Driving while balanced — September 19, 2026
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 Austin requested CH1 left/right and CH2 forward/back control after standing, and explicitly authorized deployment. The starting point is the successful recoil-release application `1d80257` / SHA-256 `5d3465e0269f9df19065d1583de35d093b46f947fdd27e49ef0de0bbf28d4dd0`, archived in `artifacts/balance-recoil-release/`. All earlier physical logs are retained.
 
 ## Operator behavior

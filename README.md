@@ -2,9 +2,9 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Successful early-recovery stand-ups — September 14 and 19, 2026:** [Findings, firmware changes and measured result](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) · [Current state](docs/progress/CURRENT.md) · [Test procedure](docs/BALANCE_TESTING.md). Two reported successes are archived with complete 1,203- and 1,303-sample logs. The September 19 repeat settled about a second sooner and showed 16% less initial wheel travel than the first success. Preserve the tested firmware while collecting more repeatability evidence. [Exact firmware identity](evidence/balance-startup-recovery/tested-firmware-identity.json).
+**Current firmware:** Wi-Fi telemetry and application OTA are installed, retaining the [driving damping v4 controller](docs/BALANCE_DRIVE_DAMPING_2026-09.md) and existing calibration. Use the [Wi-Fi / OTA operating guide](docs/WIFI_OTA.md) for updates and wireless log downloads, and the [balance test guide](docs/BALANCE_TESTING.md) for physical trials. The [current state](docs/progress/CURRENT.md) and [release evidence](evidence/wifi-ota/README.md) identify the exact installed image and verification limits. Network tests passed with motor power off; powered balance on this combined release remains unverified.
 
-**Current drive work — September 19:** [Acceleration control and planned arm assistance](docs/BALANCE_DRIVE_AGILITY_2026-09.md) is flashed. [Physical trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) show faster response, but driving/braking rocks fore/aft and startup remains variable. Further damping and arm-coordination work is needed. See [current state](docs/progress/CURRENT.md) for the exact installed image and next action.
+Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
 ![Robot Diagram](docs/RobotDiagram.png)
 
@@ -42,7 +42,9 @@ The full design record -- 30+ instrumented runs and 50+ lessons in the current S
 ### Wi-Fi telemetry and OTA
 
 The robot joins its configured Wi-Fi network and serves an embedded dashboard
-at `http://hopscotch.local/`. [Setup, API, safety design and recovery](docs/WIFI_OTA.md).
+at [hopscotch.local](http://hopscotch.local/). The last tested DHCP address was
+[192.168.1.172](http://192.168.1.172/); use the display's address if it changes.
+[Setup, API, safety design and recovery](docs/WIFI_OTA.md).
 
 - Live telemetry offered at 10 Hz: pose, motor feedback, RC state, timing and memory
 - Checksummed saved-run downloads without a USB cable
@@ -60,69 +62,82 @@ A serial CLI at 115200 baud provides debug output every 2 seconds (loop timing, 
 
 ## Transmitter Setup
 
-The RadioMaster GX12 should be configured with ELRS and the following default channel mapping:
+The firmware uses the following default functions. GX12 sources are from the
+[September 19 radio audit](docs/RADIO_TELEMETRY.md); later radio adjustments and
+persisted robot mappings must be checked before a physical test.
 
 | Function | Channel | GX12 Control |
 |----------|---------|-------------|
 | Steering | CH1 | Right stick X |
 | Throttle | CH2 | Right stick Y |
-| Arm Speed | CH5 | Left slider |
-| Arm Nudge | CH4 | Right slider |
-| Arm Select Group | CH6 | 3-way switch |
-| Arm Select Variant | CH7 | 3-way switch |
-| Arms Arm/Disarm | CH9 | Lighted button |
-| Drive Arm/Disarm | CH10 | Switch |
-| Arm Trigger Execute | CH11 | Trigger button |
-| Arm Trigger Home | CH12 | Trigger button |
-| Left Arm | CH13 | Knob |
-| Right Arm | CH14 | Knob |
+| Arm Speed | CH5 | SE |
+| Arm Nudge | CH4 | Input Rud |
+| Arm Select Group | CH6 | SB; retained setting |
+| Balance Select | CH7 | SC |
+| Arms Arm/Disarm | CH9 | SA |
+| Drive Arm/Disarm | CH10 | SD |
+| Execute / balance / calibration trigger | CH11 | SG |
+| Arm-position cycle / balance event marker | CH12 | SH |
+| Left Arm setting | CH13 | P1; unused by sequential arm controller |
+| Right Arm setting | CH14 | P2; unused by sequential arm controller |
 
-Channel assignments are fully configurable through the web dashboard. Signal loss is detected if no valid CRSF frame arrives within 500 ms — all motors hold position on failsafe.
+Ground-drive and several trigger mappings are stored in robot settings;
+standing-drive CH1/CH2 and arm-speed/nudge CH5/CH4 are fixed in firmware. Web
+configuration is disabled; use the USB console for supported configuration and
+diagnostics. Signal loss is detected if no valid CRSF frame arrives within 500 ms.
 
-## Building and Flashing
+## Building and Updating over Wi-Fi
 
 ### Prerequisites
 
-- [PlatformIO](https://platformio.org/) (CLI or IDE plugin)
-- USB-C cable to the AtomS3R
+- Python 3 and [PlatformIO](https://platformio.org/) for a source build
+- Local `src/network_secrets.h` configured as described in the [operating guide](docs/WIFI_OTA.md#local-configuration-and-access)
+- Computer and robot on the same LAN; USB is optional for normal updates and telemetry
 
 ### Build
-
-```bash
-pio run
-```
-
-Or use the helper script:
 
 ```bash
 ./scripts/build.sh
 ```
 
-### Flash Firmware
+### Update the Application
+
+Support and disarm the robot, lower both arm switches, release CH11, and wait
+for log saving to finish. Download the previous run before updating. From the
+project root (use `python3` if the local `.venv` is absent):
 
 ```bash
-pio run --target upload
+.venv/bin/python scripts/robot_wifi.py status
+.venv/bin/python scripts/robot_wifi.py log
+.venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
 ```
 
-Upload uses `esp-builtin` (JTAG) because the AtomS3R's USB-JTAG serial port is unreliable with esptool baud rate changes while firmware is running.
+Run the [candidate checks and post-update verification](docs/WIFI_OTA.md#update-the-firmware)
+when changing firmware. The CLI reads the private token, checks upload integrity,
+and verifies the rebooted slot and image digest. The dashboard can also upload
+the same application file. **Do not run `uploadfs`, even after UI changes:**
+`data/network.html` is embedded in the application, and LittleFS holds settings,
+calibration and the saved run. USB recovery is [slot-aware](docs/WIFI_OTA.md#recovery);
+OTA does not provide automatic rollback from a boot-broken application.
 
-### Upload Web UI
+### Telemetry
 
-The legacy web dashboard files in `data/` can be uploaded to LittleFS, but the current Wi-Fi dashboard is embedded in the application and does **not** require this:
+Use the dashboard for live monitoring. After each disarmed run, download the
+full onboard capture and analyze the resulting file:
 
 ```bash
-pio run --target uploadfs
+.venv/bin/python scripts/robot_wifi.py log
+.venv/bin/python scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
 ```
 
-For a balance-test firmware update, do not run `uploadfs` unless the web assets actually changed: it can replace the LittleFS volume that holds settings, arm calibration, and the saved balance log.
+The downloader creates validated `.csv` and original `.wire` files. Analysis is
+a separate command; replace `<run>` with the downloaded filename. If mDNS is
+unavailable, place `--host http://192.168.1.172` before `status`, `log` or `ota`.
 
-### Serial Monitor
+### USB Console
 
-```bash
-pio device monitor
-```
-
-Or:
+Runtime gain tuning, calibration, detailed console diagnostics and log clearing
+still use USB. Wi-Fi does not provide a motion or tuning command console.
 
 ```bash
 ./scripts/monitor.sh
@@ -132,12 +147,12 @@ Or:
 
 The firmware splits the two ESP32-S3 cores into a **control core** and a **comms core**:
 
-- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: direct IMU acquisition, complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display and debug output — control can preempt it, never the reverse.
-- **Core 0 (comms)** — WiFi and lwIP (pinned by the framework), `async_tcp` (priority 3), and the network task (priority 2). Control publishes bounded RAM snapshots. OTA and saved-file reads require a disarmed interlock because flash access can still pause both cores.
+- **Core 1 (control)** — a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: direct IMU acquisition, complementary filter, PD loop, wheel speed commands), and the control task (prio 12, 5 ms cadence with 50 Hz state-machine/drive/arm updates: serial console, CRSF, CAN, arming, failsafe). The Arduino `loopTask` (prio 1) keeps only the display and debug output.
+- **Core 0 (comms)** — Wi-Fi, lwIP, Arduino network events, `async_tcp` (priority 3), and the network task (priority 2). Control publishes bounded RAM snapshots; all network formatting happens here. OTA, saved-file reads and Wi-Fi association require a disarmed interlock because core separation alone cannot prevent cross-core stalls.
 
 Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
 
-Balance telemetry schema v2 records up to 120 seconds at 50 Hz, including tip-up, in PSRAM, including 200 Hz inner-loop timing/saturation aggregates, raw and filtered IMU signals, all setpoint components, unclamped/applied commands, CAN feedback latency, wheel and arm torque/motion, arm-assist lifecycle, yaw correction, power, safety-exit reason, and operator event markers. It is persisted as a checksummed binary file only after balance ends and drive and arms are both disarmed, and exported to validated CSV by `./scripts/save_telemetry.sh`.
+Balance telemetry schema v4 records up to 120 seconds at 50 Hz, including tip-up, in a 1,440,000-byte PSRAM buffer. It includes 200 Hz timing/saturation aggregates, raw and filtered IMU signals, setpoints, commands, CAN feedback, wheel/arm motion and torque, pilot intent/planned arm assistance, power, safety-exit reason and event markers. It is persisted as a checksummed binary only after balance ends and both groups are disarmed. `scripts/robot_wifi.py log` exports validated CSV over Wi-Fi; `scripts/save_telemetry.sh` remains the USB fallback. Live dashboard JSON schema 1 is separate from the saved-log schema.
 
 ### Module Map
 
@@ -153,7 +168,10 @@ Balance telemetry schema v2 records up to 120 seconds at 50 Hz, including tip-up
 | `arm_controller.h/cpp` | Rate-mode arm control with calibration |
 | `balance_controller.h/cpp` | Balance state machine and 200 Hz PD loop |
 | `display.h/cpp` | 128x128 sprite-based status display |
-| `web_server.h/cpp` | Async web server and WebSocket telemetry |
+| `web_server.h/cpp` | Core-0 networking, WebSocket telemetry, saved-log export and OTA |
+| `network_snapshot.h` / `network_safety.h` | Fixed-size snapshot contract and control-owned maintenance gate |
+| `data/network.html` | Dashboard embedded in the application |
+| `scripts/robot_wifi.py` | LAN status, validated log download, disarm, reconnect and verified OTA |
 
 ### Timing
 
@@ -170,7 +188,9 @@ Balance telemetry schema v2 records up to 120 seconds at 50 Hz, including tip-up
 
 Compile-time defaults live in `src/config.h`. Parameters are retained in `settings.json` on LittleFS. The previous web mutation routes are disabled; use the USB console for tuning and calibration.
 
-Balance gains can also be tuned over serial between attempts without reflashing:
+Balance gains can be tuned over USB between attempts without reflashing.
+These are command examples, not a tuning preset; inspect `bal status` before
+changing the current gains:
 
 ```
 bal kp 2.0      # inner PD: rad/s wheel speed per deg of angle error

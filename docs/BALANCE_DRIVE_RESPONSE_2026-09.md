@@ -1,5 +1,7 @@
 # Standing drive response v2 — September 19, 2026
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 Austin tested CH1 steering / CH2 forward-back on the first standing-drive release and reported that all directions worked, but forward/back had a long delay and both axes were too slow. This release changes driving response and limits. Stand-up, startup catch/recoil release, calibration, motor caps, and stationary gains remain unchanged.
 
 ## Evidence and diagnosis

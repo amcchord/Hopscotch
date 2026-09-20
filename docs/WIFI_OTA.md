@@ -1,10 +1,18 @@
 # Wi-Fi telemetry and OTA
 
 Hopscotch joins the configured 2.4 GHz network as `hopscotch.local`. Open
-`http://hopscotch.local/` (or the address on the robot display) for live pose,
+[hopscotch.local](http://hopscotch.local/) (or the address on the robot display) for live pose,
 motor feedback, RC link state, control timing, saved-run download and application
 updates. This is a LAN service. The September 19 device is configured for
-SvensHaus. No Internet server is required or deployed.
+SvensHaus; its last tested DHCP address was [192.168.1.172](http://192.168.1.172/).
+No Internet server is required or deployed.
+
+This is the current operating guide for firmware updates and telemetry.
+[Current state](progress/CURRENT.md) identifies the installed application;
+[release evidence](../evidence/wifi-ota/README.md) records the tested hashes and
+motor-power-off validation. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
+physical trials. Older dated releases and their app0-only USB commands are
+historical records, not the update procedure for this firmware.
 
 ## Control isolation
 
@@ -58,12 +66,14 @@ and a stalled WebSocket client. `/api/info` also reports the ESP reset reason.
 
 ## Local configuration and access
 
-Copy `src/network_secrets.example.h` to `src/network_secrets.h` and fill in
+For a new checkout, copy `src/network_secrets.example.h` to `src/network_secrets.h` and fill in
 SSID, Wi-Fi password, a random device API token and a distinct recovery AP
 password. The actual file is gitignored and mode 0600 on this workstation.
 Wi-Fi credentials and the token are present in the device application binary;
 keep firmware packages and full-flash backups private. Never commit the local
-header or paste its contents into a worklog.
+header or paste its contents into a worklog. Keep the already configured local
+header when updating this robot; do not replace it with the example. Changing
+credentials or the token in a build changes what is needed after its reboot.
 
 The token is needed for log downloads, disarm, reconnect and firmware upload.
 The browser only keeps the entered token in its current page; the CLI reads it
@@ -76,25 +86,126 @@ starts `Hopscotch-Recovery` using the local recovery password; its address is
 normally `192.168.4.1`. An unavailable network never blocks the normal control
 loop indefinitely. The recovery AP stays enabled until reboot once started.
 
-## Operations
+## Live telemetry and saved runs
+
+Commands below run from the project root. `scripts/robot_wifi.py` needs only
+Python 3's standard library; substitute `python3` if `.venv/bin/python` is absent.
+Its default host is `http://hopscotch.local`. Put an IP override **before** the
+subcommand: `python3 scripts/robot_wifi.py --host http://192.168.1.172 status`.
 
 ```bash
-# Live state; add --host http://<device-ip> before the subcommand if needed.
+# Read the latest snapshot; this command is a single read, not a stream.
 .venv/bin/python scripts/robot_wifi.py status
 
-# Fetch and validate the same checksummed CSV exported over USB.
+# After a run: disarm both groups and wait for log saving to finish.
 .venv/bin/python scripts/robot_wifi.py log
+```
 
-# Safe stop request, executed by the control task.
+The browser receives live pose, motor feedback, RC channels, timing and memory
+through `/ws`. Offers are 10 Hz; network delivery is best-effort, can skip frames,
+and is not a real-time control channel. The dashboard marks stale data. The full
+onboard balance capture runs independently at 50 Hz with 200 Hz aggregates;
+new captures are schema 4, up to 6,000 samples/120 seconds. Live JSON schema 1
+and saved-log schema 4 are different formats. Existing older saved runs retain
+their original schema and metadata when exported by the new firmware.
+
+After supporting the robot, lower both arm switches and release CH11. Wait for
+fresh status showing both groups disarmed, `saving_log: false`,
+`maintenance_allowed: true`, and `maintenance: false`, then download. Only the
+latest run is stored; retrieve it before the next test or firmware downgrade.
+
+A log export first copies a checksummed CSV into a bounded 4 MiB PSRAM buffer
+under maintenance, then releases the interlock and sends that immutable copy.
+One download can be in flight; a second gets 429. A slow client cannot cause
+filesystem reads while the robot is subsequently armed. The CLI validates row
+count, schema, sample values, timestamps and transport/device checksums before
+saving cleaned CSV and original `.wire` data. It refuses to overwrite files.
+Default names are `telemetry_logs/bal_YYYYMMDD_HHMMSS_wifi.csv` and `.wire`;
+use `log --output telemetry_logs/<unique-name>.csv` for a custom path.
+
+Keep both files and your operator observations. Run analysis separately using
+the downloaded filename:
+
+```bash
+.venv/bin/python scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
+# Optional plot requires matplotlib:
+.venv/bin/python scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details --plot
+```
+
+The browser's **Download latest run** saves the raw export. For a validated
+archive, use the CLI or run `python3 scripts/validate_telemetry.py <raw-download>
+<new-clean-output.csv>` afterward. Choose a new output path: the standalone
+validator can overwrite its output. Failed Wi-Fi downloads do not automatically
+create a diagnostic archive; retry before starting another run. The request
+timeout is 120 seconds. USB fallback is `./scripts/save_telemetry.sh --label
+<run-name>`; that helper saves `.csv`/`.serial` and also runs analysis.
+
+## Disarm and reconnect
+
+```bash
+# Request disarm; confirm both groups are disarmed in fresh telemetry afterward.
 .venv/bin/python scripts/robot_wifi.py disarm
 
-# Reconnect only while disarmed; used for bench recovery checks.
+# Reconnect only while disarmed; the connection drops while rejoining.
 .venv/bin/python scripts/robot_wifi.py reconnect
-
-# Build and install an application, preserving filesystem and calibration.
-./scripts/build.sh
-.venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
 ```
+
+HTTP 202 acknowledges the request, not completion. Keep the radio disarm control
+available; Wi-Fi is best-effort. Reconnect holds the maintenance interlock while
+associating and does not normally reboot. Lower both arm switches after
+maintenance or web disarm before attempting to rearm.
+
+## Update the firmware
+
+1. Support the robot, keep motor power off, lower both arm switches and release
+   CH11. Wait for the safe state above and download the previous run. Record
+   the existing build, slot and image digest from
+   [firmware information](http://hopscotch.local/api/info). Keep the previous
+   exact application package locally for recovery; a source rebuild can differ.
+2. Choose **one** application file. The frozen, bench-tested release on this
+   workstation is `artifacts/wifi-ota/release/firmware.bin`, identified by its
+   manifest and [release evidence](../evidence/wifi-ota/README.md). To prepare a
+   changed source build with the existing local credentials:
+
+   ```bash
+   ./scripts/check_balance_candidate.sh
+   bash scripts/check_radio_telemetry.sh
+   node tests/test_network_dashboard.js
+   ```
+
+   The consolidated balance check also runs `./scripts/build.sh`.
+   Keep the new binary, ELF, source revision, build output and SHA-256 together
+   in a private release package. The new application is
+   `.pio/build/m5stack-atoms3r/firmware.bin`.
+3. Recheck fresh disarmed state, then upload the chosen application:
+
+   ```bash
+   .venv/bin/python scripts/robot_wifi.py status
+   .venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
+   ```
+
+   Substitute `artifacts/wifi-ota/release/firmware.bin` to install the frozen
+   release. Do not upload a filesystem, partition, bootloader or full-flash image.
+   Alternatively, enter the token in the dashboard, select the same application
+   file and use its update control; it calculates the required size and SHA-256.
+4. Wait for upload verification and reboot. The CLI waits for a different
+   running slot and checks its reported ESP image digest against the uploaded
+   application's appended digest. Confirm its final report says both groups
+   are disarmed. If reboot is not verified, inspect the device before use;
+   an accepted upload alone is not a successful handoff.
+5. Reopen the dashboard and inspect `/api/info` and fresh telemetry. Confirm
+   expected build/image, idle/disarmed state, healthy IMU and no active
+   maintenance. Motors remain offline with motor power off. Re-download the
+   saved run to check preservation. Follow the
+   [stationary powered check](BALANCE_TESTING.md#updating-the-test-firmware)
+   before a supervised physical trial.
+
+`/api/info` reports `image_sha256`, the ESP image's internal content digest.
+It differs from the SHA-256 of the complete upload file, which includes the
+appended digest. Compare like with like; the CLI handles both checks. Firmware
+identity/slot data is cached at boot under maintenance, avoiding flash reads
+from a status request during balance. Query it read-only with
+`curl --fail --silent --show-error http://hopscotch.local/api/info`.
 
 The dashboard is embedded in `firmware.bin`, so its updates travel with OTA.
 **Do not use `uploadfs`**: the existing LittleFS volume holds settings,
@@ -103,13 +214,6 @@ endpoints return 410; they mutated control state from a networking callback.
 Use the existing USB console for tuning/calibration until a transactional
 configuration API is implemented. No Wi-Fi arming, steering or balance command
 path has been added.
-
-A log export first copies a checksummed CSV into a bounded 4 MiB PSRAM buffer
-under maintenance, then releases the interlock and sends that immutable copy.
-One download can be in flight; a second gets 429. A slow/down client cannot
-cause filesystem reads while the robot is subsequently armed. The CLI validates
-row count, schema, sample values, timestamps and transport/device checksums,
-and saves both cleaned CSV and original `.wire` data without overwriting files.
 
 OTA requires an application image, exact byte count, SHA-256 and bearer token.
 It streams into the inactive app slot, verifies size/hash and the ESP application
@@ -122,18 +226,68 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
+## HTTP and WebSocket API
+
+Port 80 on the trusted LAN. Protected requests use `Authorization: Bearer
+<device-token>`; use the CLI or dashboard to avoid putting tokens in commands
+or shared logs.
+
+| Method / path | Token | Behavior |
+| --- | --- | --- |
+| `GET /` | No | Embedded dashboard, updated with the application |
+| `GET /api/telemetry` | No | Latest RAM snapshot, JSON schema 1 |
+| `GET /api/info` | No | Build, running slot, image digest, capacity, memory, reset reason and network task cores |
+| WebSocket `/ws` | No | Receive-only live telemetry; up to four clients, two queued frames per client |
+| `GET /api/log` | Yes | Checksummed raw saved-run CSV copied under disarmed maintenance |
+| `POST /api/disarm` | Yes | 202: request queued for control-task execution |
+| `POST /api/wifi/reconnect` | Yes | 202: disarmed association requested |
+| `POST /api/ota` | Yes | Multipart application upload; exact `X-Firmware-Size` and full-file `X-Firmware-SHA256` required |
+| Any `/api/settings`, `/api/change-can-id`, `/api/reset-settings` | — | 410: disabled, including settings GET/export |
+
+Telemetry includes `sequence`, `uptime_ms`, `age_ms`, `drive_armed`, `arm_armed`,
+`arming`, `rearm_required`, the 16 `channels`, RC link/age, `balance`, `motors`,
+`power`, `timing`, `wifi`, memory and dropped-frame counts. Maintenance fields
+are `maintenance_allowed`, `maintenance`, `saving_log`, `calibration`,
+`test_mode` and `simulation`. Power values have separate freshness flags;
+`current` is summed motor IQ, not battery input current. Snapshot availability
+does not authorize an operation: the control owner independently checks the
+maintenance request.
+
+## Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| Host not found | Use the display's current IP via `--host` before the subcommand; verify the same LAN. The last tested IP is not a reservation. |
+| Stale dashboard / lost Wi-Fi | Check data freshness. Control remains local; reconnect attempts wait until disarmed. Reduce open clients/traffic, then use disarmed reconnect if needed. |
+| 401 | Use the token for the installed firmware. A new build may have different local credentials. |
+| 409 / maintenance unavailable | Disarm both groups, release triggers, wait for save/download/association to finish and inspect calibration/test/simulation state. Never bypass the interlock. |
+| 429 on log download | Let the existing transfer finish or close its client before retrying. |
+| 400 on OTA | Use the correct application file and CLI-computed size/hash; retain the rejected file for diagnosis. |
+| Update interrupted | After the aborted upload releases maintenance, check the running image and retry. A complete accepted update may already have rebooted. |
+| Upload accepted, reboot unverified | Check display, LAN/IP and image identity. Keep motors off; use recovery if the new app cannot boot. |
+| Log validation fails | Retry while disarmed before another run; retain any raw browser/USB capture. Do not accept a partial CSV as a complete trial. |
+
 ## Recovery
 
 The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
-identity are recorded in `evidence/wifi-ota/README.md`. Application packages
-are in `artifacts/wifi-ota/`.
+identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
+The current frozen application package is `artifacts/wifi-ota/release/`;
+other package directories preserve earlier iterations. The full original backup
+contains the pre-Wi-Fi driving-v4 firmware. Restoring it removes Wi-Fi/OTA and
+reverts saved data to that backup's state.
 
 After OTA, do **not** assume app0 is running: inspect `/api/info` for
 `running_slot` or inspect OTA data over USB. The old
 `scripts/flash_prepared_balance.py` intentionally programs only app0; it is not
 a general recovery tool for a device booting app1. Do not overwrite partition,
-NVS, OTA data or the filesystem just to update firmware. For a full restoration,
+NVS, OTA data or the filesystem just to update firmware. A functioning OTA
+endpoint can install a known compatible application through the same verified
+OTA procedure; download newer-schema logs before downgrading. If neither the
+LAN nor recovery AP is usable, USB is required to diagnose boot and select a
+recovery write appropriate to the actual partition/OTA state. Legacy
+`scripts/upload.sh` and `scripts/flash_prepared_balance.py` are not the normal
+update path. For a full restoration,
 preserve any newer run/settings first and use the complete backup only with a
 supported, disarmed robot. Download the saved run before any recovery.
 
@@ -168,6 +322,6 @@ Use `--ignore-radio` for network-only, motors-off testing when the transmitter
 is intentionally off or being adjusted. It still checks motor state and IMU
 health, and records RC measurements without treating link loss as a failure.
 
-See `evidence/wifi-ota/README.md` for hardware checks. Initial validation is with
+See [release evidence](../evidence/wifi-ota/README.md) for hardware checks. Initial validation is with
 motor power off. A powered stationary check and supervised balance/drive trial
 remain separate operator steps.

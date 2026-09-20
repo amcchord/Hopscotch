@@ -1,5 +1,7 @@
 # September 14: slow stand-up diagnosis and receiver timing correction
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The latest attempt barely moved because the arm-control loop was repeatedly
 stalled in radio receiver processing. Increasing motor speed or balance gains
 would not restore those missing control updates.

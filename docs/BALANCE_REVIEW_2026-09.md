@@ -1,5 +1,7 @@
 # Balance firmware review — September 13, 2026
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 **The initial candidate was flashed, but a physical trigger test exposed a startup regression.** CH11 was received; an invalid RS05 acceleration readback requirement prevented stand-up. The [startup correction](BALANCE_START_FIX_2026-09.md) documents the cause, fix and regression tests; [current state](progress/CURRENT.md) tracks its release. This candidate strengthens sensor handling, verifies arm arrival, bounds wheel commands, and makes the next run's data substantially more trustworthy. It preserves the established Speed-mode controller and avoids aggressive gain changes. Offline simulation does **not** establish improved stand-up reliability.
 
 Source baseline: `e8b1280`, originally on `agent/balance-telemetry-sync`. Candidate branch: `codex/balance-review-ready`. The exact committed source, build versions, binary hashes, and rollback files are identified in `artifacts/balance-candidate/manifest.json`. [Current state](progress/CURRENT.md) and [test procedure](BALANCE_TESTING.md) are the handoff for the next session.

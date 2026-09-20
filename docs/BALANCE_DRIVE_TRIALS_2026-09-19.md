@@ -1,5 +1,7 @@
 # First physical acceleration-drive trials
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 Both runs used the same uploaded source `5a07ebabef8f6431e8a9908fa4b53170b24a2308`, application `75ccdb4412dc3ebd0e4cc567cde845ab6bb3107d7d105e7fdcf69f4b2afa8118`, build time 18:42:41. No firmware or gain change occurred between them or during this analysis. The user first reported a stand-up runaway, then a successful stand-up with substantial front-to-back rocking while driving and a final wall contact. Both logs were saved before another run could overwrite them; both post-run checks found drive and arms disarmed.
 
 ## Failed stand-up
