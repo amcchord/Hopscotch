@@ -1,0 +1,35 @@
+{
+  "status": "installed_verified",
+  "completed_utc": "2026-09-20T21:05:08.644323+00:00",
+  "source_commit": "a772ecc833c6100f76cdb67173bdaf4f4d99cd78",
+  "application": {
+    "application_bytes": 1207616,
+    "application_sha256": "be068a3c2e02ac4343d6c15795984577d2067cceebf0c069e97be9a91b511360",
+    "esp_image_digest": "fdf7af6a96d2b6e3c3c908301ae765fcfa4c9110df27f8d88693dd80e8aeb2c2"
+  },
+  "saved_run_after": {
+    "samples": 236,
+    "csv_sha256": "aefd28b02ea7082f3578527589c7cf4238339a774e7703d576416ef9e434c658",
+    "wire_sha256": "159742998bbbab37f20793fd451dd8e269b8d0dfbbaa45906fdf2372d85564a8"
+  },
+  "motion_initiated": false,
+  "deployment_evidence": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/evidence/lowering-v6-integration/deployment.json",
+  "running_slot": "app1",
+  "transfer_seconds": 342.569,
+  "health": "Fresh IMU, disarmed, maintenance released; all six powered motors online, disabled, error-free",
+  "source_inclusion": {
+    "combined_source": "a772ecc833c6100f76cdb67173bdaf4f4d99cd78",
+    "owned_source": "f4d2bb7240afdf6bd47807208b18f720522329fb",
+    "checks": {
+      "src/balance_controller.h": true,
+      "src/balance_math.h": true,
+      "src/balance_tip_up.h": true,
+      "src/config.h": true,
+      "tests/test_balance_tip_up.cpp": true,
+      "controller_enterBalancing": true,
+      "controller_capture_and_release": true
+    }
+  },
+  "combined_checks": "11 native executables, 37 Python tests, syntax/whitespace and pinned configured build passed in integration checkout",
+  "physical_acceptance": "New handoff awaits operator trial"
+}

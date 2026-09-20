@@ -1,4 +1,4 @@
-# CH6 fast tip-up — capture tested, arm-release correction queued
+# CH6 fast tip-up — arm-release correction installed
 
 September 20, 2026. Integrated with lowering v4 in source `e55cecb` and
 [installed by the release owner](../evidence/lowering-v4-fast-integration/README.md).
@@ -23,8 +23,8 @@ return, through the existing base slew limit. The trial's old calibration
 cancelled 2.860° of saved trim before support released. Fast capture also now
 requires each rear wheel within 0.75 rad/s for the existing 120 ms dwell.
 [Trial, correction, tests and limitations](../evidence/fast-tip-up/roll-away-review/README.md).
-The combined release owner has integrated this for the next OTA. Physical
-confirmation remains pending: the 45-case approximate model has 10 improvements
+The combined release owner installed source `a772ecc` in app1 at 21:05:08 UTC
+on September 20; [image, health and saved-log verification](../evidence/fast-tip-up/roll-away-review/installation.json) passed. Physical confirmation remains pending: the 45-case approximate model has 10 improvements
 and 10 regressions, with regressions when saved trim exceeds true equilibrium.
 
 ## What the logs say
