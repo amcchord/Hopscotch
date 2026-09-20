@@ -1,0 +1,34 @@
+{
+  "baseline_source": "17c499c",
+  "lowering_checkpoint": "675a970",
+  "fast_source": "f4d2bb7240afdf6bd47807208b18f720522329fb",
+  "fast_integrated": "882ba98",
+  "stable_files": {
+    "src/drive_controller.cpp": true,
+    "src/drive_controller.h": true,
+    "src/balance_drive.h": true,
+    "src/balance_pilot.h": true,
+    "src/ground_drive_gate.h": true,
+    "src/crsf.cpp": true,
+    "src/crsf.h": true,
+    "src/motor_manager.cpp": true,
+    "src/motor_manager.h": true,
+    "src/network_safety.h": true,
+    "src/network_snapshot.h": true,
+    "src/web_server.cpp": true,
+    "src/web_server.h": true,
+    "src/main.cpp": true,
+    "data/network.html": true
+  },
+  "fast_owned_files": {
+    "src/balance_controller.h": true,
+    "src/balance_math.h": true,
+    "src/balance_tip_up.h": true,
+    "src/config.h": true,
+    "tests/test_balance_tip_up.cpp": true
+  },
+  "lowering_policy_exact": true,
+  "controller": "Combines lowering schema6 metadata and fast-only capture/release call sites. Existing preparation cap remains single-write. Slow capture arithmetic is checked against the prior helper.",
+  "reused_checks": "No radio, network transport or dashboard behavior change; retain prior acceptance instead of stress-testing the robot again.",
+  "other_worktrees_modified": false
+}

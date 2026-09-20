@@ -2137,10 +2137,18 @@ void BalanceController::dumpLog(Print* sink) {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 16384) {
         // Versioned literals describe the saved policy, including after a future OTA.
-        out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        if (header.schema_version >= 6)
+            out.println("# tip_up=ch6_fast_v2 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        else
+            out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
         out.println("# fast_tip_trajectory=duration_s:2.6 motor_limit_rad_s:2.2 lead_rad:0.18 legacy_geometric_path:1 quintic_progress:1");
         out.println("# fast_tip_start=forward_tolerance_rad:0.15 abs_tilt_deg:12 arm_rate_rad_s:0.3 wheel_rate_rad_s:0.75 neutral_CH1_CH2:1");
-        out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
+        if (header.schema_version >= 6) {
+            out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 wheel_rate_rad_s:0.75 confirm_ms:120 measured_arrival_required:1");
+            out.println("# fast_tip_release=preserve_stored_trim:1 supported_capture_calibration:0 measured_tip_fraction_span:0.1 monotonic_capture_fade:1 base_slew:existing");
+        } else {
+            out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
+        }
         out.println("# fast_tip_limits=timeout_ms:4500 stall_ms:400 control_dt_ms:40 feedback_ms:100 tilt_deg:-20:100 abs_rate_dps:100");
         out.println("# fast_tip_rate=roll_rate_uses_fast_tau_s:0.006 only_state:1 and_fast_run:1 ordinary_balance_filter_unchanged:1");
         if (header.schema_version >= 5)
