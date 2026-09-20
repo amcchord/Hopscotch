@@ -74,6 +74,16 @@ public:
             _stop_ms = 0;
         }
     }
+    // CH11 owns the stop request. Once its existing reference ramps reach
+    // zero, hand back to stationary PD even if a drive-mode oscillation keeps
+    // the ordinary calm dwell from finishing. BalanceDrive slews that handoff;
+    // BalanceLower still requires its independent calm dwell before arm motion.
+    void handoffStoppedForLowering() {
+        if (_velocity == 0 && _turn == 0) {
+            _moving = false; _stop_ms = 0;
+            _ready = false; _neutral_ms = 0;
+        }
+    }
     bool ready() const { return _ready; }
     bool moving() const { return _moving; } // includes braking until calm
     bool fastBraking() const { return _fast_braking; }

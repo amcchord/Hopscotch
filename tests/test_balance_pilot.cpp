@@ -1,4 +1,5 @@
 #include "balance_pilot.h"
+#include "balance_drive.h"
 #include "balance_telemetry.h"
 #include "config.h"
 #include <cassert>
@@ -18,6 +19,40 @@ static void unlock(balance_math::BalancePilot& p) {
     assert(p.ready() && !p.moving());
 }
 int main() {
+    // A CH11 stop must not wait indefinitely for calm in the driving
+    // controller that is producing the neutral oscillation. Finish the same
+    // reference ramps, then use the existing bounded handoff to stationary PD.
+    for(int sign : {-1,1}) {
+        balance_math::BalancePilot stopping, ordinary;
+        unlock(stopping); unlock(ordinary);
+        for(int i=0;i<80;++i) {
+            stopping.update(true,false,sign*.3f,sign*.3f,.02f,config);
+            ordinary.update(true,false,sign*.3f,sign*.3f,.02f,config);
+        }
+        balance_math::BalanceDrive drive;
+        const balance_math::DriveConfig dc={BALANCE_DRIVE_ANGLE_K,BALANCE_DRIVE_RATE_K,
+            BALANCE_DRIVE_SPEED_K,BALANCE_DRIVE_ERROR_LIMIT,BALANCE_DRIVE_ACCEL_LIMIT,
+            BALANCE_DRIVE_HANDOFF_RATE};
+        float command=sign*2.f;
+        bool handed_off=false;
+        for(int i=0;i<200;++i) {
+            stopping.update(true,false,0,0,.02f,config);
+            ordinary.update(true,false,0,0,.02f,config);
+            const float velocity=stopping.velocity(),turn=stopping.turn();
+            stopping.handoffStoppedForLowering();
+            assert(stopping.velocity()==velocity && stopping.turn()==turn);
+            if(velocity!=0 || turn!=0) assert(stopping.moving());
+            else { assert(!stopping.moving() && !stopping.ready()); handed_off=true; }
+            assert(ordinary.moving()); // unchanged ordinary calm-stop contract
+            for(int tick=0;tick<4;++tick) {
+                auto result=drive.step(stopping.moving(),0,0,command,velocity,0,
+                    command,.005f,30,dc);
+                if(handed_off) assert(std::fabs(result.speed-command)<=dc.handoff_rate*.005f+.00001f);
+                command=result.speed;
+            }
+        }
+        assert(handed_off && command==0);
+    }
     static_assert(BALANCE_PILOT_FAST_DECEL > BALANCE_PILOT_DECEL, "faster high-speed braking");
     static_assert(BALANCE_PILOT_BRAKE_FULL_SPEED > BALANCE_PILOT_BRAKE_START_SPEED, "valid blend");
     for (int sign : {-1,1}) {
@@ -174,8 +209,9 @@ int main() {
     assert(!balance_log::supported(4,236));
     assert(balance_log::supported(4,240) && balance_log::supported(5,240));
     assert(!balance_log::supported(5,236) && !balance_log::supported(6,236));
-    assert(balance_log::supported(6,240));
-    assert(!balance_log::supported(3,240) && !balance_log::supported(7,240));
+    assert(balance_log::supported(6,240) && balance_log::supported(7,240));
+    assert(!balance_log::supported(7,236));
+    assert(!balance_log::supported(3,240) && !balance_log::supported(8,240));
     old.pilot_forward=.5f;old.pilot_flags=15;old.pilot_arm=.1f;
     expanded={};std::memcpy(&expanded,&old,236);
     assert(expanded.pilot_forward==.5f && expanded.pilot_flags==15 && expanded.pilot_arm==0);

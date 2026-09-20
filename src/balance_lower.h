@@ -198,8 +198,11 @@ public:
                 _touch_left = in.arm_left; _touch_right = in.arm_right;
                 _impact_ms = now;
             }
+            const bool had_both_contacts = _left_touched && _right_touched;
             if (left_load) _left_touched = true;
             if (right_load) _right_touched = true;
+            if (!had_both_contacts && _left_touched && _right_touched)
+                _both_contact_ms = now;
             if (_left_touched && std::fabs(in.torque_left) >= c.contact_torque*.5f) _left_support_ms = now;
             if (_right_touched && std::fabs(in.torque_right) >= c.contact_torque*.5f) _right_support_ms = now;
             if ((_left_touched || _right_touched) && _phase == LowerPhase::Committing
@@ -214,15 +217,17 @@ public:
                 _left = approach(_left, -_sign_left*catch_goal, in.arm_left, catch_speed*dt, c.max_target_lead);
                 _right = approach(_right, -_sign_right*catch_goal, in.arm_right, catch_speed*dt, c.max_target_lead);
             }
-            const bool both_loaded = _left_touched && _right_touched
-                && std::fabs(in.torque_left) >= c.contact_torque*.5f
-                && std::fabs(in.torque_right) >= c.contact_torque*.5f;
             // A measured loaded impact can briefly reverse body rate before
             // the motor reverses. Keep returning rather than freeze upright.
             // Never excuse an unsupported rebound, backward displacement, the
             // global motion limits or an impact that does not settle promptly.
             const bool recent_support = _left_touched && _right_touched
                 && now - _left_support_ms <= 60 && now - _right_support_ms <= 60;
+            // First independently observed two-arm contact starts the bounded
+            // wheel stop. Waiting for a perfectly quiet supported pose kept
+            // the v6 trial coasting through repeated impacts.
+            if (_left_touched && _right_touched)
+                _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             const bool settling_impact = recent_support && now - _impact_ms <= c.impact_settle_ms
                 && _peak_fall_rate < -c.forward_rate && in.tilt < _launch_tilt-c.forward_drop*.5f;
             if (in.tilt > _launch_tilt + 2 || (in.rate > 12 && !settling_impact)) {
@@ -245,14 +250,18 @@ public:
             }
             // Return motion is intentional; requiring zero arm velocity here
             // would prevent support confirmation throughout a successful return.
-            const bool caught = both_loaded
+            // Rocking contact briefly unloads either arm during reversal.
+            // Require each independent support observation within 60 ms over
+            // the full dwell; a one-off impact cannot pass an 80 ms dwell.
+            const bool caught = recent_support
                 && in.tilt <= _launch_tilt-c.forward_drop*.5f
                 && in.velocity_left*_sign_left >= -.10f && in.velocity_right*_sign_right >= -.10f
                 && in.velocity_left*_sign_left <= c.catch_return_speed+.20f
                 && in.velocity_right*_sign_right <= c.catch_return_speed+.20f
-                && in.rate >= -c.descent_rate && in.rate <= c.calm_rate
+                && in.rate >= -c.descent_rate && in.rate <= 12.f
                 && _peak_fall_rate < -c.forward_rate;
-            if (confirmed(caught, dt, c.contact_ms)) {
+            if (confirmed(caught, dt, c.contact_ms)
+                && now - _both_contact_ms >= c.contact_ms) {
                 _supported = true;
                 _left = in.arm_left; _right = in.arm_right;
                 _progress_tilt = in.tilt; _progress_ms = now;
@@ -309,7 +318,7 @@ private:
     float _prepare_tilt = 0, _launch_tilt = 0, _peak_fall_rate = 0;
     float _touch_left = 0, _touch_right = 0;
     uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0, _impact_ms = 0;
-    uint32_t _left_support_ms = 0, _right_support_ms = 0;
+    uint32_t _left_support_ms = 0, _right_support_ms = 0, _both_contact_ms = 0;
     const char* _reason = "lower_requested";
     static bool at(float a, float b) { return std::fabs(a-b) < .001f; }
     static bool valid(const LowerInput& i) {

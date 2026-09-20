@@ -1,0 +1,220 @@
+{
+  "samples": 1519,
+  "duration_s": 30.37,
+  "installed_source": "a772ecc",
+  "fast_selected": true,
+  "csv_sha256": "eb4455fcb12291c111761d5bfe15daac550bb44014af3b84f588ea78e44e4e9e",
+  "wire_sha256": "0f856d5d8d3a0e7341de203ac4d1d840823741674c7463611a0cc96e8cd5f245",
+  "end_reason": "lower_wrong_direction",
+  "forward_rad": [
+    3.933,
+    3.545
+  ],
+  "transitions": [
+    {
+      "phase": 1,
+      "t_ms": 16745.0,
+      "roll": 87.345,
+      "roll_rate": 0.677,
+      "bl_vel": -0.074,
+      "br_vel": -0.025,
+      "arm_l": 3.933,
+      "arm_r": 3.544,
+      "arm_l_tgt": 3.933,
+      "arm_r_tgt": 3.545,
+      "arm_l_torque": -0.043,
+      "arm_r_torque": 0.081,
+      "arm_l_vel": 0.086,
+      "arm_r_vel": -0.012
+    },
+    {
+      "phase": 2,
+      "t_ms": 29270.0,
+      "roll": 87.306,
+      "roll_rate": -0.515,
+      "bl_vel": 0.094,
+      "br_vel": 0.05,
+      "arm_l": 3.932,
+      "arm_r": 3.546,
+      "arm_l_tgt": 3.932,
+      "arm_r_tgt": 3.546,
+      "arm_l_torque": 0.005,
+      "arm_r_torque": -0.039,
+      "arm_l_vel": -0.052,
+      "arm_r_vel": 0.092
+    },
+    {
+      "phase": 9,
+      "t_ms": 29850.0,
+      "roll": 86.19,
+      "roll_rate": -8.368,
+      "bl_vel": 3.123,
+      "br_vel": 3.153,
+      "arm_l": 2.293,
+      "arm_r": 5.159,
+      "arm_l_tgt": 2.183,
+      "arm_r_tgt": 5.295,
+      "arm_l_torque": 0.141,
+      "arm_r_torque": -0.081,
+      "arm_l_vel": -3.323,
+      "arm_r_vel": 3.216
+    },
+    {
+      "phase": 10,
+      "t_ms": 29950.0,
+      "roll": 84.748,
+      "roll_rate": -28.024,
+      "bl_vel": 3.136,
+      "br_vel": 3.147,
+      "arm_l": 2.107,
+      "arm_r": 5.358,
+      "arm_l_tgt": 2.083,
+      "arm_r_tgt": 5.395,
+      "arm_l_torque": 0.026,
+      "arm_r_torque": -0.016,
+      "arm_l_vel": -1.199,
+      "arm_r_vel": 1.275
+    },
+    {
+      "phase": 8,
+      "t_ms": 30370.0,
+      "roll": 77.066,
+      "roll_rate": 20.305,
+      "bl_vel": 2.99,
+      "br_vel": 2.174,
+      "arm_l": 2.143,
+      "arm_r": 5.316,
+      "arm_l_tgt": 2.16,
+      "arm_r_tgt": 5.307,
+      "arm_l_torque": -0.392,
+      "arm_r_torque": 0.079,
+      "arm_l_vel": -0.162,
+      "arm_r_vel": -0.012
+    }
+  ],
+  "stop_wait_s": 12.525,
+  "longest_calm_ms_before_27500": 260.0,
+  "waiting_driving_samples": 624,
+  "first_two_arm_load": {
+    "t_ms": 30030.0,
+    "roll": 81.896,
+    "roll_rate": -19.615,
+    "bl_vel": 3.526,
+    "br_vel": 3.375,
+    "arm_l": 2.078,
+    "arm_r": 5.39,
+    "arm_l_tgt": 2.088,
+    "arm_r_tgt": 5.38,
+    "arm_l_torque": -0.489,
+    "arm_r_torque": 0.453,
+    "arm_l_vel": 0.081,
+    "arm_r_vel": 0.081
+  },
+  "final": {
+    "t_ms": 30370.0,
+    "roll": 77.066,
+    "roll_rate": 20.305,
+    "bl_vel": 2.99,
+    "br_vel": 2.174,
+    "arm_l": 2.143,
+    "arm_r": 5.316,
+    "arm_l_tgt": 2.16,
+    "arm_r_tgt": 5.307,
+    "arm_l_torque": -0.392,
+    "arm_r_torque": 0.079,
+    "arm_l_vel": -0.162,
+    "arm_r_vel": -0.012
+  },
+  "installed_replay": {
+    "events": [
+      {
+        "t_ms": 16745.0,
+        "phase": 1,
+        "tilt": 87.345,
+        "rate": 0.677,
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 29270.0,
+        "phase": 2,
+        "tilt": 87.306,
+        "rate": -0.515,
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 29850.0,
+        "phase": 9,
+        "tilt": 86.19,
+        "rate": -8.368,
+        "wheel_command": 3.138000011444092
+      },
+      {
+        "t_ms": 29950.0,
+        "phase": 10,
+        "tilt": 84.748,
+        "rate": -28.024,
+        "wheel_command": 3.138000011444092
+      },
+      {
+        "t_ms": 30370.0,
+        "phase": 8,
+        "tilt": 77.066,
+        "rate": 20.305,
+        "wheel_command": 0.0
+      }
+    ],
+    "reason": "lower_wrong_direction",
+    "first_wheel_stop_ms": null,
+    "scope": "Replays fixed recorded sensor inputs. Candidate commands and earlier drive handoff change physics; later replay states are not predicted physical outcomes."
+  },
+  "candidate_sensor_sequence": {
+    "events": [
+      {
+        "t_ms": 16745.0,
+        "phase": 1,
+        "tilt": 87.345,
+        "rate": 0.677,
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 29270.0,
+        "phase": 2,
+        "tilt": 87.306,
+        "rate": -0.515,
+        "wheel_command": 0.0
+      },
+      {
+        "t_ms": 29850.0,
+        "phase": 9,
+        "tilt": 86.19,
+        "rate": -8.368,
+        "wheel_command": 3.138000011444092
+      },
+      {
+        "t_ms": 29950.0,
+        "phase": 10,
+        "tilt": 84.748,
+        "rate": -28.024,
+        "wheel_command": 3.138000011444092
+      },
+      {
+        "t_ms": 30110.0,
+        "phase": 3,
+        "tilt": 82.018,
+        "rate": 8.964,
+        "wheel_command": 2.8380002975463867
+      },
+      {
+        "t_ms": 30310.0,
+        "phase": 8,
+        "tilt": 77.88,
+        "rate": -37.713,
+        "wheel_command": 0.0
+      }
+    ],
+    "reason": "lower_support_lost",
+    "first_wheel_stop_ms": 30030.0,
+    "scope": "Replays fixed recorded sensor inputs. Candidate commands and earlier drive handoff change physics; later replay states are not predicted physical outcomes."
+  },
+  "candidate_header_sha256": "521aebac2af9a574a783604170d95454f5bab594493d5b774dd12f423456b65f"
+}

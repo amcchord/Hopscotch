@@ -39,7 +39,7 @@ struct Rig {
         in.torque_left=.6f; in.torque_right=-.6f; in.rate=-6; tick();
         const float caught_left=lower.left(),caught_right=lower.right();
         in.rate=-2; in.torque_left=.3f; in.torque_right=-.3f;
-        for(int i=0;i<2;++i) tick();
+        for(int i=0;i<3;++i) tick();
         assert(!lower.supported());
         tick();
         assert(lower.phase()==LowerPhase::Descending && lower.supported());
@@ -100,7 +100,7 @@ int main() {
       r.in.tilt=80; r.in.rate=-6;
       r.in.torque_left=.6f; r.in.torque_right=-.6f;
       r.in.velocity_left=.3f; r.in.velocity_right=-.3f;
-      for(int i=0;i<4;++i) r.tick();
+      for(int i=0;i<5;++i) r.tick();
       assert(r.lower.supported() && r.lower.phase()==LowerPhase::Descending);
       const float first=r.lower.left();
       for(int i=0;i<40;++i) { r.in.tilt-=.1f; r.tick(); }
@@ -205,6 +205,60 @@ int main() {
         for(int i=0;i<4 && r.lower.active();++i) r.tick(false);
         assert(r.lower.phase()==LowerPhase::Fault);
       } }
+    { // Recorded v6 contact: both arms loaded at 30.030 s, then alternately
+      // unload as the targets reverse. Instantaneous two-arm/4deg/s dwell
+      // never passed, leaving wheels coasting until a second rebound fault.
+      Rig r; r.in.tilt=87.306f; r.prepare();
+      r.in.tilt=86.19f; r.in.rate=-8.368f;
+      r.in.arm_left=-1.640f; r.in.arm_right=1.614f;
+      r.in.velocity_left=-3.323f; r.in.velocity_right=3.216f;
+      r.in.wheel_left=3.123f; r.in.wheel_right=3.153f;
+      r.tick(false); assert(r.lower.committed());
+      r.in.arm_left=-1.85f; r.in.arm_right=1.85f;
+      r.in.tilt=82.53f; r.in.rate=-38.775f;
+      r.in.velocity_left=-.211f; r.in.velocity_right=.118f;
+      for(int i=0;i<8;++i) r.tick(false);
+      const float coast=r.lower.wheelCommand();
+      struct Contact { float tilt,rate,lv,rv,lt,rt; };
+      const Contact recorded[]={
+        {81.896f,-19.615f,.081f,.081f,-.489f,.453f},
+        {81.707f,1.212f,-.052f,.042f,-.409f,.377f},
+        {81.676f,6.867f,.023f,-.235f,-.175f,.010f},
+        {81.797f,8.649f,.292f,-.348f,.110f,-.207f},
+        {82.018f,8.964f,.250f,-.408f,.051f,-.228f}
+      };
+      float previous=coast;
+      for(const auto& x:recorded) {
+        r.in.tilt=x.tilt;r.in.rate=x.rate;
+        r.in.velocity_left=x.lv;r.in.velocity_right=x.rv;
+        r.in.torque_left=x.lt;r.in.torque_right=x.rt;
+        r.tick(false);
+        assert(r.lower.active());
+        assert(r.lower.wheelCommand()<previous);
+        assert(previous-r.lower.wheelCommand()<=.06001f);
+        previous=r.lower.wheelCommand();
+      }
+      assert(r.lower.supported() && r.lower.phase()==LowerPhase::Descending);
+      r.in.rate=-2;const float first=r.lower.left();
+      for(int i=0;i<40;++i) { r.in.tilt-=.1f;r.tick(); }
+      assert(r.lower.left()>first+.1f && r.lower.phase()!=LowerPhase::Complete);
+    }
+    { // A single two-arm impact followed by complete unloading cannot
+      // qualify an 80ms support dwell using the 60ms observation grace.
+      Rig r;r.fall();r.in.rate=0;r.in.velocity_left=r.in.velocity_right=0;
+      r.in.torque_left=r.in.torque_right=.8f;r.tick();
+      r.in.torque_left=r.in.torque_right=0;
+      for(int i=0;i<10;++i) { r.tick();assert(!r.lower.supported()); }
+    }
+    { // First contact may be one arm much earlier. The real-time dwell
+      // starts from BOTH contacts, not the old one-arm impact timestamp.
+      Rig r;r.fall();r.in.rate=0;r.in.velocity_left=r.in.velocity_right=0;
+      r.in.torque_left=.8f;r.in.torque_right=0;
+      for(int i=0;i<10;++i) r.tick();
+      r.in.torque_right=.8f;r.tick();
+      r.in.torque_left=r.in.torque_right=0;
+      for(int i=0;i<10;++i) { r.tick();assert(!r.lower.supported()); }
+    }
     { Rig r; r.prepare(); r.in.wheel_left=-6.2f; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed());
       assert(std::strcmp(r.lower.reason(),"lower_prepare_disturbed")==0); }

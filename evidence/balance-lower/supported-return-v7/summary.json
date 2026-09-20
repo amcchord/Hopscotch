@@ -1,0 +1,33 @@
+{
+  "cases": 329,
+  "baseline": "a772ecc",
+  "before_complete": 255,
+  "after_complete": 258,
+  "improvements": [
+    {
+      "name": "sweep_99",
+      "before": "lower_missed_catch",
+      "after": "lower_complete",
+      "before_peak_rate": 45.862,
+      "after_peak_rate": 45.862
+    },
+    {
+      "name": "sweep_159",
+      "before": "lower_missed_catch",
+      "after": "lower_complete",
+      "before_peak_rate": 64.24,
+      "after_peak_rate": 64.24
+    },
+    {
+      "name": "sweep_162",
+      "before": "lower_missed_catch",
+      "after": "lower_complete",
+      "before_peak_rate": 55.693,
+      "after_peak_rate": 55.693
+    }
+  ],
+  "regressions": [],
+  "contact_complete": 72,
+  "delayed_complete": 15,
+  "limitations": "Unidentified contact/geometry; no post-fault/lateral physics. Does not simulate earlier standing-drive handoff or establish hardware success."
+}
