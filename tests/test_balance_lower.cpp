@@ -7,118 +7,146 @@ using namespace balance_math;
 
 struct Rig {
     BalanceLower lower;
-    LowerInput in{88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true};
-    uint32_t now = UINT32_MAX - 1000; // Exercise confirmation/deadlines through rollover.
-    void tick(bool follow = true) {
-        now += 20;
-        lower.step(now, .02f, in);
-        if (follow && lower.overridesArms()) {
-            in.arm_left = lower.left(); in.arm_right = lower.right();
-        }
+    LowerInput in{88,0,0,0,0,0,0,0,0,0,0,true};
+    uint32_t now = UINT32_MAX-1000; // Run confirmation/deadlines through rollover.
+    void tick(bool follow=true) {
+        now+=20;
+        lower.step(now,.02f,in);
+        if (follow && lower.overridesArms()) { in.arm_left=lower.left(); in.arm_right=lower.right(); }
     }
-    void start() { assert(lower.request(now, in, 1.77f, -1.77f)); }
-    void reach() {
+    void start() { assert(lower.request(now,in,1.768f,-1.767f)); }
+    void prepare() {
         start();
-        for (int i = 0; i < 25; ++i) tick();
-        assert(lower.phase() == LowerPhase::Reaching);
+        for(int i=0;i<25;++i) tick();
+        assert(lower.phase()==LowerPhase::Reaching && !lower.committed());
     }
-    void support() {
-        reach();
-        for (int i = 0; i < 360; ++i) tick();
-        assert(in.arm_left < -1.7f && in.arm_right > 1.7f);
-        in.torque_left = .8f; in.torque_right = -.8f;
-        for (int i = 0; i < 50 && lower.phase() == LowerPhase::Reaching; ++i) tick(false);
-        assert(lower.phase() == LowerPhase::Loading && !lower.supported());
-        for (int i = 0; i < 40; ++i) tick();
-        assert(!lower.supported()); // A timer/contact alone cannot release balance.
-        in.tilt -= 3;
-        for (int i = 0; i < 12; ++i) tick();
-        assert(lower.phase() == LowerPhase::Descending && lower.supported());
+    void commit() {
+        prepare();
+        for(int i=0;i<400 && !lower.committed();++i) tick();
+        assert(lower.phase()==LowerPhase::Committing && lower.committed() && !lower.supported());
+        assert(in.arm_left<=-1.26f && in.arm_right>=1.26f);
+    }
+    void fall() {
+        commit();
+        in.tilt-=.1f; in.rate=-1.1f; tick();
+        in.tilt-=1.1f; in.rate=-8;
+        for(int i=0;i<22;++i) tick();
+        assert(lower.phase()==LowerPhase::Catching && !lower.supported());
+        assert(lower.wheelCommand()<0 && lower.wheelCommand()>=-2);
+    }
+    void catchFall() {
+        fall();
+        in.torque_left=.6f; in.torque_right=-.6f; in.rate=-6; tick();
+        const float caught_left=lower.left(),caught_right=lower.right();
+        in.rate=-2; in.torque_left=.3f; in.torque_right=-.3f;
+        for(int i=0;i<2;++i) tick();
+        assert(!lower.supported());
+        tick();
+        assert(lower.phase()==LowerPhase::Descending && lower.supported());
+        assert(lower.left()>=caught_left && lower.left()<=caught_left+.061f);
+        assert(lower.right()<=caught_right && lower.right()>=caught_right-.061f);
     }
 };
 
 int main() {
-    { Rig r; r.in.healthy = false; assert(!r.lower.request(r.now, r.in, 1.77f, -1.77f)); }
-    for (float bad : {0.f, .5f, 4.f, std::numeric_limits<float>::quiet_NaN()}) {
-        Rig r; assert(!r.lower.request(r.now, r.in, bad, -1.77f));
+    const float nan=std::numeric_limits<float>::quiet_NaN();
+    { Rig r; r.in.healthy=false; assert(!r.lower.request(r.now,r.in,1.77f,-1.77f)); }
+    for(float bad:{0.f,.5f,4.f,nan}) { Rig r; assert(!r.lower.request(r.now,r.in,bad,-1.77f)); }
+    { Rig r; assert(!r.lower.request(r.now,r.in,1.77f,1.77f)); }
+    { Rig r; r.in.wheel_left=r.in.wheel_right=10; r.start();
+      for(int i=0;i<100;++i) r.tick();
+      assert(r.lower.phase()==LowerPhase::Stopping && !r.lower.overridesArms());
+      assert(!r.lower.request(r.now,r.in,1.77f,-1.77f));
+      r.in.wheel_left=r.in.wheel_right=0;
+      for(int i=0;i<24;++i) r.tick();
+      assert(!r.lower.committed()); r.tick(); assert(r.lower.phase()==LowerPhase::Reaching); }
+    { // Deliberate departure precedes contact. The v1 contact-first deadlock
+      // must never return: quiet measured preparation is enough to commit.
+      Rig r; r.commit(); assert(r.in.torque_left==0 && r.in.torque_right==0); }
+    { // Move the fast catch stroke only after forward motion is observed.
+      Rig r; r.commit(); const float prepared=r.lower.left();
+      for(int i=0;i<10;++i) r.tick();
+      assert(r.lower.left()==prepared && r.lower.wheelCommand()<0);
+      r.in.tilt-=.1f; r.in.rate=-1.1f; r.tick();
+      assert(r.lower.left()<prepared); }
+    { // Pause preparation as soon as wheels cease being quiet; do not keep
+      // advancing the arm-scheduled balance target through a growing drift.
+      Rig r; r.prepare(); r.tick(); const float held=r.lower.left();
+      r.in.wheel_left=.8f;
+      for(int i=0;i<10;++i) r.tick();
+      assert(r.lower.left()==held && !r.lower.committed());
+      r.in.wheel_left=0; r.tick(); assert(r.lower.left()<held); }
+    { Rig r; r.fall(); const float command=r.lower.wheelCommand();
+      for(int i=0;i<10;++i) r.tick();
+      assert(r.lower.wheelCommand()==command); }
+    { // Forward fall is measured, never assumed after a timer or wheel request.
+      Rig r; r.commit(); r.in.torque_left=r.in.torque_right=1;
+      for(int i=0;i<100 && r.lower.active();++i) r.tick();
+      assert(r.lower.phase()==LowerPhase::Fault && !r.lower.supported());
+      assert(std::strcmp(r.lower.reason(),"lower_no_forward_fall")==0); }
+    { // No catch: bounded launch then timeout, with arms retained (not retracted).
+      Rig r; r.fall(); float left=r.lower.left();
+      for(int i=0;i<150 && r.lower.active();++i) r.tick();
+      assert(r.lower.phase()==LowerPhase::Fault && !r.lower.supported());
+      assert(std::strcmp(r.lower.reason(),"lower_missed_catch")==0);
+      assert(r.lower.left()<=left && r.lower.wheelCommand()==0); }
+    { Rig r; r.fall(); r.in.torque_left=.8f; r.in.torque_right=0; r.in.rate=-1;
+      for(int i=0;i<20;++i) r.tick(); assert(!r.lower.supported()); }
+    { // Load without slowing the falling body is not a catch.
+      Rig r; r.fall(); r.in.torque_left=r.in.torque_right=.8f; r.in.rate=-30;
+      for(int i=0;i<20;++i) r.tick(); assert(!r.lower.supported()); }
+    { // Hold an arm at the first impact. Do not require it to stall with a
+      // growing target error or keep pushing it through the floor.
+      Rig r; r.fall(); r.in.torque_left=.8f; r.in.velocity_left=.4f; r.in.rate=-6; r.tick();
+      float held=r.lower.left(); r.in.torque_left=.3f;
+      for(int i=0;i<5;++i) r.tick(); assert(r.lower.left()==held); }
+    { Rig r; r.commit(); r.in.tilt+=3; r.tick();
+      assert(r.lower.phase()==LowerPhase::Fault && !r.lower.supported());
+      assert(std::strcmp(r.lower.reason(),"lower_wrong_direction")==0); }
+    { Rig r; r.prepare(); r.in.wheel_left=-4.2f; r.tick();
+      assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed());
+      assert(std::strcmp(r.lower.reason(),"lower_prepare_disturbed")==0); }
+    { Rig r; r.prepare();
+      for(int i=0;i<802 && r.lower.active();++i) { r.tick(false); assert(std::fabs(r.lower.left()-r.in.arm_left)<=.12001f); }
+      assert(r.lower.phase()==LowerPhase::Fault && !r.lower.committed()); }
+    { Rig r; r.in.wheel_left=20; r.start();
+      for(int i=0;i<702;++i) r.tick();
+      assert(r.lower.phase()==LowerPhase::Complete && !r.lower.committed());
+      assert(std::strcmp(r.lower.reason(),"lower_stop_timeout")==0); }
+    { Rig r; assert(r.lower.request(r.now,r.in,-1.77f,1.77f));
+      for(int i=0;i<100;++i) r.tick(); assert(r.lower.left()>0 && r.lower.right()<0); }
+    for(int fault=0;fault<4;++fault) {
+      Rig r; r.catchFall();
+      if(fault==0) r.in.healthy=false;
+      if(fault==1) r.in.rate=-70;
+      if(fault==2) r.in.wheel_left=3.1f;
+      if(fault==3) r.in.arm_left=nan;
+      r.tick(false); assert(r.lower.phase()==LowerPhase::Fault && r.lower.wheelCommand()==0); }
+    { Rig r; r.catchFall(); const float held=r.lower.left(); r.in.rate=-20; r.tick(false);
+      assert(r.lower.left()==held); }
+    { Rig r; r.catchFall(); r.in.rate=-30; r.in.torque_left=r.in.torque_right=0;
+      for(int i=0;i<5;++i) r.tick(false);
+      assert(r.lower.phase()==LowerPhase::Fault);
+      assert(std::strcmp(r.lower.reason(),"lower_support_lost")==0); }
+    { Rig r; r.catchFall();
+      for(int i=0;i<151;++i) r.tick(); assert(r.lower.phase()==LowerPhase::Fault);
+      assert(std::strcmp(r.lower.reason(),"lower_descent_timeout")==0); }
+    { Rig r; r.catchFall();
+      for(int i=0;i<600 && r.lower.phase()!=LowerPhase::Retracting;++i) {
+        r.in.tilt=std::max(0.f,r.in.tilt-.2f); r.in.rate=r.in.tilt>0?-10:0; r.tick();
+      }
+      assert(r.lower.phase()==LowerPhase::Retracting);
+      for(int i=0;i<300 && r.lower.active();++i) r.tick();
+      assert(r.lower.phase()==LowerPhase::Complete && r.lower.supported());
+      assert(std::strcmp(r.lower.reason(),"lower_complete")==0); }
+    // The actual fast sender uses this stricter fall-owner freshness/command
+    // gate. It does not affect ordinary balance or pilot driving.
+    for(float command:{-2.f,-.4f,0.f,.65f,2.f}) {
+      auto fresh=lowerWheelCommand(command,100); assert(!fresh.fault && fresh.value==command);
+      auto stale=lowerWheelCommand(command,101); assert(stale.fault && stale.value==0);
     }
-    { Rig r; assert(!r.lower.request(r.now, r.in, 1.77f, 1.77f)); }
-    { // Driving/braking must finish before arms reach; repeated CH11 cannot restart.
-        Rig r; r.in.wheel_left = r.in.wheel_right = 10; r.start();
-        for (int i = 0; i < 100; ++i) r.tick();
-        assert(r.lower.phase() == LowerPhase::Stopping && !r.lower.overridesArms());
-        assert(!r.lower.request(r.now, r.in, 1.77f, -1.77f));
-        r.in.wheel_left = r.in.wheel_right = 0;
-        for (int i = 0; i < 24; ++i) r.tick();
-        assert(r.lower.phase() == LowerPhase::Stopping);
-        r.tick(); assert(r.lower.phase() == LowerPhase::Reaching);
+    for(float bad:{nan,2.1f,-2.1f,std::numeric_limits<float>::infinity()}) {
+      auto out=lowerWheelCommand(bad,0); assert(out.fault && out.value==0);
     }
-    { // No floor contact: return arms and retain wheel balancing, never drop.
-        Rig r; r.reach();
-        for (int i = 0; i < 1500 && r.lower.active(); ++i) r.tick();
-        assert(r.lower.phase() == LowerPhase::Complete && !r.lower.supported());
-        assert(std::strcmp(r.lower.reason(), "lower_no_support") == 0);
-    }
-    for (int failure = 0; failure < 4; ++failure) {
-        Rig r; r.reach();
-        for (int i = 0; i < 360; ++i) r.tick();
-        // Torque alone, one-arm contact, movement, or upright arm stall are
-        // insufficient support evidence. Targets cannot run away from feedback.
-        r.in.torque_left = r.in.torque_right = .8f;
-        if (failure == 1) r.in.torque_right = 0;
-        if (failure == 2) r.in.velocity_left = .3f;
-        if (failure == 3) r.in.arm_left = r.in.arm_right = 0;
-        for (int i = 0; i < 100; ++i) {
-            r.tick(failure == 0);
-            assert(!r.lower.supported());
-            assert(std::fabs(r.lower.left() - r.in.arm_left) <= .12001f);
-            assert(std::fabs(r.lower.right() - r.in.arm_right) <= .12001f);
-        }
-    }
-    { Rig r; r.support();
-      const float target = r.lower.left();
-      r.in.rate = -20; r.tick(false); assert(r.lower.left() == target);
-      r.in.rate = -70; r.tick(false); assert(r.lower.phase() == LowerPhase::Fault); }
-    { Rig r; r.support(); r.in.healthy = false; r.tick();
-      assert(r.lower.phase() == LowerPhase::Fault); }
-    { Rig r; r.support(); r.in.rate = -30; r.in.torque_left = r.in.torque_right = 0;
-      for (int i = 0; i < 5; ++i) r.tick(false);
-      assert(r.lower.phase() == LowerPhase::Fault);
-      assert(std::strcmp(r.lower.reason(), "lower_support_lost") == 0); }
-    { Rig r; r.in.wheel_left = 20; r.start();
-      for (int i = 0; i < 702; ++i) r.tick();
-      assert(r.lower.phase() == LowerPhase::Complete && !r.lower.supported());
-      assert(std::strcmp(r.lower.reason(), "lower_stop_timeout") == 0); }
-    { // A calibration with opposite motor sign uses the same physical direction.
-      Rig r; assert(r.lower.request(r.now, r.in, -1.77f, 1.77f));
-      for (int i = 0; i < 100; ++i) r.tick();
-      assert(r.lower.left() > 0 && r.lower.right() < 0); }
-    { Rig r; assert(r.lower.request(r.now, r.in, 2.5f, -2.5f));
-      for (int i = 0; i < 1200; ++i) {
-          r.tick();
-          assert(std::fabs(r.lower.left()) <= 2.60001f && std::fabs(r.lower.right()) <= 2.60001f);
-      } }
-    { Rig r; r.support(); r.in.arm_left = std::numeric_limits<float>::quiet_NaN(); r.tick(false);
-      assert(r.lower.phase() == LowerPhase::Fault); }
-    { Rig r; r.support();
-      for (int i = 0; i < 151; ++i) r.tick();
-      assert(r.lower.phase() == LowerPhase::Fault);
-      assert(std::strcmp(r.lower.reason(), "lower_descent_timeout") == 0); }
-    { // Complete only after measured flat dwell and arm retraction.
-        Rig r; r.support();
-        for (int i = 0; i < 400; ++i) {
-            r.in.tilt = std::max(0.f, r.in.tilt - .2f);
-            r.in.rate = r.in.tilt > 0 ? -10 : 0;
-            r.tick();
-        }
-        r.in.tilt = 0; r.in.rate = 0;
-        r.tick(); // Enter GroundHold, then require a full 600ms of quiet data.
-        for (int i = 0; i < 29; ++i) r.tick();
-        assert(r.lower.phase() == LowerPhase::GroundHold);
-        r.tick(); assert(r.lower.phase() == LowerPhase::Retracting);
-        for (int i = 0; i < 300 && r.lower.active(); ++i) r.tick();
-        assert(r.lower.phase() == LowerPhase::Complete && r.lower.supported());
-        assert(std::strcmp(r.lower.reason(), "lower_complete") == 0);
-    }
-    std::cout << "Lowering policy checks passed: calibrated direction, calm entry, two-arm resisted contact, no-contact cancellation, bounded targets, rate pause, feedback faults, deadlines/rollover and measured landing\n";
+    std::cout << "Lowering checks passed: prepare, deliberate forward departure, measured catch, independent arm hold, missed/false catch, faults, deadlines/rollover, landing and fast sender gate\n";
 }

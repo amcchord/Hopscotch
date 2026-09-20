@@ -1,5 +1,10 @@
 # CH11 lowering evidence
 
+**Current candidate:** [forward fall and arm catch v2](forward-catch-v2/README.md).
+The historical v1 screen below was followed by a [failed physical trial](trial-20260920/README.md);
+its assumed-stable preparation missed the observed backward lean. These v1
+artifacts are retained as history, not current release validation.
+
 This is offline simulation/test evidence. No physical maneuver was performed.
 See the [behavior, model limits and first-test procedure](../../docs/BALANCE_LOWER_2026-09.md).
 
@@ -11,7 +16,8 @@ See the [behavior, model limits and first-test procedure](../../docs/BALANCE_LOW
 - [Full native/Python/build validation](validation.log): ten native executables,
   27 Python tests, syntax checks, whitespace and ESP32 build passed.
 
-Reproduce with `python3 scripts/simulate_lowering.py`; it compiles
+Historical reproduction requires the `f26ece6` source checkout. Its
+`python3 scripts/simulate_lowering.py` command compiles
 `scripts/lowering_bridge.cpp` and calls the actual `balance_lower.h` policy.
 The resulting CSV/JSON files are written under ignored `output/lowering/`.
 Run `scripts/check_balance_candidate.sh` for the consolidated source/build gate.
