@@ -1,5 +1,7 @@
 # CH11 lowering v6 — hand off before the preparation abort
 
+**Historical v6:** its [physical trial](../evidence/balance-lower/trial-v6-20260920/README.md) reached forward contact but failed during rocking support. [Installed v7](BALANCE_LOWER_V7_2026-09.md) corrects the lowering drive handoff and support qualification.
+
 Installed source `a772ecc` for operator testing. [Current state](progress/CURRENT.md)
 identifies what is installed. The operator reports that v5 now leans forward
 reliably but stops supported on its arms.

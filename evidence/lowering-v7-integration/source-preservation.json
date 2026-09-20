@@ -1,0 +1,31 @@
+{
+  "source_commit": "c442e1271eaf9f38cfbeab27c2e435fe6b8e3eb3",
+  "baseline_source": "a772ecc833c6100f76cdb67173bdaf4f4d99cd78",
+  "lowering_checkpoint": "c2dd50c",
+  "fast_source": "f4d2bb7240afdf6bd47807208b18f720522329fb",
+  "fast_evidence_source": "1a2e30b04eae57343a92b9c26148a0b43ada1ef7",
+  "ota_source": "f58f0d94321a46c013223dc8aa484277f2fe3789",
+  "ota_integrated": "660634a",
+  "stable_files": {
+    "src/drive_controller.cpp": true,
+    "src/drive_controller.h": true,
+    "src/balance_drive.h": true,
+    "src/ground_drive_gate.h": true,
+    "src/motor_manager.cpp": true,
+    "src/motor_manager.h": true,
+    "src/network_snapshot.h": true,
+    "data/network.html": true
+  },
+  "fast_owned_files": {
+    "src/balance_controller.h": true,
+    "src/balance_math.h": true,
+    "src/balance_tip_up.h": true,
+    "src/config.h": true,
+    "tests/test_balance_tip_up.cpp": true
+  },
+  "lowering_policy_exact": true,
+  "controller": "Relative to installed a772ecc, only CH11 active zero-reference pilot handoff and schema7 lowering metadata differ. Fast capture/return scheduling is unchanged.",
+  "network_merge": "Preserved transport2 socket timeouts/NoDelay, failure diagnostics, cached start_status JSON, cooperative log export and fast feedback scheduling while adding OTA progress and UART suspension.",
+  "validation": "12 native, 38 Python, configured build, radio C++/Lua, dashboard, actual pinned TCP/OTA transport regression. Transport test stub updated after consolidated check; no production code changed afterward.",
+  "other_worktrees_modified": false
+}

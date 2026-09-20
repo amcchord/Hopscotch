@@ -1,6 +1,6 @@
 # CH11 lowering v7 — leave driving mode and continue through rocking contact
 
-Prepared for the next combined update; [current state](progress/CURRENT.md)
+Installed source `c442e12` for operator testing; [current state](progress/CURRENT.md)
 identifies the installed image. The [v6 physical run](../evidence/balance-lower/trial-v6-20260920/README.md)
 confirms successful fast standing and forward lowering departure, then a stop
 supported on the arms.

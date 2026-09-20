@@ -1,4 +1,4 @@
-# CH6 fast tip-up — support-release correction installed; physical trial pending
+# CH6 fast tip-up — successful physical v2 stand-up
 
 September 20, 2026. The original trajectory was installed with lowering v4;
 its startup fix was [installed with lowering v5](../evidence/lowering-v5-integration/README.md) in `17c499c`.
@@ -23,9 +23,7 @@ return, through the existing base slew limit. The trial's old calibration
 cancelled 2.860° of saved trim before support released. Fast capture also now
 requires each rear wheel within 0.75 rad/s for the existing 120 ms dwell.
 [Trial, correction, tests and limitations](../evidence/fast-tip-up/roll-away-review/README.md).
-Installed in combined source `a772ecc`; see the [verified release](../evidence/lowering-v6-integration/README.md). Physical
-confirmation remains pending: the 45-case approximate model has 10 improvements
-and 10 regressions, with regressions when saved trim exceeds true equilibrium.
+Installed in combined source `a772ecc`; see the [verified release](../evidence/lowering-v6-integration/README.md). The [next physical trial](../evidence/fast-tip-up/trial-v2-20260920/README.md) succeeded: upright capture at 2.885 s, arm return complete at 5.145 s and recovery settled at 6.926 s. Austin reported substantial wheel travel during the catch. The successful fast policy is retained unchanged in the next lowering/OTA update. This is one successful run, not a measured reliability rate; the approximate model remains sensitive to saved-trim error.
 
 ## What the logs say
 
@@ -98,7 +96,7 @@ Replaying historical angle-versus-arm-travel geometry along the fast targets
 suggests about 74–76°/s peak body motion. This is a kinematic screen; it omits
 inertia, acceleration-induced arm reactions, contact loss, slip and sensor
 acceleration bias. It cannot establish successful or gentle fast standing.
-Use the first physical fast capture to decide whether to go faster.
+The first successful physical fast capture still has substantial catch/recoil travel; retain this speed until repeated starts establish its behavior.
 
 ## Operator trial after the combined OTA
 
@@ -125,7 +123,7 @@ Source branch: `codex/fast-tip-up`, based on `400c98d` in
 `worktrees/fast-tip-up`. The active lowering task owns the device, shared
 progress records, combined validation and next OTA. Feature bit
 32768 identifies lowering v4 support; the combined feature flags are 65535.
-Lowering v5 is identified by schema 5; the installed combined v6 update uses schema 6.
+Lowering v5 uses schema 5, v6 uses schema 6, and v7 uses schema 7. Fast v2 production and metadata remain unchanged in schema 7.
 The candidate's configured local build is for validation, not the combined
 release image. [Handoff evidence](../evidence/fast-tip-up/README.md) records
 checks and the exact integration procedure.

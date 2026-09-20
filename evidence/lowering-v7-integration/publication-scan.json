@@ -1,0 +1,10 @@
+{
+  "private_configuration_in_frozen_image": true,
+  "header_read_in_place": true,
+  "outgoing_blob_count": 45,
+  "secret_matches": 0,
+  "source_commit": "c442e1271eaf9f38cfbeab27c2e435fe6b8e3eb3",
+  "staged_files_checked": 17,
+  "staged_secret_matches": 0,
+  "changed_markdown_links_resolved": true
+}

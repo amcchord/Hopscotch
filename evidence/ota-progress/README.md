@@ -54,3 +54,12 @@ already contains transport v2; do not reapply `67f3746`. Run combined validation
 once after scope freeze, then the separately authorized release. Observe the
 screen and RC recovery on hardware. The upload installing this feature runs
 under the old firmware; these changes apply to later uploads after reboot.
+
+## Combined integration outcome
+
+Integrated as `660634a` into source `c442e12`, installed and verified in app0 on
+September 20. [Combined deployment](../lowering-v7-integration/README.md) records
+12 native executables, 38 Python tests, radio/dashboard and pinned TCP/OTA checks.
+Transport2 timeout/failure diagnostics and log-export fixes were preserved.
+This installation used the preceding firmware; the new progress screen and
+UART suspension still need observation during a subsequent hardware upload.

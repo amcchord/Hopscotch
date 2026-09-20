@@ -497,3 +497,37 @@ No autonomous motion, settings/calibration/filesystem writes or other checkout
 edits. [Release record](../../evidence/lowering-v6-integration/README.md).
 Next: separate manual lowering withCH6LOW and fast-standing trials, archiving
 each run after disarming. Physical acceptance remains pending.
+
+## 2026-09-20 — Preserve successful fast stand-up; install lowering v7 and OTA progress
+
+Archived the 1,519-row physical v6 run. Fast v2 succeeded through arm return and
+recovery; its owner retained production unchanged and supplied success evidence
+1a2e30b (integrated `93f997f`). Later CH11 waited 12.525 s in the neutral driving latch,
+then contacted both arms but never confirmed rocking support; lower_wrong_direction
+ended the run. Earlier departure now works, so preparation timing was preserved.
+
+Lowering c2dd50c adds explicit zero-reference handoff to stationary PD, bounded
+wheel braking after both contacts, and recent per-arm support qualification.
+An initial native single-impulse test exposed confirmation after only 60 ms; fixed
+with real 80 ms elapsed from BOTH first contacts and verified independently by
+the fast owner. All global motion/support-loss guards remain. Model 255 → 258/329,
+3 improvements / 0 regressions; 72/72 contact cases and 11 injected faults retain outcomes.
+Fixed-input replay later rejects old support loss; new braking changes that
+trajectory, so hardware acceptance remains outstanding.
+
+OTA owner f58f0d9 integrated as `660634a`: screen progress plus control-owner CRSF
+suspension before flash grant, retaining transport2 and cooperative export.
+Resolved web method signatures/diagnostics and adapted actual-code lifecycle
+and transport harnesses. No other checkout modified. Final source `c442e12` passed
+12 native / 38 Python tests, configured pinned build, radio, dashboard and OTA/TCP checks.
+Frozen application 1,210,736 bytes, whole SHA
+aaef0c5f2c768ff36cd51f3d41ec7ff08a55bb682c2995be958c55901635b59a, ESP digest
+5affbef55fc259591b2737cf1f17226b5878f5ac2ce847c7694919d755c975a4. No production source changed after validation.
+
+Verified installed in app0 at 2026-09-20T21:36:50.532600+00:00; transfer 421.475 s. Exact image/slot, fresh
+IMU, all six powered motors online/error-free/disabled, disarmed state and
+released maintenance verified. Original schema6 CSV/wire remained byte-identical.
+No motion or settings/filesystem writes. New OTA screen/UART pause only applies
+to subsequent uploads and remains hardware-unobserved. Exact previous v6 package
+retained; no automatic rollback. [Release evidence](../../evidence/lowering-v7-integration/README.md).
+Next: operator CH6 LOW stand-up and one CH11 trial, disarm and archive immediately.

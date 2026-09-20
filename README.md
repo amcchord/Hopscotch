@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Current firmware:** Installed source `a772ecc` combines [CH11 lowering v6](docs/BALANCE_LOWER_V6_2026-09.md) and the [fast-standing support-release correction](docs/FAST_TIP_UP_2026-09.md). Lowering hands off before the recorded preparation abort so contact can lead into continuous arm return. Fast standing releases its temporary supported-angle correction as the arms withdraw. Ordinary ground/standing driving and slow standing are preserved. Both revised motions need manual trials. [Installed evidence](evidence/lowering-v6-integration/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md).
+**Current firmware:** Installed source `c442e12` combines [CH11 lowering v7](docs/BALANCE_LOWER_V7_2026-09.md), the successful [fast-standing v2](docs/FAST_TIP_UP_2026-09.md), and [OTA progress/RC suspension](docs/WIFI_OTA.md). Lowering hands neutral driving back to stationary control, brakes after both arm contacts and tolerates brief rocking during support confirmation so arm return can continue. Ordinary driving and fast standing remain unchanged. Lowering v7 needs a manual trial. [Installed evidence](evidence/lowering-v7-integration/README.md), [current state](docs/progress/CURRENT.md).
 
 Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
@@ -88,7 +88,7 @@ diagnostics. Signal loss is detected if no valid CRSF frame arrives within 500 m
 
 The [CH6 fast tip-up](docs/FAST_TIP_UP_2026-09.md) targets roughly
 three seconds for lift/capture, with the usual CH11 trigger and unchanged slow
-mode. Its latest support-release correction is installed in `a772ecc`; physical acceptance remains pending.
+mode. Its v2 support-release correction completed an operator-confirmed successful stand-up; substantial catch/recoil travel remains for later tuning.
 
 ## Building and Updating over Wi-Fi
 
@@ -153,7 +153,7 @@ The firmware splits the two ESP32-S3 cores into a **control core** and a **comms
 
 Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
 
-Balance telemetry schema v6 (same 240-byte samples as v4/v5) records up to 120 seconds at 50 Hz, including tip-up, in a 1,440,000-byte PSRAM buffer. It includes 200 Hz timing/saturation aggregates, raw and filtered IMU signals, setpoints, commands, CAN feedback, wheel/arm motion and torque, pilot intent/planned arm assistance, power, safety-exit reason and event markers. It is persisted as a checksummed binary only after balance ends and both groups are disarmed. `scripts/robot_wifi.py log` exports validated CSV over Wi-Fi; `scripts/save_telemetry.sh` remains the USB fallback. Live dashboard JSON schema 1 is separate from the saved-log schema.
+Balance telemetry schema v7 (same 240-byte samples as v4/v5/v6) records up to 120 seconds at 50 Hz, including tip-up, in a 1,440,000-byte PSRAM buffer. It includes 200 Hz timing/saturation aggregates, raw and filtered IMU signals, setpoints, commands, CAN feedback, wheel/arm motion and torque, pilot intent/planned arm assistance, power, safety-exit reason and event markers. It is persisted as a checksummed binary only after balance ends and both groups are disarmed. `scripts/robot_wifi.py log` exports validated CSV over Wi-Fi; `scripts/save_telemetry.sh` remains the USB fallback. Live dashboard JSON schema 1 is separate from the saved-log schema.
 
 ### Module Map
 
