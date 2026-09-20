@@ -41,14 +41,36 @@ historical records, not the update procedure for this firmware.
   any individually enabled motor (including partial arming),
   calibration, simulation, motor test, USB download, or pending log/trim save.
   Once granted, the control owner inhibits arming and motion triggers, continues
-  receiving RC/CAN, and discards prohibited serial commands. Firmware upload
-  holds this state through reboot; failed/abandoned uploads abort and release it.
+  receiving CAN, and discards prohibited serial commands. For OTA, it stops all
+  six motors and shuts down the CRSF UART before granting flash access; receiver
+  parsing, UART RX interrupts and transmitter telemetry remain off through
+  verification and reboot. Other maintenance continues receiving RC as before.
+  Failed/abandoned uploads abort and restore an empty UART/parser with no valid
+  RC link; both arm switches must be observed low in new frames before rearming.
 - Initial Wi-Fi association and later reconnect scans hold this interlock until
   connected or a 12-second timeout cancels association. Lost Wi-Fi does not
   disarm or otherwise modify a moving robot. Reconnection attempts wait until
   disarmed. Normal motion and failsafes continue to use ELRS.
 - Boot and maintenance require a fresh observation of both RC arm switches low
   before rearming. An update never requests a motor to arm.
+
+### On-device OTA screen (queued for the next combined firmware release)
+
+An accepted upload replaces the robot's normal 128×128 status display with a
+large percentage and progress bar. Underneath are exact application bytes
+written/expected, average KiB/s and elapsed seconds. The display refreshes at
+10 Hz from a bounded queue, without waiting on the network/flash mutex. Normal
+status rendering, debug output and log service yield to the update screen.
+Phases are PREPARING, UPLOADING, VERIFYING and REBOOTING; the percentage stays
+below 100 until both SHA-256 and ESP image verification succeed. A failed
+upload shows UPDATE FAILED and the last byte count for five seconds while
+disarmed, then returns to normal status. Starting another upload resets progress.
+
+The firmware receiving an upload controls its screen and RC interlock. The
+upload that first installs this feature still uses the previous firmware's OTA
+behavior; the new screen/interlock apply to subsequent uploads after reboot.
+This feature has host/build coverage; a physical screen/UART/abort check remains
+part of the coordinated release validation.
 
 The timing counters measure actual intervals between 200 Hz task iterations.
 They exclude boot's first five seconds and maintenance, and reset after
