@@ -1,0 +1,2305 @@
+[
+  {
+    "name": "nominal",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.395,
+    "after_peak_rate": 52.141
+  },
+  {
+    "name": "no_floor",
+    "before": "lower_motion_limit",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 66.875,
+    "after_peak_rate": 67.32
+  },
+  {
+    "name": "one_arm_only",
+    "before": "lower_missed_catch",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 18.817,
+    "after_peak_rate": 52.141
+  },
+  {
+    "name": "stale_feedback",
+    "before": "lower_invalid_feedback",
+    "after": "lower_invalid_feedback",
+    "before_peak_rate": 1.114,
+    "after_peak_rate": 52.141
+  },
+  {
+    "name": "stale_in_fall",
+    "before": "lower_invalid_feedback",
+    "after": "lower_invalid_feedback",
+    "before_peak_rate": 9.211,
+    "after_peak_rate": 16.932
+  },
+  {
+    "name": "stale_supported",
+    "before": "lower_invalid_feedback",
+    "after": "lower_invalid_feedback",
+    "before_peak_rate": 19.395,
+    "after_peak_rate": 52.141
+  },
+  {
+    "name": "no_reach",
+    "before": "lower_motion_limit",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 66.875,
+    "after_peak_rate": 67.32
+  },
+  {
+    "name": "slow_servo",
+    "before": "lower_prepare_timeout",
+    "after": "lower_prepare_timeout",
+    "before_peak_rate": 0.252,
+    "after_peak_rate": 0.603
+  },
+  {
+    "name": "contact_loss",
+    "before": "lower_support_lost",
+    "after": "lower_support_lost",
+    "before_peak_rate": 39.356,
+    "after_peak_rate": 53.626
+  },
+  {
+    "name": "both_arms_obstructed",
+    "before": "lower_motion_limit",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 67.423,
+    "after_peak_rate": 10.248
+  },
+  {
+    "name": "wrong_wheel_sign",
+    "before": "lower_wrong_direction",
+    "after": "lower_wheel_direction",
+    "before_peak_rate": 9.895,
+    "after_peak_rate": 34.561
+  },
+  {
+    "name": "false_load_no_floor",
+    "before": "lower_motion_limit",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 66.05,
+    "after_peak_rate": 67.32
+  },
+  {
+    "name": "high_inertia_limit",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.771,
+    "after_peak_rate": 55.609
+  },
+  {
+    "name": "sweep_13",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.671,
+    "after_peak_rate": 18.875
+  },
+  {
+    "name": "sweep_14",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.035,
+    "after_peak_rate": 24.0
+  },
+  {
+    "name": "sweep_15",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 31.565,
+    "after_peak_rate": 33.278
+  },
+  {
+    "name": "sweep_16",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 15.578
+  },
+  {
+    "name": "sweep_17",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 19.51
+  },
+  {
+    "name": "sweep_18",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 15.399,
+    "after_peak_rate": 29.329
+  },
+  {
+    "name": "sweep_19",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 13.054,
+    "after_peak_rate": 18.548
+  },
+  {
+    "name": "sweep_20",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 30.071,
+    "after_peak_rate": 20.83
+  },
+  {
+    "name": "sweep_21",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 38.26,
+    "after_peak_rate": 23.127
+  },
+  {
+    "name": "sweep_22",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 15.185
+  },
+  {
+    "name": "sweep_23",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 16.991
+  },
+  {
+    "name": "sweep_24",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 18.748
+  },
+  {
+    "name": "sweep_25",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.671,
+    "after_peak_rate": 18.875
+  },
+  {
+    "name": "sweep_26",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.504,
+    "after_peak_rate": 24.41
+  },
+  {
+    "name": "sweep_27",
+    "before": "lower_missed_catch",
+    "after": "lower_complete",
+    "before_peak_rate": 31.176,
+    "after_peak_rate": 33.795
+  },
+  {
+    "name": "sweep_28",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 17.355
+  },
+  {
+    "name": "sweep_29",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 19.846
+  },
+  {
+    "name": "sweep_30",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 15.399,
+    "after_peak_rate": 30.667
+  },
+  {
+    "name": "sweep_31",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 13.054,
+    "after_peak_rate": 18.548
+  },
+  {
+    "name": "sweep_32",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 30.756,
+    "after_peak_rate": 20.83
+  },
+  {
+    "name": "sweep_33",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 38.26,
+    "after_peak_rate": 23.345
+  },
+  {
+    "name": "sweep_34",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 15.185
+  },
+  {
+    "name": "sweep_35",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 16.991
+  },
+  {
+    "name": "sweep_36",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 18.908
+  },
+  {
+    "name": "sweep_37",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.423,
+    "after_peak_rate": 22.229
+  },
+  {
+    "name": "sweep_38",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 21.623,
+    "after_peak_rate": 27.611
+  },
+  {
+    "name": "sweep_39",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 11.553,
+    "after_peak_rate": 33.564
+  },
+  {
+    "name": "sweep_40",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 43.787,
+    "after_peak_rate": 18.402
+  },
+  {
+    "name": "sweep_41",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.941,
+    "after_peak_rate": 22.514
+  },
+  {
+    "name": "sweep_42",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 43.86,
+    "after_peak_rate": 27.437
+  },
+  {
+    "name": "sweep_43",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.209,
+    "after_peak_rate": 22.76
+  },
+  {
+    "name": "sweep_44",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 13.763,
+    "after_peak_rate": 24.494
+  },
+  {
+    "name": "sweep_45",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.221,
+    "after_peak_rate": 27.559
+  },
+  {
+    "name": "sweep_46",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.68,
+    "after_peak_rate": 18.401
+  },
+  {
+    "name": "sweep_47",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 10.427,
+    "after_peak_rate": 19.952
+  },
+  {
+    "name": "sweep_48",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.302,
+    "after_peak_rate": 22.24
+  },
+  {
+    "name": "sweep_49",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.179,
+    "after_peak_rate": 22.229
+  },
+  {
+    "name": "sweep_50",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 21.492,
+    "after_peak_rate": 28.024
+  },
+  {
+    "name": "sweep_51",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.328,
+    "after_peak_rate": 34.267
+  },
+  {
+    "name": "sweep_52",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 43.787,
+    "after_peak_rate": 18.402
+  },
+  {
+    "name": "sweep_53",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.744,
+    "after_peak_rate": 22.896
+  },
+  {
+    "name": "sweep_54",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 43.86,
+    "after_peak_rate": 28.813
+  },
+  {
+    "name": "sweep_55",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 17.209,
+    "after_peak_rate": 22.76
+  },
+  {
+    "name": "sweep_56",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 13.763,
+    "after_peak_rate": 24.494
+  },
+  {
+    "name": "sweep_57",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.039,
+    "after_peak_rate": 27.834
+  },
+  {
+    "name": "sweep_58",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.963,
+    "after_peak_rate": 18.401
+  },
+  {
+    "name": "sweep_59",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 10.068,
+    "after_peak_rate": 19.952
+  },
+  {
+    "name": "sweep_60",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.19,
+    "after_peak_rate": 22.444
+  },
+  {
+    "name": "sweep_61",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.048,
+    "after_peak_rate": 25.972
+  },
+  {
+    "name": "sweep_62",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.609,
+    "after_peak_rate": 30.985
+  },
+  {
+    "name": "sweep_63",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.281,
+    "after_peak_rate": 38.061
+  },
+  {
+    "name": "sweep_64",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.987,
+    "after_peak_rate": 21.603
+  },
+  {
+    "name": "sweep_65",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 14.273,
+    "after_peak_rate": 25.17
+  },
+  {
+    "name": "sweep_66",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.474,
+    "after_peak_rate": 31.481
+  },
+  {
+    "name": "sweep_67",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.732,
+    "after_peak_rate": 27.025
+  },
+  {
+    "name": "sweep_68",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.04,
+    "after_peak_rate": 28.228
+  },
+  {
+    "name": "sweep_69",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.329,
+    "after_peak_rate": 30.938
+  },
+  {
+    "name": "sweep_70",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.582,
+    "after_peak_rate": 21.82
+  },
+  {
+    "name": "sweep_71",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 16.501,
+    "after_peak_rate": 22.955
+  },
+  {
+    "name": "sweep_72",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.2,
+    "after_peak_rate": 25.244
+  },
+  {
+    "name": "sweep_73",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.048,
+    "after_peak_rate": 25.972
+  },
+  {
+    "name": "sweep_74",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.609,
+    "after_peak_rate": 30.978
+  },
+  {
+    "name": "sweep_75",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.281,
+    "after_peak_rate": 37.88
+  },
+  {
+    "name": "sweep_76",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.061,
+    "after_peak_rate": 21.603
+  },
+  {
+    "name": "sweep_77",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.203,
+    "after_peak_rate": 25.592
+  },
+  {
+    "name": "sweep_78",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.13,
+    "after_peak_rate": 32.592
+  },
+  {
+    "name": "sweep_79",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.732,
+    "after_peak_rate": 27.025
+  },
+  {
+    "name": "sweep_80",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.04,
+    "after_peak_rate": 28.144
+  },
+  {
+    "name": "sweep_81",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.061,
+    "after_peak_rate": 31.258
+  },
+  {
+    "name": "sweep_82",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.582,
+    "after_peak_rate": 21.82
+  },
+  {
+    "name": "sweep_83",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.501,
+    "after_peak_rate": 22.923
+  },
+  {
+    "name": "sweep_84",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 14.995,
+    "after_peak_rate": 25.477
+  },
+  {
+    "name": "sweep_85",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.392,
+    "after_peak_rate": 40.252
+  },
+  {
+    "name": "sweep_86",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.57,
+    "after_peak_rate": 42.019
+  },
+  {
+    "name": "sweep_87",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.956,
+    "after_peak_rate": 45.862
+  },
+  {
+    "name": "sweep_88",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 34.051
+  },
+  {
+    "name": "sweep_89",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 35.509
+  },
+  {
+    "name": "sweep_90",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 11.459,
+    "after_peak_rate": 39.177
+  },
+  {
+    "name": "sweep_91",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.861,
+    "after_peak_rate": 41.328
+  },
+  {
+    "name": "sweep_92",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.687,
+    "after_peak_rate": 42.038
+  },
+  {
+    "name": "sweep_93",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 13.629,
+    "after_peak_rate": 42.224
+  },
+  {
+    "name": "sweep_94",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 34.994
+  },
+  {
+    "name": "sweep_95",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 35.587
+  },
+  {
+    "name": "sweep_96",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 35.91
+  },
+  {
+    "name": "sweep_97",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.392,
+    "after_peak_rate": 40.252
+  },
+  {
+    "name": "sweep_98",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.542,
+    "after_peak_rate": 42.019
+  },
+  {
+    "name": "sweep_99",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 28.372,
+    "after_peak_rate": 45.862
+  },
+  {
+    "name": "sweep_100",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 34.051
+  },
+  {
+    "name": "sweep_101",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 35.509
+  },
+  {
+    "name": "sweep_102",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 11.459,
+    "after_peak_rate": 39.177
+  },
+  {
+    "name": "sweep_103",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.861,
+    "after_peak_rate": 41.328
+  },
+  {
+    "name": "sweep_104",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.276,
+    "after_peak_rate": 42.038
+  },
+  {
+    "name": "sweep_105",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 14.636,
+    "after_peak_rate": 42.224
+  },
+  {
+    "name": "sweep_106",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 34.994
+  },
+  {
+    "name": "sweep_107",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 35.587
+  },
+  {
+    "name": "sweep_108",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 35.606
+  },
+  {
+    "name": "sweep_109",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.044,
+    "after_peak_rate": 50.397
+  },
+  {
+    "name": "sweep_110",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.506,
+    "after_peak_rate": 52.152
+  },
+  {
+    "name": "sweep_111",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.392,
+    "after_peak_rate": 52.868
+  },
+  {
+    "name": "sweep_112",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.015,
+    "after_peak_rate": 42.785
+  },
+  {
+    "name": "sweep_113",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 32.436,
+    "after_peak_rate": 43.995
+  },
+  {
+    "name": "sweep_114",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 38.177,
+    "after_peak_rate": 44.334
+  },
+  {
+    "name": "sweep_115",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 26.073,
+    "after_peak_rate": 50.844
+  },
+  {
+    "name": "sweep_116",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 21.56,
+    "after_peak_rate": 51.521
+  },
+  {
+    "name": "sweep_117",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.74,
+    "after_peak_rate": 52.373
+  },
+  {
+    "name": "sweep_118",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.717,
+    "after_peak_rate": 43.61
+  },
+  {
+    "name": "sweep_119",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 13.129,
+    "after_peak_rate": 43.98
+  },
+  {
+    "name": "sweep_120",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 11.501,
+    "after_peak_rate": 44.617
+  },
+  {
+    "name": "sweep_121",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.044,
+    "after_peak_rate": 50.397
+  },
+  {
+    "name": "sweep_122",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.506,
+    "after_peak_rate": 52.152
+  },
+  {
+    "name": "sweep_123",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.392,
+    "after_peak_rate": 52.868
+  },
+  {
+    "name": "sweep_124",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.015,
+    "after_peak_rate": 42.785
+  },
+  {
+    "name": "sweep_125",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 32.436,
+    "after_peak_rate": 43.995
+  },
+  {
+    "name": "sweep_126",
+    "before": "lower_missed_catch",
+    "after": "lower_complete",
+    "before_peak_rate": 38.177,
+    "after_peak_rate": 44.334
+  },
+  {
+    "name": "sweep_127",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 26.073,
+    "after_peak_rate": 50.844
+  },
+  {
+    "name": "sweep_128",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 21.56,
+    "after_peak_rate": 51.521
+  },
+  {
+    "name": "sweep_129",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.74,
+    "after_peak_rate": 52.373
+  },
+  {
+    "name": "sweep_130",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.717,
+    "after_peak_rate": 43.61
+  },
+  {
+    "name": "sweep_131",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 13.129,
+    "after_peak_rate": 43.98
+  },
+  {
+    "name": "sweep_132",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 11.501,
+    "after_peak_rate": 44.617
+  },
+  {
+    "name": "sweep_133",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 30.723,
+    "after_peak_rate": 59.591
+  },
+  {
+    "name": "sweep_134",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.511,
+    "after_peak_rate": 60.818
+  },
+  {
+    "name": "sweep_135",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.588,
+    "after_peak_rate": 63.09
+  },
+  {
+    "name": "sweep_136",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.301,
+    "after_peak_rate": 50.653
+  },
+  {
+    "name": "sweep_137",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.92,
+    "after_peak_rate": 52.415
+  },
+  {
+    "name": "sweep_138",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.696,
+    "after_peak_rate": 53.407
+  },
+  {
+    "name": "sweep_139",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 36.727,
+    "after_peak_rate": 61.043
+  },
+  {
+    "name": "sweep_140",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 31.902,
+    "after_peak_rate": 61.875
+  },
+  {
+    "name": "sweep_141",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.842,
+    "after_peak_rate": 61.944
+  },
+  {
+    "name": "sweep_142",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.94,
+    "after_peak_rate": 53.068
+  },
+  {
+    "name": "sweep_143",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 24.748,
+    "after_peak_rate": 53.305
+  },
+  {
+    "name": "sweep_144",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.87,
+    "after_peak_rate": 53.34
+  },
+  {
+    "name": "sweep_145",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 30.723,
+    "after_peak_rate": 59.591
+  },
+  {
+    "name": "sweep_146",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.511,
+    "after_peak_rate": 60.818
+  },
+  {
+    "name": "sweep_147",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.588,
+    "after_peak_rate": 63.09
+  },
+  {
+    "name": "sweep_148",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.301,
+    "after_peak_rate": 50.653
+  },
+  {
+    "name": "sweep_149",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.92,
+    "after_peak_rate": 52.415
+  },
+  {
+    "name": "sweep_150",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 20.696,
+    "after_peak_rate": 53.407
+  },
+  {
+    "name": "sweep_151",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 36.727,
+    "after_peak_rate": 61.043
+  },
+  {
+    "name": "sweep_152",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 31.902,
+    "after_peak_rate": 61.875
+  },
+  {
+    "name": "sweep_153",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.394,
+    "after_peak_rate": 61.944
+  },
+  {
+    "name": "sweep_154",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.94,
+    "after_peak_rate": 53.068
+  },
+  {
+    "name": "sweep_155",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 24.748,
+    "after_peak_rate": 53.305
+  },
+  {
+    "name": "sweep_156",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.675,
+    "after_peak_rate": 53.34
+  },
+  {
+    "name": "sweep_157",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.918,
+    "after_peak_rate": 59.382
+  },
+  {
+    "name": "sweep_158",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.93,
+    "after_peak_rate": 61.083
+  },
+  {
+    "name": "sweep_159",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 23.77,
+    "after_peak_rate": 64.24
+  },
+  {
+    "name": "sweep_160",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 51.744
+  },
+  {
+    "name": "sweep_161",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 52.958
+  },
+  {
+    "name": "sweep_162",
+    "before": "lower_complete",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 13.144,
+    "after_peak_rate": 55.693
+  },
+  {
+    "name": "sweep_163",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 27.989,
+    "after_peak_rate": 60.71
+  },
+  {
+    "name": "sweep_164",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.997,
+    "after_peak_rate": 61.344
+  },
+  {
+    "name": "sweep_165",
+    "before": "lower_missed_catch",
+    "after": "lower_complete",
+    "before_peak_rate": 22.634,
+    "after_peak_rate": 61.37
+  },
+  {
+    "name": "sweep_166",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 52.986
+  },
+  {
+    "name": "sweep_167",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 53.369
+  },
+  {
+    "name": "sweep_168",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 53.327
+  },
+  {
+    "name": "sweep_169",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 23.918,
+    "after_peak_rate": 59.382
+  },
+  {
+    "name": "sweep_170",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 18.93,
+    "after_peak_rate": 61.083
+  },
+  {
+    "name": "sweep_171",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 24.544,
+    "after_peak_rate": 64.24
+  },
+  {
+    "name": "sweep_172",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.882,
+    "after_peak_rate": 51.744
+  },
+  {
+    "name": "sweep_173",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.205,
+    "after_peak_rate": 52.958
+  },
+  {
+    "name": "sweep_174",
+    "before": "lower_missed_catch",
+    "after": "lower_complete",
+    "before_peak_rate": 13.246,
+    "after_peak_rate": 55.693
+  },
+  {
+    "name": "sweep_175",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 27.989,
+    "after_peak_rate": 60.71
+  },
+  {
+    "name": "sweep_176",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.997,
+    "after_peak_rate": 61.344
+  },
+  {
+    "name": "sweep_177",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 22.897,
+    "after_peak_rate": 61.37
+  },
+  {
+    "name": "sweep_178",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.706,
+    "after_peak_rate": 52.986
+  },
+  {
+    "name": "sweep_179",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 6.933,
+    "after_peak_rate": 53.369
+  },
+  {
+    "name": "sweep_180",
+    "before": "lower_prepare_disturbed",
+    "after": "lower_complete",
+    "before_peak_rate": 7.15,
+    "after_peak_rate": 53.327
+  },
+  {
+    "name": "sweep_181",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.196,
+    "after_peak_rate": 68.497
+  },
+  {
+    "name": "sweep_182",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 29.875,
+    "after_peak_rate": 67.916
+  },
+  {
+    "name": "sweep_183",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 29.54,
+    "after_peak_rate": 69.243
+  },
+  {
+    "name": "sweep_184",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.769,
+    "after_peak_rate": 65.487
+  },
+  {
+    "name": "sweep_185",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.22,
+    "after_peak_rate": 66.536
+  },
+  {
+    "name": "sweep_186",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.325,
+    "after_peak_rate": 66.772
+  },
+  {
+    "name": "sweep_187",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 39.484,
+    "after_peak_rate": 66.682
+  },
+  {
+    "name": "sweep_188",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.714,
+    "after_peak_rate": 67.385
+  },
+  {
+    "name": "sweep_189",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 32.272,
+    "after_peak_rate": 68.296
+  },
+  {
+    "name": "sweep_190",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 24.564,
+    "after_peak_rate": 66.922
+  },
+  {
+    "name": "sweep_191",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 20.051,
+    "after_peak_rate": 66.784
+  },
+  {
+    "name": "sweep_192",
+    "before": "lower_wrong_direction",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 17.475,
+    "after_peak_rate": 67.502
+  },
+  {
+    "name": "sweep_193",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.196,
+    "after_peak_rate": 68.497
+  },
+  {
+    "name": "sweep_194",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 29.875,
+    "after_peak_rate": 67.916
+  },
+  {
+    "name": "sweep_195",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 28.45,
+    "after_peak_rate": 69.243
+  },
+  {
+    "name": "sweep_196",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 19.769,
+    "after_peak_rate": 65.487
+  },
+  {
+    "name": "sweep_197",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 15.22,
+    "after_peak_rate": 66.536
+  },
+  {
+    "name": "sweep_198",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 16.215,
+    "after_peak_rate": 66.772
+  },
+  {
+    "name": "sweep_199",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 39.484,
+    "after_peak_rate": 66.682
+  },
+  {
+    "name": "sweep_200",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.714,
+    "after_peak_rate": 67.385
+  },
+  {
+    "name": "sweep_201",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 32.346,
+    "after_peak_rate": 68.296
+  },
+  {
+    "name": "sweep_202",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 24.564,
+    "after_peak_rate": 66.922
+  },
+  {
+    "name": "sweep_203",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 20.051,
+    "after_peak_rate": 66.784
+  },
+  {
+    "name": "sweep_204",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 17.813,
+    "after_peak_rate": 67.502
+  },
+  {
+    "name": "sweep_205",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 47.043,
+    "after_peak_rate": 67.234
+  },
+  {
+    "name": "sweep_206",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 43.948,
+    "after_peak_rate": 69.894
+  },
+  {
+    "name": "sweep_207",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 42.411,
+    "after_peak_rate": 67.725
+  },
+  {
+    "name": "sweep_208",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 34.484,
+    "after_peak_rate": 70.596
+  },
+  {
+    "name": "sweep_209",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 29.168,
+    "after_peak_rate": 66.405
+  },
+  {
+    "name": "sweep_210",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 27.958,
+    "after_peak_rate": 68.101
+  },
+  {
+    "name": "sweep_211",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 55.226,
+    "after_peak_rate": 67.678
+  },
+  {
+    "name": "sweep_212",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 49.555,
+    "after_peak_rate": 67.943
+  },
+  {
+    "name": "sweep_213",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 45.011,
+    "after_peak_rate": 68.018
+  },
+  {
+    "name": "sweep_214",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 42.934,
+    "after_peak_rate": 68.515
+  },
+  {
+    "name": "sweep_215",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 36.994,
+    "after_peak_rate": 68.867
+  },
+  {
+    "name": "sweep_216",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.524,
+    "after_peak_rate": 69.627
+  },
+  {
+    "name": "sweep_217",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 47.043,
+    "after_peak_rate": 67.234
+  },
+  {
+    "name": "sweep_218",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 43.948,
+    "after_peak_rate": 69.894
+  },
+  {
+    "name": "sweep_219",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 42.411,
+    "after_peak_rate": 67.725
+  },
+  {
+    "name": "sweep_220",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 34.484,
+    "after_peak_rate": 70.596
+  },
+  {
+    "name": "sweep_221",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 29.168,
+    "after_peak_rate": 66.405
+  },
+  {
+    "name": "sweep_222",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 27.958,
+    "after_peak_rate": 68.101
+  },
+  {
+    "name": "sweep_223",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 55.226,
+    "after_peak_rate": 67.678
+  },
+  {
+    "name": "sweep_224",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 49.555,
+    "after_peak_rate": 67.943
+  },
+  {
+    "name": "sweep_225",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 44.268,
+    "after_peak_rate": 68.018
+  },
+  {
+    "name": "sweep_226",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 42.934,
+    "after_peak_rate": 68.515
+  },
+  {
+    "name": "sweep_227",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 36.994,
+    "after_peak_rate": 68.867
+  },
+  {
+    "name": "sweep_228",
+    "before": "lower_complete",
+    "after": "lower_motion_limit",
+    "before_peak_rate": 33.353,
+    "after_peak_rate": 69.627
+  },
+  {
+    "name": "trial_rebound_stress",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "trial_uneven_floor",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 41.004,
+    "after_peak_rate": 43.606
+  },
+  {
+    "name": "trial_asymmetric_servo",
+    "before": "lower_missed_catch",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 45.019,
+    "after_peak_rate": 18.081
+  },
+  {
+    "name": "impact_sweep_232",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.05
+  },
+  {
+    "name": "impact_sweep_233",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_234",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_235",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_236",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_237",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_238",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 34.021,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_239",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 43.51
+  },
+  {
+    "name": "impact_sweep_240",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.512
+  },
+  {
+    "name": "impact_sweep_241",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_242",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_243",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_244",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_245",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_246",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_247",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 49.981
+  },
+  {
+    "name": "impact_sweep_248",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 46.671,
+    "after_peak_rate": 53.094
+  },
+  {
+    "name": "impact_sweep_249",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_250",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.341,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_251",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_252",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_253",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_254",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_255",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 44.664,
+    "after_peak_rate": 52.179
+  },
+  {
+    "name": "impact_sweep_256",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.588
+  },
+  {
+    "name": "impact_sweep_257",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_258",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_259",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_260",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_261",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_262",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 29.762,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_263",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.54,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_264",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 51.226
+  },
+  {
+    "name": "impact_sweep_265",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_266",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_267",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_268",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_269",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_270",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_271",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 39.724,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_272",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.951
+  },
+  {
+    "name": "impact_sweep_273",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_274",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_275",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_276",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_277",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_278",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_279",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.07
+  },
+  {
+    "name": "impact_sweep_280",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.685
+  },
+  {
+    "name": "impact_sweep_281",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_282",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_283",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_284",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_285",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_286",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_287",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 28.884,
+    "after_peak_rate": 44.104
+  },
+  {
+    "name": "impact_sweep_288",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 51.34
+  },
+  {
+    "name": "impact_sweep_289",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_290",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_291",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_292",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_293",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_294",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_295",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 40.263,
+    "after_peak_rate": 50.564
+  },
+  {
+    "name": "impact_sweep_296",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 54.716
+  },
+  {
+    "name": "impact_sweep_297",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_298",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_299",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_300",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_301",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_302",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "impact_sweep_303",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 45.362,
+    "after_peak_rate": 53.97
+  },
+  {
+    "name": "trial_v3_delayed_impact",
+    "before": "lower_motion_limit",
+    "after": "lower_complete",
+    "before_peak_rate": 82.548,
+    "after_peak_rate": 45.781
+  },
+  {
+    "name": "impact_delay_305",
+    "before": "lower_wrong_direction",
+    "after": "lower_missed_catch",
+    "before_peak_rate": 52.92,
+    "after_peak_rate": 38.906
+  },
+  {
+    "name": "impact_delay_306",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 41.816,
+    "after_peak_rate": 38.906
+  },
+  {
+    "name": "impact_delay_307",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 42.053,
+    "after_peak_rate": 46.764
+  },
+  {
+    "name": "impact_delay_308",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 42.053,
+    "after_peak_rate": 46.764
+  },
+  {
+    "name": "impact_delay_309",
+    "before": "lower_motion_limit",
+    "after": "lower_complete",
+    "before_peak_rate": 82.548,
+    "after_peak_rate": 45.781
+  },
+  {
+    "name": "impact_delay_310",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 44.647,
+    "after_peak_rate": 45.781
+  },
+  {
+    "name": "impact_delay_311",
+    "before": "lower_motion_limit",
+    "after": "lower_complete",
+    "before_peak_rate": 85.634,
+    "after_peak_rate": 56.178
+  },
+  {
+    "name": "impact_delay_312",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 53.245,
+    "after_peak_rate": 48.767
+  },
+  {
+    "name": "impact_delay_313",
+    "before": "lower_motion_limit",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 83.593,
+    "after_peak_rate": 15.306
+  },
+  {
+    "name": "impact_delay_314",
+    "before": "lower_wrong_direction",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 53.051,
+    "after_peak_rate": 15.306
+  },
+  {
+    "name": "impact_delay_315",
+    "before": "lower_motion_limit",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 88.862,
+    "after_peak_rate": 15.455
+  },
+  {
+    "name": "impact_delay_316",
+    "before": "lower_wrong_direction",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 51.566,
+    "after_peak_rate": 15.455
+  },
+  {
+    "name": "impact_delay_317",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 58.453,
+    "after_peak_rate": 65.58
+  },
+  {
+    "name": "impact_delay_318",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 50.323,
+    "after_peak_rate": 65.58
+  },
+  {
+    "name": "impact_delay_319",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 49.852,
+    "after_peak_rate": 65.267
+  },
+  {
+    "name": "impact_delay_320",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 49.852,
+    "after_peak_rate": 65.267
+  },
+  {
+    "name": "impact_delay_321",
+    "before": "lower_motion_limit",
+    "after": "lower_complete",
+    "before_peak_rate": 68.679,
+    "after_peak_rate": 66.279
+  },
+  {
+    "name": "impact_delay_322",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 52.492,
+    "after_peak_rate": 66.279
+  },
+  {
+    "name": "impact_delay_323",
+    "before": "lower_wrong_direction",
+    "after": "lower_complete",
+    "before_peak_rate": 64.256,
+    "after_peak_rate": 66.35
+  },
+  {
+    "name": "impact_delay_324",
+    "before": "lower_complete",
+    "after": "lower_complete",
+    "before_peak_rate": 51.785,
+    "after_peak_rate": 66.35
+  },
+  {
+    "name": "impact_delay_325",
+    "before": "lower_motion_limit",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 89.643,
+    "after_peak_rate": 15.306
+  },
+  {
+    "name": "impact_delay_326",
+    "before": "lower_wrong_direction",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 62.886,
+    "after_peak_rate": 15.306
+  },
+  {
+    "name": "impact_delay_327",
+    "before": "lower_motion_limit",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 78.118,
+    "after_peak_rate": 15.455
+  },
+  {
+    "name": "impact_delay_328",
+    "before": "lower_complete",
+    "after": "lower_prepare_disturbed",
+    "before_peak_rate": 61.766,
+    "after_peak_rate": 15.455
+  }
+]

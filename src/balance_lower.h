@@ -1,4 +1,5 @@
 #pragma once
+#define BALANCE_LOWER_FORWARD_PREPARE_V5 1
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -24,22 +25,21 @@ struct LowerInput {
 };
 
 struct LowerConfig {
-    float prepare_rad = 1.25f, prepare_speed = .25f;
-    float catch_rad = 2.40f, catch_speed = 1.5f;
+    float prepare_rad = 1.75f, prepare_speed = 4.0f;
+    float catch_rad = 1.85f, catch_speed = 2.0f;
     float lower_speed = .16f, retract_speed = .30f;
     float catch_return_speed = .50f;
     float one_arm_return = .06f;
-    float max_target_lead = .12f;
+    float max_target_lead = .24f;
     float contact_torque = .40f;
     float launch_accel = 2.0f, launch_speed = 2.0f; // rear rad/s^2 and rad/s
-    float wheel_stop_accel = .75f;
+    float wheel_stop_accel = 3.f;
     float forward_drop = 1.f, forward_rate = 2.f, launch_rate = 6.f;
-    float catch_start_drop = .1f;
     float calm_wheel = .65f, calm_rate = 4, calm_error = 2;
-    float descent_rate = 12, abort_rate = 65, abort_wheel = 3;
+    float descent_rate = 12, abort_rate = 65, abort_wheel = 6;
     float flat_angle = 5, flat_rate = 5;
-    uint32_t calm_ms = 500, prepare_ms = 200, contact_ms = 80, flat_ms = 600;
-    uint32_t stop_timeout_ms = 14000, prepare_timeout_ms = 16000;
+    uint32_t calm_ms = 500, contact_ms = 80, flat_ms = 600;
+    uint32_t stop_timeout_ms = 14000, prepare_timeout_ms = 2000;
     uint32_t launch_timeout_ms = 1800, catch_timeout_ms = 2500;
     uint32_t impact_settle_ms = 300;
     uint32_t descent_timeout_ms = 20000, retract_timeout_ms = 6000;
@@ -48,7 +48,7 @@ struct LowerConfig {
 
 struct LowerWheelOutput { float value; bool fault; };
 inline LowerWheelOutput lowerWheelCommand(float command, uint32_t owner_age_ms) {
-    if (!std::isfinite(command) || owner_age_ms > 100 || std::fabs(command) > 2.0f)
+    if (!std::isfinite(command) || owner_age_ms > 100 || std::fabs(command) > 6.0f)
         return {0, true};
     return {command, false};
 }
@@ -63,11 +63,15 @@ public:
     float left() const { return _left; }
     float right() const { return _right; }
     float wheelCommand() const { return _wheel_command; }
+    float preparationSetpoint(float ordinary) const {
+        return _phase == LowerPhase::Reaching ? std::min(ordinary, _prepare_tilt) : ordinary;
+    }
     float armSpeed() const {
         const LowerConfig c;
+        if (_phase == LowerPhase::Reaching) return c.prepare_speed;
         return _phase == LowerPhase::Committing || _phase == LowerPhase::Catching
-            ? ((_left_touched || _right_touched) ? c.catch_return_speed : c.catch_speed)
-            : std::max(c.prepare_speed, c.retract_speed);
+            ? ((_left_touched || _right_touched) ? c.catch_return_speed : (_probing ? .5f : c.catch_speed))
+            : c.retract_speed;
     }
     const char* reason() const { return _reason; }
     void reset() { *this = BalanceLower{}; }
@@ -97,6 +101,14 @@ public:
                               || std::fabs(in.wheel_right) > c.abort_wheel))) {
             fail("lower_motion_limit"); return;
         }
+        // Do not continue a fall with either wheel persistently moving
+        // opposite to the requested coast. Allow normal motor reversal lag.
+        const bool opposite_wheel = _committed && now-_committed_ms >= 150
+            && std::fabs(_wheel_command) > .3f
+            && ((in.wheel_left*_wheel_command < 0 && std::fabs(in.wheel_left) > .25f)
+                || (in.wheel_right*_wheel_command < 0 && std::fabs(in.wheel_right) > .25f));
+        _wheel_opposite_ms = opposite_wheel ? _wheel_opposite_ms+dt*1000 : 0;
+        if (_wheel_opposite_ms >= 100) { fail("lower_wheel_direction"); return; }
         const bool calm = std::fabs(in.rate) <= c.calm_rate
             && std::fabs(in.error) <= c.calm_error
             && std::fabs(in.wheel_left) <= c.calm_wheel
@@ -109,29 +121,32 @@ public:
         switch (_phase) {
         case LowerPhase::Stopping:
             _left = in.arm_left; _right = in.arm_right;
-            if (confirmed(calm, dt, c.calm_ms)) enter(LowerPhase::Reaching, now);
+            if (confirmed(calm, dt, c.calm_ms)) {
+                _prepare_tilt = in.tilt;
+                enter(LowerPhase::Reaching, now);
+            }
             else if (elapsed > c.stop_timeout_ms) finish("lower_stop_timeout");
             break;
         case LowerPhase::Reaching: {
-            // Prepare interception before intentionally departing upright
-            // control. Do not continue all the way to the floor while the
-            // balance loop counteracts the arms (failed v1 physical trial).
-            if (std::fabs(in.rate) > 15 || std::fabs(in.error) > 5
-                || std::fabs(in.wheel_left) > 3 || std::fabs(in.wheel_right) > 3) {
+            // Begin forward departure as the arms deploy: the controller caps
+            // the body target at the measured starting tilt instead of moving
+            // it 4.46 degrees backward with the old arm schedule. Advance
+            // promptly and hand off while moving; do not wait upright at rest.
+            if (in.tilt > _prepare_tilt+1.5f || in.rate > 15 || in.rate < -35 || std::fabs(in.error) > 5
+                || std::fabs(in.wheel_left) > 6 || std::fabs(in.wheel_right) > 6) {
                 fail("lower_prepare_disturbed"); break;
             }
-            if (calm) {
+            if (in.rate <= c.calm_rate) {
                 _left = approach(_left, -_sign_left*c.prepare_rad, in.arm_left, c.prepare_speed*dt, c.max_target_lead);
                 _right = approach(_right, -_sign_right*c.prepare_rad, in.arm_right, c.prepare_speed*dt, c.max_target_lead);
             }
             const bool ready = std::fabs(in.arm_left + _sign_left*c.prepare_rad) < .04f
-                && std::fabs(in.arm_right + _sign_right*c.prepare_rad) < .04f
-                && std::fabs(in.velocity_left) < .12f && std::fabs(in.velocity_right) < .12f;
-            if (confirmed(ready && calm, dt, c.prepare_ms)) {
+                && std::fabs(in.arm_right + _sign_right*c.prepare_rad) < .04f;
+            if (ready) {
                 _launch_tilt = in.tilt;
                 _wheel_command = (in.wheel_left + in.wheel_right)*.5f;
                 _committed = true; _committed_ms = now;
-                _peak_fall_rate = 0;
+                _peak_fall_rate = std::min(0.f, in.rate);
                 enter(LowerPhase::Committing, now);
             } else if (elapsed > c.prepare_timeout_ms) fail("lower_prepare_timeout");
             break;
@@ -144,7 +159,7 @@ public:
             // measured. Preserve that small wheel speed until support catches
             // the body instead of abruptly braking it back upright.
             _peak_fall_rate = std::min(_peak_fall_rate, in.rate);
-            if (!_catch_started && in.rate <= -1.f && in.tilt <= _launch_tilt - c.catch_start_drop) {
+            if (!_catch_started) {
                 _catch_started = true; _catch_start_ms = now;
             }
             if (_phase == LowerPhase::Committing) {
@@ -155,7 +170,10 @@ public:
                     enter(LowerPhase::Catching, now);
                 else if (elapsed > c.launch_timeout_ms) { fail("lower_no_forward_fall"); break; }
             }
-            const bool seek_load = _catch_started && now - _catch_start_ms >= 100; // exclude the initial arm acceleration impulse
+            const bool seek_load = _catch_started && now - _catch_start_ms >= 100
+                && (_left_touched || _right_touched
+                    || (_peak_fall_rate < -c.forward_rate && in.rate > _peak_fall_rate+1.f
+                        && in.tilt < _prepare_tilt-c.forward_drop*.5f)); // reject free-arm inertia
             const bool left_load = seek_load && loaded(in.arm_left, in.velocity_left, in.torque_left, _sign_left, c);
             const bool right_load = seek_load && loaded(in.arm_right, in.velocity_right, in.torque_right, _sign_right, c);
             // On first impact reverse BOTH arms toward calibrated Forward.
@@ -175,8 +193,13 @@ public:
                 && in.tilt <= _launch_tilt-c.forward_drop*.5f && _peak_fall_rate < -c.forward_rate)
                 enter(LowerPhase::Catching, now); // real early contact need not reach 1.8 rad
             if (_catch_started && !_left_touched && !_right_touched) {
-                _left = approach(_left, -_sign_left*c.catch_rad, in.arm_left, c.catch_speed*dt, c.max_target_lead);
-                _right = approach(_right, -_sign_right*c.catch_rad, in.arm_right, c.catch_speed*dt, c.max_target_lead);
+                // Park short of the v4 impact pose. Only probe farther, slowly,
+                // after the body has moved six degrees forward.
+                _probing = _probing || in.tilt < _prepare_tilt-6.f;
+                const float catch_goal = _probing ? 2.4f : c.catch_rad;
+                const float catch_speed = _probing ? .5f : c.catch_speed;
+                _left = approach(_left, -_sign_left*catch_goal, in.arm_left, catch_speed*dt, c.max_target_lead);
+                _right = approach(_right, -_sign_right*catch_goal, in.arm_right, catch_speed*dt, c.max_target_lead);
             }
             const bool both_loaded = _left_touched && _right_touched
                 && std::fabs(in.torque_left) >= c.contact_torque*.5f
@@ -265,10 +288,12 @@ public:
 
 private:
     volatile LowerPhase _phase = LowerPhase::Idle;
+    bool _probing = false;
     bool _committed = false, _supported = false, _left_touched = false, _right_touched = false, _catch_started = false;
     float _left = 0, _right = 0, _sign_left = 0, _sign_right = 0, _wheel_command = 0;
+    float _wheel_opposite_ms = 0;
     float _confirm_ms = 0, _progress_tilt = 0, _support_lost_ms = 0;
-    float _launch_tilt = 0, _peak_fall_rate = 0;
+    float _prepare_tilt = 0, _launch_tilt = 0, _peak_fall_rate = 0;
     float _touch_left = 0, _touch_right = 0;
     uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0, _impact_ms = 0;
     uint32_t _left_support_ms = 0, _right_support_ms = 0;

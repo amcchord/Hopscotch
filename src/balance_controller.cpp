@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 4;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 5;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -1615,8 +1615,10 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         }
         _arms->setOverrideTargets(_arm_left_target, _arm_right_target, arm_speed);
 
-        _effective_setpoint = base_effective_setpoint + _sp_offset;
-        _effective_setpoint = clampf(_effective_setpoint, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX);
+        // Publish once: the 200 Hz reader must never observe an intermediate
+        // arm-scheduled target above the lowering preparation ceiling.
+        _effective_setpoint = _lowering.preparationSetpoint(
+            clampf(base_effective_setpoint + _sp_offset, BALANCE_SETPOINT_MIN, BALANCE_SETPOINT_MAX));
 
         // ---------------------------------------------------------------
         // Yaw sync: hold the L/R wheel position difference at its engage
@@ -2132,8 +2134,23 @@ void BalanceController::dumpLog(Print* sink) {
         out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
         out.println("# fast_tip_limits=timeout_ms:4500 stall_ms:400 control_dt_ms:40 feedback_ms:100 tilt_deg:-20:100 abs_rate_dps:100");
         out.println("# fast_tip_rate=roll_rate_uses_fast_tau_s:0.006 only_state:1 and_fast_run:1 ordinary_balance_filter_unchanged:1");
+        if (header.schema_version >= 5)
+            out.println("# fast_tip_startup=wait_ms:1000 quiet_ms:100 post_setup_feedback:real requests_per_tick:2 feedback_cycle_ms:60 parked_during_wait:1 total_timeout_ms:4500");
     }
-    if (header.reserved & 32768) {
+    if (header.schema_version >= 5 && (header.reserved & 32768)) {
+        // Schema 5 keeps the 240-byte samples/header; all 16 feature bits were
+        // allocated. Historical schema-4 exports keep their exact v4 literals.
+        out.println("# lowering=experimental_ch11_forward_catch_v5 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        out.println("# lowering_phases=0:idle 1:stopping 2:forward_preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
+        out.println("# lowering_prepare=travel_rad:1.75 speed_rad_s:4 setpoint_ceiling:measured_start_tilt moving_handoff:1 timeout_ms:2000 backward_limit_deg:1.5 rate_min_dps:-35 rate_max_dps:15 wheel_limit_rad_s:6");
+        out.println("# lowering_launch=rear_accel_rad_s2:2 rear_speed_rad_s:-2 forward_drop_deg:1 forward_rate_dps:2 accel_pause_rate_dps:6 coast_min_arm_rad:1.8 timeout_ms:1800 initial_coast:measured_wheel_speed");
+        out.println("# lowering_catch=park_rad:1.85 speed_rad_s:2 probe_after_forward_deg:6 probe_rad:2.4 probe_speed_rad_s:0.5 first_load_nm:0.4 first_load_deceleration_dps:1 first_load_delay_ms:100 sustained_load_nm:0.2 confirm_ms:80 timeout_ms:2500");
+        out.println("# lowering_return=first_contact_reverse_both:1 speed_limit_rad_s:0.5 single_contact_limit_rad:0.06 both_contacts_goal:calibrated_forward rate_taper_limit_dps:12 loaded_rebound_ms:300 support_age_ms:60");
+        out.println("# lowering_support=both_arms measured_forward_fall_loaded_return required reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:4");
+        out.println("# lowering_rate=roll_rate_uses_fast_tau_s:0.006 while_pilot_phase_nonzero:1 ordinary_balance_filter_unchanged:1");
+        out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600 arms_measured_forward_rad:0.06");
+    } else if (header.reserved & 32768) {
         out.println("# lowering=experimental_ch11_forward_catch_v4 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
         out.println("# lowering_prepare=travel_rad:1.25 speed_rad_s:0.25 confirm_ms:200");

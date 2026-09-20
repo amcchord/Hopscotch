@@ -1,0 +1,137 @@
+{
+  "log": "telemetry_logs/bal_20260920_forward_catch_v4_wifi.csv",
+  "samples": 1237,
+  "csv_sha256": "083d7d6b8d4926de8b5e7cdecc4886531ab5b569fb6206a2b40c72693c7d8741",
+  "wire_sha256": "2fe0a88f4beb3ebd7adf7eed40c9aaed03811762c867561794a7ad54c4bf91a3",
+  "features": 65535,
+  "duration_s": 24.745,
+  "end_reason": "lower_motion_limit",
+  "inferred_forward_rad": [
+    3.928,
+    3.545
+  ],
+  "operator": "Arms contact flipped robot backward; user requests much earlier forward departure and removal of backward lean during arm lowering.",
+  "transitions": [
+    {
+      "phase": "stopping",
+      "t_ms": 17446.0,
+      "roll": 86.062,
+      "roll_rate": -0.077,
+      "arm_l_torque": 0.012,
+      "arm_r_torque": -0.031,
+      "reach_l": 0.0,
+      "reach_r": 0.0,
+      "arm_l_vel": -0.077,
+      "arm_r_vel": -0.095,
+      "motor_vel": 0.02
+    },
+    {
+      "phase": "preparing",
+      "t_ms": 17925.0,
+      "roll": 86.093,
+      "roll_rate": -0.949,
+      "arm_l_torque": 0.025,
+      "arm_r_torque": -0.176,
+      "reach_l": 0.0,
+      "reach_r": 0.0,
+      "arm_l_vel": 0.066,
+      "arm_r_vel": -0.002,
+      "motor_vel": -0.124
+    },
+    {
+      "phase": "committing",
+      "t_ms": 24125.0,
+      "roll": 90.556,
+      "roll_rate": -0.298,
+      "arm_l_torque": -0.009,
+      "arm_r_torque": 0.081,
+      "reach_l": 1.2559999999999998,
+      "reach_r": 1.2489999999999997,
+      "arm_l_vel": 0.044,
+      "arm_r_vel": 0.007,
+      "motor_vel": -0.028
+    },
+    {
+      "phase": "catching",
+      "t_ms": 24665.0,
+      "roll": 85.138,
+      "roll_rate": -35.88,
+      "arm_l_torque": 0.055,
+      "arm_r_torque": 0.087,
+      "reach_l": 1.815,
+      "reach_r": 1.8049999999999997,
+      "arm_l_vel": -1.49,
+      "arm_r_vel": 1.434,
+      "motor_vel": -0.594
+    },
+    {
+      "phase": "fault",
+      "t_ms": 24745.0,
+      "roll": 85.656,
+      "roll_rate": 105.041,
+      "arm_l_torque": -0.979,
+      "arm_r_torque": 0.912,
+      "reach_l": 1.9249999999999998,
+      "reach_r": 1.915,
+      "arm_l_vel": -1.493,
+      "arm_r_vel": 1.437,
+      "motor_vel": -0.594
+    }
+  ],
+  "sweep_start": {
+    "t_ms": 24245.0,
+    "roll": 90.396,
+    "roll_rate": -3.47,
+    "arm_l_torque": 0.059,
+    "arm_r_torque": 0.084,
+    "reach_l": 1.2570000000000001,
+    "reach_r": 1.2489999999999997,
+    "arm_l_vel": 0.014,
+    "arm_r_vel": -0.009,
+    "motor_vel": -0.234
+  },
+  "sweep_start_drop_deg": 0.1599999999999966,
+  "first_load": {
+    "t_ms": 24725.0,
+    "roll": 83.577,
+    "roll_rate": 35.981,
+    "arm_l_torque": -1.026,
+    "arm_r_torque": 1.011,
+    "reach_l": 1.899,
+    "reach_r": 1.8890000000000002,
+    "arm_l_vel": -1.099,
+    "arm_r_vel": 1.211,
+    "motor_vel": -0.594
+  },
+  "first_load_drop_deg": 6.978999999999999,
+  "minimum_forward_rate_dps": -41.31,
+  "supported_samples": 0,
+  "final_sample": {
+    "t_ms": 24745.0,
+    "roll": 85.656,
+    "roll_rate": 105.041,
+    "arm_l_torque": -0.979,
+    "arm_r_torque": 0.912,
+    "reach_l": 1.9249999999999998,
+    "reach_r": 1.915,
+    "arm_l_vel": -1.493,
+    "arm_r_vel": 1.437,
+    "motor_vel": -0.594
+  },
+  "timing_max": {
+    "sample_dt_ms": 21.0,
+    "inner_dt_max_us": 5389.0,
+    "update_age_ms": 20.0,
+    "imu_age_ms": 10.0,
+    "feedback_age_l_ms": 6.0,
+    "feedback_age_r_ms": 2.0
+  },
+  "preparation": {
+    "duration_s": 6.2,
+    "body_backward_deg": 4.462999999999994,
+    "base_backward_deg": 4.465000000000003,
+    "initial_tilt": 86.093,
+    "launch_tilt": 90.556
+  },
+  "fast_tip_selected": false
+}
