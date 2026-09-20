@@ -388,7 +388,7 @@ static constexpr float BALANCE_PILOT_DEADBAND = 0.06f;
 static constexpr float BALANCE_PILOT_MAX_VEL = 20.0f;
 static constexpr float BALANCE_PILOT_MAX_TURN = 4.5f;
 static constexpr float BALANCE_PILOT_ACCEL = 6.0f;
-static constexpr float BALANCE_PILOT_DECEL = 8.0f;
+static constexpr float BALANCE_PILOT_DECEL = 20.0f;
 static constexpr float BALANCE_PILOT_TURN_ACCEL = 18.0f;
 static constexpr float BALANCE_PILOT_VEL_KP_LOW = 1.0f; // historical v2 helper only
 static constexpr float BALANCE_PILOT_READY_MS = 400.0f;
@@ -415,6 +415,13 @@ static constexpr float BALANCE_DRIVE_ARM_SEVERE_RATE = 20.0f;
 static constexpr float BALANCE_DRIVE_ERROR_LIMIT = 8.0f;
 static constexpr float BALANCE_DRIVE_ACCEL_LIMIT = 100.0f; // same motor acceleration ceiling
 static constexpr float BALANCE_DRIVE_HANDOFF_RATE = 30.0f; // command continuity into stationary PD
+// Extra centered-stick braking is deliberately small: larger values introduced
+// falls in the uncertain-plant screen. Fade away near rest to limit recoil.
+static constexpr float BALANCE_DRIVE_BRAKE_K = 0.5f;
+static constexpr float BALANCE_DRIVE_BRAKE_LIMIT = 3.0f;
+static constexpr float BALANCE_DRIVE_BRAKE_FADE_START = 1.0f;
+static constexpr float BALANCE_DRIVE_BRAKE_FADE_FULL = 4.0f;
+static constexpr float BALANCE_DRIVE_BRAKE_TAU = 0.08f;
 static constexpr float BALANCE_DRIVE_LEARN_ERR = 1.0f;
 static constexpr float BALANCE_PILOT_ARM_GAIN = 0.008333333f; // center fraction per wheel rad/s^2
 static constexpr float BALANCE_PILOT_ARM_LIMIT = 0.10f; // about 10 degrees at each shoulder

@@ -63,6 +63,7 @@ public:
     }
     bool ready() const { return _ready; }
     bool moving() const { return _moving; } // includes braking until calm
+    bool stopping() const { return _moving && (!_ready || _forward_stick == 0); }
     bool turning() const { return _turning; }
     bool captureHeading() const { return _capture_heading; }
     float velocity() const { return _velocity; }

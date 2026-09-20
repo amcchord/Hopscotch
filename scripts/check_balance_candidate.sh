@@ -26,5 +26,5 @@ output/test_network_safety
 "$PYTHON_BIN" -m unittest discover -s tests -v
 "$PYTHON_BIN" -m py_compile scripts/*.py
 bash -n scripts/*.sh
-git diff --check -- . ':!*.serial'
+git diff --check -- . ':!*.serial' ':!*.wire'
 ./scripts/build.sh

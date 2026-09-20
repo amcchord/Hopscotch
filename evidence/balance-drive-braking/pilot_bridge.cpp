@@ -10,7 +10,10 @@ static const balance_math::PilotConfig baseconfig = {
 };
 static const balance_math::DriveConfig basedc = {
     BALANCE_DRIVE_ANGLE_K,BALANCE_DRIVE_RATE_K,BALANCE_DRIVE_SPEED_K,
-    BALANCE_DRIVE_ERROR_LIMIT,BALANCE_DRIVE_ACCEL_LIMIT,BALANCE_DRIVE_HANDOFF_RATE
+    BALANCE_DRIVE_ERROR_LIMIT,BALANCE_DRIVE_ACCEL_LIMIT,BALANCE_DRIVE_HANDOFF_RATE,
+        BALANCE_DRIVE_BRAKE_K, BALANCE_DRIVE_BRAKE_LIMIT,
+        BALANCE_DRIVE_BRAKE_FADE_START, BALANCE_DRIVE_BRAKE_FADE_FULL,
+        BALANCE_DRIVE_BRAKE_TAU
 };
 struct Trial {
  balance_math::BalancePilot p; balance_math::BalanceDrive drive;
@@ -63,7 +66,7 @@ float pilot_arm_error(float speed,float target) { return balance_math::BalancePi
 void pilot_drive(void* ptr,float error,float raw_rate,float old_rate,float speed,float pd,float previous,float dt,float limit,float* out) {
  auto& t=*static_cast<Trial*>(ptr);
  float filtered=t.filtered_rate=t.rate.update(raw_rate,dt,t.tau);
- auto r=t.drive.step(t.p.moving() && !t.stop.captured(),error,t.revised?filtered:old_rate,speed,t.p.velocity(),pd,previous,dt,limit,t.dc,!t.p.ready() || t.p.forwardStick()==0);
+ auto r=t.drive.step(t.p.moving() && !t.stop.captured(),error,t.revised?filtered:old_rate,speed,t.p.velocity(),pd,previous,dt,limit,t.dc,t.p.stopping());
  out[0]=r.raw;out[1]=r.active;
 }
 float pilot_arm_demand(void* ptr,float demand) {

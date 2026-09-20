@@ -62,10 +62,24 @@ private:
 struct DriveConfig {
     float angle_gain, rate_gain, speed_gain, speed_error_limit;
     float acceleration_limit, handoff_rate;
-    float brake_gain=0, brake_accel_limit=0, brake_fade_start=1, brake_fade_full=4;
-    float brake_tau=.08f;
+    float brake_gain, brake_accel_limit, brake_fade_start, brake_fade_full, brake_tau;
+    constexpr DriveConfig(float angle, float rate, float speed, float error_limit,
+                          float accel_limit, float handoff, float brake=0,
+                          float brake_limit=0, float fade_start=1,
+                          float fade_full=4, float tau=.08f)
+        : angle_gain(angle), rate_gain(rate), speed_gain(speed),
+          speed_error_limit(error_limit), acceleration_limit(accel_limit),
+          handoff_rate(handoff), brake_gain(brake), brake_accel_limit(brake_limit),
+          brake_fade_start(fade_start), brake_fade_full(fade_full), brake_tau(tau) {}
 };
-struct DriveResult { float raw, speed, acceleration; bool active; float brake_acceleration=0; };
+struct DriveResult {
+    float raw, speed, acceleration;
+    bool active;
+    float brake_acceleration;
+    DriveResult(float raw_command,float velocity,float accel,bool enabled,float brake=0)
+        : raw(raw_command), speed(velocity), acceleration(accel), active(enabled),
+          brake_acceleration(brake) {}
+};
 
 // While driving, turn tilt/rate/speed error into wheel ACCELERATION, then
 // integrate the motor velocity reference. This actuator state is not a second

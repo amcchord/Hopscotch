@@ -31,6 +31,7 @@ int main() {
     assert(!p.ready());
     unlock(p);
     assert(p.forwardStick()==0 && p.turnStick()==0);
+    assert(!p.stopping()); // an untouched standing robot never enters braking
     auto correction = [&](float error, bool ramp=true) {
         return p.velocityCorrection(error, BALANCE_VEL_SP_KP_LOW,
             BALANCE_VEL_SP_KP, BALANCE_VEL_SP_KNEE, BALANCE_PILOT_VEL_KP_LOW, ramp);
@@ -42,6 +43,7 @@ int main() {
         p.reset();unlock(p);
         p.update(true,false,sign,sign,.02f,config);
         assert(p.moving() && p.turning());
+        assert(!p.stopping());
         assert(sign*p.armAssist()<0); // start: shift opposite the braking swing
         assert(p.plannedArm(1)==0 && p.plannedArm(2)==0); // catch always wins
         assert(p.plannedArm(0)==p.armAssist() && p.plannedArm(3)==p.armAssist());
@@ -72,6 +74,7 @@ int main() {
         p.update(false,false,sign,sign,.02f,config); // fresh RC/feedback lost
         assert(sign*p.armAssist()>0); // brake: shift in the other direction
         assert(!p.ready() && p.moving());
+        assert(p.stopping()); // input loss brakes even with the stick held
         assert(std::fabs(p.velocity()-sign*(config.max_velocity-config.deceleration*.02f))<.00001f);
         const int brake_ticks=static_cast<int>(std::ceil(config.max_velocity/(config.deceleration*.02f)))+1;
         for(int i=0;i<brake_ticks;++i) p.update(true,false,sign,sign,.02f,config);
