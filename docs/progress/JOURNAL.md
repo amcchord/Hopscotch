@@ -274,3 +274,20 @@ pending. Publish these completed records and coordinated WIP branch checkpoints
 under Austin's existing all-work GitHub authorization, excluding private
 configuration, credentialed binaries and local caches. Next: focused candidate
 handoffs from the lowering and OTA owners, then a coordinated release.
+
+## 2026-09-20 — Complete all-agent publication snapshot
+
+Published root integration `9477a87` and radio install record `05e25ab`.
+The OTA owner published source `67f3746` with evidence/package record `50dfdf2`;
+the lowering owner explicitly checkpointed unfinished model work as `b7d52fd`.
+Both remain separate from the installed-source root. All nine local project
+branches have matching GitHub checkpoints, preserving past work and coordinated
+in-progress snapshots. All six working checkouts were clean at the checkpoint
+inventory; owners may continue after this snapshot. No forced history updates,
+worktree removal, private configuration or credentialed-binary publication.
+
+The root helper's 10 host checks, 278 relative documentation links, image/source
+identity and both archived CSV/wire pairs passed; see
+[handoff checks](../../evidence/integration-2026-09-20/ota-v2-handoff.json).
+Publication scans found no local credentials or private keys in the reviewed
+outgoing/index blobs. No robot operations occurred in this publication task.
