@@ -118,3 +118,13 @@ at the initial publication). No force push, branch merge into main, or device
 action was performed by this publication task. Root archival CSV and raw serial
 bytes were also compared with their committed blobs. Subsequent commits on the
 active braking branch are additional WIP checkpoints, not release validation.
+
+Final in-progress checkpoint: the braking owner committed all newer experimental
+files as `f156e48`; scanned and pushed it, then verified the remote hash. Strong
+braking boosts added model falls and are rejected; the provisional helper is
+default-disabled/unwired. This is preservation of unfinished work, not a release.
+The owner briefly held edits for verification. An independent-index snapshot
+was considered but unnecessary because the owner's commit arrived first; no
+extra branch was created and no other worktree/index was modified here.
+All seven branch checkpoints, including the final braking work, are published.
+Agents may continue with new work after this snapshot.
