@@ -1550,3 +1550,26 @@ The release task downloaded Austin's 2,981-sample physical v4 run over Wi-Fi. It
 Combined source `43b1967` includes the ground-drive gate and reviewed lowering source `f26ece6`. Ten native executables, 27 Python tests, pinned build, radio/dashboard checks and 81 lowering model cases passed. New logs remain schema 4/240 bytes with feature flags 4095. CH11 now requests supported lowering during settled balance; its reach, contact inference and mechanics require a separate restrained first physical trial. See [braking findings](../docs/BALANCE_DRIVE_BRAKING_2026-09.md) and [lowering limits](../docs/BALANCE_LOWER_2026-09.md).
 
 Application-only OTA verified app1 with whole-file SHA-256 `a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982`, 1,194,224 bytes, embedded digest `bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3`. Two aborted transfers preserved the old image; a 1 KiB/50 ms paced transfer with 120-second timeout succeeded in 62.8 seconds. Transmitter state also changed, so the cause remains unisolated. Postflight at 03:56:33 UTC September 20: six fresh, disabled, fault-free motors, both groups disarmed, 23.65 V, no IMU fault and maintenance released; transmitter off/rearm required. Both CSV and wire re-download match the retained 2,981-sample run byte-for-byte. No movement was initiated by the release task. Calibration was not re-read through the web API. Physical braking, ground driving and lowering trials remain pending.
+
+
+### September 20 — forward-fall/catch v2 deployed; physical impact/rebound recorded
+
+Installed the frozen source `dd74154` package in app0: 1,196,112 bytes, full
+SHA-256 `71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72`,
+ESP digest `7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190`.
+[Deployment evidence](../evidence/ota-lowering-v2/README.md) confirms powered
+but disarmed health and unchanged prior 2,371-row CSV/wire. Two paced
+transmitter-on uploads aborted; identical pacing succeeded after transmitter
+off. Cause remains unconfirmed; a separate OTA task owns transport reliability.
+
+Austin reports arms too far forward, apparent bounce and backward fall. The
+[archived v2 run](../evidence/balance-lower/trial-v2-20260920/README.md) contains
+1,984 samples/39.760 seconds, schema 4/features 8191. Fast sweep began only
+0.049° into forward departure. At inferred first contact the arms were still
+moving about 1.3 rad/s; in the final 20 ms measured body rate reversed from
+−28.789 to +42.163°/s, ending `lower_wrong_direction` before support qualified.
+The log ends at that fault and does not measure the later fall. Inner cadence
+remained healthy (maximum 5,503 µs). Seeded post-commitment replay matches;
+full preparation replay does not. Hold further v2 lowering trials while the
+owner revises moving-arm contact modeling and departure timing. Successful
+ground/standing driving code remains unchanged.

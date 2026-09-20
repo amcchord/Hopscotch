@@ -1,6 +1,11 @@
 # Centered-stick braking investigation — September 19, 2026
 
-Status: combined firmware installed and verified over Wi-Fi on September 19, 2026 (03:56 UTC September 20). Both motor groups remain disarmed; operator motion testing is next. Based on the current Wi-Fi/OTA firmware, with the concurrent flat-driving fix included. The operator described driving as mostly smooth, with slow stopping when CH2 returned to center.
+Status: braking v5 was installed with the first combined release at 03:56 UTC
+September 20. Austin subsequently reported ground/standing driving worked well.
+The later installed lowering-v2 image retains this braking code unchanged; see
+[current state](progress/CURRENT.md) for its identity and the hold on further
+lowering trials. This report preserves the original slow-stopping investigation
+and first combined release evidence.
 
 ## What the wireless log shows
 
@@ -44,6 +49,10 @@ The next operator test should use small forward/back inputs followed by centered
 
 ## Installed combined release
 
+This section records the first combined v5/v1 image, subsequently superseded by
+[lowering v2](../evidence/ota-lowering-v2/README.md). Its hashes and slot are
+historical; use [current state](progress/CURRENT.md) for the installed image.
+
 Source **`43b1967dd03d26d8b2ccf6a698901c56272039d2`**, branch `codex/drive-braking`; application **1,194,224 bytes**, whole-file SHA-256 `a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982`. Verified running **app1**, ESP embedded digest `bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3`. [Release evidence](../evidence/balance-drive-braking/README.md) records the manifests, preflight, upload and postflight.
 
 Final combined validation passed: **10 native executables, 27 Python tests, syntax/whitespace checks and the pinned ESP32 build**. Radio C++/Lua and dashboard checks passed; their source is unchanged by integration. The **81 lowering scenarios** were rerun successfully against the combined source. Production braking helper/config/model hashes match the completed simulation screen; lowering helper bytes match its reviewed source. The merged log feature mask is 4095.
@@ -52,6 +61,10 @@ Two Wi-Fi attempts aborted: the standard uploader lost its connection, then a pa
 
 After reboot, all six motors were online, disabled, fresh and fault-free; the IMU reported no fault. The saved **2,981-sample v4 log re-downloaded with both CSV and raw wire bytes identical** to the pre-update capture. Application-only OTA did not rewrite the filesystem, partition table or settings. Calibration was not directly re-read through the web API, which does not expose those settings. No motor arming, balancing, driving or lowering was initiated by the release agent.
 
-The private credentialed application/ELF are retained locally in `artifacts/drive-braking-v5/release/` and excluded from Git. The known-good previous Wi-Fi/OTA package remains at the project root `artifacts/wifi-ota/release/`; rollback uses that application through authenticated OTA after disarming and preserving newer logs. There is no automatic boot rollback.
+The private credentialed application/ELF are retained locally in `worktrees/drive-braking/artifacts/drive-braking-v5/release/` relative to the project root and excluded from Git. The previous Wi-Fi/OTA package remains at the project root `artifacts/wifi-ota/release/`; rollback uses that application through authenticated OTA after disarming and preserving newer logs. There is no automatic boot rollback.
 
-For testing, turn the transmitter back on with **CH9 and CH10 LOW** and CH1/CH2/CH4 centered, then use the usual stand-up routine. Compare a brief moderate forward/back request followed by centered CH2; very small requests remain deliberately unchanged. Retrieve the log after disarming both groups. Test the CH11 lowering feature separately using its restraint/clearance procedure.
+The original driving evaluation used the usual stand-up routine, then brief
+moderate forward/back requests followed by centered CH2. Very small requests
+remain deliberately unchanged. For future testing, follow the
+[current test guide](BALANCE_TESTING.md) and retrieve the log after disarming both
+groups. CH11 lowering trials are currently on hold.

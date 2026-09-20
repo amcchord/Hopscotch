@@ -1,0 +1,27 @@
+{
+  "source_commit": "dd74154aa3f534f95506b5c0dd66e1c6d901e091",
+  "production_sources_match_installed": true,
+  "application": {
+    "application_bytes": 1196112,
+    "application_sha256": "71ca02be6f0471a63f92605f6ae0204acd45a58539a5eec7da0e2328a9542d72",
+    "esp_image_digest": "7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190"
+  },
+  "deployment_status": "installed_verified",
+  "running_slot": "app0",
+  "archived_logs": {
+    "lowering_trial": {
+      "samples": 2371,
+      "csv_sha256": "3083a00737288438466b1d0bbd71f337d433d349e85f7d1b2b3266d4a74b2368",
+      "wire_sha256": "5c14a7f3df11dc7b1a14a242d79eb2d3f8e4838cdb81403d9d3142fe21f09ab6"
+    },
+    "forward_catch_v2": {
+      "samples": 1984,
+      "csv_sha256": "808538a68be977d0e6ccc90da526b400c63fd845b8f4cc2f2794006b7c25929f",
+      "wire_sha256": "73e03c16c94eba309a6e113a636c72ca3d07523f712ac494a93a128d3f3cc546"
+    }
+  },
+  "relative_document_links_checked": 278,
+  "helper_host_tests": 10,
+  "firmware_build_and_model_checks": "Reused unchanged validated release e9e1c65; not repeated",
+  "device_operations": false
+}

@@ -230,3 +230,47 @@ No device requests, restart, OTA, configuration, arming or movement occurred.
 Did not repeat the unchanged build/model checks for this records-only update.
 Next step remains separately authorized deployment with fresh preflight followed
 by a restrained operator trial. Hold further trials of installed lowering v1.
+
+## 2026-09-20 — Integrate verified v2 deployment, faster OTA workflow and failed trial
+
+Merged lowering handoff `d3eb777` into root `codex/wifi-ota` as `721f2ce`,
+then integrated trial evidence `d58c917`. Production source/build/dashboard/radio
+files match installed `dd74154` exactly. The deployment owner installed the
+already validated private package in app0, confirmed its ESP digest and powered
+disarmed health, and preserved the earlier 2,371-row CSV/wire unchanged. The
+immutable package manifest's queued status is preparation history; the separate
+[deployment record](../../evidence/ota-lowering-v2/README.md) establishes the
+installation. Root performed no device requests, upload, restart or movement.
+
+Two transmitter-on paced uploads disconnected without changing the running
+image or rebooting. The same pacing succeeded with the transmitter off in
+62.759 seconds. The underlying cause remains unconfirmed. The host helper now
+uses one command for manifest/preflight checks, validated run backup, paced
+upload, image/health verification and preserved-run comparison. Lost upload
+acknowledgments trigger discovery; already-installed bytes are verified without
+another flash. Ten focused host tests pass, including localhost multipart
+transport. No distinct hardware trial of the refactored CLI is claimed.
+
+README, architecture, test/lowering/OTA guides and shared current state now use
+the installed v2 identity and frozen-package workflow. Reused completed firmware
+and model validation from release record `e9e1c65`; did not rebuild unchanged
+firmware or repeat those checks. Source identity, local image hashes, new helper
+checks, archived-log integrity, documentation links and whitespace provide the
+integration checks. Exact wire bytes remain unmodified.
+
+Austin reported v2 arms too far forward, an apparent bounce and backward fall.
+The [new trial archive](../../evidence/balance-lower/trial-v2-20260920/README.md)
+contains 1,984 rows/39.760 seconds, ending `lower_wrong_direction`. Arm motion
+was still about 1.3 rad/s at inferred contact; body rate reversed sharply before
+support qualified. The log ends at the fault, before the reported later fall.
+Post-commitment replay matches; full preparation replay does not, and that
+limitation is preserved. Hold further lowering attempts. The lowering owner
+retains device/log access and is revising contact modeling and departure timing.
+
+The new `codex/ota-reliability` worktree owns transmitter-on transport fixes;
+root did not edit network source or compete for device access. Radio checkpoint
+`05e25ab` records completed Lua v3.1 SD installation; boot confirmation remains
+pending. Publish these completed records and coordinated WIP branch checkpoints
+under Austin's existing all-work GitHub authorization, excluding private
+configuration, credentialed binaries and local caches. Next: focused candidate
+handoffs from the lowering and OTA owners, then a coordinated release.
