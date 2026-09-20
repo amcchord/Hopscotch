@@ -13,6 +13,7 @@ import csv
 import ctypes as C
 from dataclasses import dataclass, asdict, replace
 import itertools
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -44,6 +45,7 @@ class Model:
     wheel_tau: float = .06
     stiffness: float = 240
     damping_ratio: float = .8
+    contact_velocity_fraction: float = 1.0
     servo_tau: float = .04
     servo_limit: float = 1.5
     joint_stiffness: float = 25
@@ -63,12 +65,15 @@ class Model:
 
 
 class Policy:
-    def __init__(self):
+    def __init__(self, header_dir=None):
         out = ROOT/'output'
         out.mkdir(exist_ok=True)
-        path = out/'lowering_bridge.so'
+        header_dir = Path(header_dir) if header_dir else ROOT/'src'
+        key = hashlib.sha256((header_dir/'balance_lower.h').read_bytes()
+                             +(ROOT/'scripts/lowering_bridge.cpp').read_bytes()).hexdigest()[:16]
+        path = out/f'lowering_bridge_{key}.so'
         subprocess.run(['clang++','-std=c++17','-Wall','-Wextra','-Werror',
-                        '-shared','-fPIC','-I'+str(ROOT/'src'),
+                        '-shared','-fPIC','-I'+str(header_dir),
                         str(ROOT/'scripts/lowering_bridge.cpp'),'-o',str(path)],check=True)
         self.lib = C.CDLL(str(path))
         self.lib.lower_new.restype = C.c_void_p
@@ -106,6 +111,7 @@ def simulate(policy,m,name):
     phase = 1
     committed = supported = False
     contact_time = commit_time = first_flat = None
+    first_impact = None
     peak_rate = peak_lead = peak_wheel = peak_torque = 0.
     values = lambda: (C.c_float*11)(theta,catch_rate,sp-theta,wheel,wheel,*arms,*velocities,*torques)
     assert policy.lib.lower_request(handle,0,values(),True,*centers)
@@ -174,7 +180,17 @@ def simulate(policy,m,name):
                 for j in range(2):
                     support=support_angle(arms[j]*signs[j],m)
                     if ground_present and (j==0 or m.right_contact) and support is not None and support>theta:
-                        force=max(0,m.stiffness*(support-theta)-2*m.damping_ratio*math.sqrt(m.stiffness)*rate)/2
+                        prior_support=support_angle(prior_arms[j]*signs[j],m)
+                        support_rate=(support-prior_support)/dt if prior_support is not None else 0.
+                        # Floor approach velocity includes the moving arm. The
+                        # previous body-rate-only damping omitted the arm's ram
+                        # into the floor and understated the physical v2 bounce.
+                        closing_rate=m.contact_velocity_fraction*support_rate-rate
+                        force=max(0,m.stiffness*(support-theta)+2*m.damping_ratio*math.sqrt(m.stiffness)*closing_rate)/2
+                        if first_impact is None:
+                            first_impact=dict(time_s=round(t+substep*dt,4),tilt_deg=round(theta,3),
+                                              body_rate_dps=round(rate,3),arm_speed_rad_s=round(abs(rates[j]),3),
+                                              closing_rate_dps=round(closing_rate,3))
                         # Finite arm-force authority. This is a model assumption,
                         # not a measured hardware torque/impact rating.
                         force=min(force,3/m.torque_per_acceleration)
@@ -201,6 +217,7 @@ def simulate(policy,m,name):
                     first_flat_s=first_flat,elapsed_s=round(t,3),peak_rate_dps=round(peak_rate,3),
                     peak_wheel_rad_s=round(peak_wheel,3),peak_model_torque_nm=round(peak_torque,3),
                     peak_target_lead_rad=round(peak_lead,5),final_tilt_deg=round(theta,3),transitions=transitions)
+        result['first_impact']=first_impact
         return result,trace
     finally:policy.lib.lower_delete(handle)
 
