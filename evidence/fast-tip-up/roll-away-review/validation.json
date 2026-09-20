@@ -1,0 +1,17 @@
+{
+  "source_commit": "f4d2bb7240afdf6bd47807208b18f720522329fb",
+  "native_command": "clang++ -std=c++17 -Wall -Wextra -Werror -Isrc tests/test_balance_tip_up.cpp -o output/test_balance_tip_up && output/test_balance_tip_up",
+  "native_result": "Fast tip-up: 162 tracking cases; max capture 2740 ms, target speed 2.0552 rad/s, acceleration 2.43902 rad/s^2; input, capture, obstruction, timing and fault checks pass",
+  "native_pass": true,
+  "source_whitespace_pass": true,
+  "paired_cases_per_policy": 45,
+  "paired_no_fall": [
+    24,
+    24
+  ],
+  "improve": 10,
+  "regress": 10,
+  "configured_build": "Deferred to integration owner; no duplicate full build",
+  "physical_validation": "New policy not yet physically tested",
+  "device_actions": "None from this task"
+}

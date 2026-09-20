@@ -1,0 +1,8 @@
+{
+  "source_file": "bal_20260920_forward_catch_v5_wifi.csv",
+  "sha256": "4d0227e2a5cb76fa0bf426746c40c45668fc34b281304c21a48842bc80929849",
+  "rows": 1219,
+  "fast_flag_rows": 0,
+  "use_for_fast_failure_analysis": false,
+  "reason": "The saved run is slow mode; the fast attempt was not retained."
+}

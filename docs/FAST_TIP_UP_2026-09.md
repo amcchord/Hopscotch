@@ -1,8 +1,9 @@
-# CH6 fast tip-up — installed, physical trial pending
+# CH6 fast tip-up — capture tested, arm-release correction queued
 
-September 20, 2026. The original trajectory was installed with lowering v4.
-The startup feedback fix is now [installed with lowering v5](../evidence/lowering-v5-integration/README.md) in source `17c499c`; a fresh manual fast-start trial is pending.
-The fast motion has not yet been physically tested. See [current state](progress/CURRENT.md)
+September 20, 2026. The original trajectory was installed with lowering v4;
+its startup fix was [installed with lowering v5](../evidence/lowering-v5-integration/README.md) in `17c499c`.
+The first distinct fast trial reached quiet capture in 2.895 seconds, then fell
+forward during arm return. See [current state](progress/CURRENT.md)
 for the exact running image and trial sequence.
 
 **Startup fix installed:** Austin reports HIGH refused to start while LOW worked.
@@ -10,7 +11,21 @@ The [startup diagnosis and correction](../evidence/fast-tip-up/startup-fix/READM
 addresses feedback aging during wheel setup and a polling interval longer than
 the fast freshness limit. It parks the arms while fresh, stationary feedback is
 confirmed, requests each motor about every 60 ms, and adds a dashboard refusal
-reason. The trajectory and physical limits are unchanged. This follow-up is installed in source `17c499c`; its physical trial remains pending.
+reason. The trajectory and physical limits are unchanged. This follow-up was
+installed in combined source `17c499c` on September 20 at 20:35:49 UTC; see the
+[verified installation](../evidence/lowering-v5-integration/deployment.json).
+That physical retry confirmed startup and trajectory execution.
+
+**Fast support-release correction:** source `f4d2bb7` preserves the saved balance
+trim instead of replacing it with the quiet, arm-supported capture angle. Its
+temporary capture offset fades during the first 0.10 of measured arm-fraction
+return, through the existing base slew limit. The trial's old calibration
+cancelled 2.860° of saved trim before support released. Fast capture also now
+requires each rear wheel within 0.75 rad/s for the existing 120 ms dwell.
+[Trial, correction, tests and limitations](../evidence/fast-tip-up/roll-away-review/README.md).
+The combined release owner has integrated this for the next OTA. Physical
+confirmation remains pending: the 45-case approximate model has 10 improvements
+and 10 regressions, with regressions when saved trim exceeds true equilibrium.
 
 ## What the logs say
 
@@ -52,7 +67,8 @@ owner's checkout; no source logs were copied between worktrees.
   old minimum-speed tail. The motor speed limit is 2.2 rad/s.
 - Before engaging balance, both measured arm positions must be within 0.15 rad
   of the tip pose, both arm speeds at most 0.30 rad/s, body rate at most 8°/s,
-  and tilt within the existing engagement window, continuously for 120 ms.
+  each rear wheel speed at most 0.75 rad/s, and tilt within the existing
+  engagement window, continuously for 120 ms.
   The production-policy tracking fixtures qualify at 2.72–2.74 seconds.
   **Roughly 3 seconds is the initial lift/capture target.** The 500 ms trigger
   window, motor-mode setup, and subsequent ordinary arm return/settling add
@@ -94,8 +110,10 @@ and disarm promptly if needed. No need to test CH11 lowering in the same run.
 Record a side view if available. After disarming both groups, download the
 saved run over Wi-Fi before another attempt replaces it.
 
-New combined-build logs use schema 5 / 240-byte samples; original fast-v1 logs used schema 4. Feature bit 16384 identifies fast
-tip-up v1 support; `pilot_flags & 128` marks a run that actually selected it.
+Samples remain 240 bytes. Schema 4 introduced fast v1; schema 5 added its startup
+wait metadata, and the next combined schema 6 identifies fast v2 capture/release.
+Feature bit 16384 identifies fast support; `pilot_flags & 128` marks a run that
+actually selected it.
 During those runs' state-1 samples, `roll_rate` is the 6 ms filtered rate;
 ordinary balancing still uses its original filter. Versioned metadata is
 printed only for matching saved feature bits, so old saved runs remain
@@ -107,7 +125,7 @@ Source branch: `codex/fast-tip-up`, based on `400c98d` in
 `worktrees/fast-tip-up`. The active lowering task owns the device, shared
 progress records, combined validation and next OTA. Feature bit
 32768 identifies lowering v4 support; the combined feature flags are 65535.
-The later lowering v5 behavior is identified by schema 5.
+Lowering v5 is identified by schema 5; the next combined v6 update uses schema 6.
 The candidate's configured local build is for validation, not the combined
 release image. [Handoff evidence](../evidence/fast-tip-up/README.md) records
 checks and the exact integration procedure.
