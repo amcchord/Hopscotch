@@ -65,3 +65,14 @@ No device request, arming, movement, settings write, upload, raw-log copying or
 private-header copying occurred here. After integration, retry CH6 HIGH from
 the normal flat Forward pose with neutral sticks; any refusal reason is visible
 in the dashboard before another run.
+
+## Installed outcome
+
+The release owner installed combined source `17c499c` in app0 and verified it
+on September 20 at 20:35:49 UTC. [Installation identity](installation.json)
+records the ESP digest, preserved 1,237-row CSV/wire hashes, six healthy disabled
+motors and disarmed groups. All owned fast-fix files match the installed source
+exactly. Physical fast tip-up remains pending. The original validation record
+above describes preparation; this installation record supersedes its queued
+status. This task only read the owner’s saved deployment record and checked
+source identity; it performed no second OTA or robot operation.

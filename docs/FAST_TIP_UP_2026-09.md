@@ -5,13 +5,15 @@ September 20, 2026. Integrated with lowering v4 in source `e55cecb` and
 The fast motion has not yet been physically tested. See [current state](progress/CURRENT.md)
 for the exact running image and trial sequence.
 
-**Startup fix queued:** Austin reports HIGH refused to start while LOW worked.
+**Startup fix installed:** Austin reports HIGH refused to start while LOW worked.
 The [startup diagnosis and correction](../evidence/fast-tip-up/startup-fix/README.md)
 addresses feedback aging during wheel setup and a polling interval longer than
 the fast freshness limit. It parks the arms while fresh, stationary feedback is
 confirmed, requests each motor about every 60 ms, and adds a dashboard refusal
-reason. The trajectory and physical limits are unchanged. This follow-up is
-awaiting the release owner's next combined OTA.
+reason. The trajectory and physical limits are unchanged. This follow-up was
+installed in combined source `17c499c` on September 20 at 20:35:49 UTC; see the
+[verified installation](../evidence/fast-tip-up/startup-fix/installation.json).
+A physical fast-start retry is still pending.
 
 ## What the logs say
 

@@ -1,0 +1,35 @@
+{
+  "status": "installed_verified_by_release_owner",
+  "source_commit": "17c499c06b57d8e6d82ffaee3fbf289b722aa8b6",
+  "startup_fix_commit": "9771beed992573eb44e7ec6afa4d7c8498c3f806",
+  "integration_commit": "3f3bc37",
+  "completed_utc": "2026-09-20T20:35:49.218928+00:00",
+  "running_slot": "app0",
+  "esp_image_sha256": "8373d0b5be1ba254b5b9e831849e122989f66523c0ea35cf7dfcd1795a2ed837",
+  "saved_run_preserved": {
+    "samples": 1237,
+    "csv_sha256": "083d7d6b8d4926de8b5e7cdecc4886531ab5b569fb6206a2b40c72693c7d8741",
+    "wire_sha256": "2fe0a88f4beb3ebd7adf7eed40c9aaed03811762c867561794a7ad54c4bf91a3"
+  },
+  "six_motors_online_disabled_error_free": true,
+  "both_groups_disarmed": true,
+  "maintenance_released": true,
+  "fast_fix_files_match_installed": {
+    "src/balance_tip_up.h": true,
+    "src/balance_controller.h": true,
+    "src/config.h": true,
+    "src/main.cpp": true,
+    "src/motor_manager.cpp": true,
+    "src/motor_manager.h": true,
+    "src/network_snapshot.h": true,
+    "src/web_server.cpp": true,
+    "data/network.html": true,
+    "tests/test_balance_tip_up.cpp": true,
+    "tests/test_motor_setup.cpp": true
+  },
+  "motion_initiated": false,
+  "physical_fast_trial": "pending",
+  "source_record": "worktrees/balance-lower/output/lowering-v5-final-nearby/deployment.json",
+  "source_record_sha256": "c03ff0534669b23ddd5e814994ac12a527dc696ed6d20c47c264e30e1c704cdd",
+  "this_task_device_operations": []
+}
