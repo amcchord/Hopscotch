@@ -1374,7 +1374,7 @@ static void controlTick() {
             if (waitingForDoubleTap && !calEdge && (now - lastCalEdgeTime > 500)) {
                 balanceWantsEdge = true;
                 waitingForDoubleTap = false;
-                Serial.println("[Main] Single tap Ch11 -- normal tip-up");
+                Serial.println("[Main] Single tap Ch11 -- tip-up requested");
             }
         } else {
             waitingForDoubleTap = false;
@@ -1396,7 +1396,8 @@ static void controlTick() {
             && balanceCtrl.getState() == BalanceState::Balancing;
         balanceCtrl.update(rollDeg, rollRateDps, ch7Active, balanceWantsEdge || lowerEdge, dt,
                            crsfRx.getChannelNormalized(DEFAULT_CH_THROTTLE),
-                           crsfRx.getChannelNormalized(DEFAULT_CH_STEERING), pilotValid);
+                           crsfRx.getChannelNormalized(DEFAULT_CH_STEERING), pilotValid,
+                           balance_math::fastTipSelected(crsfRx.getChannelNormalized(CH_FAST_TIP_UP)));
         profRecord(PROF_BAL, prof_bal);
 
         bool balanceDriving = balanceCtrl.isControllingDrive();

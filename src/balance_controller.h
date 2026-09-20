@@ -11,6 +11,7 @@
 #include "balance_pilot.h"
 #include "balance_drive.h"
 #include "balance_lower.h"
+#include "balance_tip_up.h"
 #include "balance_telemetry.h"
 
 enum class BalanceState : uint8_t {
@@ -58,7 +59,8 @@ public:
     // Called from control task at 50Hz -- state machine, arms, velocity-integrating setpoint
     void update(float roll_deg, float roll_rate_dps,
                 bool ch7_active, bool ch11_edge, float dt,
-                float pilot_forward = 0, float pilot_turn = 0, bool pilot_valid = false);
+                float pilot_forward = 0, float pilot_turn = 0, bool pilot_valid = false,
+                bool fast_tip_selected = false);
 
     BalanceState getState() const { return _state; }
     bool isActive() const { return _state != BalanceState::Idle; }
@@ -235,6 +237,9 @@ private:
     uint8_t _last_flags    = 0;
 
     // Arm ramp state (control task only)
+    balance_math::FastTipUp _fast_tip;
+    bool _fast_tip_run = false; // latched until the next new run, also saved per sample
+    balance_math::TipInput tipInput(bool pilot_valid) const;
     float _arm_left_target  = 0.0f;
     float _arm_right_target = 0.0f;
     float _arm_left_goal    = 0.0f;
@@ -280,7 +285,7 @@ private:
     void armAxisFractions(float& tip_frac, float& center_frac) const;
     float computeArmFraction() const;
     float computeScheduledSetpoint() const;
-    void enterTippingUp();
+    void enterTippingUp(bool fast_tip = false);
     void enterBalancing(float current_roll);
     void enterReturningArms(const char* reason);
     void disengage(const char* reason);

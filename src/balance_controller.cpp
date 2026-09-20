@@ -392,13 +392,19 @@ bool BalanceController::armsAtGoal(float left, float right) const {
         && fabsf(r.position - right) <= BALANCE_ARM_REACHED_RAD;
 }
 
-void BalanceController::enterTippingUp() {
+void BalanceController::enterTippingUp(bool fast_tip) {
     if (!readyToStart()) {
         Serial.println("[Balance] Tip-up REFUSED: check calibration, armed motors, faults and fresh IMU/feedback");
         return;
     }
     if (!_log_buf || _log_pending_flush || _log_flush_in_progress || _trim_save_pending) {
         Serial.println("[Balance] Tip-up REFUSED: telemetry is not ready (wait for idle save)");
+        return;
+    }
+    // Fast starts require the usual forward-arm, stationary flat pose. Refuse
+    // unsupported poses explicitly instead of silently changing to slow mode.
+    if (fast_tip && !_fast_tip.begin(millis(), tipInput(true))) {
+        Serial.printf("[Balance] Fast tip-up REFUSED: %s\n", _fast_tip.fault());
         return;
     }
 
@@ -422,6 +428,15 @@ void BalanceController::enterTippingUp() {
     _speed_mode_active = true;
     _last_speed_refresh_ms = millis();
 
+    // Motor-mode setup can block; start trajectory time from fresh feedback
+    // after it finishes. update() has already qualified the fresh neutral RC.
+    if (fast_tip && !_fast_tip.begin(millis(), tipInput(true))) {
+        exitSpeedMode();
+        Serial.printf("[Balance] Fast tip-up REFUSED after setup: %s\n", _fast_tip.fault());
+        return;
+    }
+    _fast_tip_run = fast_tip;
+
     _state = BalanceState::TippingUp;
     _targets_initialized = false;
 
@@ -434,13 +449,13 @@ void BalanceController::enterTippingUp() {
     _arm_tip_right_goal = fwd_r + BALANCE_ARM_TIP_RIGHT;
     _arm_left_goal    = _arm_tip_left_goal;
     _arm_right_goal   = _arm_tip_right_goal;
-    _arm_ramp_speed   = BALANCE_ARM_TIP_SPEED;
+    _arm_ramp_speed   = fast_tip ? BALANCE_FAST_TIP_MOTOR_RAD_S : BALANCE_ARM_TIP_SPEED;
     _arms_reached_tip = false;
 
     _arms->setOverrideTargets(_arm_left_target, _arm_right_target, _arm_ramp_speed);
 
-    Serial.printf("[Balance] TIPPING UP (wheels pre-switched to Speed)  arm goal: L=%.2f R=%.2f\n",
-                  _arm_left_goal, _arm_right_goal);
+    Serial.printf("[Balance] TIPPING UP %s (wheels pre-switched to Speed)  arm goal: L=%.2f R=%.2f\n",
+                  fast_tip ? "FAST experimental" : "SLOW", _arm_left_goal, _arm_right_goal);
 
     if (!startLog()) {
         _state = BalanceState::Idle;
@@ -624,6 +639,7 @@ void BalanceController::forceEngage() {
         Serial.println("[Balance] FORCE ENGAGE refused: telemetry is not ready");
         return;
     }
+    _fast_tip_run = false;
     Serial.printf("[Balance] FORCE ENGAGE at tilt=%.1f\n", tilt);
     _arms_returning = false;
     _arms_reached_tip = true;
@@ -710,9 +726,31 @@ balance_math::LowerInput BalanceController::lowerInput(bool pilot_valid) const {
     return in;
 }
 
+balance_math::TipInput BalanceController::tipInput(bool pilot_valid) const {
+    balance_math::TipInput in;
+    in.tilt = _tilt_angle;
+    in.rate = _drive_gyro_rate; // 6 ms filter catches fast motion without changing normal PD
+    const auto& left = _motors->getMotor(MotorRole::ArmLeft);
+    const auto& right = _motors->getMotor(MotorRole::ArmRight);
+    in.left = left.position - _arms->getForwardLeft();
+    in.right = right.position - _arms->getForwardRight();
+    in.left_velocity = left.velocity; in.right_velocity = right.velocity;
+    in.wheel_left = _motors->getMotor(MotorRole::BackLeft).velocity;
+    in.wheel_right = _motors->getMotor(MotorRole::BackRight).velocity;
+    in.healthy = pilot_valid && _motors->isDriveArmed() && _motors->isArmArmed()
+        && balance_math::fresh(micros(), _last_imu_sample_us, BALANCE_IMU_STALE_US);
+    for (int i = 0; i < _motors->motorCount(); ++i) {
+        const auto& m = _motors->getMotor(i);
+        in.healthy = in.healthy && m.online && m.enabled && !m.has_fault && !m.errors
+            && millis() - m.last_feedback_ms <= 100;
+    }
+    return in;
+}
+
 void BalanceController::update(float roll_deg, float roll_rate_dps,
                                 bool ch7_active, bool ch11_edge, float dt,
-                                float pilot_forward, float pilot_turn, bool pilot_valid) {
+                                float pilot_forward, float pilot_turn, bool pilot_valid,
+                                bool fast_tip_selected) {
     if (!_motors || !_arms) return;
     {
         uint32_t now0 = millis();
@@ -802,30 +840,49 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
     case BalanceState::Idle:
         if (ch11_edge && _motors->isArmArmed()) {
-            enterTippingUp();
+            if (fast_tip_selected && (!pilot_valid || !std::isfinite(pilot_forward)
+                || !std::isfinite(pilot_turn) || fabsf(pilot_forward) > BALANCE_PILOT_DEADBAND
+                || fabsf(pilot_turn) > BALANCE_PILOT_DEADBAND)) {
+                Serial.println("[Balance] Fast tip-up REFUSED: fresh RC and neutral CH1/CH2 required");
+            } else {
+                enterTippingUp(fast_tip_selected);
+            }
         }
         break;
 
     case BalanceState::TippingUp: {
-        float dist_l = fabsf(_arm_left_goal - _arm_left_target);
-        float dist_r = fabsf(_arm_right_goal - _arm_right_target);
+        if (_fast_tip_run) {
+            _fast_tip.step(millis(), dt, tipInput(pilot_valid));
+            if (_fast_tip.fault()) {
+                _last_outer_diag |= BAL_DIAG_SAFETY_EXIT;
+                logSample(tilt, rate);
+                hardAbort(_fast_tip.fault());
+                return;
+            }
+            _arm_left_target = _arms->getForwardLeft() + _fast_tip.left();
+            _arm_right_target = _arms->getForwardRight() + _fast_tip.right();
+            _arms->setOverrideTargets(_arm_left_target, _arm_right_target, BALANCE_FAST_TIP_MOTOR_RAD_S);
+        } else {
+            float dist_l = fabsf(_arm_left_goal - _arm_left_target);
+            float dist_r = fabsf(_arm_right_goal - _arm_right_target);
 
-        float scale_l = dist_l / 1.5f;
-        if (scale_l > 1.0f) scale_l = 1.0f;
-        if (scale_l < 0.05f) scale_l = 0.05f;
+            float scale_l = dist_l / 1.5f;
+            if (scale_l > 1.0f) scale_l = 1.0f;
+            if (scale_l < 0.05f) scale_l = 0.05f;
 
-        float scale_r = dist_r / 1.5f;
-        if (scale_r > 1.0f) scale_r = 1.0f;
-        if (scale_r < 0.05f) scale_r = 0.05f;
+            float scale_r = dist_r / 1.5f;
+            if (scale_r > 1.0f) scale_r = 1.0f;
+            if (scale_r < 0.05f) scale_r = 0.05f;
 
-        float speed_l = BALANCE_ARM_TIP_SPEED * scale_l;
-        float speed_r = BALANCE_ARM_TIP_SPEED * scale_r;
+            float speed_l = BALANCE_ARM_TIP_SPEED * scale_l;
+            float speed_r = BALANCE_ARM_TIP_SPEED * scale_r;
 
-        _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  speed_l, dt);
-        _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, speed_r, dt);
+            _arm_left_target  = moveToward(_arm_left_target,  _arm_left_goal,  speed_l, dt);
+            _arm_right_target = moveToward(_arm_right_target, _arm_right_goal, speed_r, dt);
 
-        float motor_speed = (speed_l > speed_r) ? speed_l : speed_r;
-        _arms->setOverrideTargets(_arm_left_target, _arm_right_target, motor_speed);
+            float motor_speed = (speed_l > speed_r) ? speed_l : speed_r;
+            _arms->setOverrideTargets(_arm_left_target, _arm_right_target, motor_speed);
+        }
 
         // The back wheels are already in Speed mode holding 0: refresh the
         // command every 250ms so the motor-side CAN watchdog (~1s) never
@@ -850,7 +907,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
         float tip_expected = BALANCE_SETPOINT_ARMS_TIP;
         float tip_error = fabsf(tip_expected - tilt);
-        if (arms_done &&
+        if ((_fast_tip_run ? _fast_tip.ready() : arms_done) &&
             tip_error < BALANCE_ENGAGE_THRESHOLD_DEG &&
             fabsf(rate) < BALANCE_ENGAGE_RATE_MAX_DPS) {
             enterBalancing(tilt);
@@ -1791,6 +1848,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
     s.imu_age_ms     = imu_age_ms;
     s.roll           = roll_deg;
     s.roll_rate      = _lowering.phase() != balance_math::LowerPhase::Idle
+                    || (_fast_tip_run && _state == BalanceState::TippingUp)
                     ? (float)_drive_gyro_rate : roll_rate_dps;
     s.accel_angle    = _last_accel_angle;
     s.gyro_raw       = _last_gyro_raw;
@@ -1847,6 +1905,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
                   | (_pilot.turning() ? 4 : 0) | (_pilot_input_valid ? 8 : 0)
                   | (_pilot_drive_active ? 16 : 0) | (_pilot.fastBraking() ? 32 : 0)
                   | (_lowering.active() ? 64 : 0)
+                  | (_fast_tip_run ? 128 : 0)
                   | (static_cast<uint32_t>(_lowering.phase()) << 8);
     s.pilot_arm = _pilot_arm_applied;
     _log_count++;
@@ -1874,7 +1933,7 @@ void BalanceController::flushLogToFile() {
     header.schema_version = BALANCE_LOG_SCHEMA_VERSION;
     header.header_size = sizeof(BalanceLogFileHeader);
     header.sample_size = sizeof(BalanceSample);
-    header.reserved = 49151; // prior extensions plus continuous arm return v4 (32768)
+    header.reserved = 65535; // prior features + CH6 fast tip-up (16384) + lowering v4 (32768)
     header.sample_count = _log_count;
     header.start_uptime_ms = _log_start_ms;
     header.end_uptime_ms = _log_end_ms ? _log_end_ms : millis();
@@ -2024,6 +2083,15 @@ void BalanceController::dumpLog(Print* sink) {
     out.println("# === BALANCE CONFIG ===");
     out.println("# transport_checksum=fnv1a32");
     out.printf("# telemetry_features=%u\n", header.reserved);
+    if (header.reserved & 16384) {
+        // Versioned literals describe the saved policy, including after a future OTA.
+        out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        out.println("# fast_tip_trajectory=duration_s:2.6 motor_limit_rad_s:2.2 lead_rad:0.18 legacy_geometric_path:1 quintic_progress:1");
+        out.println("# fast_tip_start=forward_tolerance_rad:0.15 abs_tilt_deg:12 arm_rate_rad_s:0.3 wheel_rate_rad_s:0.75 neutral_CH1_CH2:1");
+        out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
+        out.println("# fast_tip_limits=timeout_ms:4500 stall_ms:400 control_dt_ms:40 feedback_ms:100 tilt_deg:-20:100 abs_rate_dps:100");
+        out.println("# fast_tip_rate=roll_rate_uses_fast_tau_s:0.006 only_state:1 and_fast_run:1 ordinary_balance_filter_unchanged:1");
+    }
     if (header.reserved & 32768) {
         out.println("# lowering=experimental_ch11_forward_catch_v4 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");

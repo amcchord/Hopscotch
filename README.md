@@ -72,7 +72,7 @@ persisted robot mappings must be checked before a physical test.
 | Throttle | CH2 | Right stick Y |
 | Arm Speed | CH5 | SE |
 | Arm Nudge | CH4 | Input Rud |
-| Arm Select Group | CH6 | SB; retained setting |
+| Tip-up speed (next OTA candidate) | CH6 | SB; high = experimental fast, center/low = regular slow |
 | Balance Select | CH7 | SC |
 | Arms Arm/Disarm | CH9 | SA |
 | Drive Arm/Disarm | CH10 | SD |
@@ -85,6 +85,10 @@ Ground-drive and several trigger mappings are stored in robot settings;
 standing-drive CH1/CH2 and arm-speed/nudge CH5/CH4 are fixed in firmware. Web
 configuration is disabled; use the USB console for supported configuration and
 diagnostics. Signal loss is detected if no valid CRSF frame arrives within 500 ms.
+
+The [CH6 fast tip-up candidate](docs/FAST_TIP_UP_2026-09.md) targets roughly
+three seconds for lift/capture, with the usual CH11 trigger and unchanged slow
+mode. It is queued for the next combined OTA; physical timing remains untested.
 
 ## Building and Updating over Wi-Fi
 
