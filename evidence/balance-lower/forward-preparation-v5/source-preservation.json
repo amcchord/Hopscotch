@@ -41,5 +41,17 @@
   ],
   "ground_drive_identical": true,
   "ordinary_balance_note": "Only the phase-2 lowering preparation applies the new setpoint cap. Other balance phases return the ordinary value, covered natively. Fast startup additions are confined to the existing owner feature.",
-  "web_server_change": "Only additive start_status JSON diagnostic from fast-start owner; OTA/log transport implementation unchanged."
+  "web_server_change": "Only additive start_status JSON diagnostic from fast-start owner; OTA/log transport implementation unchanged.",
+  "final_source": "17c499c06b57d8e6d82ffaee3fbf289b722aa8b6",
+  "single_publication": "The capped effective setpoint is computed before a single volatile write; the fast reader cannot observe an uncapped intermediate.",
+  "peer_files_retained_exactly": {
+    "src/balance_tip_up.h": true,
+    "src/config.h": true,
+    "src/main.cpp": true,
+    "src/motor_manager.cpp": true,
+    "src/motor_manager.h": true,
+    "src/network_snapshot.h": true,
+    "src/web_server.cpp": true,
+    "data/network.html": true
+  }
 }

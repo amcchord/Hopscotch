@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/lowering-v4-fast-integration/README.md) records
+[latest deployment evidence](../evidence/lowering-v5-integration/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -91,25 +91,26 @@ loop indefinitely. The recovery AP stays enabled until reboot once started.
 
 ## Live telemetry and saved runs
 
-Commands below run from the project root. `scripts/robot_wifi.py` needs only
-Python 3's standard library; substitute `python3` if `.venv/bin/python` is absent.
-Its default host is `http://hopscotch.local`. Put an IP override **before** the
-subcommand: `python3 scripts/robot_wifi.py --host http://192.168.1.172 status`.
+Commands below run from the project root using the current integration helper.
+It needs only Python 3's standard library. The historical root helper predates
+the latest saved-log schema. The default host is `http://hopscotch.local`; put
+`--host http://192.168.1.172` before the subcommand to override it. The existing
+private header is read in place through `--secrets-file`.
 
 ```bash
 # Read the latest snapshot; this command is a single read, not a stream.
-.venv/bin/python scripts/robot_wifi.py status
+python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h status
 
 # After a run: disarm both groups and wait for log saving to finish.
-.venv/bin/python scripts/robot_wifi.py log
+python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h log
 ```
 
 The browser receives live pose, motor feedback, RC channels, timing and memory
 through `/ws`. Offers are 10 Hz; network delivery is best-effort, can skip frames,
 and is not a real-time control channel. The dashboard marks stale data. The full
 onboard balance capture runs independently at 50 Hz with 200 Hz aggregates;
-new captures are schema 4, up to 6,000 samples/120 seconds. Live JSON schema 1
-and saved-log schema 4 are different formats. Existing older saved runs retain
+new captures are schema 5 (240-byte samples, unchanged from v4), up to 6,000 samples/120 seconds. Live JSON schema 1
+and saved-log schema 5 are different formats. Existing older saved runs retain
 their original schema and metadata when exported by the new firmware.
 
 After supporting the robot, lower both arm switches and release CH11. Wait for
@@ -132,13 +133,13 @@ Keep both files and your operator observations. Run analysis separately using
 the downloaded filename:
 
 ```bash
-.venv/bin/python scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
+python3 worktrees/balance-lower/scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
 # Optional plot requires matplotlib:
-.venv/bin/python scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details --plot
+python3 worktrees/balance-lower/scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details --plot
 ```
 
 The browser's **Download latest run** saves the raw export. For a validated
-archive, use the CLI or run `python3 scripts/validate_telemetry.py <raw-download>
+archive, use the CLI or run `python3 worktrees/balance-lower/scripts/validate_telemetry.py <raw-download>
 <new-clean-output.csv>` afterward. Choose a new output path: the standalone
 validator can overwrite its output. Failed Wi-Fi downloads do not automatically
 create a diagnostic archive; retry before starting another run. The request
@@ -149,10 +150,10 @@ timeout is 120 seconds. USB fallback is `./scripts/save_telemetry.sh --label
 
 ```bash
 # Request disarm; confirm both groups are disarmed in fresh telemetry afterward.
-.venv/bin/python scripts/robot_wifi.py disarm
+python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm
 
 # Reconnect only while disarmed; the connection drops while rejoining.
-.venv/bin/python scripts/robot_wifi.py reconnect
+python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h reconnect
 ```
 
 HTTP 202 acknowledges the request, not completion. Keep the radio disarm control
@@ -176,28 +177,33 @@ package for recovery.
    it off remains an option when speed matters. The exact throughput cause is
    unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 lowering-v4/fast-tip-up package, from the project root:
+   September 20 lowering-v5/fast-start-fix package, from the project root:
 
    ```bash
-   python3 scripts/robot_wifi.py --host http://192.168.1.172 ota \
-     worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/manifest.json
+   python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
+     --secrets-file src/network_secrets.h ota \
+     worktrees/balance-lower/artifacts/lowering-v5-final/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v5-final/candidate/manifest.json
    ```
+
+   The root checkout is historical; use the current integration worktree helper
+   and its frozen package as shown. The private header is read in place.
 
    The helper verifies file size, whole-file hash and ESP digest, checks fresh
    disarmed maintenance eligibility, archives and validates the saved run, then
    transfers the application with 1 KiB/50 ms pacing and a 120-second socket
    timeout. It verifies the new running digest/slot, fresh IMU, disarmed state,
    return of previously online motors without errors, and identical saved-run
-   exports. The observed transfer range is about one minute with the transmitter off
-   to four minutes in the monitored transmitter-on test. There is no separate
+   exports. Observed uploads took about 64 seconds with the transmitter off, 188 seconds
+   for the latest unmonitored transmitter-on update, and 250 seconds with
+   transmitter-on acceptance monitoring and gap injection. There is no separate
    manual status/log/download loop to repeat. Gap injection and concurrent status
    monitoring are acceptance tests, not routine deployment steps.
 3. Wait for the final verified report. The helper saves state, transfer outcome
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
    Preserve the record and update shared release state once. If the transmitter was off, turn it back on; observe both arm switches low before any authorized motion test.
-   Check [current trial status](progress/CURRENT.md) first; v4 lowering is ready
+   Check [current trial status](progress/CURRENT.md) first; v5 lowering is ready
    for a restrained manual trial and is not yet physically validated.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.
@@ -212,8 +218,13 @@ same command after a successful but unacknowledged installation verifies and
 archives the current state without another flash or reboot. A failed command
 retains diagnostic evidence; inspect image identity and wait until maintenance
 has released before retrying. A validation failure must not be treated as a
-successful update. The robot's control owner still independently grants every
-flash operation; client checks do not replace that interlock.
+successful update. Keep controller power steady. If transfer stalls and Wi-Fi
+signal has fallen sharply, reposition while disarmed, check the running image
+and maintenance state, then retry the same frozen package. In the latest
+release, a transfer stopped at 148 KB with approximately −83 dBm signal; after
+repositioning to approximately −54 dBm, the complete update verified. Signal
+and power changed together, so this does not isolate a single failure cause.
+The robot's control owner still independently grants every flash operation; client checks do not replace that interlock.
 
 ### Check once, freeze once, deploy the same package
 
@@ -262,8 +273,8 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The [current combined deployment record](../evidence/lowering-v4-fast-integration/README.md)
-identifies the installed image and transmitter-on/gap test, including unchanged
+The [current combined deployment record](../evidence/lowering-v5-integration/README.md)
+identifies the installed image and the verified transmitter-on update, including unchanged
 saved-run hashes. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
 retains the old transport's interrupted attempts and transmitter-off success.
 Frozen manifests record preparation; deployment records establish installation.
@@ -321,8 +332,10 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/` from the project
-root. The previous combined driving/v1-lowering application remains at
+`worktrees/balance-lower/artifacts/lowering-v5-final/candidate/` from the project
+root. The previous exact v4 image is retained at
+`worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/`.
+The earlier combined driving/v1-lowering application remains at
 `worktrees/drive-braking/artifacts/drive-braking-v5/release/`; its driving was
 reported good, but its lowering failed. The older Wi-Fi application at `artifacts/wifi-ota/release/` is the
 known-good rollback package; other directories preserve earlier iterations. The full original backup

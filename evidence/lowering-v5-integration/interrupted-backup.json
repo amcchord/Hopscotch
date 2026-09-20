@@ -1,0 +1,188 @@
+{
+  "started_utc": "2026-09-20T20:24:59.354718+00:00",
+  "application": {
+    "application_bytes": 1206320,
+    "application_sha256": "44a3cd6c1c1e71f845f1ba8ae9a26c9ebc3f44bc9c6d8c6a20a8cb2aa2a297d7",
+    "esp_image_digest": "8373d0b5be1ba254b5b9e831849e122989f66523c0ea35cf7dfcd1795a2ed837"
+  },
+  "source_commit": "17c499c06b57d8e6d82ffaee3fbf289b722aa8b6",
+  "status": "verification_failed",
+  "motion_initiated": false,
+  "preflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 16:17:52",
+    "running_slot": "app1",
+    "image_sha256": "39486c5c2a28bfbd6afdb7cfd27758f311e86ac5561b24292fddf08d99a062db",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 169496,
+    "min_free_heap": 157240,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "preflight_state": {
+    "schema": 1,
+    "sequence": 3854,
+    "uptime_ms": 59917,
+    "age_ms": 7,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": false,
+    "rssi": 0,
+    "lq": 0,
+    "rc_age_ms": 4294967295,
+    "rearm_required": true,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -6.78501,
+      "rate": -0.027466,
+      "setpoint": 82.1,
+      "imu_age_us": 7274,
+      "fault": 0,
+      "end_reason": "",
+      "start_status": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 9813,
+        "max_us": 5445,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 9813,
+        "max_us": 5780,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 165560,
+    "min_free_heap": 157240,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -54,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 9,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "error": "timed out"
+}

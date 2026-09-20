@@ -1,6 +1,6 @@
 # CH11 lowering v5 — forward motion during arm deployment
 
-September 20, 2026. Prepared for operator testing; consult
+September 20, 2026. Installed source `17c499c` for operator testing; consult
 [current state](progress/CURRENT.md) for the installed identity and outcome.
 The previous [physical v4 attempt](../evidence/balance-lower/trial-v4-20260920/README.md)
 raised its target 4.465 degrees backward during 6.2 seconds of preparation. The
@@ -21,15 +21,15 @@ Completion still requires level, quiet body/wheels and measured Forward arms.
 
 The brief preparation uses the existing balance wheel controller with its
 setpoint capped. Its wheel velocity can be retained through the handoff up
-to 6 rad/s, approximately 0.33 m/s for the assumed 55mm wheel radius. The old 2 rad/s
+to 6 rad/s, approximately 0.33 m/s for the assumed 55 mm wheel radius. The old 2 rad/s
 sender bound would abruptly remove that measured velocity. Supported stopping
 is 3 rad/s² to avoid a long coast. Arm target lead is bounded at 0.24 rad.
-The 65 deg/s sampled body limit,100 ms owner/feedback limits, load gates, deadlines
+The 65 deg/s sampled body limit, 100 ms owner/feedback limits, load gates, deadlines
 and completion requirements remain. Persistent wheel motion opposite to its
 command now aborts. These changes apply only to the lowering maneuver.
 
 [329-case paired screen](../evidence/balance-lower/forward-preparation-v5/README.md):
-261 → 253 completions,43 improvements and 51 regressions. Most regressions use
+261 → 253 completions, 43 improvements and 51 regressions. Most regressions use
 the widest unmeasured pivot geometry. All 72 trial-informed contact cases still
 complete; delayed contact improves 8 → 15 of 24, including the v3 delayed-impact
 example. All 11 injected failures reject completion. This is an experimental
@@ -51,7 +51,7 @@ arm return, and a level finish with arms ahead. Do not assist with CH12 during
 the recorded trial. Disarm both groups and download the log before another run;
 only the latest attempt is retained on the robot.
 
-New logs use schema 5 with the same 240-byte sample/header layout. The version
+New logs use schema 5 with the same 240-byte samples and unchanged header layout. The version
 identifies this policy because all 16 feature bits were already allocated.
 Older schema 4/v4 exports retain their exact recorded metadata and checksums.
 Use the existing [single-command frozen-package OTA procedure](WIFI_OTA.md).

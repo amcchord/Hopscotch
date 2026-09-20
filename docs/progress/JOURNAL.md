@@ -381,3 +381,68 @@ fast tip-up owner of inclusion and installation. Next: a restrained v4 lowering
 trial with CH6 LOW and no CH12 assist, then separate fast-standing test; archive
 telemetry before each subsequent run. Both physical motion acceptances remain
 pending despite successful OTA.
+
+## 2026-09-20 — Install earlier forward departure and fast startup feedback fix
+
+Austin's latest v4 tests showed a backward lean during arm lowering and a flip
+at contact. Archived the latest 1,237-row / 24.745-second run directly from the
+robot. During 6.2 seconds of preparation the scheduled target moved +4.465°
+backward and the body followed +4.463°. Contact rebounded to +105.041°/s and
+ended lower_motion_limit. This is the latest retained run, not all operator
+attempts. The v4 CSV/wire and reproducible analysis are preserved.
+
+Lowering v5 caps the preparation balance target at its starting measured tilt,
+permits forward departure while the arms deploy and hands off without a quiet
+upright dwell. Catch initially parks, probes only after measured forward drop,
+and reverses both arms on qualified contact. Independent two-arm support then
+allows continuous return to measured flat/Forward. Bounded arm lead, sampled
+body limit, freshness/load/deadline checks remain; persistent opposite wheel
+motion now aborts. Lowering-only wheel handoff permits the measured velocity
+needed during preparation without abrupt clipping. Ordinary ground and standing
+drive remain unchanged.
+
+Paired production-policy model: 261 → 253 completions across 329 plants, with
+43 improvements and 51 regressions; 43 regressions use the widest unmeasured
+pivot. All 72 trial-informed contact cases complete. Delayed contacts improve
+8 → 15/24, and all 11 injected failures reject completion. Geometry, contact
+and servo dynamics are not identified; sampled guards cannot bound all
+between-tick peaks, and post-fault falling is not simulated. This remains an
+experimental manual-test build, not physical acceptance.
+
+Integrated the fast tip-up owner's 9771bee as 3f3bc37 without editing its
+checkout. Its post-setup fresh-feedback wait, real bounded motor requests and
+visible start status address the reported CH6 HIGH refusal; trajectory and slow
+standing are preserved. Combined checks passed: 11 native executables, 37 Python
+tests, syntax/whitespace, dashboard and pinned configured build. Existing radio
+and transport acceptance was reused because those paths did not change.
+
+Intermediate source 6e8c486 installed into app1 in 63.65 seconds and retained
+the saved run. Before handoff, review found that two volatile writes briefly
+published the uncapped target. Final source 17c499c publishes only the final
+capped value; its targeted configured rebuild passed, with unchanged policy
+checks and model evidence reused. Final application is 1,206,320 bytes,
+whole-file SHA-256 44a3cd6c1c1e71f845f1ba8ae9a26c9ebc3f44bc9c6d8c6a20a8cb2aa2a297d7,
+ESP digest 8373d0b5be1ba254b5b9e831849e122989f66523c0ea35cf7dfcd1795a2ed837.
+
+One final-image attempt stopped in saved-log backup before uploading; the next
+stopped after 148,480 sent bytes at 84.074 seconds with poor Wi-Fi near −83 dBm.
+Power-on resets were observed and the intermediate app1 digest remained active.
+Neither attempt was accepted as success. Austin repositioned the robot and
+confirmed steady power. Signal recovered near −54 dBm; fresh identity and idle
+eligibility were checked before retrying the same frozen package.
+
+Final normal OTA completed in 187.997 seconds with the transmitter on, verified
+2026-09-20 20:35:49 UTC in app0. All six powered motors returned online, error-free
+and disabled; fresh IMU, disarmed state and released maintenance passed. The
+1,237-row v4 CSV and wire exports were byte-identical. No autonomous motion,
+settings/calibration change, filesystem upload, credential copying or unrelated
+checkout edits occurred. The [release record](../../evidence/lowering-v5-integration/README.md)
+retains all attempts, manifest, validation, hashes and exact v4 recovery package.
+
+Updated the current state and single-command frozen-package OTA guide to use
+the integration checkout's current helper and read the private header in place.
+Recorded steady power/strong signal recovery without attributing a unique RF
+cause. Notified the fast owner of installation; it independently confirmed its
+owned source matches and retained no device actions. Next: CH6 LOW ordinary
+stand-up, one CH11 lowering trial, disarm and archive before another run. Test
+CH6 HIGH separately afterward; both revised motions await physical acceptance.

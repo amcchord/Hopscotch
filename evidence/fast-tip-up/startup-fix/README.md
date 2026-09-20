@@ -65,3 +65,11 @@ No device request, arming, movement, settings write, upload, raw-log copying or
 private-header copying occurred here. After integration, retry CH6 HIGH from
 the normal flat Forward pose with neutral sticks; any refusal reason is visible
 in the dashboard before another run.
+
+
+## Integration outcome
+
+Installed by the release owner with lowering v5 in source `17c499c`.
+[Final OTA record](../../lowering-v5-integration/README.md).
+The transmitter and motor power stayed on, with all six motors disabled.
+A manual fast-start trial remains pending. No independent owner OTA occurred.

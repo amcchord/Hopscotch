@@ -1,5 +1,8 @@
 # CH11 lowering v4: return the arms after contact
 
+**Historical v4:** its latest trial showed a backward prelean and contact rebound.
+[Installed v5](BALANCE_LOWER_V5_2026-09.md) changes the departure; physical validation is pending.
+
 The v3 trial caught the robot near upright, then faulted on the loaded rebound.
 It never reported `lower_complete`. Austin's subsequent CH12 press brought the
 robot flat. [Trial evidence](../evidence/balance-lower/trial-v3-20260920/README.md)

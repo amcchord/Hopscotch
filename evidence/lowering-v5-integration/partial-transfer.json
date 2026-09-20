@@ -1,0 +1,202 @@
+{
+  "started_utc": "2026-09-20T20:28:00.695789+00:00",
+  "application": {
+    "application_bytes": 1206320,
+    "application_sha256": "44a3cd6c1c1e71f845f1ba8ae9a26c9ebc3f44bc9c6d8c6a20a8cb2aa2a297d7",
+    "esp_image_digest": "8373d0b5be1ba254b5b9e831849e122989f66523c0ea35cf7dfcd1795a2ed837"
+  },
+  "source_commit": "17c499c06b57d8e6d82ffaee3fbf289b722aa8b6",
+  "status": "verification_failed",
+  "motion_initiated": false,
+  "preflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 16:17:52",
+    "running_slot": "app1",
+    "image_sha256": "39486c5c2a28bfbd6afdb7cfd27758f311e86ac5561b24292fddf08d99a062db",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 169944,
+    "min_free_heap": 158364,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 1,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "preflight_state": {
+    "schema": 1,
+    "sequence": 8852,
+    "uptime_ms": 175985,
+    "age_ms": 6,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": false,
+    "rssi": 0,
+    "lq": 0,
+    "rc_age_ms": 4294967295,
+    "rearm_required": true,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.005346,
+      "rate": 0.042736,
+      "setpoint": 82.1,
+      "imu_age_us": 5460,
+      "fault": 0,
+      "end_reason": "",
+      "start_status": ""
+    },
+    "power": {
+      "voltage": 24.87824,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0.84943,
+        "vel": -0.063324,
+        "torque": -8.4e-05,
+        "temp": 30,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 74
+      },
+      {
+        "id": 20,
+        "pos": 0.814148,
+        "vel": 0.025177,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 54
+      },
+      {
+        "id": 30,
+        "pos": 0.839843,
+        "vel": -0.072479,
+        "torque": 8.4e-05,
+        "temp": 29,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 34
+      },
+      {
+        "id": 40,
+        "pos": 0.832939,
+        "vel": -0.006866,
+        "torque": 8.4e-05,
+        "temp": 29,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 14
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": -0.009567,
+        "torque": -0.000214,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 154
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": -0.026688,
+        "torque": -0.000214,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 134
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 34197,
+        "max_us": 5481,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 34198,
+        "max_us": 5702,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 168688,
+    "min_free_heap": 158364,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -82,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 1012,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "saved_run_before": {
+    "samples": 1237,
+    "csv_sha256": "083d7d6b8d4926de8b5e7cdecc4886531ab5b569fb6206a2b40c72693c7d8741",
+    "wire_sha256": "2fe0a88f4beb3ebd7adf7eed40c9aaed03811762c867561794a7ad54c4bf91a3"
+  },
+  "transfer": {
+    "chunk_bytes": 1024,
+    "interval_seconds": 0.05,
+    "timeout_seconds": 120,
+    "tcp_nodelay": true,
+    "transport_error": "[Errno 32] Broken pipe",
+    "sent_bytes": 148480,
+    "seconds": 84.074
+  },
+  "error": "Installed image/health not verified: <urlopen error timed out>. Inspect before retrying or testing."
+}

@@ -1,17 +1,16 @@
 # CH6 fast tip-up — installed, physical trial pending
 
-September 20, 2026. Integrated with lowering v4 in source `e55cecb` and
-[installed by the release owner](../evidence/lowering-v4-fast-integration/README.md).
+September 20, 2026. The original trajectory was installed with lowering v4.
+The startup feedback fix is now [installed with lowering v5](../evidence/lowering-v5-integration/README.md) in source `17c499c`; a fresh manual fast-start trial is pending.
 The fast motion has not yet been physically tested. See [current state](progress/CURRENT.md)
 for the exact running image and trial sequence.
 
-**Startup fix queued:** Austin reports HIGH refused to start while LOW worked.
+**Startup fix installed:** Austin reports HIGH refused to start while LOW worked.
 The [startup diagnosis and correction](../evidence/fast-tip-up/startup-fix/README.md)
 addresses feedback aging during wheel setup and a polling interval longer than
 the fast freshness limit. It parks the arms while fresh, stationary feedback is
 confirmed, requests each motor about every 60 ms, and adds a dashboard refusal
-reason. The trajectory and physical limits are unchanged. This follow-up is
-awaiting the release owner's next combined OTA.
+reason. The trajectory and physical limits are unchanged. This follow-up is installed in source `17c499c`; its physical trial remains pending.
 
 ## What the logs say
 
@@ -95,7 +94,7 @@ and disarm promptly if needed. No need to test CH11 lowering in the same run.
 Record a side view if available. After disarming both groups, download the
 saved run over Wi-Fi before another attempt replaces it.
 
-Logs retain schema 4 / 240-byte samples. Feature bit 16384 identifies fast
+New combined-build logs use schema 5 / 240-byte samples; original fast-v1 logs used schema 4. Feature bit 16384 identifies fast
 tip-up v1 support; `pilot_flags & 128` marks a run that actually selected it.
 During those runs' state-1 samples, `roll_rate` is the 6 ms filtered rate;
 ordinary balancing still uses its original filter. Versioned metadata is
@@ -106,8 +105,9 @@ correctly described after OTA.
 
 Source branch: `codex/fast-tip-up`, based on `400c98d` in
 `worktrees/fast-tip-up`. The active lowering task owns the device, shared
-progress records, combined validation and next OTA. It reserves feature bit
-32768 for lowering v4; combining both changes yields feature flags 65535.
+progress records, combined validation and next OTA. Feature bit
+32768 identifies lowering v4 support; the combined feature flags are 65535.
+The later lowering v5 behavior is identified by schema 5.
 The candidate's configured local build is for validation, not the combined
 release image. [Handoff evidence](../evidence/fast-tip-up/README.md) records
 checks and the exact integration procedure.
