@@ -34,17 +34,13 @@ uint8_t CrsfReceiver::crc8(const uint8_t* data, int len) {
 
 void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_t baudrate) {
     _serial = &serial;
+    _rx_pin = rx_pin; _tx_pin = tx_pin; _baudrate = baudrate;
+    _suspended = false;
     // Retain bursts between the 50 Hz control ticks (up to 840 wire bytes/tick).
     _serial->setRxBufferSize(2048);
     _serial->begin(baudrate, SERIAL_8N1, rx_pin, tx_pin);
 
-    // Initialize channels to center
-    for (int i = 0; i < CRSF_MAX_CHANNELS; i++) {
-        _channels[i] = CRSF_CHANNEL_MID;
-    }
-
-    _buf_pos = 0;
-    _last_frame_time = 0;
+    resetInput();
     _max_update_us = 0;
     _budget_yields = 0;
     _received_bytes = 0;
@@ -52,8 +48,31 @@ void CrsfReceiver::begin(HardwareSerial& serial, int rx_pin, int tx_pin, uint32_
     Serial.printf("[CRSF] Initialized on RX=%d TX=%d @ %lu baud\n", rx_pin, tx_pin, baudrate);
 }
 
+void CrsfReceiver::resetInput() {
+    for (auto& channel : _channels) channel = CRSF_CHANNEL_MID;
+    _buf_pos = 0;
+    _last_frame_time = 0;
+    _link_quality = 0;
+    _rssi = 0;
+}
+
+void CrsfReceiver::suspend() {
+    if (!_serial || _suspended) return;
+    _suspended = true;
+    _serial->end();
+    resetInput();
+}
+
+void CrsfReceiver::resume() {
+    if (!_serial || !_suspended) return;
+    resetInput();
+    _serial->setRxBufferSize(2048);
+    _serial->begin(_baudrate, SERIAL_8N1, _rx_pin, _tx_pin);
+    _suspended = false;
+}
+
 void CrsfReceiver::update() {
-    if (!_serial) return;
+    if (!_serial || _suspended) return;
 
     // A byte limit alone did NOT bound elapsed time: the old available()/read()
     // loop consumed 1.21 seconds in the September 14 tip-up log. Arduino ESP32
@@ -248,7 +267,7 @@ void CrsfReceiver::sendAttitudeTelemetry(float pitch_deg, float roll_deg, float 
 }
 
 bool CrsfReceiver::writeTelemetry(const uint8_t* frame, size_t length) {
-    if (!_serial) return false;
+    if (!_serial || _suspended) return false;
     if (_serial->availableForWrite() < static_cast<int>(length)) {
         ++_telemetry_drops;
         return false;

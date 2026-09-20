@@ -1225,14 +1225,41 @@ static void controlTick() {
 
     // All safety predicates are read on their owning control task. Once
     // granted, arming, serial mutation, calibration and balance triggers stop.
-    webUI.maintenance.service(maintenanceAllowed());
+    if (webUI.maintenance.pending()) {
+        const bool safe = maintenanceAllowed();
+        webUI.maintenance.service(safe, [](bool ota) {
+            // Complete the interlock before granting flash access on core 0.
+            rcRearmRequired = true;
+            waitingForDoubleTap = false;
+            prevCalTrigger = prevMoveTrigger = true;
+            calHoldStart = 0;
+            calHoldFired = false;
+            if (ota) {
+                crsfRx.suspend();
+                driveCtrl.emergencyStop();
+                armCtrl.clearOverride();
+                armCtrl.holdPosition();
+                motorMgr.disarmAll();
+                dbgThrottle = dbgSteering = 0.0f;
+            }
+        });
+    }
+    if (crsfRx.suspended() && !webUI.maintenance.ota()) {
+        // Aborted/rejected OTA: old frames and partial packets are gone. Arm
+        // switches must be observed LOW in new frames before any later arm.
+        crsfRx.resume();
+        rcRearmRequired = true;
+        prevCalTrigger = prevMoveTrigger = true;
+        calHoldStart = 0;
+        calHoldFired = false;
+    }
     if (webUI.maintenance.granted()) {
         rcRearmRequired = true;
         waitingForDoubleTap = false;
         prevCalTrigger = true;
         serviceWebDisarm();
         pollSerialCommands(); // Discard prohibited commands instead of deferring them.
-        crsfRx.update();
+        if (!webUI.maintenance.ota()) crsfRx.update();
         motorMgr.processFeedback();
         publishNetworkSnapshot(now);
         return;
@@ -1628,8 +1655,19 @@ static void sentinelTaskFunc(void* param) {
 // late. Display and the periodic debug burst. Networking runs on core 0.
 // ---------------------------------------------------------------------------
 void loop() {
-    if (logDownloadActive || webUI.maintenance.busy()) { delay(5); return; }
     uint32_t now = millis();
+    const auto ota = webUI.otaProgress();
+    if (ota.visible(now) && (ota.active() || (!motorMgr.isDriveArmed() && !motorMgr.isArmArmed()))) {
+        // OTA owns the whole screen. This never takes the network mutex, which
+        // can be held across a flash erase/write; no normal UI or log I/O runs.
+        if (now - lastDisplayTick >= 100) {
+            lastDisplayTick = now;
+            display.renderOta(ota, now);
+        }
+        delay(5);
+        return;
+    }
+    if (logDownloadActive || webUI.maintenance.busy()) { delay(5); return; }
     uint32_t nowUs = micros();
 
     // loopTask gap -- expected to grow under control-task preemption; only

@@ -52,8 +52,9 @@ void timingJson(JsonObject o, const LoopTiming& t) {
 void WebUI::begin(ExportCallback export_log, DisarmCallback disarm) {
     _export = export_log; _disarm = disarm;
     _snapshots = xQueueCreate(1, sizeof(NetworkSnapshot));
+    _otaProgress = xQueueCreate(1, sizeof(OtaProgress));
     _mutex = xSemaphoreCreateMutex();
-    if (!_snapshots || !_mutex) { Serial.println("[Network] Allocation failed; networking disabled"); return; }
+    if (!_snapshots || !_otaProgress || !_mutex) { Serial.println("[Network] Allocation failed; networking disabled"); return; }
     mbedtls_sha256_init(&_sha);
     if (xTaskCreatePinnedToCore([](void* p) { static_cast<WebUI*>(p)->run(); },
             "NetworkTask", 12288, this, 2, nullptr, 0) != pdPASS)
@@ -72,10 +73,23 @@ bool WebUI::authorized(AsyncWebServerRequest* r) {
     r->send(401, "application/json", "{\"error\":\"device token required\"}");
     return false;
 }
-bool WebUI::acquireMaintenance() {
-    if (!maintenance.request()) return false;
+OtaProgress WebUI::otaProgress() const {
+    OtaProgress progress;
+    if (_otaProgress) xQueuePeek(_otaProgress, &progress, 0);
+    return progress;
+}
+void WebUI::publishOta(OtaPhase phase) {
+    _ota_progress.phase = phase;
+    _ota_progress.received = _ota_received;
+    _ota_progress.total = _ota_size;
+    _ota_progress.updated_ms = millis();
+    if (phase == OtaPhase::Preparing) _ota_progress.started_ms = _ota_progress.updated_ms;
+    xQueueOverwrite(_otaProgress, &_ota_progress);
+}
+bool WebUI::acquireMaintenance(bool ota) {
+    if (!maintenance.request(ota)) return false;
     const auto start = millis();
-    while (maintenance.state() == MaintenanceGate::Requested && millis() - start < 300) delay(1);
+    while (maintenance.pending() && millis() - start < 300) delay(1);
     if (maintenance.granted()) return true;
     maintenance.release();
     return false;
@@ -85,6 +99,7 @@ void WebUI::failOta(const char* reason) {
     _ota_failure = reason;
     _ota_failed_bytes = _ota_received;
     _ota_failed_idle_ms = millis() - _ota_last_ms;
+    publishOta(OtaPhase::Failed);
     Update.abort(); _ota_request = nullptr; _ota_received = 0;
     mbedtls_sha256_free(&_sha); mbedtls_sha256_init(&_sha);
     releaseMaintenance();
@@ -212,7 +227,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         if (!result) { r->send(503, "text/plain", "Insufficient memory"); return; }
         r->_tempObject = result; // Freed by AsyncWebServerRequest, including disconnects.
         if (!authorized(r)) return;
-        if (_ota_request || _restart_ms || !acquireMaintenance()) {
+        if (_ota_request || _restart_ms || !acquireMaintenance(true)) {
             result->code = 409; result->message = "Update busy or robot not disarmed"; return;
         }
         String sizeText = r->hasHeader("X-Firmware-Size") ? r->getHeader("X-Firmware-Size")->value() : "";
@@ -234,6 +249,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         _ota_received = 0;
         _ota_last_ms = millis();
         _ota_failure = ""; _ota_failed_bytes = 0; _ota_failed_idle_ms = 0;
+        publishOta(OtaPhase::Preparing);
         if (!Update.begin(_ota_size, U_FLASH)) {
             failOta("begin_failed"); result->code = 500; result->message = "Cannot begin update"; return;
         }
@@ -251,6 +267,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         failOta("write_or_length"); result->code = 400; result->message = "Update write or length failed"; return;
     }
     mbedtls_sha256_update_ret(&_sha, data, len); _ota_received += len;
+    publishOta(final ? OtaPhase::Verifying : OtaPhase::Receiving);
     if (final) {
         uint8_t digest[32]; char hex[65];
         mbedtls_sha256_finish_ret(&_sha, digest);
@@ -261,6 +278,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         if (!Update.end()) { failOta("esp_verification"); result->code = 400; result->message = "ESP application verification failed"; return; }
         result->code = 200; result->message = "Firmware verified; rebooting";
         _restart_ms = millis() + 1000;
+        publishOta(OtaPhase::Rebooting);
         // Maintenance remains latched through reboot; boot requires switch-low.
     }
 }

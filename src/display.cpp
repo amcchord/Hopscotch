@@ -20,6 +20,42 @@ void Display::begin() {
     Serial.println("[Display] Sprite initialized 128x128");
 }
 
+void Display::renderOta(const OtaProgress& progress, uint32_t now) {
+    if (!_initialized) return;
+    _sprite.fillSprite(COL_BG);
+    _sprite.setTextSize(1);
+    const bool failed = progress.phase == OtaPhase::Failed;
+    _sprite.setTextColor(failed ? COL_RED : COL_TEXT);
+    const char* label = "UPLOADING";
+    switch (progress.phase) {
+        case OtaPhase::Preparing: label = "PREPARING"; break;
+        case OtaPhase::Verifying: label = "VERIFYING"; break;
+        case OtaPhase::Rebooting: label = "REBOOTING"; break;
+        case OtaPhase::Failed: label = "UPDATE FAILED"; break;
+        default: break;
+    }
+    _sprite.drawCenterString(label, SCREEN_W / 2, 6);
+
+    char text[32];
+    snprintf(text, sizeof(text), "%u%%", progress.percent());
+    _sprite.setTextSize(4);
+    _sprite.drawCenterString(text, SCREEN_W / 2, 27);
+    _sprite.setTextSize(1);
+    _sprite.drawRect(6, 66, 116, 6, COL_DARKGRAY);
+    _sprite.fillRect(7, 67, 114 * progress.percent() / 100, 4, failed ? COL_RED : COL_GREEN);
+
+    _sprite.setTextColor(COL_TEXT);
+    snprintf(text, sizeof(text), "%lu/%lu B", static_cast<unsigned long>(progress.received),
+             static_cast<unsigned long>(progress.total));
+    _sprite.drawCenterString(text, SCREEN_W / 2, 80);
+    snprintf(text, sizeof(text), "%.1f KiB/s  %lus", progress.bytesPerSecond(now) / 1024.0f,
+             static_cast<unsigned long>(progress.elapsedMs(now) / 1000));
+    _sprite.drawCenterString(text, SCREEN_W / 2, 94);
+    _sprite.setTextColor(COL_YELLOW);
+    _sprite.drawCenterString(failed ? "Switches LOW to rearm" : "Motors OFF / RC OFF", SCREEN_W / 2, 116);
+    _sprite.pushSprite(&M5.Display, 0, 0);
+}
+
 uint16_t Display::motorColor(const MotorState& m) const {
     if (!m.online) return COL_GRAY;
     if (m.has_fault) return COL_RED;
