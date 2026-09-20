@@ -1,0 +1,122 @@
+{
+  "source_commit": "dd74154aa3f534f95506b5c0dd66e1c6d901e091",
+  "upstream_candidate": "13d4ee2aa51afe7e5ab7aebf32b711da403a1fb1",
+  "base": "eb2bb23e0ad2dc84f75aecdeb6a17be93848b7a3",
+  "changed_production_files": [
+    "src/balance_controller.cpp",
+    "src/balance_controller.h",
+    "src/balance_lower.h"
+  ],
+  "other_production_build_dashboard_radio_files_identical": 35,
+  "candidate_sources_identical_to_handoff": true,
+  "v1_export_descriptors_identical": true,
+  "model_cases": 229,
+  "model_results_identical_to_handoff": true,
+  "sweep_outcomes": {
+    "lower_complete": 180,
+    "lower_prepare_disturbed": 36
+  },
+  "injected_failures_reject_success": 11,
+  "nominal": {
+    "name": "nominal",
+    "model": {
+      "pivot": 0.12,
+      "arm": 0.3,
+      "wheel_radius": 0.055,
+      "equilibrium": 86.63,
+      "arm_eq_slope": -6.3,
+      "nonlinear_com": 0.0,
+      "arm_inertia_ratio": 0.03,
+      "arm_joint_inertia": 0.004,
+      "gravity": 8.82,
+      "wheel_coupling": 6.0,
+      "wheel_tau": 0.06,
+      "stiffness": 240,
+      "damping_ratio": 0.8,
+      "servo_tau": 0.04,
+      "servo_limit": 1.5,
+      "joint_stiffness": 25,
+      "torque_per_acceleration": 0.004,
+      "center_left": 1.768,
+      "center_right": -1.767,
+      "initial_speed": 0,
+      "floor": true,
+      "right_contact": true,
+      "stale_at": 1000000000.0,
+      "stale_phase": -1,
+      "slip_at": 1000000000.0,
+      "slip_after_catch": 1000000000.0,
+      "jam": false,
+      "launch_sign": 1,
+      "false_load": false
+    },
+    "outcome": "lower_complete",
+    "final_phase": "complete",
+    "commit_s": 5.92,
+    "catch_s": 6.74,
+    "first_flat_s": 17.66,
+    "elapsed_s": 19.9,
+    "peak_rate_dps": 19.838,
+    "peak_wheel_rad_s": 1.73,
+    "peak_model_torque_nm": 3.708,
+    "peak_target_lead_rad": 0.08435,
+    "final_tilt_deg": 0.0,
+    "transitions": [
+      {
+        "time_s": 0.0,
+        "phase": "stopping",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 0.48,
+        "phase": "reaching",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 5.92,
+        "phase": "committing",
+        "tilt_deg": 91.395
+      },
+      {
+        "time_s": 6.42,
+        "phase": "catching",
+        "tilt_deg": 89.753
+      },
+      {
+        "time_s": 6.74,
+        "phase": "descending",
+        "tilt_deg": 85.712
+      },
+      {
+        "time_s": 18.44,
+        "phase": "ground_hold",
+        "tilt_deg": 0.0
+      },
+      {
+        "time_s": 19.04,
+        "phase": "retracting",
+        "tilt_deg": 0.0
+      },
+      {
+        "time_s": 19.9,
+        "phase": "complete",
+        "tilt_deg": 0.0
+      }
+    ]
+  },
+  "highest_completed_sweep_rate_dps": 55.151,
+  "physical_replay_identical_to_handoff": true,
+  "physical_csv_wire_identical_to_archive": true,
+  "physical_rows": 2371,
+  "csv_sha256": "3083a00737288438466b1d0bbd71f337d433d349e85f7d1b2b3266d4a74b2368",
+  "wire_sha256": "5c14a7f3df11dc7b1a14a242d79eb2d3f8e4838cdb81403d9d3142fe21f09ab6",
+  "checks": {
+    "native_executables": 10,
+    "python_tests": 27,
+    "esp32_build": "passed",
+    "radio": "passed",
+    "dashboard": "passed"
+  },
+  "device_io": false,
+  "installed_unchanged": true
+}
