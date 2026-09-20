@@ -1,12 +1,13 @@
 -- Hopscotch / GX12 / EdgeTX 2.11, 128x64 monochrome. Read-only telemetry.
 -- No model writes, channel overrides, CRSF commands, or safety decisions.
 -- Install as a model telemetry screen; roller / ENTER changes pages.
-local TTL = 150 -- getTime() units: 10 ms. Mark unknown after 1.5 seconds.
+local LIVE_TTL = 150 -- getTime() units: 10 ms. Show HOLD after 1.5 seconds.
+local HOLD_TTL = 300 -- Keep each last valid reading for at most three seconds.
 local HAPTIC = true -- one pulse on loss/fault transition, rate limited
 local page, pages = 1, 5
 local status, detail, lastSequence, received, incompatible
 local everLive, wasLive, wasFault, lastBuzz = false, false, false, -1000
-local sensorIds, sensors, events = {}, {}, {}
+local sensorIds, sensors, quantities, events = {}, {}, {}, {}
 local nextDiscover, nextSample = 0, 0
 local names = {"FM", "RxBt", "Curr", "Roll", "RQly", "TQly", "1RSS", "TPWR", "tx-voltage"}
 local motions = {[0]="NONE", [1]="FORWARD", [2]="CENTER", [3]="BACKWARD", [4]="JUMP", [256]="BALANCE"}
@@ -15,6 +16,18 @@ local function has(value, bit) return math.floor(value / bit) % 2 == 1 end
 local function age(now, before)
   if before == nil or now < before then return 1e9 end
   return now - before
+end
+local function remember(cache, key, v, now)
+  if (type(v) == "number" and v == v and v > -math.huge and v < math.huge)
+      or (type(v) == "string" and v ~= "") then
+    local entry = cache[key] or {}
+    entry.value, entry.time = v, now
+    cache[key] = entry
+  end
+end
+local function reading(cache, key)
+  local entry = cache[key]
+  if entry and age(getTime(),entry.time) <= HOLD_TTL then return entry.value end
 end
 local function u16(d, i) return d[i] * 256 + d[i+1] end
 local function signed(d, i)
@@ -59,6 +72,13 @@ local function decode(command, d, now)
     if has(new.flags,1) ~= has(status.flags,1) then event(has(new.flags,1) and "DRIVE ARMED" or "DRIVE DISARMED", now) end
     if has(new.flags,2) ~= has(status.flags,2) then event(has(new.flags,2) and "ARMS ARMED" or "ARMS DISARMED", now) end
   end
+  if has(new.flags,256) then
+    remember(quantities,"tilt",new.tilt,now)
+    remember(quantities,"error",new.error,now)
+  end
+  if has(new.flags,1024) then remember(quantities,"volts",new.volts,now) end
+  if has(new.flags,2048) then remember(quantities,"amps",new.amps,now) end
+  if new.temp ~= 255 then remember(quantities,"temp",new.temp,now) end
   status, received, lastSequence, incompatible = new, now, sequence, nil
 end
 local function sample(now)
@@ -75,11 +95,17 @@ local function sample(now)
     local value, current, fresh
     if sensorIds[name] and getSourceValue then value, current, fresh = getSourceValue(sensorIds[name]) end
     -- Never fall back to getValue's cached values with no freshness information.
-    sensors[name] = (current and fresh) and value or nil
+    -- An update for one sensor must not erase another sensor's last reading.
+    -- Stale/invalid samples do not extend the hold, even if their value repeats.
+    local validType = type(value) == (name == "FM" and "string" or "number")
+    if current and fresh and validType then remember(sensors,name,value,now) end
   end
 end
 local function live(now)
-  return status ~= nil and incompatible == nil and age(now,received) <= TTL
+  return status ~= nil and incompatible == nil and age(now,received) <= LIVE_TTL
+end
+local function available(now)
+  return status ~= nil and incompatible == nil and age(now,received) <= HOLD_TTL
 end
 local function buzz(now)
   if HAPTIC and playHaptic and age(now,lastBuzz) >= 500 then
@@ -110,13 +136,10 @@ local function value(v, fmt, suffix)
   if type(v) ~= "number" or v ~= v then return "--" end
   return string.format(fmt,v) .. (suffix or "")
 end
-local function freshValue(flag, v)
-  if has(status.flags,flag) then return v end
-end
 local function title(name, now)
   lcd.drawFilledRectangle(0,0,128,9)
   text(1,1,name, SMLSIZE+INVERS)
-  local badge = live(now) and "LIVE" or (status and "OLD" or "BASIC")
+  local badge = live(now) and "LIVE" or (available(now) and "HOLD" or (status and "OLD" or "BASIC"))
   if incompatible then badge = "VER?" end
   text(91,1,badge, SMLSIZE+INVERS)
   text(117,1,tostring(page), SMLSIZE+INVERS)
@@ -164,17 +187,17 @@ local function home()
   text(0,12,headline(),SMLSIZE)
   if status.progress <= 100 then text(106,12,tostring(status.progress).."%") end
   robot()
-  text(47,24,value(freshValue(1024,status.volts),"%.1f","V"),MIDSIZE)
+  text(47,24,value(reading(quantities,"volts"),"%.1f","V"),MIDSIZE)
   text(47,39,"DRIVE "..armState(1,4))
   text(47,48,"ARMS  "..armState(2,8))
-  text(0,57,"LQ "..value(sensors.RQly,"%.0f","%"))
+  text(0,57,"LQ "..value(reading(sensors,"RQly"),"%.0f","%"))
   text(48,57,"M:"..(motions[status.motion] or tostring(status.motion)))
 end
 local function health()
-  text(0,12,"TILT "..value(freshValue(256,status.tilt),"%+.1f","deg"))
-  text(0,22,"ERROR "..value(freshValue(256,status.error),"%+.1f","deg"))
-  text(0,32,"MOTOR IQ "..value(freshValue(2048,status.amps),"%.1f","A"))
-  text(0,42,"MAX TEMP "..value(status.temp ~= 255 and status.temp or nil,"%.0f","C"))
+  text(0,12,"TILT "..value(reading(quantities,"tilt"),"%+.1f","deg"))
+  text(0,22,"ERROR "..value(reading(quantities,"error"),"%+.1f","deg"))
+  text(0,32,"MOTOR IQ "..value(reading(quantities,"amps"),"%.1f","A"))
+  text(0,42,"MAX TEMP "..value(reading(quantities,"temp"),"%.0f","C"))
   text(0,52,"IMU "..(has(status.flags,256) and "LIVE" or "STALE").." FAULT "..string.format("%04X",status.inner))
 end
 local function motors()
@@ -203,10 +226,10 @@ local function history(now)
   for i=1,2 do if events[i] then text(0,48+(i-1)*8,string.sub(events[i].text,1,25)) end end
 end
 local function radio()
-  text(0,12,"CONTROL LQ "..value(sensors.RQly,"%.0f","%"))
-  text(0,22,"RETURN  LQ "..value(sensors.TQly,"%.0f","%"))
-  text(0,32,"RSSI "..value(sensors["1RSS"],"%.0f","dBm").."  "..value(sensors.TPWR,"%.0f","mW"))
-  text(0,42,"RADIO "..value(sensors["tx-voltage"],"%.1f","V"))
+  text(0,12,"CONTROL LQ "..value(reading(sensors,"RQly"),"%.0f","%"))
+  text(0,22,"RETURN  LQ "..value(reading(sensors,"TQly"),"%.0f","%"))
+  text(0,32,"RSSI "..value(reading(sensors,"1RSS"),"%.0f","dBm").."  "..value(reading(sensors,"TPWR"),"%.0f","mW"))
+  text(0,42,"RADIO "..value(reading(sensors,"tx-voltage"),"%.1f","V"))
   text(0,54,"Roll / ENTER: next page")
 end
 local function unavailable(now)
@@ -219,8 +242,9 @@ local function unavailable(now)
     text(0,44,"Age "..value(age(now,received)/100,"%.1f","s"))
   else
     text(0,12,"BASIC TELEMETRY")
-    text(0,23,"FM: "..(type(sensors.FM)=="string" and string.sub(sensors.FM,1,19) or "--"))
-    text(0,33,"ROBOT "..value(sensors.RxBt,"%.1f","V"))
+    local fm = reading(sensors,"FM")
+    text(0,23,"FM: "..(type(fm)=="string" and string.sub(fm,1,19) or "--"))
+    text(0,33,"ROBOT "..value(reading(sensors,"RxBt"),"%.1f","V"))
     text(0,43,"Drive / arms UNKNOWN")
     text(0,54,"New firmware: full status")
   end
@@ -236,7 +260,7 @@ local function run(e)
   title(titles[page],now)
   if page == 5 then radio()
   elseif page == 4 then history(now)
-  elseif not live(now) then unavailable(now)
+  elseif not available(now) then unavailable(now)
   elseif page == 1 then home()
   elseif page == 2 then health()
   elseif page == 3 then motors() end

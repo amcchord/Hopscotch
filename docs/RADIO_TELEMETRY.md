@@ -116,9 +116,15 @@ An active drive with disarmed arms is now `WHEELS READY`/`DRIVING`/`BRAKING`, no
 shown separately: `ON` is enabled, not proof that a wheel is physically moving.
 
 The Lua never writes model data, emits a CRSF command, arms, or changes channels.
-After 1.5 seconds without a new valid status sequence it hides current motor /
-arming / motion values and says **ROBOT DATA LOST / UNKNOWN**. Standard telemetry
-uses EdgeTX's individual current/fresh flags, not cached `getValue()` results.
+Each numeric reading and standard telemetry sensor keeps its last valid value
+for three seconds after the last accepted fresh sample. Missing, stale, invalid,
+or unrelated updates do not refresh that value's hold. Standard telemetry uses
+EdgeTX's individual current/fresh flags, not cached `getValue()` results.
+After 1.5 seconds without a new valid status sequence the header says **HOLD**;
+after three seconds it hides motor / arming / motion values and says
+**ROBOT DATA LOST / UNKNOWN**. Duplicate status or run-detail packets cannot
+extend this hold. New arming/fault/IMU-stale flags appear immediately, even while
+the associated last numeric reading is held. Existing loss alerts stay at 1.5 seconds.
 An unsupported schema asks for a script update. Haptic alerts are transition
 based and limited to one per five seconds; they do not replace robot failsafes.
 [EdgeTX source freshness API](https://luadoc.edgetx.org/lua-api-reference/variables/getsourcevalue).
@@ -127,7 +133,8 @@ Do not display battery percentage, remaining runtime, or consumed mAh: existing
 firmware sends zero placeholders for capacity and percentage. `Curr` is the sum
 of absolute motor IQ measurements, not battery input current. The dashboard
 labels it **MOTOR IQ**. Voltage expires after two seconds without a valid VBUS
-reply; current requires fresh replies from all six online motors. Tilt is the
+reply at the sender; the Lua then applies its three-second display hold. Current
+requires fresh replies from all six online motors. Tilt is the
 balance controller's actual filtered angle, not a presumed chassis orientation.
 
 ### Wire contract v1
