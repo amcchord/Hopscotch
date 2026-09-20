@@ -18,6 +18,12 @@ extern const uint8_t dashboard_start[] asm("_binary_data_network_html_start");
 extern const uint8_t dashboard_end[] asm("_binary_data_network_html_end");
 
 namespace {
+// The pinned HTTP server defaults to a three-second receive timeout. OTA must
+// let TCP retransmit through brief radio contention; our bounded watchdog owns
+// abandonment, before the upload socket's longer receive timeout fires.
+constexpr uint32_t OTA_IDLE_TIMEOUT_MS = 15000;
+constexpr uint32_t OTA_RX_TIMEOUT_S = 20;
+constexpr uint32_t OTA_ACK_TIMEOUT_MS = 15000;
 struct UploadResult { int code; const char* message; };
 class Guard {
     SemaphoreHandle_t mutex;
@@ -75,7 +81,10 @@ bool WebUI::acquireMaintenance() {
     return false;
 }
 void WebUI::releaseMaintenance() { maintenance.release(); }
-void WebUI::failOta() {
+void WebUI::failOta(const char* reason) {
+    _ota_failure = reason;
+    _ota_failed_bytes = _ota_received;
+    _ota_failed_idle_ms = millis() - _ota_last_ms;
     Update.abort(); _ota_request = nullptr; _ota_received = 0;
     mbedtls_sha256_free(&_sha); mbedtls_sha256_init(&_sha);
     releaseMaintenance();
@@ -102,6 +111,10 @@ void WebUI::setupRoutes() {
         d["free_heap"] = ESP.getFreeHeap(); d["min_free_heap"] = ESP.getMinFreeHeap();
         d["free_psram"] = ESP.getFreePsram();
         d["automatic_boot_rollback"] = false;
+        d["ota_transport_version"] = 2;
+        d["ota_rx_timeout_s"] = OTA_RX_TIMEOUT_S;
+        d["ota_ack_timeout_ms"] = OTA_ACK_TIMEOUT_MS;
+        d["ota_idle_timeout_ms"] = OTA_IDLE_TIMEOUT_MS;
         d["reset_reason"] = static_cast<int>(esp_reset_reason());
         d["network_core"] = _networkCore; d["http_core"] = xPortGetCoreID();
         d["wifi_event_core"] = _eventCore;
@@ -187,7 +200,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
     auto* result = static_cast<UploadResult*>(r->_tempObject);
     if (index == 0) {
         if (result) {
-            if (_ota_request == r && !_restart_ms) failOta();
+            if (_ota_request == r && !_restart_ms) failOta("multiple_files");
             if (!_restart_ms) { result->code = 400; result->message = "Only one firmware file is allowed"; }
             return;
         }
@@ -209,21 +222,29 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         if (!valid || !next || _ota_size < 1024 || _ota_size > next->size || !len || data[0] != 0xe9) {
             releaseMaintenance(); result->code = 400; result->message = "Invalid application, size or SHA-256"; return;
         }
+        // Override only an authenticated, eligible application upload. Normal
+        // HTTP clients keep the pinned server's short request timeout.
+        r->client()->setRxTimeout(OTA_RX_TIMEOUT_S);
+        r->client()->setAckTimeout(OTA_ACK_TIMEOUT_MS);
+        r->client()->setNoDelay(true);
+        _ota_received = 0;
+        _ota_last_ms = millis();
+        _ota_failure = ""; _ota_failed_bytes = 0; _ota_failed_idle_ms = 0;
         if (!Update.begin(_ota_size, U_FLASH)) {
-            failOta(); result->code = 500; result->message = "Cannot begin update"; return;
+            failOta("begin_failed"); result->code = 500; result->message = "Cannot begin update"; return;
         }
         _ota_request = r; _ota_received = 0;
         result->code = 408; result->message = "Update did not complete";
         mbedtls_sha256_starts_ret(&_sha, 0);
         r->onDisconnect([this, r]() {
             Guard guard(_mutex);
-            if (_ota_request == r && !_restart_ms) failOta();
+            if (_ota_request == r && !_restart_ms) failOta("client_disconnect");
         });
     }
     if (_ota_request != r || _restart_ms) return;
     _ota_last_ms = millis();
     if (index != _ota_received || len > _ota_size - _ota_received || Update.write(data, len) != len) {
-        failOta(); result->code = 400; result->message = "Update write or length failed"; return;
+        failOta("write_or_length"); result->code = 400; result->message = "Update write or length failed"; return;
     }
     mbedtls_sha256_update_ret(&_sha, data, len); _ota_received += len;
     if (final) {
@@ -231,9 +252,9 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         mbedtls_sha256_finish_ret(&_sha, digest);
         for (int i=0; i<32; ++i) snprintf(hex + i*2, 3, "%02x", digest[i]);
         if (_ota_received != _ota_size || _ota_sha != hex) {
-            failOta(); result->code = 400; result->message = "Application size or SHA-256 mismatch"; return;
+            failOta("hash_mismatch"); result->code = 400; result->message = "Application size or SHA-256 mismatch"; return;
         }
-        if (!Update.end()) { failOta(); result->code = 400; result->message = "ESP application verification failed"; return; }
+        if (!Update.end()) { failOta("esp_verification"); result->code = 400; result->message = "ESP application verification failed"; return; }
         result->code = 200; result->message = "Firmware verified; rebooting";
         _restart_ms = millis() + 1000;
         // Maintenance remains latched through reboot; boot requires switch-low.
@@ -276,8 +297,18 @@ void WebUI::refreshTelemetry() {
     wifi["rssi"] = WiFi.status() == WL_CONNECTED ? WiFi.RSSI() : 0;
     wifi["ip"] = _ip; wifi["recovery_ap"] = _ap;
     d["ws_dropped"] = _dropped;
+    auto ota = d["ota"].to<JsonObject>();
+    ota["active"] = _ota_request != nullptr || _restart_ms != 0;
+    ota["received_bytes"] = _ota_received;
+    ota["expected_bytes"] = _ota_size;
+    ota["last_failure"] = _ota_failure;
+    ota["failed_bytes"] = _ota_failed_bytes;
+    ota["failed_idle_ms"] = _ota_failed_idle_ms;
     _json = ""; serializeJson(d, _json);
     _ws.cleanupClients(4);
+    // Keep fresh GET diagnostics in RAM, but reserve radio airtime for the
+    // upload. Existing connections resume offers after an abort; none can arm.
+    if (_ota_request || _restart_ms) return;
     // A stalled client must not suppress delivery to every other client.
     // Each connection has a two-frame limit and independently drops old work.
     for (const auto& client : _ws.getClients()) {
@@ -345,7 +376,8 @@ void WebUI::run() {
                     connectingUntil = millis() + 12000;
                 }
             }
-            if (_ota_request && !_restart_ms && millis() - _ota_last_ms > 15000) failOta();
+            if (_ota_request && !_restart_ms && millis() - _ota_last_ms > OTA_IDLE_TIMEOUT_MS)
+                failOta("inactivity_timeout");
             if (_restart_ms && static_cast<int32_t>(millis() - _restart_ms) >= 0) ESP.restart();
             if (millis() - lastTelemetry >= 100) { lastTelemetry = millis(); refreshTelemetry(); }
         }

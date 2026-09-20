@@ -1,0 +1,28 @@
+{
+  "status": "queued_not_installed",
+  "prepared_utc": "2026-09-20T18:26:08.424739+00:00",
+  "source_commit": "67f37468ca615995ed5a37298e11b3d99ce379ff",
+  "branch": "codex/ota-reliability",
+  "application_bytes": 1196992,
+  "application_sha256": "56b9517f3a1f7ee7e82f0898b9d4a6e95f533d317c3a6574e1a8b60acf3d8062",
+  "esp_image_digest": "08e46a1d6188d853c576d6f86ad2aee4a1205d9ec97b1d26f80b858dca68d982",
+  "ota_transport_version": 2,
+  "ota_rx_timeout_s": 20,
+  "ota_ack_timeout_ms": 15000,
+  "ota_idle_timeout_ms": 15000,
+  "partition_capacity": 3342336,
+  "private_configuration_verified": true,
+  "secret_header_copied": false,
+  "package_path": "worktrees/ota-reliability/artifacts/ota-reliability/candidate/",
+  "production_changes": [
+    "src/web_server.cpp",
+    "src/web_server.h"
+  ],
+  "motion_sources_unchanged_from": "d3eb777",
+  "installed_esp_image_digest_at_handoff": "7668a0215df34b7e5c0030a23705ba8016343260d1e6bab7aacfe202897c7190",
+  "device_requests": false,
+  "ota_attempted": false,
+  "motion_initiated": false,
+  "validation": "10 native executables,37 Python tests,radio/dashboard,pinned build,actual-method OTA transport harness",
+  "limits": "Transmitter-on hardware validation pending. Transport tolerates short TCP gaps; disconnected uploads still abort. No automatic boot rollback."
+}

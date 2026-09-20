@@ -260,6 +260,11 @@ contains the exact installed v2 identity, interrupted attempts and preserved
 run hashes. The original release manifest remains a preparation record marked
 `queued_not_installed`; the separate deployment record establishes installation.
 
+A separate [OTA reliability candidate](OTA_RELIABILITY_2026-09.md) extends the
+upload socket's short receive timeout and pauses dashboard streaming during
+uploads. Transmitter-on hardware validation is pending; keep the demonstrated
+transmitter-off procedure until the installed transport is verified.
+
 ## HTTP and WebSocket API
 
 Port 80 on the trusted LAN. Protected requests use `Authorization: Bearer

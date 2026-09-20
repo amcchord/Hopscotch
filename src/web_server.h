@@ -34,6 +34,9 @@ private:
     AsyncWebServerRequest* _ota_request = nullptr;
     size_t _ota_size = 0, _ota_received = 0;
     uint32_t _ota_last_ms = 0, _restart_ms = 0;
+    const char* _ota_failure = "";
+    size_t _ota_failed_bytes = 0;
+    uint32_t _ota_failed_idle_ms = 0;
     String _ota_sha;
     mbedtls_sha256_context _sha;
     std::weak_ptr<uint8_t> _download;
@@ -43,6 +46,6 @@ private:
     bool authorized(AsyncWebServerRequest* request);
     bool acquireMaintenance();
     void releaseMaintenance();
-    void failOta();
+    void failOta(const char* reason);
     void upload(AsyncWebServerRequest* request, size_t index, uint8_t* data, size_t len, bool final);
 };
