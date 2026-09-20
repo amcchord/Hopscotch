@@ -1,0 +1,144 @@
+{
+  "log": "telemetry_logs/bal_20260920_lowering_trial_wifi.csv",
+  "csv_sha256": "3083a00737288438466b1d0bbd71f337d433d349e85f7d1b2b3266d4a74b2368",
+  "wire_sha256": "5c14a7f3df11dc7b1a14a242d79eb2d3f8e4838cdb81403d9d3142fe21f09ab6",
+  "samples": 2371,
+  "duration_s": 47.419,
+  "build": "Sep 19 2026 23:44:38",
+  "features": 4095,
+  "end_reason": "lower_motion_limit",
+  "operator": {
+    "ground_drive": "worked really well",
+    "standing_drive": "worked really well",
+    "lowering": "tipped backward on its own; no catch/push reported"
+  },
+  "transitions": [
+    {
+      "phase": "stopping",
+      "t_s": 37.02,
+      "since_ch11_s": 0.0,
+      "roll": 86.631,
+      "roll_rate": 0.257,
+      "setpoint": 86.593,
+      "base_sp": 85.215,
+      "sp_offset": 1.3779,
+      "bl_vel": -0.042,
+      "br_vel": 0.004,
+      "motor_vel": -0.093
+    },
+    {
+      "phase": "reaching",
+      "t_s": 37.5,
+      "since_ch11_s": 0.48,
+      "roll": 86.601,
+      "roll_rate": 0.308,
+      "setpoint": 86.614,
+      "base_sp": 85.215,
+      "sp_offset": 1.3993,
+      "bl_vel": -0.018,
+      "br_vel": -0.043,
+      "motor_vel": 0.035
+    },
+    {
+      "phase": "canceling",
+      "t_s": 45.6,
+      "since_ch11_s": 8.58,
+      "roll": 90.146,
+      "roll_rate": 7.447,
+      "setpoint": 88.044,
+      "base_sp": 92.381,
+      "sp_offset": -4.3376,
+      "bl_vel": -4.171,
+      "br_vel": -4.073,
+      "motor_vel": -4.354
+    },
+    {
+      "phase": "fault",
+      "t_s": 47.419,
+      "since_ch11_s": 10.399,
+      "roll": 108.494,
+      "roll_rate": 77.06,
+      "setpoint": 87.171,
+      "base_sp": 90.633,
+      "sp_offset": -3.4618,
+      "bl_vel": -26.564,
+      "br_vel": -26.556,
+      "motor_vel": -30.0
+    }
+  ],
+  "supported_lowering_samples": 0,
+  "loading_samples": 0,
+  "inferred_forward_rad": [
+    3.917,
+    3.536
+  ],
+  "reach": {
+    "roll": [
+      86.601,
+      91.763
+    ],
+    "setpoint": [
+      86.604,
+      91.233
+    ],
+    "base_sp": [
+      85.215,
+      92.364
+    ],
+    "meas_vel": [
+      -3.615,
+      0.327
+    ],
+    "max_resisted_target_error_left_rad": 0.017000000000000348,
+    "max_resisted_target_error_right_rad": 0.018000000000000682,
+    "max_abs_torque_left_nm": 0.547,
+    "max_abs_torque_right_nm": 0.333,
+    "max_extra_lean_beyond_base_and_pi_deg": 0.001000000000000556
+  },
+  "lowering_timing_max": {
+    "sample_dt_ms": 21.0,
+    "inner_dt_max_us": 5469.0,
+    "update_age_ms": 20.0,
+    "imu_age_ms": 10.0,
+    "feedback_age_l_ms": 6.0,
+    "feedback_age_r_ms": 6.0
+  },
+  "pre_lowering_pilot_drive_samples": 1049,
+  "lowering_pilot_inputs": {
+    "pilot_forward": [
+      0.0,
+      0.0
+    ],
+    "pilot_steering": [
+      0.0,
+      0.0
+    ]
+  },
+  "replay": {
+    "scope": "Recorded inputs through deployed 43b1967 helper, not a physical simulation",
+    "calibration": "Forward inferred from settled target; historical centers +1.768/-1.767 rad",
+    "transitions": [
+      {
+        "phase": "stopping",
+        "t_s": 37.02,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "reaching",
+        "t_s": 37.5,
+        "reason": "lower_requested"
+      },
+      {
+        "phase": "canceling",
+        "t_s": 45.6,
+        "reason": "lower_reach_disturbed"
+      },
+      {
+        "phase": "fault",
+        "t_s": 47.419,
+        "reason": "lower_motion_limit"
+      }
+    ],
+    "phase_mismatch_t_ms": []
+  }
+}

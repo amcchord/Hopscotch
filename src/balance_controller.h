@@ -18,7 +18,7 @@ enum class BalanceState : uint8_t {
     TippingUp      = 1,
     Balancing      = 2,
     ReturningArms  = 3,
-    Lowering       = 4, // Append-only telemetry ID: arms support descent.
+    Lowering       = 4, // Append-only ID: forward fall, catch and supported descent.
 };
 
 struct RawImuData {
@@ -182,7 +182,7 @@ private:
     balance_math::RecoilUnwind _recoil_unwind;
     balance_math::BalancePilot _pilot;
     balance_math::BalanceLower _lowering; // control-task owned; prepare while balancing
-    float _lower_lean_offset = 0;
+    volatile float _lower_wheel_command = 0; // control owner -> 200 Hz sender
     balance_math::LowerInput lowerInput(bool pilot_valid) const;
     bool _pilot_input_valid = false;
     volatile float _pilot_velocity_ff = 0; // requested speed for the 200 Hz driving controller

@@ -1,111 +1,112 @@
-# Experimental CH11 return to flat
+# Experimental CH11 forward fall and arm catch — v2
 
-**September 20 operator follow-up:** driving worked very well, but installed v1
-lowering tipped backward without intervention. The failed run is archived and
-replayed. A forward-fall/catch v2 candidate is queued, **not installed**; hold
-further v1 lowering attempts. See [current state](progress/CURRENT.md) for the
-candidate evidence and release status. The v1 procedure below is retained as
-installed-behavior documentation, not an instruction to repeat the failed trial.
+**Installed September 20; further lowering trials are on hold.** Austin reports
+the subsequent v2 attempt staged the arms too far forward, nearly bounced off
+them and fell backward. The lowering task owns the new log and diagnosis; this
+operator report does not establish the cause. The sequence below documents the
+installed behavior, not a request to repeat the failed trial.
 
-**Integration update:** this feature is included in installed combined source
-`43b1967`. See [current state](progress/CURRENT.md) and the [combined release
-record](BALANCE_DRIVE_BRAKING_2026-09.md#installed-combined-release). The isolated
-build/handoff details below are historical; physical evaluation remains pending.
+See the [verified OTA record](../evidence/ota-lowering-v2/README.md). Austin's first physical v1 trial
+failed: the robot leaned backward, never qualified arm contact, canceled the
+reach and tipped backward on its own. Ground and standing driving worked very
+well. The [archived 2,371-sample run and diagnosis](../evidence/balance-lower/trial-20260920/README.md)
+reproduce every recorded helper transition through the deployed v1 code.
 
-## Operator behavior
+Austin clarified the desired maneuver: **let the robot fall forward and catch
+that fall with its arms**. V2 explicitly leaves upright balancing before
+contact. It does not wait for an arm tracking stall while the wheel controller
+counteracts the forward arm motion.
 
-After stand-up has completed its normal arm return and settled, one fresh CH11
-pulse requests a supported return to all four wheels. CH7, drive arming and arm
-arming must remain active. CH1/CH2 are treated as neutral for the maneuver so
-the existing standing-drive controller first stops travel. Repeated CH11 pulses
-do not restart a maneuver. Idle single/double-tap stand-up behavior is unchanged.
+## Sequence
 
-The stored arm **Forward** reference points up while the body is standing.
-This maneuver reaches physically forward/down along the negative calibrated
-center axis, then brings the arms back to their flat Forward reference as the
-body lowers. It does not simply invoke the old ReturningArms routine, which
-immediately stops wheel balancing and ends logging.
+A fresh CH11 pulse after ordinary stand-up settles requests the maneuver.
+CH7 and both arming switches must remain active, with fresh real RC, IMU and
+six-motor feedback. CH1/CH2 are treated as neutral while lowering owns motion.
+Existing idle single/double-tap stand-up behavior is unchanged.
 
-| Stage | Behavior and progression |
+| Phase | Action and progression |
 | --- | --- |
-| LOWER_WAIT | Ordinary wheel balancing/braking continues. Require both wheels <=0.65 rad/s, tilt rate <=4 deg/s and balance error <=2 deg for 500 ms. |
-| LOWER_REACH | Move each arm forward at 0.25 rad/s, limiting its target to 0.12 rad ahead of measured position. Both arms must show >=0.4 Nm load, >=0.06 rad resisted motion, <=0.12 rad/s speed and sufficient forward extension for 240 ms. |
-| LOWER_LOAD | Retain wheel balancing. Remove contact preload, slowly request 3 degrees of forward lean, and ease the arms back only 0.035 rad. Require >=2 degrees of measured forward body motion, load on both arms, and quiet wheel/body motion before releasing wheel balance. |
-| LOWERING | Rear wheels hold zero speed; front wheels retain their existing hold. Arms unwind at up to 0.16 rad/s, pausing above 12 deg/s forward body descent. Fresh sensors, motor feedback, arming, radio, rate, support-loss and progress limits remain required. |
-| Ground hold/retract | Require measured tilt within +/-5 degrees, rate <=5 deg/s and quiet wheels for 600 ms. Retract arms to the Forward reference, verify their measured arrival, then restore CSP ground drive and finish the log as `lower_complete`. |
+| Stop | Ordinary standing-drive braking/balance continues. Require quiet wheels, body rate and balance error for 500 ms. |
+| Prepare | Position arms 1.3 rad physically forward of their standing-up reference, at 0.25 rad/s. Advance only while balance remains calm; require measured arrival and 200 ms of quiet balance. The body may lean backward slightly here as the normal controller compensates the arm mass. Preparation failure ends the attempt while retaining the measured arm pose. |
+| Forward initiation | Transfer wheel ownership out of upright PD/position PI. Slew rear speed backward at up to 4 rad/s², capped at 2 rad/s, to initiate forward body rotation. Pause further acceleration once forward rate reaches 6°/s. After measured forward rate reaches 1°/s, swing the arms farther forward at up to 1.5 rad/s, capped at 2.4 rad travel. |
+| Catch | Once measured forward tilt drops 1°, forward rate exceeds 2°/s and both arms extend at least 1.8 rad, retain the small rear speed rather than abruptly braking the body upright. Hold each arm at its first qualifying load; do not continue pushing it into the floor. After both impacts, permit only 0.06 rad of yielding at 0.12 rad/s, pausing during rapid forward descent. |
+| Supported descent | Require an actual forward fall, subsequent reduction in falling rate, both arms loaded and slow arm motion for 80 ms. An early catch can qualify after 0.5° of forward travel. Only then unwind the support arms toward flat at 0.16 rad/s, pausing above 12°/s forward descent. Slew rear speed to zero at 0.75 rad/s². |
+| Flat hold/retract | Require tilt within ±5°, body rate within 5°/s and quiet wheels for 600 ms. Retract arms at 0.30 rad/s, verify measured arrival, then restore ground drive and end as `lower_complete`. Ground drive still requires neutral after handoff. |
 
-Missing contact, out-of-reach support or failed weight transfer causes slow arm
-retraction while wheel balancing continues. A fault after weight transfer stops
-the maneuver and holds the measured arm positions; it does not command a fast
-return of the supporting arms. Disarm and CH7 cancellation retain priority.
-Ground drive still requires neutral sticks after the balance handoff.
+Motor direction comes from the opposite-sign calibrated center axes. The
+stored **Forward** reference is the flat-body reference; it points up when the
+body stands. Negative center-axis travel reaches physically forward/down.
 
-## Validation and limitations
+## Protection and limits
 
-The native checks execute the production maneuver helper: calibrated direction,
-quiet entry, contact qualification, unsupported cancellation, target lead bounds,
-weight-transfer requirement, rate pause, sensor/support faults, timeouts, clock
-rollover and measured landing. All ten native executables, 27 Python tests,
-syntax checks, whitespace checks and the full pinned ESP32 build passed.
+- Each target stays within 0.12 rad of measured arm position. Contact detection
+  ignores the first 100 ms of the fast arm sweep and requires at least 1.5 rad
+  of extension. First load is 0.4 Nm; sustained support requires 0.2 Nm on both
+  arms plus measured body deceleration and slow arm motion. These are contact
+  inferences, not dedicated foot sensors.
+- Lowering uses the existing fast 6 ms gyro-rate filter and requires every
+  motor's feedback to be at most 100 ms old. Ordinary driving retains its
+  existing freshness rules. The 200 Hz wheel sender rejects stale lowering
+  commands after 100 ms and requests outside ±2 rad/s.
+- Wrong-way departure (>2° backward from the launch posture or >12°/s backward),
+  missed catch, stale feedback, support loss, excessive motion and lack of
+  progress produce faults. No-forward timeout is 1.8 s; catch timeout is 2.5 s.
+  Preparation has a 16 s deadline; complete descent has 20 s after departure.
+- On fault or CH7 cancellation after departure, stop the wheel command and
+  retain measured arm positions through the existing hard-abort/override
+  resynchronization. Do not command a rapid arm return during a fall. A fault
+  is **not** evidence that an unsupported robot will land safely.
+- Normal ground drive, standing-drive v5, balancing gains, startup, arming,
+  radio, motor configuration and network implementation are unchanged. The
+  controller changes are confined to CH11 lowering and its stored telemetry.
 
-The [contact-model evidence](../evidence/balance-lower/README.md) contains 81
-scenarios using this same C++ helper. Of 72 geometry/compliance/servo/body-model
-variants, 52 complete and 20 cancel because support is out of reach. The nominal
-run takes 26.12 seconds and peaks at 18.09 deg/s; completed variants peak at
-14.51–20.10 deg/s. Missing/one-arm contact, an unreachable floor, slow servos,
-stale feedback and obstructed arms do not report a successful landing. Loss of
-support during descent produces a fault, not a claim of a controlled landing.
+## Evidence and next physical check
 
-**These are screening results, not physical validation.** Arm length, pivot
-location, contact stiffness/damping and the wide-angle gravity model are
-estimates. Preparation assumes the existing balance controller can follow the
-arm equilibrium/lean request; the model does not execute the full firmware
-scheduler or validate that coupled response. It omits sideways roll, uneven
-contact, floor friction, backlash, structural flex and realistic impact forces.
-The small-angle arm equilibrium fit is extrapolated while reaching.
+The [v2 evidence](../evidence/balance-lower/forward-catch-v2/README.md) includes
+229 model cases, native checks, historical replay and the full ESP32 build.
+The nominal model reaches flat/retracted in 19.90 s and peaks at 19.84°/s.
+Of 216 chosen geometry/plant/servo/inertia variants, 180 complete and 36 fault
+while preparing, before intentional departure. All 11 injected fault scenarios
+avoid reporting success. These counts are screening outcomes, not reliability.
 
-The maximum forward extension is 1.4 times the calibrated center delta, capped
-at 2.6 rad (about 142 degrees for the archived 1.77-rad calibration). This exceeds the historical
-0.3-fraction forward recovery range and is **mechanically unverified**. Two-arm
-torque/tracking plus measured weight transfer is an inference of support, not
-a dedicated foot-contact sensor. An obstruction or incorrect calibration can
-defeat those assumptions. Before an unsupported trial, verify clearance and
-the reach direction with the body secured and unobstructed arm travel.
+The new model includes wheel/body/arm coupling and floor forces during every
+phase, including preparation. Its balanced preparation is no longer assumed
+successful. However, geometry, wide-angle COM, inertia, joint stiffness,
+friction and contact forces are not calibrated to this robot. Preparation's
+stationary balance cascade is approximated; the full scheduler is not emulated.
+Sideways roll, uneven contact and realistic structural impact are absent.
+Some completed variants catch at up to **55.15°/s**: software completion alone
+does not demonstrate a graceful catch. Peak model torque is not a hardware
+load rating. Arm clearance and actual catch severity require physical checks.
 
-## First supervised trial after the combined release
+The release owner integrated and checked source `dd74154`, then prepared a
+private configured package. This task installed those exact bytes; the previous
+v5/v1 application remains available for rollback. Ground/standing-driving code
+is unchanged. This worktree's public-example credential build is compile-only.
 
-1. Verify the combined installed image and retained calibration; use the usual
-   fresh-radio/motor/IMU checks from [BALANCE_TESTING.md](BALANCE_TESTING.md).
-2. On a level surface with a catch restraint that allows descent, perform normal
-   stand-up. Leave CH1/CH2/CH4 centered and wait for stable balance. Keep clear
-   of the arm sweep and have the existing disarm control available.
-3. Pulse CH11 once, then release. Check that both arms reach toward the floor,
-   that the body transfers weight forward, and that lowering remains slow.
-   Support/disarm if direction, contact or body motion is wrong; do not force
-   the arms through an obstruction or repeat a failed maneuver without its log.
-4. After completion, center the sticks, then disarm both groups and keep power
-   on for saving. Download the complete `.csv` and `.wire` using
-   `scripts/robot_wifi.py log`. Record floor contact, any asymmetry, landing
-   harshness, intervention and actual elapsed time beside the log.
+After diagnosis and approval of a new **restrained, supervised** trial, verify the forward arm direction
+and clearance, stand up normally with neutral sticks, then pulse CH11. Expect a
+slow preparation followed by a deliberate forward departure, arm catch and
+supported lowering. Keep the existing disarm control available. Record actual
+arm/floor contact, any asymmetry, impact severity and intervention. After
+supporting/disarming, allow the log to save and download both CSV and exact wire
+before another attempt. The previous v1 maneuver failed; the installed ESP digest in the deployment
+record identifies v2 even though the cached build-date string is unchanged.
 
-## Integration record
+## Integration and telemetry
 
-Worktree `worktrees/balance-lower`, branch `codex/balance-lower`, based on the
-standing-drive owner's committed `10766f7` integration checkpoint. Changes are a
-new `balance_lower.h` policy, CH11 routing in `main.cpp`, focused integration in
-`balance_controller.cpp/.h`, tests, simulation and these dedicated docs/evidence.
-No shared progress files, radio files, normal control gains, motor setup or
-other agents' checkouts were edited. No device command, flash or motion occurred.
+Worktree `worktrees/balance-lower`, branch `codex/balance-lower`, now includes
+the exact deployed `eb2bb23` combined release before the focused v2 changes.
+Shared CURRENT/JOURNAL and other agents' worktrees are owned by their existing
+coordinators and were not edited here.
 
-Existing BalanceState IDs 0–3 remain unchanged; supported descent appends ID 4
-(radio mode 2 / phase 6). Preparation remains Balancing (ID 2), with status
-labels LOWER_WAIT/REACH/LOAD/CANCEL. Log feature bit 2048 identifies this version;
-`pilot_flags` bit 64 marks active lowering and bits 8–11 contain the helper phase.
-No binary sample layout change. The stored header feature distinguishes old
-logs when exporting. Combine the feature with the braking owner's bit 1024.
-
-The local build uses the public example Wi-Fi header and is **compile-only**.
-The release owner must build the integrated source with the actual private
-configuration, run the combined release checks and record the installed image.
-This prototype must be physically evaluated before claiming graceful or
-repeatable real-world lowering.
+Schema 4 and the 240-byte sample remain unchanged. Feature bit 4096 identifies
+v2 (combined flags 8191). Phase bits 8–11 in `pilot_flags` retain the existing
+encoding; phase 9 now means forward initiation and phase 10 means catching.
+Stored v1 logs retain their original phase-9 Loading description when exported.
+Balance state 4 now covers departure, catch and supported descent. Its wheel
+commands are recorded in the existing command columns; its setpoint column is
+zero because upright PD does not own that state. For new v2 captures, `roll_rate` records the
+6 ms catch-rate filter while the lowering phase is nonzero; ordinary balance
+retains its existing slower filter. The feature-tagged CSV metadata documents
+this choice, and historical v1 exports retain their stored values.

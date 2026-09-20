@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[combined release evidence](../evidence/balance-drive-braking/README.md) records
+[latest deployment evidence](../evidence/ota-lowering-v2/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -160,49 +160,76 @@ maintenance or web disarm before attempting to rearm.
 
 ## Update the firmware
 
-1. Support the robot, keep motor power off, lower both arm switches and release
-   CH11. Wait for the safe state above and download the previous run. Record
-   the existing build, slot and image digest from
-   [firmware information](http://hopscotch.local/api/info). Keep the previous
-   exact application package locally for recovery; a source rebuild can differ.
-2. Choose **one** application file. The frozen, bench-tested release on this
-   workstation is `worktrees/drive-braking/artifacts/drive-braking-v5/release/firmware.bin`
-   relative to the project root, identified by its
-   manifest and [release evidence](../evidence/balance-drive-braking/README.md). To prepare a
-   changed source build with the existing local credentials:
+Use a frozen, already checked package. **Do not rebuild or rerun the full test
+suite simply to deploy those same bytes.** One task owns device access; the
+other tasks continue in their own worktrees. Keep the previous exact application
+package for recovery.
+
+1. Support the robot, disarm both groups, lower both arm switches and release
+   CH11. Motor power may stay on when the robot is safely supported and all
+   motors are disabled; cycling power is not a routine OTA requirement. For the
+   currently installed transport, switch the transmitter off during upload:
+   repeated transmitter-on transfers broke, while the same paced transfer
+   succeeded with it off. The precise RF/transport cause remains unconfirmed.
+2. Run one command with the frozen application and its manifest. For the
+   September 20 forward-fall/catch v2 package, from the project root:
 
    ```bash
-   ./scripts/check_balance_candidate.sh
-   bash scripts/check_radio_telemetry.sh
-   node tests/test_network_dashboard.js
+   python3 scripts/robot_wifi.py --host http://192.168.1.172 ota \
+     worktrees/drive-braking/artifacts/lowering-v2/candidate/firmware.bin \
+     --manifest worktrees/drive-braking/artifacts/lowering-v2/candidate/manifest.json
    ```
 
-   The consolidated balance check also runs `./scripts/build.sh`.
-   Keep the new binary, ELF, source revision, build output and SHA-256 together
-   in a private release package. The new application is
-   `.pio/build/m5stack-atoms3r/firmware.bin`.
-3. Recheck fresh disarmed state, then upload the chosen application:
+   The helper verifies file size, whole-file hash and ESP digest, checks fresh
+   disarmed maintenance eligibility, archives and validates the saved run, then
+   transfers the application with 1 KiB/50 ms pacing and a 120-second socket
+   timeout. It verifies the new running digest/slot, fresh IMU, disarmed state,
+   return of previously online motors without errors, and identical saved-run
+   exports. The transfer itself takes about 63 seconds for this image. There
+   is no separate manual status/log/download loop to repeat.
+3. Wait for the final verified report. The helper saves state, transfer outcome
+   and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
+   startup. `--record-dir <new-directory>` selects a durable evidence location.
+   Preserve the record and update shared release state once. Turn the transmitter
+   back on and observe both arm switches low before any authorized motion test.
+   Check [current trial status](progress/CURRENT.md) first; further CH11 lowering
+   attempts are on hold after the failed v2 trial.
 
-   ```bash
-   .venv/bin/python scripts/robot_wifi.py status
-   .venv/bin/python scripts/robot_wifi.py ota .pio/build/m5stack-atoms3r/firmware.bin
-   ```
+`--host` and `--secrets-file` go before `ota`; other OTA options go after it.
+An isolated worktree can use `--secrets-file /absolute/project/src/network_secrets.h`
+to read the existing private header in place. Never copy secrets or credentialed
+binaries between worktrees. The helper reads the frozen binary at its existing
+path. `HOPSCOTCH_API_TOKEN` still takes precedence when set.
 
-   Substitute `worktrees/drive-braking/artifacts/drive-braking-v5/release/firmware.bin` to install the frozen
-   release. Do not upload a filesystem, partition, bootloader or full-flash image.
-   Alternatively, enter the token in the dashboard, select the same application
-   file and use its update control; it calculates the required size and SHA-256.
-4. Wait for upload verification and reboot. The CLI waits for a different
-   running slot and checks its reported ESP image digest against the uploaded
-   application's appended digest. Confirm its final report says both groups
-   are disarmed. If reboot is not verified, inspect the device before use;
-   an accepted upload alone is not a successful handoff.
-5. Reopen the dashboard and inspect `/api/info` and fresh telemetry. Confirm
-   expected build/image, idle/disarmed state, healthy IMU and no active
-   maintenance. Motors remain offline with motor power off. Re-download the
-   saved run to check preservation. Follow the
-   [stationary powered check](BALANCE_TESTING.md#updating-the-test-firmware)
-   before a supervised physical trial.
+If an upload loses its acknowledgment, the helper checks the actual running
+image before reporting failure. It never blindly repeats a write. Rerunning the
+same command after a successful but unacknowledged installation verifies and
+archives the current state without another flash or reboot. A failed command
+retains diagnostic evidence; inspect image identity and wait until maintenance
+has released before retrying. A validation failure must not be treated as a
+successful update. The robot's control owner still independently grants every
+flash operation; client checks do not replace that interlock.
+
+### Check once, freeze once, deploy the same package
+
+During development, run the focused checks for changed code. At scope freeze,
+the integration owner runs consolidated validation once and records the result:
+
+```bash
+./scripts/check_balance_candidate.sh
+bash scripts/check_radio_telemetry.sh
+node tests/test_network_dashboard.js
+```
+
+The consolidated check includes the pinned firmware build. Freeze its configured
+`firmware.bin`, ELF, source revision, manifest and build/check output in a private
+package. Confirm existing private network configuration; an example-credential
+compile is not a deployment artifact. Reuse that validated package across
+handoffs. Repeat checks only for new changes, failures or an unresolved concern.
+Documentation-only changes do not require a firmware build; host updater changes
+use `python3 -m unittest discover -s tests -p test_robot_wifi.py -v`. Hardware
+network stress tests belong to network changes/diagnosis, not every deployment.
+New motion behavior still needs its supervised physical trial.
 
 `/api/info` reports `image_sha256`, the ESP image's internal content digest.
 It differs from the SHA-256 of the complete upload file, which includes the
@@ -230,13 +257,10 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The September 19 combined release required a manually paced 1 KiB/50 ms upload
-with a 120-second socket timeout after two failed transfers. This pacing is not
-a CLI option in `robot_wifi.py`. The operator also switched the transmitter off
-near completion, so no single cause was isolated. See the [deployment
-record](BALANCE_DRIVE_BRAKING_2026-09.md#installed-combined-release). If a client
-times out, inspect the running digest/uptime and wait for maintenance to finish
-or abort before retrying; sending all bytes does not prove installation.
+The [September 20 deployment record](../evidence/ota-lowering-v2/README.md)
+contains the exact installed v2 identity, interrupted attempts and preserved
+run hashes. The original release manifest remains a preparation record marked
+`queued_not_installed`; the separate deployment record establishes installation.
 
 ## HTTP and WebSocket API
 
@@ -285,8 +309,10 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/drive-braking/artifacts/drive-braking-v5/release/` from the project
-root. The previous Wi-Fi application at `artifacts/wifi-ota/release/` is the
+`worktrees/drive-braking/artifacts/lowering-v2/candidate/` from the project
+root. The previous combined driving/v1-lowering application remains at
+`worktrees/drive-braking/artifacts/drive-braking-v5/release/`; its driving was
+reported good, but its lowering failed. The older Wi-Fi application at `artifacts/wifi-ota/release/` is the
 known-good rollback package; other directories preserve earlier iterations. The full original backup
 contains the pre-Wi-Fi driving-v4 firmware. Restoring it removes Wi-Fi/OTA and
 reverts saved data to that backup's state.

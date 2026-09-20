@@ -1,0 +1,19 @@
+{
+  "base": "eb2bb23",
+  "unchanged_files": [
+    "src/config.h",
+    "src/main.cpp",
+    "src/balance_pilot.h",
+    "src/balance_drive.h",
+    "src/ground_drive_gate.h",
+    "src/drive_controller.cpp",
+    "src/arm_controller.cpp",
+    "src/motor_manager.cpp",
+    "src/network_safety.h",
+    "src/network_snapshot.h",
+    "src/crsf.cpp"
+  ],
+  "v1_export_descriptors_unchanged": true,
+  "csv_wire_identical": true,
+  "rows": 2371
+}
