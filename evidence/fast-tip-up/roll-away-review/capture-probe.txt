@@ -1,0 +1,3 @@
+Installed source: 17c499c06b57d8e6d82ffaee3fbf289b722aa8b6
+Synthetic counterexample; not a hardware recording.
+capture_ms=2740 measured_wheel_rad_s=5
