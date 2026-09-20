@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 7;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 8;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -2157,7 +2157,9 @@ void BalanceController::dumpLog(Print* sink) {
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
         // Metadata-only policy revisions retain historical exports exactly.
-        if (header.schema_version >= 7)
+        if (header.schema_version >= 8)
+            out.println("# lowering=experimental_ch11_forward_catch_v8 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 7)
             out.println("# lowering=experimental_ch11_forward_catch_v7 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         else if (header.schema_version >= 6)
             out.println("# lowering=experimental_ch11_forward_catch_v6 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
@@ -2177,7 +2179,10 @@ void BalanceController::dumpLog(Print* sink) {
         out.println("# lowering_support=both_arms measured_forward_fall_loaded_return required reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:4");
         }
         out.println("# lowering_rate=roll_rate_uses_fast_tau_s:0.006 while_pilot_phase_nonzero:1 ordinary_balance_filter_unchanged:1");
-        out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        if (header.schema_version >= 8)
+            out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.24 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        else
+            out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
         out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600 arms_measured_forward_rad:0.06");
     } else if (header.reserved & 32768) {
         out.println("# lowering=experimental_ch11_forward_catch_v4 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");

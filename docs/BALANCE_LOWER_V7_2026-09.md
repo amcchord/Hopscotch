@@ -1,5 +1,7 @@
 # CH11 lowering v7 — leave driving mode and continue through rocking contact
 
+**Physical result:** [V7 succeeded](../evidence/balance-lower/trial-v7-success-20260920/README.md), finishing flat with arms Forward in 14.109 s after CH11. [V8](BALANCE_LOWER_V8_2026-09.md) prepares a faster supported return while preserving the successful catch and landing.
+
 Installed source `c442e12` for operator testing; [current state](progress/CURRENT.md)
 identifies the installed image. The [v6 physical run](../evidence/balance-lower/trial-v6-20260920/README.md)
 confirms successful fast standing and forward lowering departure, then a stop

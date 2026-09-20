@@ -1,0 +1,209 @@
+{
+  "cases": 329,
+  "before_complete": 258,
+  "after_complete": 258,
+  "improved": [],
+  "regressed": [],
+  "median_seconds_saved_common_success": 2.7199999999999998,
+  "nominal_before": {
+    "name": "nominal",
+    "model": {
+      "pivot": 0.12,
+      "arm": 0.3,
+      "wheel_radius": 0.055,
+      "equilibrium": 86.63,
+      "arm_eq_slope": -6.3,
+      "nonlinear_com": 0.0,
+      "arm_inertia_ratio": 0.03,
+      "arm_joint_inertia": 0.004,
+      "gravity": 8.82,
+      "wheel_coupling": 6.0,
+      "wheel_tau": 0.06,
+      "stiffness": 240,
+      "damping_ratio": 0.8,
+      "contact_velocity_fraction": 1.0,
+      "servo_tau": 0.04,
+      "servo_limit": 4.0,
+      "servo_accel": 1000000.0,
+      "servo_delay_ticks": 0,
+      "joint_stiffness": 25,
+      "torque_per_acceleration": 0.004,
+      "center_left": 1.768,
+      "center_right": -1.767,
+      "initial_speed": 0,
+      "floor": true,
+      "right_contact": true,
+      "right_servo_scale": 1.0,
+      "right_floor_height": 0.0,
+      "stale_at": 1000000000.0,
+      "stale_phase": -1,
+      "slip_at": 1000000000.0,
+      "slip_after_catch": 1000000000.0,
+      "jam": false,
+      "launch_sign": 1,
+      "false_load": false
+    },
+    "outcome": "lower_complete",
+    "final_phase": "complete",
+    "commit_s": 1.0,
+    "catch_s": 1.62,
+    "first_flat_s": 10.82,
+    "elapsed_s": 13.08,
+    "peak_rate_dps": 52.141,
+    "peak_wheel_rad_s": 0.944,
+    "peak_model_torque_nm": 3.199,
+    "peak_target_lead_rad": 0.22095,
+    "final_tilt_deg": 0.0,
+    "transitions": [
+      {
+        "time_s": 0.0,
+        "phase": "stopping",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 0.48,
+        "phase": "reaching",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 1.0,
+        "phase": "committing",
+        "tilt_deg": 86.184
+      },
+      {
+        "time_s": 1.1,
+        "phase": "catching",
+        "tilt_deg": 85.076
+      },
+      {
+        "time_s": 1.62,
+        "phase": "descending",
+        "tilt_deg": 70.773
+      },
+      {
+        "time_s": 11.6,
+        "phase": "ground_hold",
+        "tilt_deg": 0.001
+      },
+      {
+        "time_s": 12.2,
+        "phase": "retracting",
+        "tilt_deg": 0.014
+      },
+      {
+        "time_s": 13.08,
+        "phase": "complete",
+        "tilt_deg": 0.0
+      }
+    ],
+    "first_impact": {
+      "time_s": 1.4375,
+      "tilt_deg": 74.392,
+      "body_rate_dps": -52.141,
+      "arm_speed_rad_s": 0.405,
+      "closing_rate_dps": 72.652
+    }
+  },
+  "nominal_after": {
+    "name": "nominal",
+    "model": {
+      "pivot": 0.12,
+      "arm": 0.3,
+      "wheel_radius": 0.055,
+      "equilibrium": 86.63,
+      "arm_eq_slope": -6.3,
+      "nonlinear_com": 0.0,
+      "arm_inertia_ratio": 0.03,
+      "arm_joint_inertia": 0.004,
+      "gravity": 8.82,
+      "wheel_coupling": 6.0,
+      "wheel_tau": 0.06,
+      "stiffness": 240,
+      "damping_ratio": 0.8,
+      "contact_velocity_fraction": 1.0,
+      "servo_tau": 0.04,
+      "servo_limit": 4.0,
+      "servo_accel": 1000000.0,
+      "servo_delay_ticks": 0,
+      "joint_stiffness": 25,
+      "torque_per_acceleration": 0.004,
+      "center_left": 1.768,
+      "center_right": -1.767,
+      "initial_speed": 0,
+      "floor": true,
+      "right_contact": true,
+      "right_servo_scale": 1.0,
+      "right_floor_height": 0.0,
+      "stale_at": 1000000000.0,
+      "stale_phase": -1,
+      "slip_at": 1000000000.0,
+      "slip_after_catch": 1000000000.0,
+      "jam": false,
+      "launch_sign": 1,
+      "false_load": false
+    },
+    "outcome": "lower_complete",
+    "final_phase": "complete",
+    "commit_s": 1.0,
+    "catch_s": 1.62,
+    "first_flat_s": 8.120000000000001,
+    "elapsed_s": 10.14,
+    "peak_rate_dps": 52.141,
+    "peak_wheel_rad_s": 0.944,
+    "peak_model_torque_nm": 3.199,
+    "peak_target_lead_rad": 0.22095,
+    "final_tilt_deg": 0.0,
+    "transitions": [
+      {
+        "time_s": 0.0,
+        "phase": "stopping",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 0.48,
+        "phase": "reaching",
+        "tilt_deg": 86.63
+      },
+      {
+        "time_s": 1.0,
+        "phase": "committing",
+        "tilt_deg": 86.184
+      },
+      {
+        "time_s": 1.1,
+        "phase": "catching",
+        "tilt_deg": 85.076
+      },
+      {
+        "time_s": 1.62,
+        "phase": "descending",
+        "tilt_deg": 70.773
+      },
+      {
+        "time_s": 8.66,
+        "phase": "ground_hold",
+        "tilt_deg": 0.004
+      },
+      {
+        "time_s": 9.26,
+        "phase": "retracting",
+        "tilt_deg": 0.017
+      },
+      {
+        "time_s": 10.14,
+        "phase": "complete",
+        "tilt_deg": 0.0
+      }
+    ],
+    "first_impact": {
+      "time_s": 1.4375,
+      "tilt_deg": 74.392,
+      "body_rate_dps": -52.141,
+      "arm_speed_rad_s": 0.405,
+      "closing_rate_dps": 72.652
+    }
+  },
+  "slower_success_cases": [],
+  "contact_cases_complete": 72,
+  "delayed_cases_complete": 15
+}

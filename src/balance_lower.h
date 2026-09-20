@@ -28,7 +28,9 @@ struct LowerConfig {
     float prepare_rad = 1.75f, prepare_speed = 4.0f;
     float moving_handoff_rad = 1.60f;
     float catch_rad = 1.85f, catch_speed = 2.0f;
-    float lower_speed = .16f, retract_speed = .30f;
+    // V7 completed with close target tracking; speed up only supported return.
+    // The existing body-rate pause and 0.30 rad/s motor cap still apply.
+    float lower_speed = .24f, retract_speed = .30f;
     float catch_return_speed = .50f;
     float one_arm_return = .06f;
     float max_target_lead = .24f;

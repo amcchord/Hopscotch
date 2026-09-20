@@ -278,6 +278,21 @@ int main() {
       if(fault==2) r.in.wheel_left=6.1f;
       if(fault==3) r.in.arm_left=nan;
       r.tick(false); assert(r.lower.phase()==LowerPhase::Fault && r.lower.wheelCommand()==0); }
+    { // Successful v7 descent spent 11.37s tracking its slow targets with
+      // <=0.021rad error. V8 advances supported targets 50% faster, while
+      // preserving the motor cap and rate pause through a recorded disturbance.
+      Rig r; r.catchFall(); r.in.rate=-6.7f;
+      const float start=r.lower.left();
+      for(int i=0;i<50;++i) { r.in.tilt-=.14f; r.tick(); }
+      assert(r.lower.left()>start+.235f && r.lower.left()<start+.245f);
+      assert(r.lower.armSpeed()==.30f);
+      const float held=r.lower.left();
+      for(float rate:{-22.752f,-12.01f,7.684f}) {
+        r.in.rate=rate; r.tick(false);
+        assert(r.lower.active() && r.lower.left()==held);
+      }
+      r.in.rate=-6.7f; r.tick(); assert(r.lower.left()>held);
+    }
     { Rig r; r.catchFall(); const float held=r.lower.left(); r.in.rate=-20; r.tick(false);
       assert(r.lower.left()==held); }
     { Rig r; r.catchFall(); r.in.rate=-30; r.in.torque_left=r.in.torque_right=0;
