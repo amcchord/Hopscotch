@@ -1,6 +1,6 @@
 # Radio telemetry — September 20, 2026
 
-## Crash fix ready — Lua v3.1, not installed
+## Crash fix installed — Lua v3.1, September 20 at 14:05 EDT
 
 Austin's GX12 photo shows `attempt to index a nil value (field 'table')`.
 Reproduced on v3 at `event()` when the first fresh FM value arrives. EdgeTX
@@ -20,13 +20,21 @@ tests incorrectly exposed the desktop library to this monochrome script.
   Accounted for binary32 versus binary64 rounding at the -0.45 display boundary
   in the host assertion. Native fixture/transport, CSV integrity, syntax and
   rendered-layout checks pass. This is not a full hardware VM/scheduler test.
-- Candidate `hop.lua`: 17,524 bytes, SHA-256
+- Installed `hop.lua` from source `605c66d`: 17,524 bytes, SHA-256
   `d2674ebd99d1609c62ff9de6cf657e739c6eaa4653f8fcf490b659a9cd7bc995`.
   Package/evidence: project-root `artifacts/radio-lua-v3.1-2026-09-20/`.
-- The radio is not attached. Installed v3 below remains faulty; replace its
-  Lua with v3.1 and remove generated hop.luac after a fresh backup on reconnect.
-  Page 6 will show LUA v3.1. Firmware/mappings and other worktrees are untouched.
-  Next: reconnect NO NAME, install/readback/eject, then verify on the handset.
+- Austin reattached NO NAME and authorized deployment. Verified the volume UUID,
+  all six frozen-package manifest entries and source equality. Backed up v3,
+  its bytecode and current configuration to project-root
+  `artifacts/radio-lua-v3.1-2026-09-20/install-20260920T180506Z/` before replacing
+  only `SCRIPTS/TELEMETRY/hop.lua` and removing generated `hop.luac`.
+- Card readback matched the tested source after sync; Lua 5.3.6/32-bit syntax
+  check passed directly from the card. All four MODELS/RADIO files and two
+  unrelated telemetry files stayed byte-identical. Model00 still selects hop;
+  LOGS exists and logging remains OFF by default. Safe eject succeeded.
+- Firmware, mappings and other worktrees are untouched. Next: reboot the radio,
+  open telemetry screen 2 and verify the display on the handset. Diagnostics
+  page 6 should show LUA v3.1. Hardware boot/runtime verification remains pending.
 
 References: [EdgeTX library availability](https://luadoc.edgetx.org/overview/version-libraries),
 [2.11 library registration](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/thirdparty/Lua/src/linit.c).
