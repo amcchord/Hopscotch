@@ -1,6 +1,6 @@
 # CH11 lowering v8 — faster supported return
 
-Prepared for the next update; [current state](progress/CURRENT.md) identifies
+Installed source `47eb19a` for operator testing; [current state](progress/CURRENT.md) identifies
 what is installed. V7 has now completed an operator-confirmed successful
 lowering and a second successful fast stand-up. The [saved successful run](../evidence/balance-lower/trial-v7-success-20260920/README.md)
 provides a baseline worth preserving.

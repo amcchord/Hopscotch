@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/lowering-v7-integration/README.md) records
+[latest deployment evidence](../evidence/lowering-v8-integration/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -114,8 +114,8 @@ The browser receives live pose, motor feedback, RC channels, timing and memory
 through `/ws`. Offers are 10 Hz; network delivery is best-effort, can skip frames,
 and is not a real-time control channel. The dashboard marks stale data. The full
 onboard balance capture runs independently at 50 Hz with 200 Hz aggregates;
-new captures are schema 7 (240-byte samples, unchanged from v4/v5/v6), up to 6,000 samples/120 seconds. Live JSON schema 1
-and saved-log schema 7 are different formats. Existing older saved runs retain
+new captures are schema 8 (240-byte samples, unchanged from v4–v7), up to 6,000 samples/120 seconds. Live JSON schema 1
+and saved-log schema 8 are different formats. Existing older saved runs retain
 their original schema and metadata when exported by the new firmware.
 
 After supporting the robot, lower both arm switches and release CH11. Wait for
@@ -182,13 +182,13 @@ package for recovery.
    it off remains an option when speed matters. The exact throughput cause is
    unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 lowering-v7/OTA-progress package, from the project root:
+   September 20 lowering-v8/faster-return package, from the project root:
 
    ```bash
    python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
      --secrets-file src/network_secrets.h ota \
-     worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/manifest.json
+     worktrees/balance-lower/artifacts/lowering-v8-return/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v8-return/candidate/manifest.json
    ```
 
    Use the current integration worktree helper and its frozen package as shown.
@@ -201,15 +201,16 @@ package for recovery.
    return of previously online motors without errors, and identical saved-run
    exports. Observed uploads took about 64 seconds with the transmitter off, 188 seconds
    for the earlier unmonitored transmitter-on update, 250 seconds with
-   acceptance monitoring/gap injection, and 343 seconds for v6, and 421.475 seconds for this
-   update installing the OTA progress/interlock. These are observations, not fixed upload deadlines. There is no separate
+   acceptance monitoring/gap injection, 343 seconds for v6, 421.475 seconds to
+   install the OTA progress/interlock, and 475.235 seconds for the first update
+   under that interlock. These are observations, not fixed upload deadlines. There is no separate
    manual status/log/download loop to repeat. Gap injection and concurrent status
    monitoring are acceptance tests, not routine deployment steps.
 3. Wait for the final verified report. The helper saves state, transfer outcome
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
    Preserve the record and update shared release state once. If the transmitter was off, turn it back on; observe both arm switches low before any authorized motion test.
-   Check [current trial status](progress/CURRENT.md) first; v7 lowering is ready
+   Check [current trial status](progress/CURRENT.md) first; v8 lowering is ready
    for a restrained manual trial and is not yet physically validated.
 
 After the progress/interlock firmware is installed, subsequent uploads show a
@@ -218,8 +219,11 @@ elapsed seconds on the robot. A queue supplies the 10 Hz display without taking
 the flash mutex. The display reaches 100% only after SHA/ESP verification; an
 abort retains its partial count for five seconds, then returns to status. The
 update that installs this feature still runs under the preceding firmware.
-Its installation does not itself validate the new screen or UART pause on
-hardware, and no faster transmitter-on transfer time is claimed yet.
+The first subsequent update completed in 475.235 s with the transmitter
+linked before/after. One in-flight snapshot confirmed active OTA, maintenance,
+disabled motors and cleared RC/link input, consistent with UART suspension.
+The physical progress screen was not independently observed.
+This is one observed transfer, not a controlled performance comparison.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.
 An isolated worktree can use `--secrets-file /absolute/project/src/network_secrets.h`
@@ -288,7 +292,7 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The [current combined deployment record](../evidence/lowering-v7-integration/README.md)
+The [current combined deployment record](../evidence/lowering-v8-integration/README.md)
 identifies the installed image and the verified transmitter-on update, including unchanged
 saved-run hashes. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
 retains the old transport's interrupted attempts and transmitter-off success.
@@ -347,8 +351,10 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/` from the project
-root. The previous exact v6 image is retained at
+`worktrees/balance-lower/artifacts/lowering-v8-return/candidate/` from the project
+root. The successful previous v7 image is retained at
+`worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/`, source `c442e12`.
+The older exact v6 image is retained at
 `worktrees/balance-lower/artifacts/lowering-v6-fast/candidate/`, source `a772ecc`.
 The older exact v5 image is retained at
 `worktrees/balance-lower/artifacts/lowering-v5-final/candidate/`.

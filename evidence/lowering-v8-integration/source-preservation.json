@@ -1,0 +1,13 @@
+{
+  "baseline_source": "c442e1271eaf9f38cfbeab27c2e435fe6b8e3eb3",
+  "changed_production_files": [
+    "src/balance_controller.cpp",
+    "src/balance_lower.h",
+    "src/balance_telemetry.h"
+  ],
+  "policy_change": "Only supported lower_speed .16 to .24 rad/s; guards, catch, braking, final retraction and motor cap unchanged.",
+  "controller_runtime_unchanged_except_schema": true,
+  "fast_normal_driving_ota_crsf_unchanged": true,
+  "other_worktrees_modified": false,
+  "reused_checks": "Radio/dashboard/pinned TCP checks from c442e12; all affected source byte-identical. Consolidated includes actual OTA lifecycle and helper tests."
+}

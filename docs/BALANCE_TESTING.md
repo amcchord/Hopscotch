@@ -1,14 +1,14 @@
 # Balance Mode Test Guide
 
-**September 20 update:** [lowering v5](BALANCE_LOWER_V5_2026-09.md) removes
-v4's scheduled backward prelean and begins forward movement during arm deployment.
-The combined candidate includes the fast tip-up startup feedback fix. Check
-[current installed identity](progress/CURRENT.md) before testing. Use CH6 LOW
-for the first lowering trial, then test fast standing separately.
+**September 20 update:** [v7 completed fast standing and lowering](../evidence/balance-lower/trial-v7-success-20260920/README.md).
+[V8](BALANCE_LOWER_V8_2026-09.md) speeds supported arm return while preserving
+catch, final landing and motion guards. Check [current installed identity](progress/CURRENT.md)
+before testing. The faster return needs a manual trial; use CH6 LOW to isolate
+lowering, or retain CH6 HIGH when intentionally testing the successful fast lift.
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [experimental CH11 forward-fall/catch v5](BALANCE_LOWER_V5_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; physical lowering v5 and corrected fast standing are pending.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH11 forward-fall/catch v8](BALANCE_LOWER_V8_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; v7 lowering and fast v2 have operator-confirmed success, while the faster v8 return is pending a physical trial.
 
 ## Safety and Test Area
 
@@ -31,7 +31,7 @@ Transport version 2 passed a full transmitter-on update with a four-second
 receive gap. The transmitter may stay on while disarmed; transmitter-off was
 faster in the recorded tests. Wait for the final verified report before testing.
 
-Use the v5 procedure for the next restrained lowering trial; stop further attempts on a fault and retrieve the log.
+Use the current v8 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -80,26 +80,30 @@ A held stick through startup cannot unlock standing drive. If control pauses aft
 
 ## Supported return to flat
 
-**V4 is ready for a restrained supervised trial, not validated for an unsupported fall.**
+V7 completed a physical flat/Forward finish. V8 changes the supported return
+speed from 0.16 to 0.24 rad/s; its faster motion remains to be tested.
 
-Select CH6 low for this trial. A fresh CH11 pulse after stand-up and arm return have settled requests an
-experimental supported descent. It is not a disturbance marker. Test this
-separately from braking, with a catch restraint and verified arm sweep/reach;
-follow the full [CH11 lowering procedure](BALANCE_LOWER_V4_2026-09.md). CH12 remains
-the balance event marker. V4 intentionally leaves upright balance to fall forward and catch on the arms;
-physical support and graceful landing are not established by simulation.
+After stand-up and arm return settle, center CH1/CH2 and pulse CH11 once. The
+sequence deliberately falls forward, catches on the arms, then returns them
+until the body is flat and both arms are Forward. Follow the [current lowering
+procedure](BALANCE_LOWER_V8_2026-09.md) with the established clear-area/spotter
+setup. Keep CH12 assistance out of this trial so automatic completion can be
+assessed. Disarm and archive the saved run before another attempt.
 
 ## Commands and RC Markers
 
+Run the Wi-Fi commands from the project root, using the current integration
+helper and the existing private header in place.
+
 | Action | Command/control | Behavior |
 |---|---|---|
-| Live state | Dashboard or `python3 scripts/robot_wifi.py status` | Latest best-effort pose, motors, RC and maintenance state |
+| Live state | Dashboard or `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h status` | Latest best-effort pose, motors, RC and maintenance state |
 | Tag a run over USB | `bal note baseline-hard-floor` | Stores up to 63 characters in the next/current log; untethered, keep observations in a sidecar note |
 | Detailed USB controller state | `bal status` | Shows gains, setpoint state, buffered samples, and pending-save state |
 | Mark a disturbance | Press CH12 while balance is active | Increments the `marker` column on the same 50 Hz control tick; CH12 arm-home behavior is suppressed while balancing |
 | USB marker | `bal mark` | Equivalent marker for bench tests |
-| Download latest run | `python3 scripts/robot_wifi.py log` | Validates schema/checksums/row count and saves `.csv` plus `.wire`; run analysis separately |
-| Disarm over Wi-Fi | `python3 scripts/robot_wifi.py disarm` | Authenticated request; verify the control task has disarmed both groups in fresh telemetry |
+| Download latest run | `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h log` | Validates schema/checksums/row count and saves `.csv` plus `.wire`; run analysis separately |
+| Disarm over Wi-Fi | `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm` | Authenticated request; verify the control task has disarmed both groups in fresh telemetry |
 | Delete latest run over USB | `bal log clear` | Requires inactive balance and both motor groups disarmed; download first |
 
 Set gains over USB between attempts. Wi-Fi has no gain, note, marker or motion
@@ -156,7 +160,7 @@ Override its port or timeout only when needed:
 
 ## What the Log Captures
 
-New captures use **schema 4, 240 bytes/sample, feature flags 8191** and a
+New captures use **schema 8, 240 bytes/sample, feature flags 65535** and a
 1,440,000-byte buffer for 6,000 samples. The CSV contains the full 50 Hz
 state-machine/outer-loop stream plus aggregates from every 200 Hz inner-loop
 tick. Live Wi-Fi JSON schema 1 is a separate snapshot format, offered at 10 Hz;
@@ -221,8 +225,11 @@ The first combined release added braking feature bit 1024 and lowering bit 2048 
 4095). Pilot flag 32 identifies accelerated reference braking; bit 64 identifies
 active lowering, with its phase in bits 8–11. Forward-fall/catch v2 adds feature
 bit 4096 (total 8191); the lowering guide documents its changed phases/rate field.
-Old files retain their original version/configuration and export unknown new
-fields as blank. Download new logs before restoring an older reader.
+Schemas 5–8 retain the 240-byte layout and distinguish subsequent lowering/fast
+policies in metadata. Fast support uses feature bit 16384, while pilot flag 128
+marks an actually selected fast run; lowering v4 and later use feature bit 32768.
+The current combined feature flags are 65535. Old files retain their original
+version/configuration and export unknown new fields as blank. Download new logs before restoring an older reader.
 
 The profiler resets at balance entry and freezes at exit; Wi-Fi and USB exports
 report the same physical run. The dashboard's network timing counters instead

@@ -531,3 +531,29 @@ No motion or settings/filesystem writes. New OTA screen/UART pause only applies
 to subsequent uploads and remains hardware-unobserved. Exact previous v6 package
 retained; no automatic rollback. [Release evidence](../../evidence/lowering-v7-integration/README.md).
 Next: operator CH6 LOW stand-up and one CH11 trial, disarm and archive immediately.
+
+## 2026-09-20 — Successful v7 trial and faster supported return v8
+
+Austin reported both fast standing and laydown worked. Archived 1,759 rows /
+35.195 s from c442e12, schema7, ending lower_complete. Fast capture 2.890 s,
+return complete 5.131 s, recovery settled 6.871 s. Lowering took 14.109 s;
+supported descent took 11.370 s with at most 0.021/0.011 rad target error.
+Final tilt −2.818°, rate −0.455°/s, Forward error −0.027/+0.007 rad.
+The former stop gate completed in 0.479 s and contact support in 0.240 s.
+
+Source 47eb19a changes one motion parameter: supported target speed 0.16 to
+0.24 rad/s. Catch, all guards, motor cap and final landing remain unchanged.
+Final retraction already takes 0.740 s and approaches its body-rate guard;
+retained that speed. The same 329-case model retains 258 completions and all
+outcomes, with median 2.72 s saved among common successes. 12 native/38 Python,
+syntax and pinned build pass; final metadata indentation rebuild also passed.
+No other agent checkout edited. Fast and OTA owners informed; no added changes.
+
+Verified app-only OTA in app1 at 2026-09-20T22:12:58.795503+00:00, transfer 475.235 s. Application
+1,211,120 bytes, whole SHA 5dfd2201ac0a0d986325dfa913980467cdba47c7d53db7797db24149b188cb80,
+ESP digest 6b0b637e58e45c5f0b5c54521acdd81ab8d3f9ca56cd7d54311e56b8cbcc50d1. Exact image/slot, powered disabled health,
+fresh IMU, disarmed/released-maintenance state and identical successful log
+exports verified. One in-flight snapshot confirmed active OTA, maintenance, disabled motors and cleared RC/link input. The transmitter was linked before and after reboot. This is consistent with the installed UART suspension; the physical progress screen was not independently observed.
+No motion/settings/filesystem writes. Exact successful v7 rollback retained.
+[Release](../../evidence/lowering-v8-integration/README.md). Next: operator trial
+of faster supported return, disarm and archive before another attempt.

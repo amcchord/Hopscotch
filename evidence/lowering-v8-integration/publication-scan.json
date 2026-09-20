@@ -1,0 +1,10 @@
+{
+  "source_commit": "47eb19a2ce57f51eeea368c4c6469edd1cc51a96",
+  "outgoing_blobs": 24,
+  "secret_matches": 0,
+  "private_configuration_verified_in_frozen_image": true,
+  "secret_header_read_in_place": true,
+  "staged_files_checked": 16,
+  "staged_secret_matches": 0,
+  "changed_document_links_resolve": true
+}

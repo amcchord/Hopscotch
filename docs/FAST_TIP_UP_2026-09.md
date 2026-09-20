@@ -25,6 +25,8 @@ requires each rear wheel within 0.75 rad/s for the existing 120 ms dwell.
 [Trial, correction, tests and limitations](../evidence/fast-tip-up/roll-away-review/README.md).
 Installed in combined source `a772ecc`; see the [verified release](../evidence/lowering-v6-integration/README.md). The [next physical trial](../evidence/fast-tip-up/trial-v2-20260920/README.md) succeeded: upright capture at 2.885 s, arm return complete at 5.145 s and recovery settled at 6.926 s. Austin reported substantial wheel travel during the catch. The successful fast policy is retained unchanged in the next lowering/OTA update. This is one successful run, not a measured reliability rate; the approximate model remains sensitive to saved-trim error.
 
+The [following v7 physical run](../evidence/balance-lower/trial-v7-success-20260920/README.md) also succeeded: capture at 2.890 s, arm return complete at 5.131 s and recovery settled at 6.871 s, followed by successful lowering. Fast v2 remains unchanged in the faster-return v8 release.
+
 ## What the logs say
 
 Four September 20 traces take 8.823–8.834 seconds from their first tip-up sample
@@ -123,7 +125,7 @@ Source branch: `codex/fast-tip-up`, based on `400c98d` in
 `worktrees/fast-tip-up`. The active lowering task owns the device, shared
 progress records, combined validation and next OTA. Feature bit
 32768 identifies lowering v4 support; the combined feature flags are 65535.
-Lowering v5 uses schema 5, v6 uses schema 6, and v7 uses schema 7. Fast v2 production and metadata remain unchanged in schema 7.
+Lowering v5 uses schema 5, v6 uses schema 6, and v7 uses schema 7. Fast v2 production and metadata remain unchanged in schemas 7 and 8.
 The candidate's configured local build is for validation, not the combined
 release image. [Handoff evidence](../evidence/fast-tip-up/README.md) records
 checks and the exact integration procedure.
