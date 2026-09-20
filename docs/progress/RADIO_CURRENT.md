@@ -1,10 +1,11 @@
 # Radio telemetry — September 19, 2026
 
-## Ready to install — Lua v3
+## Installed — Lua v3, September 19 at 23:58 EDT
 
 Austin reported residual blanking and repeated Basic page content, and asked
-for an update prepared before reconnecting the radio. The candidate is ready
-in the radio worktree. No radio or robot was accessed during this change.
+for an update prepared before reconnecting the radio. The candidate was prepared
+in the radio worktree, then installed after Austin reattached the radio and
+explicitly requested copying it to the SD card. No robot firmware was changed.
 
 - Fixed the Basic fallback routing: overview, standard pose/power, unavailable
   motor details, observed events/run report, radio link and diagnostics each
@@ -20,16 +21,21 @@ in the radio worktree. No radio or robot was accessed during this change.
   missed-update regression, expiry/recovery, unknown/schema/duplicate handling,
   logger lifecycle/error/limit tests, CSV parser and rendered layouts passed.
   Radio runtime/storage timing and the physical RF path remain unverified.
-- Candidate `hop.lua`: 17,299 bytes, SHA-256
+- Installed `hop.lua` from source `9c5b88d`: 17,299 bytes, SHA-256
   `db6ca509d52780358728b18b4a59186e862c4e1195aed939415d566269e1da7f`.
   Prepared package: project-root `artifacts/radio-lua-v3-2026-09-19/`.
-- Last installed script remains the prior `c26027a` version below. When Austin
-  reconnects NO NAME, back up the currently installed Lua/bytecode, verify the
-  selected model still references hop, replace only hop.lua and remove hop.luac,
-  confirm LOGS exists, compare all MODELS/RADIO bytes, sync/readback/eject.
+- Verified the frozen package, source hash and NO NAME volume identity before
+  replacing `SCRIPTS/TELEMETRY/hop.lua`. Backed up the prior Lua, bytecode and
+  current configuration in `artifacts/radio-lua-v3-2026-09-19/install-20260920T035847Z/`
+  at the project root. Removed old `hop.luac`, verified LOGS already exists and
+  model00 still selects hop. Card syntax/readback passed after sync; all four
+  MODELS/RADIO files and two unrelated telemetry files were unchanged. Safe
+  eject succeeded. Logging remains OFF until enabled on Diagnostics.
 - Worktree remains `codex/radio-telemetry`; no edits to other branches, firmware,
-  SD/model configuration or channel mappings. Root integration belongs to its
-  current task owner. Next: invite radio attachment, then install this candidate.
+  model configuration or channel mappings. Root integration belongs to its
+  current task owner. Next: reboot the radio, open telemetry screen 2, verify
+  distinct pages and steady values. Page 6 shows LUA v3; hold ENTER there to
+  opt into a diagnostic CSV if needed. Hardware runtime/RF checks remain pending.
 
 ## Previous installed Lua update — 22:31 EDT
 
