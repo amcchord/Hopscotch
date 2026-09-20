@@ -74,3 +74,21 @@ The script validates fast-run flags, derives milestones from telemetry states
 and flags, excludes all later driving from catch metrics, and writes a reviewed
 plot. No new motion code was added; no duplicate firmware build was run. This
 task performed no robot calls, raw-log copying, settings writes or deployment.
+
+## Next combined release installed
+
+The integration owner installed source `c442e1271eaf9f38cfbeab27c2e435fe6b8e3eb3`
+in app0 at 21:36:50 UTC. It changes the lowering-only stationary handoff and
+contact/support confirmation, and includes the separate OTA progress/interlock
+work. The successful fast v2 source and capture call sites remain identical.
+[Installation and source-preservation verification](next-release-installation.json)
+confirms the exact image, all six powered motors online/error-free/disabled,
+released maintenance and the original 1,519-row CSV/wire unchanged.
+
+Focused review checked the new lower support dwell: both arms must have been
+independently detected for at least 80 ms of real elapsed time, with each support
+observation no older than 60 ms. A native single-impact probe with quiet arms
+and subsequently zero loads did not qualify support. Combined validation and
+deployment remained with the integration owner. Next: separate CH6 LOW stand-up,
+one CH11 lowering attempt, then disarm and archive before another run. This new
+lowering behavior still needs physical acceptance.
