@@ -1,0 +1,17 @@
+{
+  "installed_baseline": "8449ddb",
+  "combined_source": "e55cecb235728f874ea88cb81a50f7ad4628964d",
+  "existing_production_files_checked": 40,
+  "changed_existing_files": [
+    "src/balance_controller.cpp",
+    "src/balance_controller.h",
+    "src/balance_lower.h",
+    "src/config.h",
+    "src/main.cpp"
+  ],
+  "new_source": "src/balance_tip_up.h",
+  "unchanged_ground_standing_drive_radio_dashboard_network": true,
+  "fast_source_preserved": "3814f1f",
+  "lowering_policy_preserved": "f4fafc7",
+  "historical_v1_v2_v3_export_metadata_byte_identical": true
+}

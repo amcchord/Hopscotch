@@ -1,9 +1,9 @@
-# CH6 fast tip-up — next OTA candidate
+# CH6 fast tip-up — installed, physical trial pending
 
-September 20, 2026. This change is queued for integration with the lowering
-owner's next OTA. It has **not been tested on the robot or installed by this
-task**. The current installed source remains identified in the release owner's
-[current state](progress/CURRENT.md).
+September 20, 2026. Integrated with lowering v4 in source `e55cecb` and
+[installed by the release owner](../evidence/lowering-v4-fast-integration/README.md).
+The fast motion has not yet been physically tested. See [current state](progress/CURRENT.md)
+for the exact running image and trial sequence.
 
 ## What the logs say
 

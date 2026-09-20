@@ -333,3 +333,51 @@ a single-command, frozen-package fast update path. No autonomous motion,
 calibration/settings write, filesystem upload, secret copying or changes to
 other agents' checkouts. Next: transmitter-on disarmed gap/reinstall acceptance,
 then a restrained operator v3 trial with telemetry.
+
+## 2026-09-20 — Install continuous arm return and integrate CH6 fast tip-up
+
+Austin's v3 trial stopped upright supported by the arms; one CH12 press then
+brought it flat. Retrieved/validated 1,908 rows, 38.235 s from installed `8449ddb`.
+The recorded end was lower_wrong_direction, not successful completion. At first
+contact, outward arm velocity persisted into the next 20 ms frame despite a small
+target reversal, while body rate rebounded to +45.776 deg/s. Seeded pinned replay
+matches the fault; the manual CH12 action is outside the saved trace.
+
+Lowering checkpoint f4fafc7 changes the catch to continuous return toward Forward
+after two independent contacts, retaining a small one-arm retreat and sampled
+motion/health/deadline limits. Brief loaded rebound may settle while returning;
+measured flat/Forward remains mandatory for completion. Revised simulation uses
+actual policy motor-speed limits plus delay/acceleration sensitivities.329 paired
+cases:257→260 complete,7 improve/4 regress, all 11 injected failures reject
+completion. Stiff delayed impacts still fail and post-fault motion is not modeled.
+Native regressions cover the recorded input sequence and continued return.
+
+Coordinated the other active task's CH6 fast tip-up in its own checkout. Reviewed
+and merged `3814f1f` into combined e55cecb, resolving only feature-mask/adjacent
+metadata conflicts to 65535. Its 162 tracking cases reach quiet capture within
+2.74 s; this is not physical contact-dynamics validation. CH6 LOW preserves slow
+standing. Ground/standing drive, radio/dashboard/network and old log metadata
+are preserved. No other owner's checkout was edited.
+
+Combined 11-native/37-Python, syntax/whitespace, configured pinned build,
+radio/Lua, dashboard and OTA harness checks passed once. Frozen configured app
+is 1,203,520 bytes, whole-file SHA-256 6b648fbb0c584146954b7f02d9d34d2e5f24cd06be7965169fcf5f2d078ff808,
+ESP digest 62e38da80f1a6e61bb8ed1162c5bf4f83b280d0001d82469f500131dc96f7f42.
+Retained exact prior v3/v2/v5 packages for recovery and reused unchanged models.
+
+Installed into app0 and verified 2026-09-20 19:31:57UTC using normal updater
+checks, with transmitter on and an injected 4 s sender gap after 256 KiB. HTTP200
+arrived after 249.699 s;67 successful RC observations stayed fresh/disarmed,
+5 read-only monitor requests timed out. Exact digest/slot, powered disabled
+motor health, fresh IMU and released maintenance passed; 1,908-row CSV and wire
+were identical across OTA. No autonomous motion or settings/filesystem writes.
+The slower monitored throughput is recorded, without attributing a precise RF
+cause; normal deployment omits the gap/monitoring. Docs now permit transmitter-on
+updates while disarmed and retain transmitter-off as an observed faster option.
+
+[Release record](../../evidence/lowering-v4-fast-integration/README.md) contains
+manifest, source audit, validation and full deployment evidence. Notified the
+fast tip-up owner of inclusion and installation. Next: a restrained v4 lowering
+trial with CH6 LOW and no CH12 assist, then separate fast-standing test; archive
+telemetry before each subsequent run. Both physical motion acceptances remain
+pending despite successful OTA.

@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Current firmware:** The combined release includes [progressive braking v5](docs/BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](docs/GROUND_DRIVE_2026-09.md) and [experimental CH11 forward-fall/catch v3](docs/BALANCE_LOWER_V3_2026-09.md). Source `8449ddb` adds first-contact arm yielding, OTA transport version 2 and cooperative saved-log export. See [installed identity/evidence](evidence/ota-lowering-v3/README.md), [current state](docs/progress/CURRENT.md), [OTA operations](docs/WIFI_OTA.md) and [test procedure](docs/BALANCE_TESTING.md). Driving worked well in Austin's trial. Lowering v3 needs a restrained physical trial after the earlier v2 rebound.
+**Current firmware:** Installed source `e55cecb` combines [CH11 lowering v4](docs/BALANCE_LOWER_V4_2026-09.md), [CH6 fast tip-up](docs/FAST_TIP_UP_2026-09.md), the existing [standing drive](docs/BALANCE_DRIVE_BRAKING_2026-09.md) and [flat-ground drive](docs/GROUND_DRIVE_2026-09.md). V4 continues returning the arms after floor contact toward a measured level/Forward finish. CH6 high selects experimental fast standing; center/low preserves slow standing. Both new motions need restrained physical trials; use CH6 low to test lowering separately. [Installed identity/evidence](evidence/lowering-v4-fast-integration/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md). Transmitter-on OTA with a four-second receive gap passed; saved telemetry was preserved.
 
 Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
@@ -72,7 +72,7 @@ persisted robot mappings must be checked before a physical test.
 | Throttle | CH2 | Right stick Y |
 | Arm Speed | CH5 | SE |
 | Arm Nudge | CH4 | Input Rud |
-| Tip-up speed (next OTA candidate) | CH6 | SB; high = experimental fast, center/low = regular slow |
+| Tip-up speed | CH6 | SB; high = experimental fast, center/low = regular slow |
 | Balance Select | CH7 | SC |
 | Arms Arm/Disarm | CH9 | SA |
 | Drive Arm/Disarm | CH10 | SD |
@@ -86,7 +86,7 @@ standing-drive CH1/CH2 and arm-speed/nudge CH5/CH4 are fixed in firmware. Web
 configuration is disabled; use the USB console for supported configuration and
 diagnostics. Signal loss is detected if no valid CRSF frame arrives within 500 ms.
 
-The [CH6 fast tip-up candidate](docs/FAST_TIP_UP_2026-09.md) targets roughly
+The [CH6 fast tip-up](docs/FAST_TIP_UP_2026-09.md) targets roughly
 three seconds for lift/capture, with the usual CH11 trigger and unchanged slow
 mode. It is queued for the next combined OTA; physical timing remains untested.
 

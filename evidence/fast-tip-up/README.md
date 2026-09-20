@@ -1,6 +1,10 @@
 # Fast tip-up candidate handoff — September 20, 2026
 
-**Status: validated source candidate; queued for the lowering owner's next OTA.
+**Release status update:** source `3814f1f` was merged into `e55cecb` and
+[installed/verified](../lowering-v4-fast-integration/README.md). The handoff below
+records preparation history; fast motion remains physically untested.
+
+**Preparation status at handoff: validated source candidate; queued for the lowering owner's next OTA.
 No fast physical test or deployment was performed here.**
 
 Project/repository: Hopscotch. Task checkout `worktrees/fast-tip-up`, branch

@@ -1,0 +1,1705 @@
+{
+  "started_utc": "2026-09-20T19:27:05.000525+00:00",
+  "application": {
+    "application_bytes": 1203520,
+    "application_sha256": "6b648fbb0c584146954b7f02d9d34d2e5f24cd06be7965169fcf5f2d078ff808",
+    "esp_image_digest": "62e38da80f1a6e61bb8ed1162c5bf4f83b280d0001d82469f500131dc96f7f42"
+  },
+  "source_commit": "e55cecb235728f874ea88cb81a50f7ad4628964d",
+  "status": "installed_verified",
+  "motion_initiated": false,
+  "preflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 14:58:53",
+    "running_slot": "app1",
+    "image_sha256": "45e7a83cd649e4a1e5182058e3cfb9e4cc80fad4cda27be4a2c9f4465451ab11",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 166632,
+    "min_free_heap": 148736,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "preflight_state": {
+    "schema": 1,
+    "sequence": 79856,
+    "uptime_ms": 1557902,
+    "age_ms": 17,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -71,
+    "lq": 100,
+    "rc_age_ms": 1,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.508351,
+      "rate": -0.128348,
+      "setpoint": 91.83979,
+      "imu_age_us": 5620,
+      "fault": 0,
+      "end_reason": "lower_wrong_direction"
+    },
+    "power": {
+      "voltage": 22.70271,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 1.028341,
+        "vel": 0.016022,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 135
+      },
+      {
+        "id": 20,
+        "pos": 52.49858,
+        "vel": 0.016022,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 115
+      },
+      {
+        "id": 30,
+        "pos": 9.217788,
+        "vel": 0.031281,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 95
+      },
+      {
+        "id": 40,
+        "pos": -4.809554,
+        "vel": 0.040436,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 75
+      },
+      {
+        "id": 1,
+        "pos": 3.910386,
+        "vel": 0.036758,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 2,
+        "pos": 3.552048,
+        "vel": -0.060928,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      1185
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 211104,
+        "max_us": 5501,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 211104,
+        "max_us": 6039,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 168384,
+    "min_free_heap": 148736,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -51,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 3707,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "saved_run_before": {
+    "samples": 1908,
+    "csv_sha256": "45bc5962c7b41b094788be198724a5b9ddc51a7bcdc360a5a87f75bfbfac29d4",
+    "wire_sha256": "089ef134491e79f4e58d9f42e0dda40ef4c68dee4e560acc6c7d0e46b4844fb3"
+  },
+  "transfer": {
+    "chunk_bytes": 1024,
+    "interval_seconds": 0.05,
+    "timeout_seconds": 120,
+    "tcp_nodelay": true,
+    "status": 200,
+    "response": "Firmware verified; rebooting",
+    "sent_bytes": 1203716,
+    "seconds": 249.699,
+    "transmitter_on_preflight": true,
+    "rc_snapshots": [
+      {
+        "uptime_ms": 1584452,
+        "age_ms": 16,
+        "link_up": true,
+        "rc_age_ms": 1,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": false,
+        "ota": {
+          "active": false,
+          "received_bytes": 0,
+          "expected_bytes": 0,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1586662,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 39782,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1591812,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 55978,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1596977,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 74942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1600757,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 94142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1604972,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 110942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1608777,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 132542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "request_error": "timed out"
+      },
+      {
+        "uptime_ms": 1617387,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 157742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1621307,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 173342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1623462,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 179342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1625517,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 180542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1627877,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 181742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1631707,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 203342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1636232,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 218942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1640247,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 245342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1645437,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 268142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1649537,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 296942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1653552,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 329342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "request_error": "timed out"
+      },
+      {
+        "uptime_ms": 1663412,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 343742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1665672,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 343742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1667827,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 344942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1669987,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 344942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1673892,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 362942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1677277,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 378542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1681437,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 413342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1685147,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 431342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1688697,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 466142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "request_error": "<urlopen error timed out>"
+      },
+      {
+        "uptime_ms": 1697537,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 509342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1700302,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 526142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1702362,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 526142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1704627,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 527342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "request_error": "timed out"
+      },
+      {
+        "uptime_ms": 1714342,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 584942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1718637,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 612542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1720897,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 625742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1723057,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 626942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1727982,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 641342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1732797,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 660542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1735572,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 672542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1739272,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 673742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1741732,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 674942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1743997,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 676142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1746467,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 683342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1749347,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 684542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1751402,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 685742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1755612,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 698942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1759722,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 713342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1762032,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 726542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1764507,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 752942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1768617,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 780542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1772402,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 797342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1776417,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 811742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1781547,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 836942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1783702,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 838142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1786277,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 839342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1789772,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 847742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1793367,
+        "age_ms": 5,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 883742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1796037,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 917342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1799227,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 938942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1801282,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 940142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1804282,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 966542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1807222,
+        "age_ms": 2,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 991742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1809902,
+        "age_ms": 3,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1009742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1813917,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1027742,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1818127,
+        "age_ms": 1,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1049342,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "request_error": "timed out"
+      },
+      {
+        "uptime_ms": 1827292,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1106942,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1830092,
+        "age_ms": 4,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1150142,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      },
+      {
+        "uptime_ms": 1832982,
+        "age_ms": 6,
+        "link_up": true,
+        "rc_age_ms": 0,
+        "drive_armed": false,
+        "arm_armed": false,
+        "maintenance": true,
+        "ota": {
+          "active": true,
+          "received_bytes": 1176542,
+          "expected_bytes": 1203520,
+          "last_failure": "",
+          "failed_bytes": 0,
+          "failed_idle_ms": 0
+        }
+      }
+    ],
+    "gap_injected": true,
+    "gap_seconds": 4,
+    "gap_after_body_bytes": 262144
+  },
+  "postflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 15:25:52",
+    "running_slot": "app0",
+    "image_sha256": "62e38da80f1a6e61bb8ed1162c5bf4f83b280d0001d82469f500131dc96f7f42",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 178700,
+    "min_free_heap": 175464,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "postflight_state": {
+    "schema": 1,
+    "sequence": 399,
+    "uptime_ms": 4162,
+    "age_ms": 4,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -79,
+    "lq": 100,
+    "rc_age_ms": 1,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.353088,
+      "rate": -0.030812,
+      "setpoint": 82.1,
+      "imu_age_us": 753,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 22.66762,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": -0.026703,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 115
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0.035858,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 95
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0.025177,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 75
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": -0.040436,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0.037766,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0.009567,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      976
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 0,
+        "max_us": 0,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 0,
+        "max_us": 0,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 178600,
+    "min_free_heap": 175464,
+    "free_psram": 6930595,
+    "wifi": {
+      "connected": true,
+      "rssi": -51,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 0,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "saved_run_after": {
+    "samples": 1908,
+    "csv_sha256": "45bc5962c7b41b094788be198724a5b9ddc51a7bcdc360a5a87f75bfbfac29d4",
+    "wire_sha256": "089ef134491e79f4e58d9f42e0dda40ef4c68dee4e560acc6c7d0e46b4844fb3"
+  },
+  "final_state": {
+    "schema": 1,
+    "sequence": 1496,
+    "uptime_ms": 15027,
+    "age_ms": 9,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -77,
+    "lq": 97,
+    "rc_age_ms": 0,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.360025,
+      "rate": -0.018573,
+      "setpoint": 82.1,
+      "imu_age_us": 716,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 22.66762,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": -0.032806,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 95
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0.000763,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 75
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": -0.029755,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": -0.01297,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0.041794,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0.055893,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 154
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      1007
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 1371,
+        "max_us": 5477,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 1371,
+        "max_us": 5795,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 178328,
+    "min_free_heap": 159168,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -51,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 0,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "completed_utc": "2026-09-20T19:31:57.759072+00:00",
+  "transmitter_on_acceptance": {
+    "transmitter_on_during_upload": true,
+    "motors_disarmed_throughout": true,
+    "transmitter_on_after_reboot": true,
+    "receive_gap_survived": true,
+    "saved_run_unchanged": true,
+    "snapshot_count": 67,
+    "passed": true
+  }
+}

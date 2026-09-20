@@ -1,6 +1,6 @@
 # OTA transport reliability — September 20, 2026
 
-This networking candidate follows the [verified lowering-v2 deployment](../evidence/ota-lowering-v2/README.md).
+The installed networking update follows the [verified lowering-v2 deployment](../evidence/ota-lowering-v2/README.md).
 Two transmitter-on uploads disconnected without an ESP reboot; the same paced
 upload succeeded with the transmitter off. That pattern suggests contention,
 but does not establish RF interference or a particular library timeout as the
@@ -14,7 +14,7 @@ without received data. Increasing only the desktop client's 120-second timeout
 does not change this server limit. Hopscotch already has a separate 15-second
 OTA inactivity watchdog.
 
-The candidate changes only the networking implementation:
+The networking update changes only the networking implementation:
 
 - After authentication, maintenance grant and application-header validation,
   an upload receives a 20-second TCP receive timeout, a 15-second ACK timeout
@@ -54,12 +54,17 @@ harness and radio/dashboard checks. Freeze the configured binary and manifest;
 do not copy the private header or reuse an example-credential binary. No
 lowering-model rerun is needed when motion sources are byte-identical.
 
-Hardware reliability with the transmitter on is **not yet verified**. Coordinate
-a disarmed device window with the lowering task and Austin before uploading.
-Install this candidate through the existing verified procedure; the currently
-installed old transport may still require the transmitter off. Then test a full
-application upload with the transmitter on, including a deliberate four-second
-receive gap, verifying the resulting slot/digest, disarmed health and saved-run
-preservation. That validation requires an explicit reinstall; the normal CLI
-correctly skips an already-installed image. Retain the old exact application for
-recovery. Update the routine transmitter guidance only after hardware evidence.
+Hardware acceptance passed in the [combined v4/fast-tip-up update](../evidence/lowering-v4-fast-integration/README.md):
+transmitter on, four-second deliberate receive gap after 256 KiB, HTTP 200,
+expected app0 digest, healthy disarmed reboot, and identical 1,908-row saved-run
+CSV/wire. All 67 successful RC observations were fresh and disarmed; five
+read-only monitor requests timed out. Transfer took 249.699 seconds. This is one
+successful trial, not proof against all RF conditions; the monitored workload
+and deliberate pause differ from routine deployment. Transmitter-off previously
+took about 63 seconds. Ordinary updates reuse the same paced helper without
+monitoring/gap injection or a redundant reinstall.
+
+The old long-log exporter separately caused a task-watchdog reset before an
+upload. Installed source `8449ddb` fixed this with cooperative checksum/CSV work
+and longer eligible download timeouts, preserving the filesystem and recovering
+the log. That fix remains in the new combined image.

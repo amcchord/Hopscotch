@@ -1,0 +1,17 @@
+{
+  "status": "queued_not_installed",
+  "prepared_utc": "2026-09-20T19:27:04.878965+00:00",
+  "source_commit": "e55cecb235728f874ea88cb81a50f7ad4628964d",
+  "application_bytes": 1203520,
+  "application_sha256": "6b648fbb0c584146954b7f02d9d34d2e5f24cd06be7965169fcf5f2d078ff808",
+  "esp_image_digest": "62e38da80f1a6e61bb8ed1162c5bf4f83b280d0001d82469f500131dc96f7f42",
+  "features": 65535,
+  "schema": 4,
+  "sample_bytes": 240,
+  "private_configuration_verified": true,
+  "secret_header_copied": false,
+  "package_path": "worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/",
+  "rollback_package_path": "worktrees/balance-lower/artifacts/lowering-v3-export/candidate/",
+  "rollback_source": "8449ddb5758d60d6b3b3e84702bef4d386b06791",
+  "rollback_esp_digest": "45e7a83cd649e4a1e5182058e3cfb9e4cc80fad4cda27be4a2c9f4465451ab11"
+}

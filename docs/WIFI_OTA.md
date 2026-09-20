@@ -9,7 +9,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/ota-lowering-v3/README.md) records
+[latest deployment evidence](../evidence/lowering-v4-fast-integration/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -169,18 +169,19 @@ package for recovery.
 
 1. Support the robot, disarm both groups, lower both arm switches and release
    CH11. Motor power may stay on when the robot is safely supported and all
-   motors are disabled; cycling power is not a routine OTA requirement. For the
-   bootstrap from old transport, switch the transmitter off during upload.
-   Installed source `8449ddb` includes transport version 2; transmitter-on
-   hardware acceptance is still pending. Use transmitter-off until that record
-   is complete.
+   motors are disabled; cycling power is not a routine OTA requirement. The transmitter may remain on with both arm switches LOW and fresh
+   disarmed status. A full transmitter-on update, including a four-second receive
+   gap, passed with transport version 2. That monitored transfer took 250 seconds
+   versus about 63 seconds for the earlier transmitter-off transfer; switching
+   it off remains an option when speed matters. The exact throughput cause is
+   unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 lowering-v3/export-fix package, from the project root:
+   September 20 lowering-v4/fast-tip-up package, from the project root:
 
    ```bash
    python3 scripts/robot_wifi.py --host http://192.168.1.172 ota \
-     worktrees/balance-lower/artifacts/lowering-v3-export/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v3-export/candidate/manifest.json
+     worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/manifest.json
    ```
 
    The helper verifies file size, whole-file hash and ESP digest, checks fresh
@@ -188,14 +189,15 @@ package for recovery.
    transfers the application with 1 KiB/50 ms pacing and a 120-second socket
    timeout. It verifies the new running digest/slot, fresh IMU, disarmed state,
    return of previously online motors without errors, and identical saved-run
-   exports. The transfer itself takes about 63 seconds for this image. There
-   is no separate manual status/log/download loop to repeat.
+   exports. The observed transfer range is about one minute with the transmitter off
+   to four minutes in the monitored transmitter-on test. There is no separate
+   manual status/log/download loop to repeat. Gap injection and concurrent status
+   monitoring are acceptance tests, not routine deployment steps.
 3. Wait for the final verified report. The helper saves state, transfer outcome
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
-   Preserve the record and update shared release state once. Turn the transmitter
-   back on and observe both arm switches low before any authorized motion test.
-   Check [current trial status](progress/CURRENT.md) first; v3 lowering is ready
+   Preserve the record and update shared release state once. If the transmitter was off, turn it back on; observe both arm switches low before any authorized motion test.
+   Check [current trial status](progress/CURRENT.md) first; v4 lowering is ready
    for a restrained manual trial and is not yet physically validated.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.
@@ -260,15 +262,17 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The [September 20 deployment record](../evidence/ota-lowering-v2/README.md)
-contains the exact installed v2 identity, interrupted attempts and preserved
-run hashes. The original release manifest remains a preparation record marked
-`queued_not_installed`; the separate deployment record establishes installation.
+The [current combined deployment record](../evidence/lowering-v4-fast-integration/README.md)
+identifies the installed image and transmitter-on/gap test, including unchanged
+saved-run hashes. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
+retains the old transport's interrupted attempts and transmitter-off success.
+Frozen manifests record preparation; deployment records establish installation.
 
-A separate [OTA reliability candidate](OTA_RELIABILITY_2026-09.md) extends the
-upload socket's short receive timeout and pauses dashboard streaming during
-uploads. Transmitter-on hardware validation is pending; keep the demonstrated
-transmitter-off procedure until the installed transport is verified.
+[OTA transport version 2](OTA_RELIABILITY_2026-09.md) extends the upload socket's
+receive timeout and pauses dashboard streaming during uploads. Its first
+transmitter-on hardware acceptance passed. The slower measured throughput and
+read-only monitor timeouts are retained in the evidence; one test does not
+establish reliability in all RF conditions.
 
 ## HTTP and WebSocket API
 
@@ -317,7 +321,7 @@ The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
 The current frozen application package is
-`worktrees/balance-lower/artifacts/lowering-v3-export/candidate/` from the project
+`worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/` from the project
 root. The previous combined driving/v1-lowering application remains at
 `worktrees/drive-braking/artifacts/drive-braking-v5/release/`; its driving was
 reported good, but its lowering failed. The older Wi-Fi application at `artifacts/wifi-ota/release/` is the

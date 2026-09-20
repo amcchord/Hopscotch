@@ -1,5 +1,9 @@
 # CH11 lowering v3: first-impact yielding
 
+**Historical:** the v3 physical trial stopped upright on loaded arms; see
+[v4 continuous return](BALANCE_LOWER_V4_2026-09.md) and the
+[trial record](../evidence/balance-lower/trial-v3-20260920/README.md).
+
 The installed combined image is source `8449ddb`, with the lowering fix, OTA
 transport update and cooperative log export. See the
 [deployment record](../evidence/ota-lowering-v3/README.md),
