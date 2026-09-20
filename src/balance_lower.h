@@ -24,15 +24,16 @@ struct LowerInput {
 };
 
 struct LowerConfig {
-    float prepare_rad = 1.30f, prepare_speed = .25f;
+    float prepare_rad = 1.25f, prepare_speed = .25f;
     float catch_rad = 2.40f, catch_speed = 1.5f;
     float lower_speed = .16f, retract_speed = .30f;
-    float catch_yield = .06f, catch_yield_speed = .12f;
+    float catch_yield = .06f, catch_yield_speed = .5f;
     float max_target_lead = .12f;
     float contact_torque = .40f;
-    float launch_accel = 4.0f, launch_speed = 2.0f; // rear rad/s^2 and rad/s
+    float launch_accel = 2.0f, launch_speed = 2.0f; // rear rad/s^2 and rad/s
     float wheel_stop_accel = .75f;
     float forward_drop = 1.f, forward_rate = 2.f, launch_rate = 6.f;
+    float catch_start_drop = .1f;
     float calm_wheel = .65f, calm_rate = 4, calm_error = 2;
     float descent_rate = 12, abort_rate = 65, abort_wheel = 3;
     float flat_angle = 5, flat_rate = 5;
@@ -143,7 +144,7 @@ public:
                 fail("lower_wrong_direction"); break;
             }
             _peak_fall_rate = std::min(_peak_fall_rate, in.rate);
-            if (!_catch_started && in.rate <= -1.f && in.tilt < _launch_tilt) {
+            if (!_catch_started && in.rate <= -1.f && in.tilt <= _launch_tilt - c.catch_start_drop) {
                 _catch_started = true; _catch_start_ms = now;
             }
             if (_phase == LowerPhase::Committing) {
@@ -157,16 +158,24 @@ public:
             const bool seek_load = _catch_started && now - _catch_start_ms >= 100; // exclude the initial arm acceleration impulse
             const bool left_load = seek_load && loaded(in.arm_left, in.velocity_left, in.torque_left, _sign_left, c);
             const bool right_load = seek_load && loaded(in.arm_right, in.velocity_right, in.torque_right, _sign_right, c);
-            // Remove preload independently when an arm is loaded. Never drive
-            // a stopped arm farther through the floor to seek a tracking stall.
-            if (!_left_touched && left_load) { _left = _touch_left = in.arm_left; _left_touched = true; }
-            if (!_right_touched && right_load) { _right = _touch_right = in.arm_right; _right_touched = true; }
-            if (_catch_started && !_left_touched) _left = approach(_left, -_sign_left*c.catch_rad, in.arm_left, c.catch_speed*dt, c.max_target_lead);
-            if (_catch_started && !_right_touched) _right = approach(_right, -_sign_right*c.catch_rad, in.arm_right, c.catch_speed*dt, c.max_target_lead);
-            // Yield a bounded few degrees after both impacts so an early
-            // catch can accept forward weight instead of jacking the body up.
-            // Stop yielding during fast descent; this is not a timed release.
-            if (_left_touched && _right_touched && in.rate >= -c.descent_rate) {
+            // V2 kept the other arm advancing after first impact and delayed
+            // yielding until both arms slowed. The measured rebound took one
+            // more frame. Stop BOTH strokes on first load, while retaining
+            // independent contact latches: one arm still cannot prove support.
+            if ((left_load || right_load) && !_left_touched && !_right_touched) {
+                _left = _touch_left = in.arm_left;
+                _right = _touch_right = in.arm_right;
+            }
+            if (left_load) _left_touched = true;
+            if (right_load) _right_touched = true;
+            if (_catch_started && !_left_touched && !_right_touched) {
+                _left = approach(_left, -_sign_left*c.catch_rad, in.arm_left, c.catch_speed*dt, c.max_target_lead);
+                _right = approach(_right, -_sign_right*c.catch_rad, in.arm_right, c.catch_speed*dt, c.max_target_lead);
+            }
+            // Absorb measured impact/deceleration immediately with a bounded
+            // retreat. Do not yield a still-accelerating unsupported fall, and
+            // never restart the travel budget when the second arm touches.
+            if ((_left_touched || _right_touched) && in.rate >= _peak_fall_rate + 1.f) {
                 _left = approach(_left, _touch_left + _sign_left*c.catch_yield,
                                  in.arm_left, c.catch_yield_speed*dt, c.max_target_lead);
                 _right = approach(_right, _touch_right + _sign_right*c.catch_yield,

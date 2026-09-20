@@ -55,6 +55,8 @@ class Model:
     initial_speed: float = 0
     floor: bool = True
     right_contact: bool = True
+    right_servo_scale: float = 1.0
+    right_floor_height: float = 0.0
     stale_at: float = 1e9
     stale_phase: int = -1
     slip_at: float = 1e9
@@ -85,12 +87,12 @@ class Policy:
         self.lib.lower_reason.restype = C.c_char_p
 
 
-def support_angle(q, m):
+def support_angle(q, m, floor_height=0.):
     a, b = m.pivot+m.arm*math.cos(q), m.arm*math.sin(q)
     radius = math.hypot(a,b)
     if radius <= m.wheel_radius:
         return None
-    return (-math.asin(m.wheel_radius/radius)-math.atan2(b,a))/RAD
+    return (-math.asin((m.wheel_radius-floor_height)/radius)-math.atan2(b,a))/RAD
 
 
 def simulate(policy,m,name):
@@ -162,6 +164,7 @@ def simulate(policy,m,name):
                     # of the arm and no omission of body reaction in preparation.
                     deflection=signs[j]*contact_torque[j]/m.joint_stiffness
                     servo=clamp((target+deflection-arms[j])/m.servo_tau,-m.servo_limit,m.servo_limit)
+                    if j==1:servo*=m.right_servo_scale
                     arms[j]+=servo*dt
                     if m.jam and arms[j]*signs[j]<-1.6: arms[j]=-1.6*signs[j]
                 rates=[(a-b)/dt for a,b in zip(arms,prior_arms)]
@@ -178,9 +181,10 @@ def simulate(policy,m,name):
                 ground_present=m.floor and t<m.slip_at and (contact_time is None or t-contact_time<m.slip_after_catch)
                 contact_torque=[0.,0.]
                 for j in range(2):
-                    support=support_angle(arms[j]*signs[j],m)
+                    height=m.right_floor_height if j==1 else 0.
+                    support=support_angle(arms[j]*signs[j],m,height)
                     if ground_present and (j==0 or m.right_contact) and support is not None and support>theta:
-                        prior_support=support_angle(prior_arms[j]*signs[j],m)
+                        prior_support=support_angle(prior_arms[j]*signs[j],m,height)
                         support_rate=(support-prior_support)/dt if prior_support is not None else 0.
                         # Floor approach velocity includes the moving arm. The
                         # previous body-rate-only damping omitted the arm's ram
@@ -226,6 +230,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,default=ROOT/'output/lowering-catch')
     parser.add_argument('--nominal-only',action='store_true')
+    parser.add_argument('--baseline-ref',help='Also screen a pinned historical policy through the SAME model/cases')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
     policy=Policy();base=Model()
     cases=[('nominal',base)]
@@ -244,10 +249,23 @@ def main():
                 [160,320],[.03,.08],[0,1],[0,.03,.06]):
             cases.append((f'sweep_{len(cases)}',replace(base,pivot=geometry[0],arm=geometry[1],
                 gravity=plant[0],wheel_coupling=plant[1],stiffness=stiffness,servo_tau=tau,nonlinear_com=com,arm_inertia_ratio=inertia)))
+        # Trial-informed sensitivities, not an identified or validated plant:
+        # q~1.92 at tilt~82.5 constrains a family of contact geometries; a noisy
+        # single-run departure fit suggests gravity coefficient ~27, versus the
+        # earlier unmeasured 8.82. Include stiff/soft and asymmetric contact.
+        rebound=replace(base,pivot=.086,equilibrium=84.62,gravity=27,wheel_coupling=7,
+                        arm_inertia_ratio=.015,joint_stiffness=100,stiffness=1200)
+        cases += [('trial_rebound_stress',rebound),
+                  ('trial_uneven_floor',replace(rebound,right_floor_height=.01)),
+                  ('trial_asymmetric_servo',replace(rebound,right_servo_scale=.8))]
+        for geometry,gravity,stiffness,joint,damping in itertools.product(
+                [(.076,.28),(.086,.30),(.096,.32)],[18,24,27],[240,1200],[25,100],[.2,.8]):
+            cases.append((f'impact_sweep_{len(cases)}',replace(rebound,pivot=geometry[0],arm=geometry[1],
+                gravity=gravity,stiffness=stiffness,joint_stiffness=joint,damping_ratio=damping)))
     results=[]
     for name,model in cases:
         result,trace=simulate(policy,model,name);results.append(result)
-        if not name.startswith('sweep_'):
+        if not name.startswith(('sweep_','impact_sweep_')):
             with (args.output/(name+'.csv')).open('w') as stream:
                 writer=csv.writer(stream);writer.writerow(['time_s','tilt_deg','rate_dps','arm_l','arm_r',
                     'target_l','target_r','torque_l','torque_r','phase','committed','wheel_rad_s','setpoint',
@@ -258,8 +276,24 @@ def main():
     assert results[0]['outcome']=='lower_complete',results[0]
     for r in results:
         assert r['peak_target_lead_rad']<=.1201,r
-        if r['name'] not in ('nominal','high_inertia_limit') and not r['name'].startswith('sweep_'):
+        if r['name'] not in ('nominal','high_inertia_limit') and not r['name'].startswith(('sweep_','trial_','impact_sweep_')):
             assert r['outcome']!='lower_complete',r
+    if args.baseline_ref:
+        folder=args.output/'baseline';folder.mkdir(exist_ok=True)
+        (folder/'balance_lower.h').write_bytes(subprocess.check_output(
+            ['git','show',args.baseline_ref+':src/balance_lower.h'],cwd=ROOT))
+        baseline=Policy(folder);old=[]
+        for name,model in cases:
+            result,trace=simulate(baseline,model,name);old.append(result)
+            if name in ('nominal','trial_rebound_stress','trial_uneven_floor','trial_asymmetric_servo'):
+                with (folder/(name+'.csv')).open('w') as stream:
+                    writer=csv.writer(stream);writer.writerow(['time_s','tilt_deg','rate_dps','arm_l','arm_r',
+                        'target_l','target_r','torque_l','torque_r','phase','committed','wheel_rad_s','setpoint',
+                        'wheel_request','supported']);writer.writerows(trace)
+        (folder/'results.json').write_text(json.dumps(dict(source=args.baseline_ref,results=old),indent=2)+'\n')
+        paired=[dict(name=a['name'],before=a['outcome'],after=b['outcome'],
+                     before_peak_rate=a['peak_rate_dps'],after_peak_rate=b['peak_rate_dps']) for a,b in zip(old,results)]
+        (args.output/'comparison.json').write_text(json.dumps(paired,indent=2)+'\n')
 
 
 if __name__=='__main__':main()

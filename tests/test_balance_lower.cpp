@@ -24,13 +24,13 @@ struct Rig {
         prepare();
         for(int i=0;i<400 && !lower.committed();++i) tick();
         assert(lower.phase()==LowerPhase::Committing && lower.committed() && !lower.supported());
-        assert(in.arm_left<=-1.26f && in.arm_right>=1.26f);
+        assert(in.arm_left<=-1.21f && in.arm_right>=1.21f);
     }
     void fall() {
         commit();
-        in.tilt-=.1f; in.rate=-1.1f; tick();
+        in.tilt-=.2f; in.rate=-1.1f; tick();
         in.tilt-=1.1f; in.rate=-8;
-        for(int i=0;i<22;++i) tick();
+        for(int i=0;i<27;++i) tick();
         assert(lower.phase()==LowerPhase::Catching && !lower.supported());
         assert(lower.wheelCommand()<0 && lower.wheelCommand()>=-2);
     }
@@ -67,8 +67,9 @@ int main() {
       Rig r; r.commit(); const float prepared=r.lower.left();
       for(int i=0;i<10;++i) r.tick();
       assert(r.lower.left()==prepared && r.lower.wheelCommand()<0);
-      r.in.tilt-=.1f; r.in.rate=-1.1f; r.tick();
-      assert(r.lower.left()<prepared); }
+      r.in.tilt-=.049f; r.in.rate=-1.579f; r.tick();
+      assert(r.lower.left()==prepared); // recorded v2 premature trigger
+      r.in.tilt-=.2f; r.tick(); assert(r.lower.left()<prepared); }
     { // Pause preparation as soon as wheels cease being quiet; do not keep
       // advancing the arm-scheduled balance target through a growing drift.
       Rig r; r.prepare(); r.tick(); const float held=r.lower.left();
@@ -98,8 +99,21 @@ int main() {
     { // Hold an arm at the first impact. Do not require it to stall with a
       // growing target error or keep pushing it through the floor.
       Rig r; r.fall(); r.in.torque_left=.8f; r.in.velocity_left=.4f; r.in.rate=-6; r.tick();
-      float held=r.lower.left(); r.in.torque_left=.3f;
-      for(int i=0;i<5;++i) r.tick(); assert(r.lower.left()==held); }
+      float left=r.lower.left(),right=r.lower.right(); r.in.torque_left=.3f;
+      for(int i=0;i<10;++i) r.tick();
+      assert(r.lower.left()>=left && r.lower.left()<=left+.061f);
+      assert(r.lower.right()<=right && r.lower.right()>=right-.061f);
+      assert(!r.lower.supported()); } // One loaded arm cannot qualify support.
+    { // Regression: measured first v2 impact. Right load was just under 0.4Nm;
+      // it must stop advancing with the left rather than pushing another frame.
+      Rig r; r.fall(); r.in.tilt=82.511f; r.in.rate=-38.43f; r.tick(false);
+      r.in.arm_left=-1.922f; r.in.arm_right=1.912f;
+      r.in.velocity_left=-1.31f; r.in.velocity_right=1.349f;
+      r.in.torque_left=-.525f; r.in.torque_right=.385f; r.in.rate=-28.789f;
+      r.tick(false);
+      assert(r.lower.left()>=r.in.arm_left && r.lower.left()<=r.in.arm_left+.061f);
+      assert(r.lower.right()<=r.in.arm_right && r.lower.right()>=r.in.arm_right-.061f);
+      assert(!r.lower.supported()); }
     { Rig r; r.commit(); r.in.tilt+=3; r.tick();
       assert(r.lower.phase()==LowerPhase::Fault && !r.lower.supported());
       assert(std::strcmp(r.lower.reason(),"lower_wrong_direction")==0); }
