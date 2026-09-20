@@ -1,0 +1,106 @@
+{
+  "source": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260920_forward_catch_v6_wifi.csv",
+  "source_sha256": "eb4455fcb12291c111761d5bfe15daac550bb44014af3b84f588ea78e44e4e9e",
+  "installed_source": "a772ecc833c6100f76cdb67173bdaf4f4d99cd78",
+  "rows": 1519,
+  "duration_s": 30.37,
+  "end_reason": "lower_wrong_direction",
+  "operator_report": "Fast tip worked with substantial catch travel; later manually settled oscillations before lowering.",
+  "events": {
+    "capture": {
+      "t_ms": 2885.0,
+      "roll": 82.885,
+      "roll_rate": -0.063,
+      "meas_drift": 0.0,
+      "arm_tip_frac": 1.0,
+      "vel_integral": 0.0,
+      "run_curve_shift": 0.0,
+      "capture_shift": 0.0
+    },
+    "arm_return": {
+      "t_ms": 3326.0,
+      "roll": 82.892,
+      "roll_rate": -0.105,
+      "meas_drift": -0.0,
+      "arm_tip_frac": 1.0,
+      "vel_integral": 0.0,
+      "run_curve_shift": 0.0,
+      "capture_shift": -2.43
+    },
+    "arm_base_ramp_complete": {
+      "t_ms": 5145.0,
+      "roll": 89.047,
+      "roll_rate": 1.571,
+      "meas_drift": 1.059,
+      "arm_tip_frac": 0.03,
+      "vel_integral": 1.6122,
+      "run_curve_shift": 0.0,
+      "capture_shift": -0.0
+    },
+    "recovery_settled": {
+      "t_ms": 6926.0,
+      "roll": 87.054,
+      "roll_rate": -1.128,
+      "meas_drift": -2.575,
+      "arm_tip_frac": 0.0,
+      "vel_integral": -0.0233,
+      "run_curve_shift": 0.0,
+      "capture_shift": -0.0
+    },
+    "pilot_ready": {
+      "t_ms": 8385.0,
+      "roll": 87.416,
+      "roll_rate": -0.208,
+      "meas_drift": -1.935,
+      "arm_tip_frac": 0.0,
+      "vel_integral": 0.1346,
+      "run_curve_shift": 0.0,
+      "capture_shift": -0.0
+    },
+    "intentional_drive": {
+      "t_ms": 10185.0,
+      "roll": 87.402,
+      "roll_rate": -0.266,
+      "meas_drift": -1.958,
+      "arm_tip_frac": 0.0,
+      "vel_integral": 0.1498,
+      "run_curve_shift": 0.0,
+      "capture_shift": -0.0
+    },
+    "lower_request": {
+      "t_ms": 16745.0,
+      "roll": 87.345,
+      "roll_rate": 0.677,
+      "meas_drift": 8.739,
+      "arm_tip_frac": 0.0,
+      "vel_integral": 0.0663,
+      "run_curve_shift": 0.0,
+      "capture_shift": -0.0
+    }
+  },
+  "fast_metrics": {
+    "tip_to_capture_s": 2.884,
+    "capture_to_ramp_complete_s": 2.26,
+    "capture_to_recovery_settled_s": 4.041,
+    "maximum_forward_wheel_position_rad": 1.864,
+    "minimum_reverse_wheel_position_rad": -2.635,
+    "maximum_forward_common_speed_rad_s": 2.9145,
+    "minimum_reverse_common_speed_rad_s": -4.7844999999999995,
+    "maximum_recovery_integral_deg": 1.779,
+    "steady_window_ms": [
+      7445.0,
+      10165.0
+    ],
+    "steady_wheel_position_range_rad": 0.2939999999999998,
+    "steady_tilt_range_deg": [
+      87.233,
+      87.469
+    ]
+  },
+  "decision": "Preserve successful fast v2 production policy for the lowering/drive-handoff correction.",
+  "limits": [
+    "Wheel radians are not ground displacement; effective tire radius and slip are unmeasured.",
+    "One operator-confirmed successful stand-up does not establish a success rate.",
+    "Later intentional driving and manual settling are excluded from fast-catch metrics."
+  ]
+}
