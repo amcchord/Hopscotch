@@ -1,0 +1,331 @@
+{
+  "duration_s": 120,
+  "mode": "normal",
+  "nonreading_websocket_client": false,
+  "websocket_frames": [
+    461
+  ],
+  "max_frame_gap_ms": [
+    2870
+  ],
+  "http_requests": 66,
+  "rc_age_max_ms": 2456,
+  "rc_lq_min": 0,
+  "imu_age_max_us": 8425,
+  "observed_min_heap": 162436,
+  "errors": [
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "RC or IMU fault",
+    "Unexpected armed/active state; stopped load",
+    "Unexpected armed/active state; stopped load",
+    "Unexpected armed/active state; stopped load",
+    "Unexpected armed/active state; stopped load",
+    "Unexpected armed/active state; stopped load"
+  ],
+  "transport_errors": [],
+  "reconnects": 0,
+  "before": {
+    "schema": 1,
+    "sequence": 17020,
+    "uptime_ms": 343739,
+    "age_ms": 11,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -88,
+    "lq": 95,
+    "rc_age_ms": 0,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -3.055566,
+      "rate": 0.048996,
+      "setpoint": 82.1,
+      "imu_age_us": 683,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1729,
+      709
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 67748,
+        "max_us": 5501,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 67748,
+        "max_us": 5916,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 178460,
+    "min_free_heap": 105132,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -41,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 4672
+  },
+  "after": {
+    "schema": 1,
+    "sequence": 21718,
+    "uptime_ms": 439444,
+    "age_ms": 12,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": true,
+    "link_up": true,
+    "rssi": -79,
+    "lq": 4,
+    "rc_age_ms": 66,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": false,
+    "saving_log": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -3.069398,
+      "rate": 0.051508,
+      "setpoint": 82.1,
+      "imu_age_us": 7251,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      191,
+      191,
+      191,
+      228,
+      1792,
+      191,
+      1792,
+      0,
+      0,
+      204,
+      947
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 86889,
+        "max_us": 5529,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 86889,
+        "max_us": 5916,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 172468,
+    "min_free_heap": 105132,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -41,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 5116
+  }
+}

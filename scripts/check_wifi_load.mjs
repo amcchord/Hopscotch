@@ -1,6 +1,6 @@
 // Invoked by check_wifi_load.py after its motors-off/disarmed preflight.
 import fs from 'node:fs';
-const [host, seconds, output, mode = 'overload'] = process.argv.slice(2);
+const [host, seconds, output, mode = 'overload', radio = 'require-radio'] = process.argv.slice(2);
 const duration = Number(seconds) * 1000;
 const readerCount = mode === 'normal' ? 1 : 3;
 const sockets = [], counts = Array(readerCount).fill(0), gaps = Array(readerCount).fill(0);
@@ -19,7 +19,8 @@ function checkState(s) {
   if (s.drive_armed || s.arm_armed || s.arming || s.balance.active) {
     errors.push('Unexpected armed/active state; stopped load'); end = 0;
   }
-  if (!s.link_up || s.balance.fault) errors.push('RC or IMU fault');
+  if (s.balance.fault) errors.push('IMU fault');
+  if (radio !== 'ignore-radio' && !s.link_up) errors.push('RC link lost');
   rcAgeMax = Math.max(rcAgeMax, s.rc_age_ms);
   lqMin = Math.min(lqMin, s.lq);
   imuAgeMax = Math.max(imuAgeMax, s.balance.imu_age_us);
@@ -61,6 +62,7 @@ const after = await telemetry();
 const result = {
   duration_s: duration / 1000, elapsed_s: (Date.now() - startedMs) / 1000,
   mode, nonreading_websocket_client: mode !== 'normal',
+  rc_link_required: radio !== 'ignore-radio',
   websocket_frames: counts, max_frame_gap_ms: gaps, http_requests: requests,
   rc_age_max_ms: rcAgeMax, rc_lq_min: lqMin, imu_age_max_us: imuAgeMax,
   observed_min_heap: minHeap, errors, transport_errors: transportErrors,

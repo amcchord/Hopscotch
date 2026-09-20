@@ -1,0 +1,312 @@
+{
+  "response": 202,
+  "before": {
+    "schema": 1,
+    "sequence": 23066,
+    "uptime_ms": 454742,
+    "age_ms": 4,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -77,
+    "lq": 3,
+    "rc_age_ms": 87,
+    "rearm_required": true,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -3.052747,
+      "rate": 0.03299,
+      "setpoint": 82.1,
+      "imu_age_us": 2248,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      191,
+      191,
+      191,
+      228,
+      1792,
+      1792,
+      1792,
+      0,
+      0,
+      188,
+      1007
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 61242,
+        "max_us": 5497,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 61242,
+        "max_us": 5835,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 176324,
+    "min_free_heap": 101772,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -39,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 3374
+  },
+  "after": {
+    "schema": 1,
+    "sequence": 23332,
+    "uptime_ms": 457397,
+    "age_ms": 9,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -77,
+    "lq": 4,
+    "rc_age_ms": 27,
+    "rearm_required": true,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -3.053106,
+      "rate": 0.059596,
+      "setpoint": 82.1,
+      "imu_age_us": 7264,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      191,
+      191,
+      191,
+      228,
+      1792,
+      1792,
+      1792,
+      0,
+      0,
+      204,
+      1007
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 289,
+        "max_us": 5470,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 290,
+        "max_us": 5488,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 175116,
+    "min_free_heap": 101772,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -40,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 3374
+  },
+  "info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 19 2026 22:28:57",
+    "running_slot": "app0",
+    "image_sha256": "08f5faeb998e090cb1d1a4cb339814817149975e8eb83b9210f58007a92e14cd",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 175604,
+    "min_free_heap": 101772,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  }
+}

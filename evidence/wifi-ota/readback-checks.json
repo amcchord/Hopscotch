@@ -1,0 +1,11 @@
+{
+  "tool": "OpenOCD 2.1200.20260304",
+  "adapter_khz": 1000,
+  "application_match": true,
+  "filesystem_unchanged": true,
+  "bootloader_partitions_unchanged": true,
+  "application_sha256": "811e0db5e718bbbfe8b5c809d947a97d67a635da307115d7ad4a98faf42fd1a1",
+  "filesystem_sha256": "0b437fc7a9f9d52418a76a7d54d3d93cd9f0a31808597b01f64e90e378c4520d",
+  "firmware_size": 1187152,
+  "running_slot": "app0"
+}

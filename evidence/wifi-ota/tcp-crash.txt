@@ -1,0 +1,26 @@
+Guru Meditation Error: Core  0 panic'ed (LoadProhibited). Exception was unhandled.
+
+Core  0 register dump:
+PC      : 0x42026d6b  PS      : 0x00060a30  A0      : 0x82026df3  A1      : 0x3fcf6cc0  
+A2      : 0x00000000  A3      : 0x3fcbfc78  A4      : 0x00000000  A5      : 0x3fca34c4  
+A6      : 0x3fca34dc  A7      : 0x3fcf6360  A8      : 0x82064d50  A9      : 0x3fcf6cb0  
+A10     : 0x00000000  A11     : 0x00000006  A12     : 0x00000014  A13     : 0x0000ffff  
+A14     : 0x00000000  A15     : 0x00000001  SAR     : 0x00000018  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x00000030  LBEG    : 0x40056f5c  LEND    : 0x40056f72  LCOUNT  : 0xffffffff  
+
+
+Backtrace: 0x42026d68:0x3fcf6cc0 0x42026df0:0x3fcf6cf0 0x42059db9:0x3fcf6d10 0x4205e806:0x3fcf6d80 0x4206215e:0x3fcf6db0 0x420554b9:0x3fcf6dd0
+
+
+
+
+ELF file SHA256: 33d75aafb5d59067
+
+Rebooting...
+
+Decoded against release-694bd47/firmware.elf:
+AsyncServer::_accept (AsyncTCP.cpp:1510)
+AsyncServer::_s_accept (AsyncTCP.cpp:1549)
+tcp_process / tcp_input -> ip4_input -> ethernet_input -> tcpip_thread
+
+Fault: listener this == nullptr (A2=0); load at this+0x30.

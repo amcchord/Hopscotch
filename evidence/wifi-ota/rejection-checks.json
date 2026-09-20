@@ -1,0 +1,218 @@
+{
+  "initial_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 19 2026 22:28:57",
+    "running_slot": "app0",
+    "image_sha256": "08f5faeb998e090cb1d1a4cb339814817149975e8eb83b9210f58007a92e14cd",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 178356,
+    "min_free_heap": 170948,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "unauthenticated_log": {
+    "status": 401,
+    "body": "{\"error\":\"device token required\"}"
+  },
+  "unauthenticated_disarm": {
+    "status": 401,
+    "body": "{\"error\":\"device token required\"}"
+  },
+  "empty_update": {
+    "status": 400,
+    "body": "One firmware file is required"
+  },
+  "unauthenticated_update": {
+    "status": 401,
+    "body": "{\"error\":\"device token required\"}"
+  },
+  "unsafe_state_rejects_ota": {
+    "status": 409,
+    "body": "Update busy or robot not disarmed"
+  },
+  "unsafe_state_rejects_log": {
+    "status": 409,
+    "body": "{\"error\":\"disarm both groups and wait for log save\"}"
+  },
+  "truncated_update": {
+    "status": 400,
+    "body": "Application size or SHA-256 mismatch"
+  },
+  "bad_hash": {
+    "status": 400,
+    "body": "Application size or SHA-256 mismatch"
+  },
+  "invalid_esp_image": {
+    "status": 400,
+    "body": "ESP application verification failed"
+  },
+  "after_interrupted_upload": {
+    "schema": 1,
+    "sequence": 6217,
+    "uptime_ms": 120112,
+    "age_ms": 17,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -77,
+    "lq": 0,
+    "rc_age_ms": 22,
+    "rearm_required": true,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -3.049567,
+      "rate": 0.077028,
+      "setpoint": 82.1,
+      "imu_age_us": 2270,
+      "fault": 0,
+      "end_reason": ""
+    },
+    "power": {
+      "voltage": 0,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": 0,
+        "torque": 0,
+        "temp": 0,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 4294967295
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      191,
+      191,
+      191,
+      228,
+      1792,
+      1792,
+      1792,
+      0,
+      0,
+      204,
+      1036
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 376,
+        "max_us": 5010,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 376,
+        "max_us": 5402,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 179480,
+    "min_free_heap": 170948,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -39,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 0
+  },
+  "final_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 19 2026 22:28:57",
+    "running_slot": "app0",
+    "image_sha256": "08f5faeb998e090cb1d1a4cb339814817149975e8eb83b9210f58007a92e14cd",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 179020,
+    "min_free_heap": 170948,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  }
+}

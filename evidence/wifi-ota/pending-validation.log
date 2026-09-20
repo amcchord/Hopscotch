@@ -1,0 +1,93 @@
+Native checks passed: 100000 wheel mixes, sensor validity/rollover, USB partial writes/stall/disconnect
+Startup recovery checks passed: signed trigger, one-shot lifecycle, rollover, calm hysteresis, stale input, anti-windup, 50000 bounded updates
+Recoil release checks passed: both directions, confirmation, hysteresis, blend, stale/settled reset, no extra opposite windup, 50000 bounded updates
+Standing drive checks passed: gates, reversal, input loss, heading/turn limits, planned arms/recovery priority, invalid input, 50000 bounded updates, v2/v3/v4 layout
+Acceleration drive checks passed: untouched PD, immediate lean, balance authority, anti-windup, handoff, invalid inputs, 50000 bounded mixer updates, fast fresh-sample rate filter, graded and direction-confirmed emergency arms
+Motor setup checks passed: RS05 write-only acceleration, both rear motors, retry/failure paths, mandatory current readback
+CRSF production parser/timing tests passed
+Motor feedback tests passed: RS05/RS00, remapping, malformed/ack/fault freshness, receive budgets
+network safety and timing tests passed
+test_invalid_callbacks_do_not_dereference_listener (test_asynctcp_guard.AcceptGuardTests.test_invalid_callbacks_do_not_dereference_listener) ... ok
+test_rejects_changed_dependency (test_asynctcp_guard.AcceptGuardTests.test_rejects_changed_dependency) ... ok
+test_aborted_device_dump_does_not_wait_for_timeout (test_receive_telemetry.ReceiverTests.test_aborted_device_dump_does_not_wait_for_timeout) ... ok
+test_disconnect_preserves_partial_data (test_receive_telemetry.ReceiverTests.test_disconnect_preserves_partial_data) ... ok
+test_fragmented_trailer_preserves_exact_bytes (test_receive_telemetry.ReceiverTests.test_fragmented_trailer_preserves_exact_bytes) ... ok
+test_timeout_and_refusal (test_receive_telemetry.ReceiverTests.test_timeout_and_refusal) ... ok
+test_before_detection_matches_installed (test_startup_model.StartupModelTests.test_before_detection_matches_installed) ... ok
+test_hold_capture_preserves_travel_reference (test_startup_model.StartupModelTests.test_hold_capture_preserves_travel_reference) ... ok
+test_ramp_completion_keeps_learned_correction (test_startup_model.StartupModelTests.test_ramp_completion_keeps_learned_correction) ... ok
+test_recoil_release_preserves_initial_catch (test_startup_model.StartupModelTests.test_recoil_release_preserves_initial_catch) ... ok
+test_recoil_release_requires_confirmation_and_resets_after_settle (test_startup_model.StartupModelTests.test_recoil_release_requires_confirmation_and_resets_after_settle) ... ok
+test_backward_timestamp (test_telemetry.TelemetryTests.test_backward_timestamp) ... ok
+test_full_120_second_capture (test_telemetry.TelemetryTests.test_full_120_second_capture) ... ok
+test_interleaved_debug_detected (test_telemetry.TelemetryTests.test_interleaved_debug_detected) ... ok
+test_legacy (test_telemetry.TelemetryTests.test_legacy) ... ok
+test_malformed_row (test_telemetry.TelemetryTests.test_malformed_row) ... ok
+test_missing_trailer (test_telemetry.TelemetryTests.test_missing_trailer) ... ok
+test_nonfinite_rejected (test_telemetry.TelemetryTests.test_nonfinite_rejected) ... ok
+test_old_log_exported_with_unknown_pilot_fields (test_telemetry.TelemetryTests.test_old_log_exported_with_unknown_pilot_fields) ... ok
+test_old_logs_unknown_planned_arms (test_telemetry.TelemetryTests.test_old_logs_unknown_planned_arms) ... ok
+test_pre_extension_v2_unknown_age (test_telemetry.TelemetryTests.test_pre_extension_v2_unknown_age) ... ok
+test_schema3_full_duration_pilot_transfer (test_telemetry.TelemetryTests.test_schema3_full_duration_pilot_transfer) ... ok
+test_schema4_full_duration_drive_arms_transfer (test_telemetry.TelemetryTests.test_schema4_full_duration_drive_arms_transfer) ... ok
+test_silent_numeric_corruption (test_telemetry.TelemetryTests.test_silent_numeric_corruption) ... ok
+test_simulator_reads_candidate_settings (test_telemetry.TelemetryTests.test_simulator_reads_candidate_settings) ... ok
+test_truncated_rows_even_with_valid_checksum (test_telemetry.TelemetryTests.test_truncated_rows_even_with_valid_checksum) ... ok
+test_valid_mixed_newlines (test_telemetry.TelemetryTests.test_valid_mixed_newlines) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.224s
+
+OK
+Building firmware...
+Processing m5stack-atoms3r (platform: espressif32@6.7.0; board: esp32-s3-devkitc-1; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devkitc-1.html
+PLATFORM: Espressif 32 (6.7.0) > Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-openocd-esp32 @ 2.1100.20220706 (11.0) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 40 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- M5Unified @ 0.2.13
+|-- M5GFX @ 0.2.19+sha.53a7184
+|-- ESP Async WebServer @ 3.0.6
+|-- Async TCP @ 3.1.4
+|-- ArduinoJson @ 7.4.3
+|-- Madgwick @ 1.2.0
+|-- LittleFS @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- ESPmDNS @ 2.0.0
+|-- Update @ 2.0.0
+Building in release mode
+prepare_file([".pio/build/m5stack-atoms3r/network.html.txt.o"], ["data/network.html"])
+Converting .pio/build/m5stack-atoms3r/network.html.txt.o
+revert_original_file([".pio/build/m5stack-atoms3r/network.html.txt.o"], ["data/network.html"])
+Compiling .pio/build/m5stack-atoms3r/src/main.cpp.o
+<command-line>: warning: "ARDUINO_EVENT_RUNNING_CORE" redefined
+<command-line>: note: this is the location of the previous definition
+Compiling .pio/build/m5stack-atoms3r/src/web_server.cpp.o
+<command-line>: warning: "ARDUINO_EVENT_RUNNING_CORE" redefined
+<command-line>: note: this is the location of the previous definition
+Linking .pio/build/m5stack-atoms3r/firmware.elf
+Retrieving maximum program size .pio/build/m5stack-atoms3r/firmware.elf
+Checking size .pio/build/m5stack-atoms3r/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  16.3% (used 53288 bytes from 327680 bytes)
+Flash: [====      ]  35.5% (used 1187269 bytes from 3342336 bytes)
+Building .pio/build/m5stack-atoms3r/firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+========================= [SUCCESS] Took 4.76 seconds =========================
+Build complete.

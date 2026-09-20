@@ -14,7 +14,7 @@ Hopscotch is firmware for a remote-controlled 4-wheeled robot with two arms. It 
 | ELRS Receiver | CRSF protocol at 420000 baud on **GPIO1 (RX)**, **GPIO2 (TX)** via Grove port |
 | Drive Motors | 4x Robstride RS05 — CAN IDs 10 (front right), 20 (back right), 30 (back left), 40 (front left) |
 | Arm Motors | 2x Robstride RS00 — CAN IDs 1 (left arm), 2 (right arm) |
-| WiFi | Joins a configurable network (default: SvensHaus / montreal19) |
+| WiFi | Joins the configured network; credentials are in gitignored `src/network_secrets.h`. |
 
 See `docs/RobotDiagram.png` for the physical layout. The robot has four wheels in a rectangular arrangement and two arms mounted at the front.
 

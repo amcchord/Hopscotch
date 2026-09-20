@@ -49,6 +49,13 @@ Espressif's [flash concurrency documentation](https://docs.espressif.com/project
 explains the cross-core cache constraint. This build retains Arduino 2.0.16 /
 PlatformIO espressif32 6.7.0 and the previously pinned motor/IMU dependencies.
 
+`scripts/patch_asynctcp.py` applies two checked fixes to the pinned Async TCP
+3.1.4 source during every build: reject invalid accept callbacks, and stop its
+error callback from accessing a PCB already freed by lwIP. The original source
+SHA-256 must match exactly; dependency changes fail the build pending review.
+These fixes address a core-0 panic reproduced by concurrent HTTP connections
+and a stalled WebSocket client. `/api/info` also reports the ESP reset reason.
+
 ## Local configuration and access
 
 Copy `src/network_secrets.example.h` to `src/network_secrets.h` and fill in
@@ -137,6 +144,29 @@ and `node tests/test_network_dashboard.js`. The maintenance test enumerates all
 1,024 combinations of blocking conditions and races cancellation against grant.
 The dashboard SHA implementation is compared with Node's independent SHA-256,
 including block boundaries and a full firmware-sized input.
+
+With motor power **off**, run the hardware load regression:
+
+```bash
+.venv/bin/python scripts/check_wifi_load.py --host http://hopscotch.local \
+  --seconds 180 --output output/wifi-load.json
+# Normal dashboard delivery without connection churn / saturation:
+.venv/bin/python scripts/check_wifi_load.py --host http://hopscotch.local \
+  --mode normal --seconds 120 --output output/wifi-normal.json
+```
+
+This requires Node with built-in WebSocket support (Node 26 was used). It opens
+one nonreading WebSocket with a small TCP receive window, three active telemetry
+readers and three repeated HTTP workers. It checks continuous uptime, 200 Hz
+task progress, no new intervals above 7.5 ms, RC/IMU health, bounded telemetry
+backpressure and successful client delivery. Overload permits bounded HTTP
+timeouts and requires WebSocket reconnection/recovery; normal mode requires
+zero transport errors/reconnects, at least 4 Hz and no gap over two seconds.
+It refuses online motors or an
+unsafe maintenance state, and preserves existing output evidence.
+Use `--ignore-radio` for network-only, motors-off testing when the transmitter
+is intentionally off or being adjusted. It still checks motor state and IMU
+health, and records RC measurements without treating link loss as a failure.
 
 See `evidence/wifi-ota/README.md` for hardware checks. Initial validation is with
 motor power off. A powered stationary check and supervised balance/drive trial

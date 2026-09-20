@@ -1,5 +1,7 @@
 # Radio telemetry — September 19, 2026
 
+**Subsequent firmware integration:** the Wi-Fi/OTA task installed the combined robot firmware, including the structured radio payload, on September 19. See [current robot state](CURRENT.md). The actual GX12 screen/RF rendering remains unverified. The historical installation record below is retained.
+
 - **Objective:** audit and back up the GX12 configuration; build a robot-state
   Lua display and extensible firmware telemetry without changing mappings.
 - **Work area:** `worktrees/radio-telemetry`, branch `codex/radio-telemetry`.

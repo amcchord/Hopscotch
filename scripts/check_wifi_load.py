@@ -18,6 +18,7 @@ def main():
     p.add_argument('--seconds', type=int, default=120)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--mode', choices=['normal', 'overload'], default='overload')
+    p.add_argument('--ignore-radio', action='store_true', help='Do not require an RC link during motors-off network testing')
     a = p.parse_args()
     if a.seconds < 30:
         p.error('Use at least 30 seconds to exercise TCP backpressure')
@@ -34,7 +35,8 @@ def main():
         if sock is not None:
             stalled_client(sock, u)
         subprocess.run(['node', str(Path(__file__).with_suffix('.mjs')),
-                        a.host.rstrip('/'), str(a.seconds), str(a.output), a.mode], check=True)
+                        a.host.rstrip('/'), str(a.seconds), str(a.output), a.mode,
+                        'ignore-radio' if a.ignore_radio else 'require-radio'], check=True)
     x = json.loads(a.output.read_text())
     assert not x['errors'], x['errors']
     assert min(x['websocket_frames']) > a.seconds, x['websocket_frames']
