@@ -1,0 +1,539 @@
+{
+  "started_utc": "2026-09-20T20:59:14.144559+00:00",
+  "application": {
+    "application_bytes": 1207616,
+    "application_sha256": "be068a3c2e02ac4343d6c15795984577d2067cceebf0c069e97be9a91b511360",
+    "esp_image_digest": "fdf7af6a96d2b6e3c3c908301ae765fcfa4c9110df27f8d88693dd80e8aeb2c2"
+  },
+  "source_commit": "a772ecc833c6100f76cdb67173bdaf4f4d99cd78",
+  "status": "installed_verified",
+  "motion_initiated": false,
+  "preflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 16:17:52",
+    "running_slot": "app0",
+    "image_sha256": "8373d0b5be1ba254b5b9e831849e122989f66523c0ea35cf7dfcd1795a2ed837",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385687,
+    "free_heap": 172896,
+    "min_free_heap": 144048,
+    "free_psram": 6926367,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 1,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "preflight_state": {
+    "schema": 1,
+    "sequence": 60062,
+    "uptime_ms": 1162601,
+    "age_ms": 18,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -80,
+    "lq": 100,
+    "rc_age_ms": 0,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.39635,
+      "rate": -0.075712,
+      "setpoint": 88.15783,
+      "imu_age_us": 6094,
+      "fault": 0,
+      "end_reason": "bailout_angle_error",
+      "start_status": "Fast tip-up started"
+    },
+    "power": {
+      "voltage": 23.79048,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": -11.41024,
+        "vel": 0.019073,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 20,
+        "pos": 9.762376,
+        "vel": 0.011444,
+        "torque": -8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 30,
+        "pos": -5.5964,
+        "vel": 0.005341,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      },
+      {
+        "id": 40,
+        "pos": -15.5226,
+        "vel": -0.077057,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 155
+      },
+      {
+        "id": 1,
+        "pos": 4.085028,
+        "vel": 0.00856,
+        "torque": -0.000214,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 135
+      },
+      {
+        "id": 2,
+        "pos": 3.539968,
+        "vel": 0.010574,
+        "torque": -0.000214,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 115
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      947
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 132181,
+        "max_us": 5511,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 132181,
+        "max_us": 5969,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 173128,
+    "min_free_heap": 144048,
+    "free_psram": 6928695,
+    "wifi": {
+      "connected": true,
+      "rssi": -51,
+      "ip": "192.168.1.172",
+      "recovery_ap": true
+    },
+    "ws_dropped": 1526,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "saved_run_before": {
+    "samples": 236,
+    "csv_sha256": "aefd28b02ea7082f3578527589c7cf4238339a774e7703d576416ef9e434c658",
+    "wire_sha256": "159742998bbbab37f20793fd451dd8e269b8d0dfbbaa45906fdf2372d85564a8"
+  },
+  "transfer": {
+    "chunk_bytes": 1024,
+    "interval_seconds": 0.05,
+    "timeout_seconds": 120,
+    "tcp_nodelay": true,
+    "status": 200,
+    "response": "Firmware verified; rebooting",
+    "sent_bytes": 1207812,
+    "seconds": 342.569
+  },
+  "postflight_info": {
+    "firmware": "hopscotch-wifi-ota-1",
+    "build": "Sep 20 2026 16:17:52",
+    "running_slot": "app1",
+    "image_sha256": "fdf7af6a96d2b6e3c3c908301ae765fcfa4c9110df27f8d88693dd80e8aeb2c2",
+    "ota_capacity": 3342336,
+    "flash_bytes": 8388608,
+    "psram_bytes": 8385751,
+    "free_heap": 178312,
+    "min_free_heap": 175292,
+    "free_psram": 6928131,
+    "automatic_boot_rollback": false,
+    "ota_transport_version": 2,
+    "ota_rx_timeout_s": 20,
+    "ota_ack_timeout_ms": 15000,
+    "ota_idle_timeout_ms": 15000,
+    "reset_reason": 3,
+    "network_core": 0,
+    "http_core": 0,
+    "wifi_event_core": 0
+  },
+  "postflight_state": {
+    "schema": 1,
+    "sequence": 423,
+    "uptime_ms": 4477,
+    "age_ms": 10,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -76,
+    "lq": 100,
+    "rc_age_ms": 1,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.386747,
+      "rate": -0.009224,
+      "setpoint": 82.1,
+      "imu_age_us": 985,
+      "fault": 0,
+      "end_reason": "",
+      "start_status": ""
+    },
+    "power": {
+      "voltage": 23.68521,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0.000383,
+        "vel": -0.008392,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 75
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": -0.049591,
+        "torque": -8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": -0.000763,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": -0.03891,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": -0.101214,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 155
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": -0.050858,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 135
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      1007
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 0,
+        "max_us": 0,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 0,
+        "max_us": 0,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 177700,
+    "min_free_heap": 173832,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -52,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 0,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "saved_run_after": {
+    "samples": 236,
+    "csv_sha256": "aefd28b02ea7082f3578527589c7cf4238339a774e7703d576416ef9e434c658",
+    "wire_sha256": "159742998bbbab37f20793fd451dd8e269b8d0dfbbaa45906fdf2372d85564a8"
+  },
+  "final_state": {
+    "schema": 1,
+    "sequence": 650,
+    "uptime_ms": 7742,
+    "age_ms": 7,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -74,
+    "lq": 98,
+    "rc_age_ms": 0,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.400914,
+      "rate": -0.026756,
+      "setpoint": 82.1,
+      "imu_age_us": 800,
+      "fault": 0,
+      "end_reason": "",
+      "start_status": ""
+    },
+    "power": {
+      "voltage": 23.68521,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 0.000383,
+        "vel": -0.008392,
+        "torque": -8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 55
+      },
+      {
+        "id": 20,
+        "pos": 0,
+        "vel": 0.058746,
+        "torque": -8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 35
+      },
+      {
+        "id": 30,
+        "pos": 0,
+        "vel": -0.032806,
+        "torque": 8.4e-05,
+        "temp": 27,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 15
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": -0.020599,
+        "torque": 8.4e-05,
+        "temp": 28,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 155
+      },
+      {
+        "id": 1,
+        "pos": 0,
+        "vel": -0.025681,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 135
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": -0.013596,
+        "torque": -0.000214,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 115
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1779,
+      1007
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 388,
+        "max_us": 5432,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 388,
+        "max_us": 5641,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 176400,
+    "min_free_heap": 149800,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -53,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 0,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  },
+  "completed_utc": "2026-09-20T21:05:08.644323+00:00"
+}

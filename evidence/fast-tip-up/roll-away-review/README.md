@@ -2,8 +2,9 @@
 
 The distinct CH6 HIGH trial reached quiet capture at **2.895 seconds**, then
 rolled forward after the arms returned. The source correction is **`f4d2bb7`**.
-It is integrated by the lowering owner for the next combined OTA; this record
-alone does not establish installation or successful physical balance.
+Installed by the lowering owner in combined source `a772ecc`; see the
+[verified OTA record](../../lowering-v6-integration/README.md). Physical
+acceptance of the correction remains pending.
 
 ## Recorded evidence
 

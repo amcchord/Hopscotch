@@ -1,5 +1,7 @@
 # CH11 lowering v5 — forward motion during arm deployment
 
+**Historical v5:** its physical trial ended before catch with a preparation wheel-speed abort. [Installed v6](BALANCE_LOWER_V6_2026-09.md) adds the earlier handoff; see the [recorded trial](../evidence/balance-lower/trial-v5-20260920/README.md).
+
 September 20, 2026. Installed source `17c499c` for operator testing; consult
 [current state](progress/CURRENT.md) for the installed identity and outcome.
 The previous [physical v4 attempt](../evidence/balance-lower/trial-v4-20260920/README.md)

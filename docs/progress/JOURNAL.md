@@ -473,3 +473,27 @@ fast owner without copying logs between worktrees. Its initial analysis finds
 quiet capture, then a support-biased equilibrium shift during arm return.
 The owner is investigating a bounded fast-only correction; this task retains
 all robot operations, combined schema6 metadata and final release ownership.
+
+## 2026-09-20 — Install coordinated lowering v6 and fast support release
+
+Integrated fast owner f4d2bb7 as882ba98; its quiet supported capture remains a
+transient offset rather than a permanent−2.86° equilibrium correction. Initial
+measured arm return releases that offset; independent wheel capture gates were
+also added. Slow capture arithmetic, trajectory, return speed and shared driving
+gains remain unchanged. Fast model24/45 without a modeled fall before/after,10 improvements
+and10 regressions; saved-trim uncertainty remains documented.
+
+Combined source a772ecc passed11native/37Python,syntax/whitespace and pinned
+configured build once. Existing radio/dashboard/OTA acceptance was reused.
+Schema6 identifies both new policies while retaining original schema5 export
+metadata. Frozen application1,207,616bytes; whole-file SHA-256
+be068a3c2e02ac4343d6c15795984577d2067cceebf0c069e97be9a91b511360, ESP digest
+fdf7af6a96d2b6e3c3c908301ae765fcfa4c9110df27f8d88693dd80e8aeb2c2. Exact prior v5/v4 packages retained.
+
+Verified installed in app1 at2026-09-20T21:05:08.644323+00:00; normal OTA transfer342.569s. Exact image,
+powered disabled motor feedback, fresh IMU, disarmed state and released
+maintenance passed. The236-row fast-trial CSV and wire were byte-identical.
+No autonomous motion, settings/calibration/filesystem writes or other checkout
+edits. [Release record](../../evidence/lowering-v6-integration/README.md).
+Next: separate manual lowering withCH6LOW and fast-standing trials, archiving
+each run after disarming. Physical acceptance remains pending.

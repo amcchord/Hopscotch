@@ -8,5 +8,5 @@ at `telemetry_logs/bal_20260920_fast_tip_v1_wifi.*` in this checkout.
 
 The fast-tip-up owner was given read-only access to these files for diagnosis;
 no raw log was copied between checkouts. Capture was quiet, followed by forward
-roll during arm support release. The bounded fast correction and its evidence
-will be integrated before the next application-only OTA.
+roll during arm support release. The [derived analysis and correction](../roll-away-review/README.md) are
+integrated in the [verified combined update](../../lowering-v6-integration/README.md).

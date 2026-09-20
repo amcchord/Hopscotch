@@ -1,4 +1,4 @@
-# CH6 fast tip-up — capture tested, arm-release correction queued
+# CH6 fast tip-up — support-release correction installed; physical trial pending
 
 September 20, 2026. The original trajectory was installed with lowering v4;
 its startup fix was [installed with lowering v5](../evidence/lowering-v5-integration/README.md) in `17c499c`.
@@ -23,7 +23,7 @@ return, through the existing base slew limit. The trial's old calibration
 cancelled 2.860° of saved trim before support released. Fast capture also now
 requires each rear wheel within 0.75 rad/s for the existing 120 ms dwell.
 [Trial, correction, tests and limitations](../evidence/fast-tip-up/roll-away-review/README.md).
-The combined release owner has integrated this for the next OTA. Physical
+Installed in combined source `a772ecc`; see the [verified release](../evidence/lowering-v6-integration/README.md). Physical
 confirmation remains pending: the 45-case approximate model has 10 improvements
 and 10 regressions, with regressions when saved trim exceeds true equilibrium.
 
@@ -111,7 +111,7 @@ Record a side view if available. After disarming both groups, download the
 saved run over Wi-Fi before another attempt replaces it.
 
 Samples remain 240 bytes. Schema 4 introduced fast v1; schema 5 added its startup
-wait metadata, and the next combined schema 6 identifies fast v2 capture/release.
+wait metadata, and combined schema 6 identifies fast v2 capture/release.
 Feature bit 16384 identifies fast support; `pilot_flags & 128` marks a run that
 actually selected it.
 During those runs' state-1 samples, `roll_rate` is the 6 ms filtered rate;
@@ -125,7 +125,7 @@ Source branch: `codex/fast-tip-up`, based on `400c98d` in
 `worktrees/fast-tip-up`. The active lowering task owns the device, shared
 progress records, combined validation and next OTA. Feature bit
 32768 identifies lowering v4 support; the combined feature flags are 65535.
-Lowering v5 is identified by schema 5; the next combined v6 update uses schema 6.
+Lowering v5 is identified by schema 5; the installed combined v6 update uses schema 6.
 The candidate's configured local build is for validation, not the combined
 release image. [Handoff evidence](../evidence/fast-tip-up/README.md) records
 checks and the exact integration procedure.

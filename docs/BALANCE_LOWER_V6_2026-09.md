@@ -1,6 +1,6 @@
 # CH11 lowering v6 — hand off before the preparation abort
 
-Prepared for the next combined update. [Current state](progress/CURRENT.md)
+Installed source `a772ecc` for operator testing. [Current state](progress/CURRENT.md)
 identifies what is installed. The operator reports that v5 now leans forward
 reliably but stops supported on its arms.
 
