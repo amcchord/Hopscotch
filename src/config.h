@@ -168,6 +168,22 @@ static constexpr uint32_t BALANCE_ARM_HOLD_MAX_MS       = 1000;    // start retu
 static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.71f;   // arm delta to tip robot up (left)
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.96f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
+// CH6 high selects the experimental fast trajectory for the next CH11 stand-up.
+// Slow mode, endpoint poses, balance gains and arm-return policy stay identical.
+static constexpr uint8_t  CH_FAST_TIP_UP = 5; // physical CH6, independent of legacy arm-group mapping
+static constexpr float    BALANCE_FAST_TIP_DURATION_S = 2.6f;
+static constexpr float    BALANCE_FAST_TIP_MOTOR_RAD_S = 2.2f;
+static constexpr float    BALANCE_FAST_TIP_LEAD_RAD = 0.18f;
+static constexpr float    BALANCE_FAST_TIP_MAX_DT_S = 0.04f;
+static constexpr float    BALANCE_FAST_TIP_START_TILT_DEG = 12.0f;
+static constexpr float    BALANCE_FAST_TIP_START_WHEEL_RAD_S = 0.75f;
+static constexpr float    BALANCE_FAST_TIP_MAX_TILT_DEG = 100.0f;
+static constexpr float    BALANCE_FAST_TIP_MAX_RATE_DPS = 100.0f;
+static constexpr float    BALANCE_FAST_TIP_CAPTURE_RATE_DPS = 8.0f;
+static constexpr float    BALANCE_FAST_TIP_CAPTURE_ARM_RAD_S = 0.30f;
+static constexpr uint32_t BALANCE_FAST_TIP_CAPTURE_MS = 120;
+static constexpr uint32_t BALANCE_FAST_TIP_STALL_MS = 400;
+static constexpr uint32_t BALANCE_FAST_TIP_TIMEOUT_MS = 4500;
 static constexpr float    BALANCE_ARM_RETURN_SPEED      = 1.5f;    // rad/s. 2.5 was dynamically infeasible: the equilibrium
                                                                    // moved 3 deg in 1s while the robot's tilt never budged --
                                                                    // velocity-mode PD chases a moving equilibrium with

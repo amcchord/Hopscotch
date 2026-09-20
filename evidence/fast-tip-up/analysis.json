@@ -1,0 +1,148 @@
+{
+  "kind": "kinematic_screen_not_physical_validation",
+  "archived_runs": [
+    {
+      "file": "bal_20260920_lowering_trial_wifi.csv",
+      "sha256": "3083a00737288438466b1d0bbd71f337d433d349e85f7d1b2b3266d4a74b2368",
+      "rows": 2371,
+      "tip_rows": 441,
+      "tip_to_balance_s": 8.829,
+      "first_crossing_deg_s": {
+        "60": 3.348,
+        "70": 4.449,
+        "75": 5.208,
+        "80": 6.288
+      },
+      "engage_roll_deg": 83.431,
+      "engage_rate_dps": 0.096,
+      "peak_tip_rate_dps": 30.132,
+      "peak_target_tracking_error_rad": {
+        "l": 0.05000000000000071,
+        "r": 0.121
+      },
+      "peak_arm_torque_nm": {
+        "l": 0.647,
+        "r": 1.915
+      }
+    },
+    {
+      "file": "bal_20260920_forward_catch_v2_wifi.csv",
+      "sha256": "808538a68be977d0e6ccc90da526b400c63fd845b8f4cc2f2794006b7c25929f",
+      "rows": 1984,
+      "tip_rows": 441,
+      "tip_to_balance_s": 8.834,
+      "first_crossing_deg_s": {
+        "60": 3.663,
+        "70": 4.904,
+        "75": 5.863,
+        "80": 7.329
+      },
+      "engage_roll_deg": 80.582,
+      "engage_rate_dps": 0.173,
+      "peak_tip_rate_dps": 30.447,
+      "peak_target_tracking_error_rad": {
+        "l": 0.0519999999999996,
+        "r": 0.12400000000000011
+      },
+      "peak_arm_torque_nm": {
+        "l": 0.557,
+        "r": 1.919
+      }
+    },
+    {
+      "file": "bal_20260920_recovered_v2_bailout.csv",
+      "sha256": "060630a8862ccf391506f95580d73794a5f6fbccf3ff8dae8b50c45b5568037e",
+      "rows": 4789,
+      "tip_rows": 441,
+      "tip_to_balance_s": 8.823,
+      "first_crossing_deg_s": {
+        "60": 3.603,
+        "70": 4.863,
+        "75": 5.803,
+        "80": 7.202
+      },
+      "engage_roll_deg": 80.538,
+      "engage_rate_dps": 0.005,
+      "peak_tip_rate_dps": 30.315,
+      "peak_target_tracking_error_rad": {
+        "l": 0.05400000000000027,
+        "r": 0.11900000000000022
+      },
+      "peak_arm_torque_nm": {
+        "l": 0.549,
+        "r": 1.897
+      }
+    },
+    {
+      "file": "bal_20260920_forward_catch_v3_wifi.csv",
+      "sha256": "45bc5962c7b41b094788be198724a5b9ddc51a7bcdc360a5a87f75bfbfac29d4",
+      "rows": 1908,
+      "tip_rows": 441,
+      "tip_to_balance_s": 8.823,
+      "first_crossing_deg_s": {
+        "60": 3.243,
+        "70": 4.263,
+        "75": 4.943,
+        "80": 5.863
+      },
+      "engage_roll_deg": 85.258,
+      "engage_rate_dps": -0.122,
+      "peak_tip_rate_dps": 30.094,
+      "peak_target_tracking_error_rad": {
+        "l": 0.051000000000000156,
+        "r": 0.11400000000000032
+      },
+      "peak_arm_torque_nm": {
+        "l": 0.668,
+        "r": 1.897
+      }
+    }
+  ],
+  "production_policy_test": "Fast tip-up: 162 tracking cases; max capture 2740 ms, target speed 2.0552 rad/s, acceleration 2.43902 rad/s^2; input, capture, obstruction, timing and fault checks pass",
+  "trajectory_duration_comparison": [
+    {
+      "trajectory_s": 1.0,
+      "quintic_left_peak_speed_rad_s": 5.08125,
+      "quintic_left_peak_acceleration_rad_s2": 15.64619229503886
+    },
+    {
+      "trajectory_s": 2.6,
+      "quintic_left_peak_speed_rad_s": 1.954326923076923,
+      "quintic_left_peak_acceleration_rad_s2": 2.314525487431784
+    },
+    {
+      "trajectory_s": 3.0,
+      "quintic_left_peak_speed_rad_s": 1.6937499999999999,
+      "quintic_left_peak_acceleration_rad_s2": 1.7384658105598734
+    }
+  ],
+  "archived_geometry_replays": [
+    {
+      "file": "bal_20260920_lowering_trial_wifi.csv",
+      "kinematic_peak_100ms_rate_dps": 75.95592916666668,
+      "kinematic_final_roll_deg": 83.4075
+    },
+    {
+      "file": "bal_20260920_forward_catch_v2_wifi.csv",
+      "kinematic_peak_100ms_rate_dps": 74.27572152454779,
+      "kinematic_final_roll_deg": 80.566
+    },
+    {
+      "file": "bal_20260920_recovered_v2_bailout.csv",
+      "kinematic_peak_100ms_rate_dps": 74.604187707641,
+      "kinematic_final_roll_deg": 80.537
+    },
+    {
+      "file": "bal_20260920_forward_catch_v3_wifi.csv",
+      "kinematic_peak_100ms_rate_dps": 73.5101010476189,
+      "kinematic_final_roll_deg": 85.26650000000001
+    }
+  ],
+  "limits": [
+    "No fast hardware trial has occurred.",
+    "Geometry replay assumes the slow contact path survives faster acceleration.",
+    "Body/contact inertia, torque demand, slip and sensor acceleration bias are unmodeled.",
+    "Startup motor-mode setup and 500 ms CH11 recognition delay precede logged tip time.",
+    "Existing capture hold and arm return follow balance engagement; total settling is longer."
+  ]
+}
