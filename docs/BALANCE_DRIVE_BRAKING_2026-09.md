@@ -1,6 +1,6 @@
 # Centered-stick braking investigation — September 19, 2026
 
-Status: braking candidate validated; awaiting combined release integration and OTA. Based on the current Wi-Fi/OTA firmware, with the concurrent flat-driving fix included. The operator described driving as mostly smooth, with slow stopping when CH2 returned to center.
+Status: combined firmware installed and verified over Wi-Fi on September 19, 2026 (03:56 UTC September 20). Both motor groups remain disarmed; operator motion testing is next. Based on the current Wi-Fi/OTA firmware, with the concurrent flat-driving fix included. The operator described driving as mostly smooth, with slow stopping when CH2 returned to center.
 
 ## What the wireless log shows
 
@@ -22,7 +22,7 @@ The extra controller gain and early PD handoff were rejected. The production inn
 - Acceleration stays 6 rad/s², full speed 20 rad/s, steering differential 4.5 rad/s. Existing balance authority, damping, motor limits, arm recovery, fresh-input checks and calm neutral reacquisition are unchanged. Low-speed pilot trajectories/arm assist remain bit-for-bit v4 in the native regression.
 - Telemetry remains the 240-byte schema-v4 layout. Feature bit 1024 identifies braking-v5 settings; pilot flag 32 marks the faster part of reference braking. Exporting an old v4 log continues to describe its original limits.
 
-The concurrent flat-driving gate fix is included. Any queued CH11 stand-down feature is integrated only after its separate checks and review.
+The concurrent flat-driving gate fix is included. The separately requested experimental [CH11 supported return to flat](BALANCE_LOWER_2026-09.md) is also included after its native/model checks and integration review. CH11 while balancing now requests lowering; its first physical test needs restraint and verified arm clearance.
 
 ## Experiments, checks and limits
 
@@ -41,3 +41,17 @@ Native checks cover high/low-speed braking, forward/reverse symmetry, unchanged 
 Use `evidence/balance-drive-braking/analyze.py` for physical metrics and the plotted stops. `screen_ramps.py`, `screen_capture.py`, `screen_boost.py`, and `screen_mild_boost.py` preserve the parameter screens. Rejected experiments use archived public helpers through `experiment_model.py`; `final_screen.py` compares the chosen source with installed v4 source `aa9ae13`.
 
 The next operator test should use small forward/back inputs followed by centered CH2, with enough clear travel space to compare stopping and recoil. The operator performs all movement. Download the saved run over Wi-Fi after both motor groups are disarmed, before another run replaces it. No USB cable is needed for normal telemetry or OTA.
+
+## Installed combined release
+
+Source **`43b1967dd03d26d8b2ccf6a698901c56272039d2`**, branch `codex/drive-braking`; application **1,194,224 bytes**, whole-file SHA-256 `a3b1e64c109bfc91eb43842769efebefbc9b32d16baea290de0af2f6b7a8b982`. Verified running **app1**, ESP embedded digest `bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3`. [Release evidence](../evidence/balance-drive-braking/README.md) records the manifests, preflight, upload and postflight.
+
+Final combined validation passed: **10 native executables, 27 Python tests, syntax/whitespace checks and the pinned ESP32 build**. Radio C++/Lua and dashboard checks passed; their source is unchanged by integration. The **81 lowering scenarios** were rerun successfully against the combined source. Production braking helper/config/model hashes match the completed simulation screen; lowering helper bytes match its reviewed source. The merged log feature mask is 4095.
+
+Two Wi-Fi attempts aborted: the standard uploader lost its connection, then a paced upload reached a shorter 30-second response timeout. The old app0 identity and uptime were checked after both, and maintenance released. A slower 1KiB/50ms transfer with the standard 120-second timeout succeeded in **62.8 seconds**. The operator turned off the transmitter near the end of that transfer. Pacing, timeout and radio state all changed, so this does **not** isolate radio interference or powered CAN as the cause. Both unsuccessful attempts are retained in the evidence.
+
+After reboot, all six motors were online, disabled, fresh and fault-free; the IMU reported no fault. The saved **2,981-sample v4 log re-downloaded with both CSV and raw wire bytes identical** to the pre-update capture. Application-only OTA did not rewrite the filesystem, partition table or settings. Calibration was not directly re-read through the web API, which does not expose those settings. No motor arming, balancing, driving or lowering was initiated by the release agent.
+
+The private credentialed application/ELF are retained locally in `artifacts/drive-braking-v5/release/` and excluded from Git. The known-good previous Wi-Fi/OTA package remains at the project root `artifacts/wifi-ota/release/`; rollback uses that application through authenticated OTA after disarming and preserving newer logs. There is no automatic boot rollback.
+
+For testing, turn the transmitter back on with **CH9 and CH10 LOW** and CH1/CH2/CH4 centered, then use the usual stand-up routine. Compare a brief moderate forward/back request followed by centered CH2; very small requests remain deliberately unchanged. Retrieve the log after disarming both groups. Test the CH11 lowering feature separately using its restraint/clearance procedure.

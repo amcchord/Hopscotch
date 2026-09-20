@@ -1,0 +1,7 @@
+Paced upload started; bytes: 1194224 source: app0
+Sent 262144 bytes after 13.8 s
+Sent 524288 bytes after 27.6 s
+Sent 786432 bytes after 41.3 s
+Sent 1048576 bytes after 55.0 s
+Upload result: 200 Firmware verified; rebooting elapsed: 62.8
+Verified running digest: bc1e158acac24fa08a9fb81b26933b00243baa71f67c106c9696135182f0a9b3 slot: app1 both motor groups disarmed
