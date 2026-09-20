@@ -1,5 +1,7 @@
 # September 14: failed stand-up after the feedback correction
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The feedback correction did not resolve initial roll-away. Austin reports that
 the robot stood, ran away a substantial distance, then became stable after he
 stopped it by hand. He attributes the reboot to bumping the USB cable. Do not

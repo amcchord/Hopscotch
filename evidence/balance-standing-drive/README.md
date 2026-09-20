@@ -1,5 +1,7 @@
 # Standing drive candidate evidence
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 See `../../docs/BALANCE_STANDING_DRIVE_2026-09.md` for the operator procedure, exact control changes, verification and limitations. Source starts from 39720e9 (installed recoil-release source 1d80257). The application was flashed and physically tested; Austin requested faster forward/back response after all directions worked. See the findings document and trial-metrics.json.
 
 `screen.py` compiles the actual production `BalancePilot` class via `pilot_bridge.cpp`, then compares neutral commands to the frozen installed model and exercises forward/stop/reverse and input loss. `screen.json` retains all movement cases; `screen.txt` is the summary. The nominal traces are model outputs, not observations of the robot. No yaw/contact/slip model; no claimed braking distance or reliability probability.

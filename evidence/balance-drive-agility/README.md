@@ -1,5 +1,7 @@
 # Acceleration drive / planned arms evidence
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The actual physical trial in this directory is **installed response-v2**, not the new candidate. See [findings](../../docs/BALANCE_DRIVE_AGILITY_2026-09.md).
 
 - `attached.serial/.txt`: read-only USB retrieval status; IDLE/disarmed, no live motor/receiver traffic.

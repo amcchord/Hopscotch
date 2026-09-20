@@ -1,5 +1,7 @@
 # September 13, 2026 — CH11 received, stand-up refused
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The transmitter was working. The September candidate introduced a startup regression: it required acceleration-limit readback from the RS05 rear drive motors, whose acceleration register is write-only. This prevented the stand-up sequence from reaching any arm movement. The correction checks acceleration-write transmission and keeps mandatory current-limit readback.
 
 ## What the robot showed

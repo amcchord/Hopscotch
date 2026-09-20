@@ -1,5 +1,7 @@
 # Driving damping evidence
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 See [findings and firmware changes](../../docs/BALANCE_DRIVE_DAMPING_2026-09.md).
 
 - `identify.py`, `observed-frequency-ratios.json`: windowed ratios from the archived physical v3 trial, excluding the terminal contact bout.

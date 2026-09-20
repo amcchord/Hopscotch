@@ -48,3 +48,35 @@ locations, rollback limitation and next safe operator step are recorded in
 [CURRENT.md](CURRENT.md) and [release evidence](../../evidence/wifi-ota/README.md).
 Next action is powered stationary motor/feedback verification with arm switches
 low, then only Austin's supervised physical tests.
+
+## 2026-09-19 — Make OTA and wireless telemetry the documented workflow
+
+Documentation-only follow-up in the root control checkout on `codex/wifi-ota`,
+based on `aa9ae13`. Updated README, project reference, Wi-Fi/OTA runbook, balance
+test guide, radio integration docs and current-state records. Normal firmware
+updates now use application OTA; live monitoring and validated saved-run
+downloads use Wi-Fi. Documented `.csv`/`.wire` retention, separate analysis,
+maintenance prerequisites, active-slot/image verification, disabled settings
+APIs, and the remaining USB tuning/calibration/recovery operations. Removed
+active instructions to upload LittleFS, including for embedded dashboard changes.
+
+Added current-workflow pointers to 22 historical balance/evidence documents and
+updated the tuning-history handoff without changing prior test results. The
+release remains source `6018cd4`; installed state and powered-test limits refer
+to the last verification session, not a new device inspection.
+
+Validation: checked Markdown file/heading links, documented CLI arguments via
+offline `--help`, API/schema/configuration claims against current source, frozen
+release size and both SHA-256 identities against its manifest, whitespace, and
+the documentation diff for local secrets. All passed. No firmware build or
+hardware tests were repeated for prose-only changes. No device commands, flash,
+settings changes, remote push or Internet deployment occurred in this pass.
+Preserved the user's untracked pre-radio-upgrade telemetry pair.
+
+Concurrent ground-drive work reported separate ownership in
+`worktrees/ground-drive` and coordination with the standing-drive task. Replied
+that this task owns only root documentation; the next release owner must update
+CURRENT after actual integration/deployment. Their worktrees were untouched.
+Next operator step remains a disarmed powered feedback check, then supervised
+physical testing when RC is ready; use the Wi-Fi guide for subsequent updates
+and downloads.

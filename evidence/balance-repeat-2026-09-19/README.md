@@ -1,5 +1,7 @@
 # September 19 successful stand-up repeat
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 Austin reported another very successful stand-up. The first read-only inspection found drive disarmed, arms armed, and 1,303 samples waiting in RAM. After Austin lowered both switches, fresh status confirmed both groups disarmed and `pending save: no`. The full new recording was then downloaded; no old stored file was mistaken for this run.
 
 - `pending-save.serial/.txt`: initial diagnostic and reason download waited.

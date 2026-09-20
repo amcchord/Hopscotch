@@ -1,5 +1,7 @@
 # Settling review after two successful starts
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 This is a recommendation review, not a firmware change. The tested application remains `720f2e3` / SHA-256 `5531c6287dd5ef8d398d426a7596d8c6d91e6c914825d137bc9a1ef485734e35`. No USB access, motion, tuning or flash was performed during this review.
 
 ## Where the remaining time goes

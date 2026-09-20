@@ -1,5 +1,7 @@
 # September 14: respond to early roll-away, then learn equilibrium
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 The latest stand-up still required a hand stop. Austin's requested direction is to detect the developing runaway and respond promptly, giving the controller time to find equilibrium instead of guessing a fixed balance angle. This firmware implements that approach. The first follow-up succeeded according to Austin, and the complete telemetry records an early catch followed by settling. A September 19 repeat also succeeded with matching firmware/configuration metadata. Two captured successes support repeatability under these conditions; they do not measure a broader success rate.
 
 ## What the last trial established

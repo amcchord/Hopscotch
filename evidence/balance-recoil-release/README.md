@@ -1,5 +1,7 @@
 # Confirmed recoil release v1
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 Source `1d80257e5609a173d9bbe104997eab1f9d4c7341` was uploaded application-only and verified. See `device-checks.json` for exact image/health identity and `../../docs/BALANCE_RECOIL_RELEASE_2026-09.md` for behavior, validation, limitations, restoration and physical test.
 
 - `screen.py` / `.json` / `.txt`: frozen baseline versus final mirrored policy, 324 cases each; initial catch output equality asserted.

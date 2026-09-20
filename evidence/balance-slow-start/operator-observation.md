@@ -1,5 +1,7 @@
 # September 14 operator report
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 After application `5368df8` was flashed, Austin started a test while the host
 was observing timing. No tool initiated arming, tip-up or balance.
 

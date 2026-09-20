@@ -1,5 +1,10 @@
 # Wi-Fi / OTA release — September 19, 2026
 
+This is the release verification record. For routine updates, live telemetry,
+saved-run download and recovery, use the [Wi-Fi / OTA operating guide](../../docs/WIFI_OTA.md).
+Check [current state](../../docs/progress/CURRENT.md) before deployment; slot
+addresses below record the verification session and can change with later OTA.
+
 Source: `6018cd4` on local branch `codex/wifi-ota`, based on `112e7e7`.
 Project/control checkout: `/Users/austinmcchord/Development/Hopscotch`.
 Radio worktree was not changed. No remote push or Internet deployment.
@@ -7,7 +12,7 @@ Radio worktree was not changed. No remote push or Internet deployment.
 ## Installed application
 
 - ESP32-S3 / M5Stack AtomS3R, 8 MiB flash / 8 MiB PSRAM.
-- Running partition: app0 (`0x10000`); two existing 3,342,336-byte OTA slots.
+- Running partition at final verification: app0 (`0x10000`); two existing 3,342,336-byte OTA slots. Query `/api/info` for the current `running_slot`.
 - File size: **1,187,632 bytes**; application SHA-256:
   `3bd85bfdd26f48df86c5d87b76797282f4c2479a7e96b2838217f479553171cf`.
 - Verified ESP image content digest:

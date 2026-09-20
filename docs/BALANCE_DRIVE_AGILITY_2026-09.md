@@ -1,5 +1,7 @@
 # Standing drive: acceleration control and planned arm assistance
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 September 19, 2026. Austin requested 10× the installed forward/back limit, 3× the turning limit, and immediate response even at full stick. He also proposed using the arms to initiate lean and help acceleration/braking. This candidate implements those requests. Physical performance is still unverified; the exact release identity and deployment state are in [CURRENT](progress/CURRENT.md).
 
 ## What the latest physical run establishes

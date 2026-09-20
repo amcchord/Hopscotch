@@ -1,5 +1,7 @@
 # September 14: stand-up reliability pass
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 This pass corrects motor feedback faults that occur as balance starts. It is a
 test candidate for reducing initial roll-away; an unaided stand-up improvement
 still needs a physical trial. The radio timing fix remains in place.

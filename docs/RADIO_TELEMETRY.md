@@ -5,6 +5,14 @@ its execution and reports the result.** Keep steering, throttle, disarm, and the
 existing triggers working independently of Lua. Use the screen to make actual
 robot state legible, then add a named motion catalogue as the robot grows.
 
+**Current integration:** the installed [Wi-Fi/OTA firmware](progress/CURRENT.md)
+includes this structured radio payload and retains driving damping v4. Robot
+updates now use [application OTA](WIFI_OTA.md#update-the-firmware), and complete
+saved runs use the [Wi-Fi download workflow](WIFI_OTA.md#live-telemetry-and-saved-runs).
+The Lua script is installed on the GX12, but actual RF forwarding/screen behavior
+remains unverified. The configuration audit below is a September 19 snapshot;
+Austin's subsequent radio adjustments may change its saved mappings.
+
 ## Download and configuration audit
 
 The complete accessible radio storage was copied from `/Volumes/NO NAME` to
@@ -53,7 +61,7 @@ Reviewed configuration:
 - Existing Lua includes ELRS tools, the model wizard, GPS Plus Code telemetry,
   and Snake; none is a robot-state dashboard.
 
-### Actual saved radio mapping, unchanged
+### Saved radio mapping at the audit
 
 Robot functions below describe the reviewed source/default settings, not a live
 download of the robot's persisted channel map. Ground-drive channels and several
@@ -80,9 +88,10 @@ written during this task.
 | 15 | SL1 | Not used by the current control loop |
 | 16 | SL2 | Not used by the current control loop |
 
-The README's slider descriptions were inaccurate for this actual model. Do not
-use them as an installation instruction. Neither this audit nor the Lua script
-changes any mixer, input, trim, switch, function button, channel, or trigger.
+The earlier README slider descriptions were inaccurate for this saved model;
+the README now reflects this audit. Verify current channels after any radio
+adjustment. Neither this audit nor the Lua script changes any mixer, input,
+trim, switch, function button, channel, or trigger.
 
 ### What remains inside the RF module
 
@@ -94,7 +103,7 @@ which is currently arm speed) before considering any changes. Do not infer full
 16-channel resolution or telemetry bandwidth from `channelsCount: 16` alone.
 [ELRS model configuration](https://www.expresslrs.org/software/model-config-match/).
 
-## Implemented display and firmware candidate
+## Implemented display and integrated firmware
 
 `radio/SCRIPTS/TELEMETRY/hop.lua` is a receive-only EdgeTX telemetry script with
 five pages, navigated using the roller / ENTER:
@@ -108,9 +117,10 @@ five pages, navigated using the roller / ENTER:
    state/arming changes. This is bounded session history, not a persistent log.
 5. **Radio:** control/return link quality, RSSI, transmit power, TX battery.
 
-The existing firmware can supply the basic fallback (FM and voltage). It cannot
-prove separate drive/arm state: its `DISARM` text was based only on the arms.
-The candidate fixes FM to describe the whole robot and adds structured status.
+The pre-integration firmware supplied basic fallback (FM and voltage), but
+could not prove separate drive/arm state: its `DISARM` text was based only on
+the arms. The installed combined firmware fixes FM to describe the whole robot
+and adds structured status.
 An active drive with disarmed arms is now `WHEELS READY`/`DRIVING`/`BRAKING`, not
 `DISARM`. Motor-manager accepted arming state and individual motor feedback are
 shown separately: `ON` is enabled, not proof that a wheel is physically moving.
@@ -213,13 +223,15 @@ instead of delaying control. Existing control loops and mappings are unchanged.
 
 ## Installation, verification, and rollback
 
-Update after authorization: `hop.lua` is installed on the radio and selected in
+`hop.lua` is installed on the radio and selected in
 telemetry screen 2 (index 1). Original Values screen and all mappings are intact.
 The SD files passed readback verification and the volume was safely ejected.
-The robot firmware candidate remains unflashed. This branch must be integrated
-with the latest balance work before flashing.
+The combined robot firmware was subsequently installed and bench-tested for
+Wi-Fi/OTA with motor power off. See [current state](progress/CURRENT.md) for
+source/image identity. RF display verification remains outstanding.
 
-Installation procedure (SD steps completed; robot firmware steps remain):
+For future display or robot updates (SD installation and firmware integration
+are already complete):
 
 1. Preserve a fresh model/radio backup if either has changed since this audit.
 2. Copy `radio/SCRIPTS/TELEMETRY/hop.lua` to `/SCRIPTS/TELEMETRY/hop.lua` on the
@@ -227,10 +239,10 @@ Installation procedure (SD steps completed; robot firmware steps remain):
 3. On the radio's model Display page, select **Script → hop** in a spare
    telemetry screen. Keep the existing Values screen. Do not edit mixers,
    channels, switch functions, or RF parameters. Long RTN exits telemetry.
-4. The unmodified robot will show Basic telemetry. For full status, integrate
-   and build the firmware change, then follow `docs/BALANCE_TESTING.md` and the
-   project's authorized application-only flash/readback process. Do not upload
-   LittleFS or reset settings/calibration.
+4. Update the robot only if its firmware needs changing, using the
+   [OTA procedure](WIFI_OTA.md#update-the-firmware). The current release already
+   includes full structured status. Robot OTA does not copy Lua files to the
+   handset. Do not upload LittleFS or reset settings/calibration.
 5. First verify with both motor groups disarmed. Check firmware identity,
    module versions/settings, matching voltage, all six motor roles, live/stale
    transitions, page navigation, script memory/CPU, and no new control timing
@@ -241,8 +253,10 @@ Installation procedure (SD steps completed; robot firmware steps remain):
 Radio rollback: remove the added telemetry-screen selection and `hop.lua` /
 radio-generated `hop.luac`; the original Values screen still works. Restore the
 backed-up model file only if needed and only after comparing newer user changes.
-Robot rollback: use the exact pre-install application image and existing
-project procedure, preserving settings, calibration, and saved run logs.
+Robot recovery: follow the [Wi-Fi/OTA recovery guide](WIFI_OTA.md#recovery),
+preserving calibration/settings and downloading the saved run first. The active
+slot can change after every OTA. Restoring pre-Wi-Fi firmware removes its OTA
+service; do not use historical app0-only commands as a generic recovery method.
 
 Host validation: `bash scripts/check_radio_telemetry.sh`, the existing consolidated
 balance checks, and PlatformIO build. The new tests feed actual C++-encoded

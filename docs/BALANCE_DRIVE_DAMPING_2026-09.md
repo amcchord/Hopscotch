@@ -1,5 +1,7 @@
 # Driving damping and graded arm recovery — September 19, 2026
 
+> **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](WIFI_OTA.md) and the [current test guide](BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
+
 This fork changes driving after a successful stand-up. Austin authorized implementation, simulation, and an application-only upload, then a stop. Physical movement and later telemetry review belong to Austin's subsequent test. Stand-up repeatability is still unresolved and is outside this change.
 
 ## Evidence and reasoning
