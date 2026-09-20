@@ -11,3 +11,4 @@ __pycache__/
 output/
 artifacts/
 scratch/
+src/network_secrets.h

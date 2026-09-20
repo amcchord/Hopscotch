@@ -88,7 +88,7 @@ public:
 
     // Telemetry log. serviceLog() is called only from the low-priority loop
     // after balance mode is fully idle; it is the only path that writes flash.
-    void dumpLog();
+    void dumpLog(Print* sink = nullptr);
     void clearLog();
     void serviceLog();
     void setLogNote(const char* note);

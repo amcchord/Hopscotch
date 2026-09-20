@@ -2,7 +2,6 @@
 #include <M5Unified.h>
 #include <WiFi.h>
 #include <LittleFS.h>
-#include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <MadgwickAHRS.h>
 
@@ -36,7 +35,6 @@ static Madgwick         ahrsFilter;
 // Timing
 static uint32_t lastControlTick  = 0;
 static uint32_t lastDisplayTick  = 0;
-static uint32_t lastWsTick       = 0;
 static uint32_t lastTelTick      = 0;
 // (lastCalPrintTick removed -- calibration now via TX triggers)
 static uint32_t controlTickCount = 0;
@@ -222,8 +220,12 @@ static RawImuData sharedImu = {};
 static volatile bool       sharedImuReady = false;
 static portMUX_TYPE        imuMux = portMUX_INITIALIZER_UNLOCKED;
 static volatile bool logDownloadActive = false;
-static volatile bool webDisarmPending = false;
-static bool rcRearmRequired = false;
+static std::atomic<bool> webDisarmPending{false};
+static bool rcRearmRequired = true; // Boot / OTA never arms from switches already high.
+static LoopTiming networkControlTiming;
+static LoopTiming networkBalanceTiming;
+static QueueHandle_t networkBalanceStats = nullptr;
+static void publishNetworkSnapshot(uint32_t now);
 
 // Task handles (control core split)
 static TaskHandle_t balanceTaskHandle  = nullptr;
@@ -287,6 +289,7 @@ static void printSerialHelp() {
     Serial.println("  bal log clear               Delete telemetry log file");
     Serial.println("  bal note <text>             Tag the next/current test run");
     Serial.println("  bal mark                    Add a numbered event marker");
+    Serial.println("  net status                  WiFi address and maintenance state");
     Serial.println("  help                        Show this help");
     Serial.println("-----------------------------");
 }
@@ -590,6 +593,15 @@ static void processSerialCommand(const char* cmd) {
     while (*cmd == ' ') cmd++;
     if (*cmd == '\0') return;
 
+    if (webUI.maintenance.busy() && strcmp(cmd, "disarm") && strcmp(cmd, "disarm arms")) {
+        Serial.println("[Cmd] REFUSED during network maintenance");
+        return;
+    }
+    if (strcmp(cmd, "net status") == 0) {
+        Serial.printf("[Network] connected=%d rearm_required=%d maintenance=%d; address on display / mDNS\n",
+                      webUI.connected(), rcRearmRequired, webUI.maintenance.busy());
+        return;
+    }
     // A capture snapshots its gains once. Keep the control task free of
     // bench diagnostics, flash writes and tuning changes during that run.
     if (balanceCtrl.isActive()
@@ -637,6 +649,7 @@ static void processSerialCommand(const char* cmd) {
         Serial.printf("[Sim] Steering = %.2f\n", simSteering);
 
     } else if (strcmp(cmd, "arm") == 0) {
+        if (rcRearmRequired) { Serial.println("[Cmd] Lower both RC arm switches first"); return; }
         Serial.println("[Sim] Arming drive motors...");
         motorMgr.requestArmDrive();
 
@@ -649,6 +662,7 @@ static void processSerialCommand(const char* cmd) {
         motorMgr.disarmDriveMotors();
 
     } else if (strcmp(cmd, "arm arms") == 0) {
+        if (rcRearmRequired) { Serial.println("[Cmd] Lower both RC arm switches first"); return; }
         Serial.println("[Sim] Arming arm motors (ensure arms are in FORWARD position)...");
         motorMgr.requestArmArms();
 
@@ -860,10 +874,6 @@ static void applySettings() {
 // ---------------------------------------------------------------------------
 // Callbacks for WebUI
 // ---------------------------------------------------------------------------
-static void onSettingsChanged() {
-    applySettings();
-}
-
 static void onDisarmRequested() {
     // Async TCP runs on the other core: enqueue intent, never mutate motor
     // modes or balance state concurrently with the control task.
@@ -871,8 +881,7 @@ static void onDisarmRequested() {
 }
 
 static void serviceWebDisarm() {
-    if (!webDisarmPending) return;
-    webDisarmPending = false;
+    if (!webDisarmPending.exchange(false)) return;
     rcRearmRequired = true;
     Serial.println("[Main] Emergency disarm requested via web");
     if (balanceCtrl.isActive()) {
@@ -882,28 +891,6 @@ static void serviceWebDisarm() {
     driveCtrl.emergencyStop();
     armCtrl.holdPosition();
     motorMgr.disarmAll();
-}
-
-static bool onCanIdChange(uint8_t old_id, uint8_t new_id) {
-    Serial.printf("[Main] CAN ID change: %d -> %d\n", old_id, new_id);
-    return motorMgr.changeMotorCanIdOnBus(old_id, new_id);
-}
-
-// ---------------------------------------------------------------------------
-// WiFi management
-// ---------------------------------------------------------------------------
-static void initWifi() {
-    const Settings& s = settingsMgr.settings;
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(s.wifi_ssid, s.wifi_password);
-    wifiIP = WiFi.softAPIP().toString();
-    wifiConnected = true;
-    webUI.setWifiState(true, wifiIP.c_str());
-    Serial.printf("[WiFi] AP started: SSID=%s IP=%s\n", s.wifi_ssid, wifiIP.c_str());
-}
-
-static void updateWifi() {
-    // AP mode is always available -- nothing to poll
 }
 
 // ---------------------------------------------------------------------------
@@ -936,6 +923,14 @@ static void balanceTaskFunc(void* param) {
         uint32_t nowUs = micros();
         float dt = (float)(nowUs - prevUs) / 1000000.0f;
         prevUs = nowUs;
+        // Flash maintenance intentionally pauses both cores. Exclude it and
+        // initial boot from live-control measurements, resetting on exit.
+        static bool wasMaintenance = false;
+        const bool maintenance = webUI.maintenance.busy();
+        if (wasMaintenance && !maintenance) networkBalanceTiming = {};
+        else if (!maintenance && millis() > 5000) networkBalanceTiming.record(static_cast<uint32_t>(dt * 1000000.0f));
+        wasMaintenance = maintenance;
+        if (networkBalanceStats) xQueueOverwrite(networkBalanceStats, &networkBalanceTiming);
         if (dt <= 0.0f) dt = 0.005f;
 
         // This task owns sensor acquisition as well as PD. A control-task
@@ -1036,18 +1031,10 @@ void setup() {
     balanceCtrl.begin(&motorMgr, &armCtrl);
     balanceCtrl.setSettingsManager(&settingsMgr);
 
-    // 7. WiFi AP
-    initWifi();
-
-    // 8. Web server
-    webUI.begin(&settingsMgr, &motorMgr, &crsfRx);
-    webUI.onSettingsChanged(onSettingsChanged);
-    webUI.onDisarmRequested(onDisarmRequested);
-    webUI.onCanIdChange(onCanIdChange);
-    webUI.onMaintenanceAllowed([]() {
-        return !balanceCtrl.isActive() && !balanceCtrl.isLogPendingFlush()
-            && !motorMgr.isDriveArmed() && !motorMgr.isArmArmed() && !motorMgr.isArming();
-    });
+    // Networking owns all HTTP/JSON/OTA work on core 0. Credentials are local
+    // build configuration; no settings migration or filesystem image upload.
+    networkBalanceStats = xQueueCreate(1, sizeof(LoopTiming));
+    webUI.begin([](Print* out) { balanceCtrl.dumpLog(out); }, onDisarmRequested);
 
     Serial.println("[Main] Initialization complete, entering control loop");
     Serial.printf("[Main] Control loop: %d Hz, Display: 25 fps, WS: 10 Hz\n", CONTROL_LOOP_HZ);
@@ -1066,7 +1053,6 @@ void setup() {
 
     lastControlTick = millis();
     lastDisplayTick = millis();
-    lastWsTick = millis();
     lastTelTick = millis();
     lastDebugTick = millis();
 
@@ -1178,6 +1164,46 @@ static radio_status::Snapshot radioSnapshot(uint32_t now, uint16_t sequence) {
     return s;
 }
 
+static bool maintenanceAllowed() {
+    bool anyEnabled = false;
+    for (int i=0; i<NUM_MOTORS; ++i) anyEnabled |= motorMgr.getMotor(i).enabled;
+    return MaintenanceConditions{balanceCtrl.isActive(), balanceCtrl.isLogPendingFlush(),
+        motorMgr.isDriveArmed(), motorMgr.isArmArmed(), motorMgr.isArming(),
+        armCtrl.isInCalMode(), testModeActive, simEnabled, logDownloadActive, anyEnabled}.allowed();
+}
+
+static void publishNetworkSnapshot(uint32_t now) {
+    NetworkSnapshot s;
+    static uint32_t sequence = 0;
+    s.sequence = ++sequence; s.uptime_ms = now;
+    s.drive_armed = motorMgr.isDriveArmed(); s.arm_armed = motorMgr.isArmArmed();
+    s.arming = motorMgr.isArming(); s.link_up = crsfRx.isLinkUp();
+    s.rssi = crsfRx.getRssi(); s.lq = crsfRx.getLinkQuality();
+    s.rc_age_ms = crsfRx.timeSinceLastFrame();
+    s.rearm_required = rcRearmRequired; s.balance_active = balanceCtrl.isActive();
+    s.saving_log = balanceCtrl.isLogPendingFlush(); s.maintenance = webUI.maintenance.busy();
+    s.safe = maintenanceAllowed();
+    s.tilt = balanceCtrl.getTiltAngle(); s.rate = balanceCtrl.getGyroRate();
+    s.setpoint = balanceCtrl.getEffectiveSetpoint(); s.inner_fault = balanceCtrl.getInnerFault();
+    s.imu_age_us = micros() - balanceCtrl.getImuSampleUs();
+    strlcpy(s.balance_state, balanceCtrl.getStateString(), sizeof(s.balance_state));
+    strlcpy(s.end_reason, balanceCtrl.getLogEndReason(), sizeof(s.end_reason));
+    s.voltage = motorMgr.getBusVoltage(); s.current = motorMgr.getTotalCurrent();
+    s.voltage_fresh = motorMgr.busVoltageFresh(now); s.current_fresh = motorMgr.motorCurrentFresh(now);
+    for (int i=0; i<16; ++i) s.channels[i] = crsfRx.getChannel(i);
+    for (int i=0; i<NUM_MOTORS; ++i) {
+        const auto& m = motorMgr.getMotor(i); auto& out = s.motors[i];
+        out.id = m.can_id; out.pos = m.position; out.vel = m.velocity;
+        out.torque = m.torque; out.temp = m.temperature; out.error = m.errors;
+        out.age_ms = m.has_first_feedback ? now - m.last_feedback_ms : UINT32_MAX;
+        out.online = m.online && m.has_first_feedback && out.age_ms <= 500;
+        out.enabled = m.enabled;
+    }
+    if (networkBalanceStats) xQueuePeek(networkBalanceStats, &s.balance_timing, 0);
+    s.control_timing = networkControlTiming;
+    webUI.publish(s);
+}
+
 static void controlTick() {
     uint32_t now = millis();
     uint32_t nowUs = micros();
@@ -1193,6 +1219,20 @@ static void controlTick() {
     }
     ctlLastTickUs = nowUs;
 
+    // All safety predicates are read on their owning control task. Once
+    // granted, arming, serial mutation, calibration and balance triggers stop.
+    webUI.maintenance.service(maintenanceAllowed());
+    if (webUI.maintenance.granted()) {
+        rcRearmRequired = true;
+        waitingForDoubleTap = false;
+        prevCalTrigger = true;
+        serviceWebDisarm();
+        pollSerialCommands(); // Discard prohibited commands instead of deferring them.
+        crsfRx.update();
+        motorMgr.processFeedback();
+        publishNetworkSnapshot(now);
+        return;
+    }
     // Process serial debug commands (non-blocking)
     serviceWebDisarm();
     pollSerialCommands();
@@ -1488,6 +1528,8 @@ static void controlTick() {
             loopOverruns++;
         }
 
+        publishNetworkSnapshot(now);
+
         // (Periodic debug burst moved to loopTask -- Serial output must never
         // sit on the control path.)
     }
@@ -1536,7 +1578,14 @@ static void controlTaskFunc(void* param) {
     (void)param;
     TickType_t lastWake = xTaskGetTickCount();
     Serial.printf("[Main] Control task started on core %d\n", xPortGetCoreID());
+    uint32_t previousUs = micros();
+    bool wasMaintenance = false;
     for (;;) {
+        const uint32_t nowUs = micros();
+        const bool maintenance = webUI.maintenance.busy();
+        if (wasMaintenance && !maintenance) networkControlTiming = {};
+        else if (!maintenance && millis() > 5000) networkControlTiming.record(nowUs - previousUs);
+        previousUs = nowUs; wasMaintenance = maintenance;
         controlTick();
         vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(1000 / BALANCE_LOOP_HZ));
     }
@@ -1563,10 +1612,10 @@ static void sentinelTaskFunc(void* param) {
 
 // ---------------------------------------------------------------------------
 // Main loop (loopTask, core 1, priority 1): everything that is allowed to be
-// late. Display, WebSocket telemetry, and the periodic debug burst.
+// late. Display and the periodic debug burst. Networking runs on core 0.
 // ---------------------------------------------------------------------------
 void loop() {
-    if (logDownloadActive) { delay(5); return; }
+    if (logDownloadActive || webUI.maintenance.busy()) { delay(5); return; }
     uint32_t now = millis();
     uint32_t nowUs = micros();
 
@@ -1578,10 +1627,9 @@ void loop() {
     }
     profLastLoopUs = nowUs;
 
-    // While balancing, display and WebSocket work is throttled hard: they
-    // share the core (at low priority) and neither matters mid-run.
+    // Display shares the control core at low priority; reduce it during balance.
     bool balancing = balanceCtrl.isActive();
-    if (!balancing) balanceCtrl.serviceLog();
+    if (!balancing && !webUI.maintenance.busy()) balanceCtrl.serviceLog();
 
     // -----------------------------------------------------------------------
     // ~25 fps display update (5 fps while balancing)
@@ -1590,7 +1638,9 @@ void loop() {
     if (now - lastDisplayTick >= display_period) {
         lastDisplayTick = now;
 
-        updateWifi();
+        wifiConnected = webUI.connected();
+        char networkIp[32]; webUI.copyIp(networkIp, sizeof(networkIp));
+        wifiIP = networkIp;
 
         uint32_t prof_start = micros();
         display.render(motorMgr, crsfRx,
@@ -1599,17 +1649,6 @@ void loop() {
                        &armCtrl,
                        motorMgr.isArmingDrive(), motorMgr.isArmingArms());
         profRecord(PROF_DISP, prof_start);
-    }
-
-    // -----------------------------------------------------------------------
-    // ~10 Hz WebSocket telemetry (1 Hz while balancing)
-    // -----------------------------------------------------------------------
-    uint32_t ws_period = balancing ? 1000 : WEBSOCKET_PERIOD_MS;
-    if (now - lastWsTick >= ws_period) {
-        lastWsTick = now;
-        uint32_t prof_start = micros();
-        webUI.sendTelemetry();
-        profRecord(PROF_WS, prof_start);
     }
 
     // -----------------------------------------------------------------------

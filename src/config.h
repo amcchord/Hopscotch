@@ -66,8 +66,9 @@ static constexpr uint32_t BALANCE_LOOP_PERIOD_US  = 1000000 / BALANCE_LOOP_HZ;  
 // task is pinned there by the framework, async_tcp/lwip pinned there via
 // build flags); Core 1 is the dedicated control core. Priorities: sentinel
 // (stall forensics) > 200Hz balance PD > 50Hz control > loopTask (display/
-// WebSocket/debug at priority 1) -- nothing on the comms core can preempt
-// control, and on the control core only control preempts control.
+// debug at priority 1). Network tasks do not preempt control, but
+// flash operations pause both cores; OTA / log reads require a control-owned
+// disarmed maintenance interlock. Live HTTP and WebSocket data comes from RAM.
 static constexpr int      CONTROL_CORE           = 1;
 static constexpr int      CONTROL_TASK_PRIORITY  = 12;
 static constexpr int      BALANCE_TASK_PRIORITY  = 18;

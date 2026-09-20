@@ -1,52 +1,48 @@
 #pragma once
-
 #include <ESPAsyncWebServer.h>
-#include "motor_manager.h"
-#include "crsf.h"
-#include "settings.h"
+#include <freertos/queue.h>
+#include <freertos/semphr.h>
+#include <mbedtls/sha256.h>
+#include <memory>
+#include "network_snapshot.h"
 
 class WebUI {
 public:
-    void begin(SettingsManager* settings, MotorManager* motors, CrsfReceiver* crsf);
-
-    // Push telemetry to connected WebSocket clients (call at ~10Hz)
-    void sendTelemetry();
-
-    // Callback to be set by main.cpp for when settings change
-    using SettingsChangedCallback = void(*)();
-    void onSettingsChanged(SettingsChangedCallback cb) { _settings_cb = cb; }
-
-    // Callback for emergency disarm
+    using ExportCallback = void(*)(Print*);
     using DisarmCallback = void(*)();
-    void onDisarmRequested(DisarmCallback cb) { _disarm_cb = cb; }
-
-    // Callback for CAN ID change
-    using CanIdChangeCallback = bool(*)(uint8_t old_id, uint8_t new_id);
-    void onCanIdChange(CanIdChangeCallback cb) { _canid_cb = cb; }
-    using MaintenanceAllowedCallback = bool(*)();
-    void onMaintenanceAllowed(MaintenanceAllowedCallback cb) { _maintenance_cb = cb; }
-
-    // WiFi state for telemetry
-    void setWifiState(bool connected, const char* ip);
-
+    void begin(ExportCallback export_log, DisarmCallback disarm);
+    // Control task: bounded value copy, no allocation, formatting, I/O or waits.
+    void publish(const NetworkSnapshot& snapshot);
+    MaintenanceGate maintenance;
+    bool connected() const { return _connected.load(); }
+    void copyIp(char* out, size_t size);
 private:
     AsyncWebServer _server{80};
     AsyncWebSocket _ws{"/ws"};
-
-    SettingsManager* _settings = nullptr;
-    MotorManager*    _motors = nullptr;
-    CrsfReceiver*    _crsf = nullptr;
-
-    SettingsChangedCallback _settings_cb = nullptr;
-    DisarmCallback          _disarm_cb = nullptr;
-    CanIdChangeCallback     _canid_cb = nullptr;
-    MaintenanceAllowedCallback _maintenance_cb = nullptr;
-
-    bool _wifi_connected = false;
-    char _ip_address[32] = "0.0.0.0";
-
+    QueueHandle_t _snapshots = nullptr;
+    SemaphoreHandle_t _mutex = nullptr;
+    ExportCallback _export = nullptr;
+    DisarmCallback _disarm = nullptr;
+    std::atomic<bool> _connected{false};
+    String _json = "{}", _ip = "0.0.0.0";
+    char _runningSlot[17] = "unknown", _imageSha[65] = {};
+    uint32_t _otaCapacity = 0;
+    int _networkCore = -1, _eventCore = -1;
+    uint32_t _dropped = 0;
+    bool _ap = false;
+    uint32_t _reconnectAtMs = 0;
+    AsyncWebServerRequest* _ota_request = nullptr;
+    size_t _ota_size = 0, _ota_received = 0;
+    uint32_t _ota_last_ms = 0, _restart_ms = 0;
+    String _ota_sha;
+    mbedtls_sha256_context _sha;
+    std::weak_ptr<uint8_t> _download;
+    void run();
     void setupRoutes();
-    void onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client,
-                   AwsEventType type, void* arg, uint8_t* data, size_t len);
-    String buildTelemetryJson();
+    void refreshTelemetry();
+    bool authorized(AsyncWebServerRequest* request);
+    bool acquireMaintenance();
+    void releaseMaintenance();
+    void failOta();
+    void upload(AsyncWebServerRequest* request, size_t index, uint8_t* data, size_t len, bool final);
 };

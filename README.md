@@ -39,13 +39,20 @@ The balance point is self-calibrating: an arm-position-to-balance-point curve pr
 
 The full design record -- 30+ instrumented runs and 50+ lessons in the current Speed-mode campaign -- lives in `telemetry_logs/TUNING_HISTORY.md`. Offline tooling: `scripts/fit_balance_model.py --speed-only` fits the plant model from telemetry, and `scripts/balance_sim.py` is an approximate planar simulator (capture/arm-return scenarios, push response, control-task stall injection) used to screen controller changes before robot time. It reads current firmware constants but does not simulate full self-righting, contacts, slip, sensor mounting movement, or the actual task scheduler. The repeatable flash, safety, test, marker, download, and analysis workflow is in [`docs/BALANCE_TESTING.md`](docs/BALANCE_TESTING.md).
 
-### Web Dashboard
+### Wi-Fi telemetry and OTA
 
-The robot creates a WiFi access point (default SSID: `Hopscotch`) and serves a web UI on port 80 with:
+The robot joins its configured Wi-Fi network and serves an embedded dashboard
+at `http://hopscotch.local/`. [Setup, API, safety design and recovery](docs/WIFI_OTA.md).
 
-- Live 10 Hz telemetry over WebSocket — motor positions, velocities, torques, temperatures, all 16 RC channels, arming state, link quality
-- REST API for reading/writing settings, emergency disarm, CAN ID reassignment, and factory reset
-- All settings are persisted to flash as JSON
+- Live telemetry offered at 10 Hz: pose, motor feedback, RC state, timing and memory
+- Checksummed saved-run downloads without a USB cable
+- Authenticated application OTA into the inactive firmware slot, preserving settings and calibration
+- Control-owned disarmed interlock for flash operations and Wi-Fi association
+- Authenticated emergency-disarm request; the radio remains the motion-control path
+
+The dashboard is included in the application, so OTA also updates the UI.
+Configure the gitignored `src/network_secrets.h` before building. Settings and
+calibration continue to live in LittleFS; configuration/tuning uses the USB console.
 
 ### Serial Console
 
@@ -101,7 +108,7 @@ Upload uses `esp-builtin` (JTAG) because the AtomS3R's USB-JTAG serial port is u
 
 ### Upload Web UI
 
-The web dashboard files in `data/` must be uploaded separately to LittleFS:
+The legacy web dashboard files in `data/` can be uploaded to LittleFS, but the current Wi-Fi dashboard is embedded in the application and does **not** require this:
 
 ```bash
 pio run --target uploadfs
@@ -125,8 +132,8 @@ Or:
 
 The firmware splits the two ESP32-S3 cores into a **control core** and a **comms core**:
 
-- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: direct IMU acquisition, complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display, WebSocket telemetry, and debug output — control can preempt it, never the reverse.
-- **Core 0 (comms)** — WiFi and lwIP (pinned there by the framework) plus `async_tcp` (pinned by build flag). Networking can no longer preempt the control loops.
+- **Core 1 (control)** — three tasks by priority: a stall-forensics sentinel (prio 24), the 200 Hz balance task (prio 18: direct IMU acquisition, complementary filter, PD loop, wheel speed commands), and the 50 Hz control task (prio 12: serial console, CRSF parsing, CAN scan/feedback, arming logic, drive/arm/balance controllers, failsafe). The Arduino `loopTask` (prio 1) keeps only the display and debug output — control can preempt it, never the reverse.
+- **Core 0 (comms)** — WiFi and lwIP (pinned by the framework), `async_tcp` (priority 3), and the network task (priority 2). Control publishes bounded RAM snapshots. OTA and saved-file reads require a disarmed interlock because flash access can still pause both cores.
 
 Control-task gaps over 100 ms are recorded as forensic events (profiler section attribution plus a sentinel-gap discriminator). The profiler is reset at balance entry and frozen at exit, so `bal log` reports only the physical run rather than idle-time download activity.
 
@@ -155,13 +162,13 @@ Balance telemetry schema v2 records up to 120 seconds at 50 Hz, including tip-up
 | Control loop | 50 Hz (5 ms task cadence) |
 | Balance loop | 200 Hz |
 | Display refresh | 25 fps (5 fps while balancing) |
-| WebSocket telemetry | 10 Hz (1 Hz while balancing) |
+| WebSocket telemetry | 10 Hz offered, including while balancing; slow clients drop frames |
 | CRSF telemetry uplink | 5 Hz |
 | Stall sentinel | 100 Hz |
 
 ## Configuration
 
-Compile-time defaults live in `src/config.h`. Most parameters can be overridden at runtime through `settings.json` (persisted to LittleFS) via the web dashboard or REST API.
+Compile-time defaults live in `src/config.h`. Parameters are retained in `settings.json` on LittleFS. The previous web mutation routes are disabled; use the USB console for tuning and calibration.
 
 Balance gains can also be tuned over serial between attempts without reflashing:
 

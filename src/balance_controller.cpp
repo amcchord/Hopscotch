@@ -1838,7 +1838,7 @@ void BalanceController::markEvent() {
     if (_logging && _marker_count < 0xFFFF) _marker_count++;
 }
 
-void BalanceController::dumpLog() {
+void BalanceController::dumpLog(Print* sink) {
     if (isActive() || _logging || _motors->isDriveArmed() || _motors->isArmArmed() || _motors->isArming()) {
         Serial.println("[Balance] Log dump REFUSED while balance mode is active");
         return;
@@ -1850,7 +1850,7 @@ void BalanceController::dumpLog() {
         return;
     }
 
-    TelemetryTransport out;
+    TelemetryTransport out(sink);
     File f = LittleFS.open(BALANCE_LOG_PATH, "r");
     if (!f) {
         // Preserve access to a pre-v2 CSV that survived a firmware-only flash.

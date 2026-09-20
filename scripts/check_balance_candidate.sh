@@ -19,6 +19,8 @@ clang++ -std=c++17 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/test_crsf_nat
 output/test_crsf_native
 clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -Itests/stubs -Isrc tests/test_motor_feedback.cpp src/robstride.cpp src/motor_manager.cpp -o output/test_motor_feedback
 output/test_motor_feedback
+clang++ -std=c++17 -Wall -Wextra -Werror -pthread -Isrc tests/test_network_safety.cpp -o output/test_network_safety
+output/test_network_safety
 "$PYTHON_BIN" -m unittest discover -s tests -v
 "$PYTHON_BIN" -m py_compile scripts/*.py
 bash -n scripts/*.sh
