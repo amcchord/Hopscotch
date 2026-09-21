@@ -807,3 +807,25 @@ probe, run or OTA performed. Existing firmware tests need no repeat for evidence
 integration. Device ownership remains here; investigate the left response before
 choosing a correction, retaining valid current-limit checks and the write-only
 ACC_RAD constraint. The download/review request is complete.
+
+## 2026-09-20 — Preserve successful fast laydown; hand stand-up drift to owner
+
+Fast-tip task relayed another successful test and Austin's request to reduce
+stand-up drift. Archived 1,325 schema 10 samples / 26.660 s, lower_complete, with
+fresh disarmed/saving-finished checks and verified post-export idle/health.
+Source 45c1a94/app0 remains installed. CSV/wire hashes and exact read-in-place
+paths sent to fast-tip task; no raw log copies between worktrees.
+
+CH6 fast-lowering flag is set throughout the successful lower. CH11 starts
+18.421 s; supported descent 19.721–25.891 s; completion 26.660 s. Total 8.239 s,
+supported 6.170 s, compared with normal v9's 12.009/9.900 s. Final tilt -1.814 degrees,
+rate -0.182 degrees/s, Forward errors -0.028/+0.006 rad. This first physical fast
+success is 3.770 s shorter overall, not a controlled comparison or reliability
+estimate. [Archive/result](../../evidence/balance-lower/fast-tip-drift-20260921T011755Z/README.md).
+
+Fast-tip task owns stand-up capture/equilibrium/drift analysis and any source
+candidate, starting from exact installed code. Austin's suspected angle drift
+is a hypothesis to test against the recordings. This task retains device and
+integration ownership; no overlapping motor/stand-up changes, motion, settings
+writes or OTA. Current download/record work is complete; await the owner's
+justified candidate before release work.

@@ -30,3 +30,12 @@ pulse CH11 to lower, then disarm and archive before another run. Verify continue
 arm return, a gentle final landing and arms Forward. No autonomous motion.
 
 [Verified release and recovery](../evidence/lowering-v10-integration/README.md).
+
+## First physical fast-laydown result
+
+Austin confirmed the next run worked. [Telemetry](../evidence/balance-lower/fast-tip-drift-20260921T011755Z/README.md)
+records CH6 fast selection and lower_complete in 8.239 seconds, with 6.170 seconds
+of supported return. The earlier normal v9 run took 12.009/9.900 seconds respectively.
+Final tilt -1.814 degrees, rate -0.182 degrees/s and Forward errors -0.028/+0.006 rad.
+These are separate observed runs, not a controlled performance or reliability
+study. The faster lowering succeeded; current follow-up concerns stand-up drift.

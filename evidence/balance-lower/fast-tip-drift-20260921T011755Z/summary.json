@@ -1,0 +1,78 @@
+{
+  "samples": 1325,
+  "schema": 10,
+  "run_duration_s": 26.66,
+  "end_reason": "lower_complete",
+  "fast_tip_selected": true,
+  "fast_lower_selected": true,
+  "lower_events": [
+    {
+      "t_ms": 18421.0,
+      "phase": 1,
+      "tilt": 87.116,
+      "rate": -3.077,
+      "fast": true
+    },
+    {
+      "t_ms": 18901.0,
+      "phase": 2,
+      "tilt": 87.118,
+      "rate": 0.253,
+      "fast": true
+    },
+    {
+      "t_ms": 19481.0,
+      "phase": 9,
+      "tilt": 85.626,
+      "rate": -11.78,
+      "fast": true
+    },
+    {
+      "t_ms": 19581.0,
+      "phase": 10,
+      "tilt": 83.066,
+      "rate": -42.225,
+      "fast": true
+    },
+    {
+      "t_ms": 19721.0,
+      "phase": 3,
+      "tilt": 81.558,
+      "rate": 2.017,
+      "fast": true
+    },
+    {
+      "t_ms": 25891.0,
+      "phase": 4,
+      "tilt": -1.593,
+      "rate": -4.188,
+      "fast": true
+    },
+    {
+      "t_ms": 26496.0,
+      "phase": 5,
+      "tilt": -1.71,
+      "rate": 0.02,
+      "fast": true
+    },
+    {
+      "t_ms": 26660.0,
+      "phase": 7,
+      "tilt": -1.814,
+      "rate": -0.182,
+      "fast": true
+    }
+  ],
+  "lower_duration_s": 8.239,
+  "final_tilt_deg": -1.814,
+  "final_rate_dps": -0.182,
+  "final_forward_error_rad": [
+    -0.028000000000000025,
+    0.005999999999999783
+  ],
+  "final_wheel_rad_s": [
+    0.004,
+    0.047
+  ],
+  "scope": "Lowering phase/timing only; fast-tip task owns stand-up drift analysis. Recorded completion is one physical trial, not a reliability rate or controlled speed comparison."
+}
