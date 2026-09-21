@@ -169,7 +169,7 @@ static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.71f;   // arm delta 
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.96f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
 // CH6 high selects the experimental fast trajectory for the next CH11 stand-up.
-// Slow mode and the established endpoint poses/arm-return policy are preserved.
+// Slow mode, endpoint poses, balance gains and arm-return policy stay identical.
 static constexpr uint8_t  CH_FAST_TIP_UP = 5; // physical CH6, independent of legacy arm-group mapping
 static constexpr float    BALANCE_FAST_TIP_DURATION_S = 2.6f;
 static constexpr float    BALANCE_FAST_TIP_MOTOR_RAD_S = 2.2f;
@@ -389,11 +389,6 @@ static constexpr uint32_t BALANCE_START_RECOVERY_CONFIRM_MS = 60;
 static constexpr float    BALANCE_START_RECOVERY_TIP_MAX = 0.90f;
 static constexpr uint32_t BALANCE_START_RECOVERY_FEEDBACK_MS = 30;
 static constexpr float    BALANCE_START_RECOVERY_KI = 1.0f;
-// Fast lift already has a measured capture and the saved equilibrium trim.
-// Learning the short arm-release transient at the slow-start boost gain built
-// +2.85 degrees of correction, then a -7.0 rad/s recoil (Sept 20 fast trial).
-// Retain the same detector, 800 ms window and bounds; halve only its fast gain.
-static constexpr float    BALANCE_FAST_START_RECOVERY_KI = 0.5f;
 static constexpr uint32_t BALANCE_START_RECOVERY_BOOST_MS = 800;
 static constexpr float    BALANCE_START_RECOVERY_LIMIT_DEG = 6.0f;
 static constexpr float    BALANCE_START_RECOVERY_RATE_DPS = 6.0f;
