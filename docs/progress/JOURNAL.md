@@ -773,3 +773,17 @@ remains in ota-throughput; no package, private header or raw export was copied.
 
 Next: operator CH6 HIGH / CH11 fast-laydown trial, disarm and archive. Future
 ordinary OTA can collect new receiver timings without an extra benchmark run.
+
+## 2026-09-20 — Archive failed fast stand-up for fast-tip owner
+
+Fast-tip task relayed Austin's request to download a new fast stand-up fall.
+Verified installed 45c1a94/app0, fresh IDLE/disarmed, saving finished, powered
+healthy disabled motors and maintenance eligibility. Archived 291 samples /
+5.906 s, schema 10, bailout_angle_error; CSV/wire validated and
+preserved byte-for-byte. Post-export fresh idle/health/maintenance-release
+verification passed. [Evidence](../../evidence/balance-lower/fast-tip-fall-20260921T010806Z/README.md).
+
+Sent exact read-in-place paths, hashes and image identity to fast-tip task,
+which owns analysis. No raw log copies between worktrees, no autonomous motion,
+settings change or OTA. This task retains device ownership and holds updates
+until the trace diagnosis is reviewed. No cause inferred from exit reason alone.

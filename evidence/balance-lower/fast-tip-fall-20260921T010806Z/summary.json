@@ -1,0 +1,7 @@
+{
+  "telemetry_schema": "10",
+  "run_duration_ms": "5906",
+  "end_reason": "bailout_angle_error",
+  "samples": 291,
+  "post_archive_idle_verified": true
+}
