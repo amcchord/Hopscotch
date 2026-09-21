@@ -717,3 +717,23 @@ Completed release records committed as `a2c783b`; exact installed identity,
 recovery/verification results, AP comparison, host fix and source-integration
 requirement were sent to the lowering task. Exclusive device/release ownership
 has returned to that task. No further robot requests are planned here.
+
+## 2026-09-20 — Analyze receiver timings from the next normal deployment
+
+The lowering owner supplied its regular v12 update record (source `09d2e01`,
+release record `5b1b545`). Read that technical evidence in place and appended
+the derived findings to `docs/OTA_THROUGHPUT_2026-09.md`. No robot requests,
+reconnects, uploads, builds, private-file copies or other-checkout edits.
+Device ownership remains with the lowering task.
+
+1,215,936 bytes took 438.820 s, 2.706 KiB/s, with no host sleeps. Receiver elapsed
+438.622 s; flash writes totaled 5.214650 s (max 0.154555 s), final verification
+0.149445 s. These measured operations account for only about 1.22% of receiver
+time. Max receive gap was 13.487 s, host send blocking 405.642140 s (max send
+28.327570 s), response wait 33.046991 s. Same channel-1 AP before/after,
+-57/-56 dBm and RC linked. AP selection and unpaced sending have not resolved
+the observed slowdown. Evidence points further investigation toward transport
+delivery and receiver scheduling/parsing, without isolating RF/TCP/flow-control
+causes. No flash or control-priority change is justified by these timings.
+Next useful evidence is TCP retransmission/receive-window behavior during an
+already-authorized update; no benchmark reflash requested or performed.

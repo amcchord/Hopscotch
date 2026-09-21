@@ -1,11 +1,11 @@
 # Strongest AP selection and OTA throughput
 
-Installed source `45c1a94` on `codex/ota-throughput`, based on verified v10
+This feature first shipped as source `45c1a94` on `codex/ota-throughput`, based on v10
 record `d5f18fa` (motion source `7917543`). The initial investigation was offline;
 Austin subsequently authorized deployment. [Deployment evidence](../evidence/ota-throughput-deployment/README.md)
 records exact identity, the host-timeout fix, successful retry and stronger AP
-selected during a safe reconnect. Device ownership returns to the lowering task
-after this deployment handoff.
+selected during a safe reconnect. Device ownership has returned to the lowering
+task, which integrated the changes and preserves them in later motion releases.
 
 ## Findings
 
@@ -112,3 +112,45 @@ disarmed reconnect selected a different BSSID on channel 1 and improved -69 to
 signal is a connection preference, not a guarantee of permanent best coverage.
 The next normal update can measure this connection and collect receiver timings.
 The physical percentage display was confirmed by Austin; no motion was initiated.
+
+## First receiver timings from a later regular update
+
+The lowering owner supplied the next normal authorized deployment, v12 source
+`09d2e01b6ef89a357319a8eeea2fa11db8221932`, recorded at commit `5b1b545` in
+`worktrees/balance-lower/evidence/lowering-v12-integration/deployment.json`.
+That record was read in place; no raw log or private package was copied, and no
+robot requests, scans or extra uploads were made for this analysis. The ordinary
+update completed with HTTP 200 and verified image, health, RC and log retention.
+
+| Measurement | Observed value |
+|---|---:|
+| Application / host transfer duration | 1,215,936 bytes / 438.820 s |
+| Application throughput | 2.706 KiB/s |
+| Receiver elapsed | 438.622 s |
+| Cumulative flash write time | 5.214650 s |
+| Longest flash write | 0.154555 s |
+| Final verification | 0.149445 s |
+| Longest gap between upload callbacks | 13.487 s |
+| Host time blocked in socket sends | 405.642140 s |
+| Longest individual socket send | 28.327570 s |
+| Final response wait / host pacing sleeps | 33.046991 s / 0 s |
+
+The same channel-1 AP (`8C:30:66:7A:2E:DD`) was present before and after, at
+-57 / -56 dBm; RC was linked before and after. This transfer used the new AP
+selection and receiver timing code, unlike the initial installation above.
+
+Measured flash writing plus final verification accounts for only 5.364095 s,
+about 1.22% of receiver elapsed time. Approximately 433.258 s lies outside
+those operations. Optimizing those flash calls alone therefore cannot explain
+or remove most of this delay. The long receive gaps and blocked socket sends
+point investigation toward transport delivery and receiver scheduling/parsing;
+these measurements do not isolate RF interference, TCP retransmissions, flow
+control, or other receiver work. Chunk hashing is outside the flash-write timer.
+
+Stronger association and removal of artificial host sleeps have not resolved
+the observed slowdown. This remains an uncontrolled observation; it does not
+prove RC interference or that the strongest-AP policy made uploads slower.
+Keep the flash implementation and control priorities unchanged on this evidence.
+Useful next measurements are TCP retransmission/receive-window behavior during
+the next already-authorized update, alongside AP and transmitter conditions.
+No diagnostic reflash is needed to collect the existing receiver timings.
