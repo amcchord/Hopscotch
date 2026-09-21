@@ -1,0 +1,38 @@
+test_all_unsafe_states_block_client_preflight (test_robot_wifi.DeploymentTests.test_all_unsafe_states_block_client_preflight) ... ok
+test_already_installed_is_verified_without_reboot_or_upload (test_robot_wifi.DeploymentTests.test_already_installed_is_verified_without_reboot_or_upload) ... Deployment record: /var/folders/pg/x2msg02s7918_tfk38ftkwdm0000gn/T/tmpzr3uuiss/record
+Archiving saved run before upload
+Verified already_installed_verified: slot app0, build new; image matches, both groups disarmed, saved run archived.
+ok
+test_changed_saved_run_fails_handoff_and_retains_evidence (test_robot_wifi.DeploymentTests.test_changed_saved_run_fails_handoff_and_retains_evidence) ... Deployment record: /var/folders/pg/x2msg02s7918_tfk38ftkwdm0000gn/T/tmpue4q87zz/record
+Archiving saved run before upload
+Uploading 1056 bytes with paced profile; duration depends on link/flash
+{"status": 200}
+ok
+test_corrupt_export_is_saved_but_not_accepted (test_robot_wifi.DeploymentTests.test_corrupt_export_is_saved_but_not_accepted) ... ok
+test_early_http_rejection_is_retained_after_body_send_failure (test_robot_wifi.DeploymentTests.test_early_http_rejection_is_retained_after_body_send_failure) ... ok
+test_fast_and_paced_uploads_measure_backpressure_and_sleep (test_robot_wifi.DeploymentTests.test_fast_and_paced_uploads_measure_backpressure_and_sleep) ... ok
+test_fast_disconnect_never_retries_or_switches_profile (test_robot_wifi.DeploymentTests.test_fast_disconnect_never_retries_or_switches_profile) ... ok
+test_fast_profile_keeps_preflight_backup_and_postflight (test_robot_wifi.DeploymentTests.test_fast_profile_keeps_preflight_backup_and_postflight) ... Deployment record: /var/folders/pg/x2msg02s7918_tfk38ftkwdm0000gn/T/tmp0p83tf8u/record
+Archiving saved run before upload
+Uploading 1056 bytes with fast profile; duration depends on link/flash
+{"status": 200}
+Verified installed_verified: slot app0, build new; image matches, both groups disarmed, saved run archived.
+ok
+test_hash_missing_wrong_slot_and_armed_postflight_never_succeed (test_robot_wifi.DeploymentTests.test_hash_missing_wrong_slot_and_armed_postflight_never_succeed) ... ok
+test_invalid_profile_and_pacing_fail_before_network_access (test_robot_wifi.DeploymentTests.test_invalid_profile_and_pacing_fail_before_network_access) ... ok
+test_lost_upload_response_verifies_without_retransmitting (test_robot_wifi.DeploymentTests.test_lost_upload_response_verifies_without_retransmitting) ... Deployment record: /var/folders/pg/x2msg02s7918_tfk38ftkwdm0000gn/T/tmpten52g37/record
+Archiving saved run before upload
+Uploading 1056 bytes with paced profile; duration depends on link/flash
+{"transport_error": "connection reset"}
+Verified installed_verified: slot app0, build new; image matches, both groups disarmed, saved run archived.
+ok
+test_manifest_and_image_integrity_checked_before_device_access (test_robot_wifi.DeploymentTests.test_manifest_and_image_integrity_checked_before_device_access) ... ok
+test_no_saved_log_is_explicitly_recorded (test_robot_wifi.DeploymentTests.test_no_saved_log_is_explicitly_recorded) ... ok
+test_powered_feedback_must_return_but_offline_update_is_allowed (test_robot_wifi.DeploymentTests.test_powered_feedback_must_return_but_offline_update_is_allowed) ... ok
+test_response_timeout_closes_once_without_reusing_failed_reader (test_robot_wifi.DeploymentTests.test_response_timeout_closes_once_without_reusing_failed_reader) ... ok
+test_transport_sends_exact_multipart_and_waits_for_slow_receiver (test_robot_wifi.DeploymentTests.test_transport_sends_exact_multipart_and_waits_for_slow_receiver) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.172s
+
+OK

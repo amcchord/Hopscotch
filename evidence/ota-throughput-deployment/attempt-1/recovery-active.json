@@ -1,0 +1,161 @@
+{
+  "observed_at": 1789951750.727349,
+  "info": {
+    "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+  },
+  "telemetry": {
+    "schema": 1,
+    "sequence": 101940,
+    "uptime_ms": 668784,
+    "age_ms": 5,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": false,
+    "rssi": 0,
+    "lq": 0,
+    "rc_age_ms": 4294967295,
+    "rearm_required": true,
+    "maintenance": true,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -2.245075,
+      "rate": 0.044726,
+      "setpoint": 82.1,
+      "imu_age_us": 286,
+      "fault": 0,
+      "end_reason": "",
+      "start_status": ""
+    },
+    "power": {
+      "voltage": 25.08878,
+      "current": 0,
+      "voltage_fresh": false,
+      "current_fresh": false
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": -0.001917,
+        "vel": 0.017548,
+        "torque": -8.4e-05,
+        "temp": 23,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      },
+      {
+        "id": 20,
+        "pos": -0.00115,
+        "vel": -0.022125,
+        "torque": -8.4e-05,
+        "temp": 23,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      },
+      {
+        "id": 30,
+        "pos": 0.000767,
+        "vel": 0.05722,
+        "torque": 8.4e-05,
+        "temp": 23,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      },
+      {
+        "id": 40,
+        "pos": 0,
+        "vel": 0.023651,
+        "torque": 8.4e-05,
+        "temp": 22,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      },
+      {
+        "id": 1,
+        "pos": 0.000767,
+        "vel": 0.019638,
+        "torque": -0.000214,
+        "temp": 22,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      },
+      {
+        "id": 2,
+        "pos": 0,
+        "vel": -0.023666,
+        "torque": -0.000214,
+        "temp": 22,
+        "error": 0,
+        "online": false,
+        "enabled": false,
+        "age_ms": 453505
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992,
+      992
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 3071,
+        "max_us": 5488,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 3071,
+        "max_us": 5730,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 170676,
+    "min_free_heap": 145228,
+    "free_psram": 6926063,
+    "wifi": {
+      "connected": true,
+      "rssi": -56,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 385,
+    "ota": {
+      "active": true,
+      "received_bytes": 1071102,
+      "expected_bytes": 1214928,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0
+    }
+  }
+}

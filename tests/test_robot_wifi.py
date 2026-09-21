@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from unittest.mock import patch
 
@@ -89,7 +90,7 @@ class DeploymentTests(unittest.TestCase):
                     patch.object(wifi.time, 'sleep'), self.assertRaisesRegex(ValueError, 'not verified'):
                 wifi.wait_for_image('http://robot', self.identity['esp_image_digest'], 'app1')
 
-    def run_deploy(self, before=None, logs=None, transfer=None):
+    def run_deploy(self, before=None, logs=None, transfer=None, profile='paced'):
         before = before or self.old
         logs = logs or [dict(samples=5, csv_sha256='csv', wire_sha256='wire')] * 2
         def request(_host, path, **kwargs):
@@ -99,8 +100,104 @@ class DeploymentTests(unittest.TestCase):
                 patch.object(wifi, 'archive_log', side_effect=logs) as archive, \
                 patch.object(wifi, 'upload_application', return_value=transfer or dict(status=200)) as upload, \
                 patch.object(wifi, 'wait_for_image', return_value=(self.new, idle())):
-            result = wifi.deploy('http://robot', self.firmware, record_dir=self.directory / 'record')
+            result = wifi.deploy('http://robot', self.firmware, record_dir=self.directory / 'record', upload_profile=profile)
+            if upload.called:
+                self.assertEqual(upload.call_args.kwargs, wifi.UPLOAD_PROFILES[profile])
             return result, archive.call_count, upload.call_count
+
+    def test_fast_profile_keeps_preflight_backup_and_postflight(self):
+        record, archives, uploads = self.run_deploy(profile='fast')
+        self.assertEqual(record['upload_profile'], 'fast')
+        self.assertEqual(record['status'], 'installed_verified')
+        self.assertEqual((archives, uploads), (2, 1))
+
+    def test_invalid_profile_and_pacing_fail_before_network_access(self):
+        with patch.object(wifi, 'request') as request, self.assertRaises(ValueError):
+            wifi.deploy('http://robot', self.firmware, upload_profile='bogus')
+        request.assert_not_called()
+        for kwargs in (dict(interval=-1), dict(interval=float('nan')), dict(interval=6),
+                       dict(chunk_bytes=0), dict(chunk_bytes=65537)):
+            with self.subTest(kwargs=kwargs), patch.object(wifi.http.client, 'HTTPConnection') as connection, self.assertRaises(ValueError):
+                wifi.upload_application('http://robot', image_bytes(), self.identity, **kwargs)
+            connection.assert_not_called()
+
+    def test_fast_and_paced_uploads_measure_backpressure_and_sleep(self):
+        payload = image_bytes() * 40
+        for profile in ('fast', 'paced'):
+            with self.subTest(profile=profile), \
+                    patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                    patch.object(wifi.http.client, 'HTTPConnection') as connection:
+                conn = connection.return_value
+                now = [0.0]
+                sent = []
+                def send(chunk):
+                    sent.append(chunk)
+                    now[0] += .02  # Simulated socket backpressure.
+                def sleep(interval):
+                    now[0] += interval
+                conn.send.side_effect = send
+                response = conn.getresponse.return_value
+                response.status = 200
+                response.read.return_value = b'Firmware verified; rebooting'
+                headers = {'X-OTA-Write-Us': '12345', 'X-OTA-Verify-Us': 'bad', 'X-OTA-Elapsed-Ms': '120'}
+                response.getheader.side_effect = headers.get
+                with patch.object(wifi.time, 'monotonic', side_effect=lambda: now[0]), \
+                        patch.object(wifi.time, 'sleep', side_effect=sleep) as sleeper:
+                    result = wifi.upload_application('http://robot', payload, self.identity, **wifi.UPLOAD_PROFILES[profile])
+                body = b''.join(sent)
+                self.assertEqual(result['status'], 200)
+                self.assertIn(payload, body)
+                self.assertEqual(result['sent_bytes'], len(body))
+                self.assertAlmostEqual(result['send_block_seconds'], len(sent) * .02)
+                self.assertEqual(result['max_send_block_seconds'], .02)
+                self.assertEqual(result['server_timings'], {'write_us': 12345, 'elapsed_ms': 120})
+                if profile == 'fast':
+                    sleeper.assert_not_called()
+                    self.assertEqual(len(sent[0]), 16384)
+                    self.assertEqual(result['pacing_sleep_seconds'], 0)
+                else:
+                    self.assertEqual(len(sent[0]), 1024)
+                    self.assertAlmostEqual(result['pacing_sleep_seconds'], .05 * (len(sent) - 1))
+
+    def test_fast_disconnect_never_retries_or_switches_profile(self):
+        with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                patch.object(wifi.http.client, 'HTTPConnection') as connection:
+            conn = connection.return_value
+            conn.send.side_effect = OSError('connection lost')
+            conn.getresponse.side_effect = OSError('no response')
+            result = wifi.upload_application('http://robot', image_bytes(), self.identity, **wifi.UPLOAD_PROFILES['fast'])
+            self.assertIn('connection lost', result['transport_error'])
+            self.assertEqual(result['sent_bytes'], 0)
+            self.assertEqual(conn.send.call_count, 1)
+            self.assertEqual(connection.call_count, 1)
+
+    def test_response_timeout_closes_once_without_reusing_failed_reader(self):
+        with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                patch.object(wifi.http.client, 'HTTPConnection') as connection:
+            conn = connection.return_value
+            conn.getresponse.side_effect = TimeoutError('timed out')
+            result = wifi.upload_application('http://robot', image_bytes(), self.identity,
+                                             **wifi.UPLOAD_PROFILES['fast'])
+            self.assertEqual(result['transport_error'], 'timed out')
+            self.assertGreater(result['sent_bytes'], len(image_bytes()))
+            conn.getresponse.assert_called_once()
+            conn.close.assert_called_once()
+            self.assertEqual(connection.call_count, 1)
+
+    def test_early_http_rejection_is_retained_after_body_send_failure(self):
+        with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                patch.object(wifi.http.client, 'HTTPConnection') as connection:
+            conn = connection.return_value
+            conn.send.side_effect = BrokenPipeError('body rejected')
+            response = conn.getresponse.return_value
+            response.status = 409
+            response.read.return_value = b'Maintenance denied'
+            response.getheader.return_value = None
+            result = wifi.upload_application('http://robot', image_bytes(), self.identity)
+            self.assertEqual(result['status'], 409)
+            self.assertEqual(result['response'], 'Maintenance denied')
+            conn.getresponse.assert_called_once()
+            self.assertEqual(result['sent_bytes'], 0)
 
     def test_lost_upload_response_verifies_without_retransmitting(self):
         record, archives, uploads = self.run_deploy(transfer=dict(transport_error='connection reset'))
@@ -132,12 +229,15 @@ class DeploymentTests(unittest.TestCase):
         self.assertTrue(record['absent'])
         self.assertEqual(record['samples'], 0)
 
-    def test_transport_sends_exact_authenticated_multipart(self):
+    def test_transport_sends_exact_multipart_and_waits_for_slow_receiver(self):
         captured = {}
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
                 captured.update(path=self.path, headers=dict(self.headers),
                                 body=self.rfile.read(int(self.headers['Content-Length'])))
+                # The image is queued locally, but the receiver still needs
+                # longer than the connection/send timeout to finish it.
+                time.sleep(0.15)
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(b'Firmware verified; rebooting')
@@ -147,7 +247,9 @@ class DeploymentTests(unittest.TestCase):
         thread = threading.Thread(target=server.handle_request, daemon=True)
         thread.start()
         try:
-            with patch.object(wifi, 'device_token', return_value='private-test-token'):
+            with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                    patch.object(wifi, 'UPLOAD_SOCKET_TIMEOUT_SECONDS', 0.03), \
+                    patch.object(wifi, 'UPLOAD_RESPONSE_TIMEOUT_SECONDS', 2):
                 result = wifi.upload_application(f'http://127.0.0.1:{server.server_port}',
                                                  image_bytes(), self.identity, interval=0)
             thread.join(timeout=3)

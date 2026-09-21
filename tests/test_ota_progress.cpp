@@ -1,9 +1,20 @@
 #include "ota_progress.h"
+#include "ota_metrics.h"
 #include <cassert>
 #include <iostream>
 #include <type_traits>
 
 int main() {
+    OtaMetrics metrics;
+    metrics.start(UINT32_MAX - 9);
+    metrics.received(20); // Wrap-safe gaps.
+    assert(metrics.max_receive_gap_ms == 30);
+    metrics.wrote(UINT32_MAX);
+    metrics.wrote(7);
+    assert(metrics.write_us == uint64_t(UINT32_MAX) + 7 && metrics.write_calls == 2);
+    assert(metrics.max_write_us == UINT32_MAX);
+    metrics.start(123);
+    assert(metrics.write_calls == 0 && metrics.write_us == 0 && metrics.max_receive_gap_ms == 0);
     static_assert(std::is_trivially_copyable<OtaProgress>::value, "FreeRTOS value snapshot");
     OtaProgress p;
     assert(!p.visible(0) && !p.active() && p.percent() == 0);

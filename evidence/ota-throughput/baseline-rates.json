@@ -1,0 +1,50 @@
+[
+  {
+    "release": "v7",
+    "evidence": "evidence/lowering-v7-integration/deployment.json",
+    "application_bytes": 1210736,
+    "seconds": 421.475,
+    "application_kib_per_second": 2.805,
+    "scheduled_pacing_seconds": 59.15,
+    "rc_linked_before": true,
+    "rc_linked_after": true,
+    "rssi_before": -55,
+    "rssi_after": -61
+  },
+  {
+    "release": "v8",
+    "evidence": "evidence/lowering-v8-integration/deployment.json",
+    "application_bytes": 1211120,
+    "seconds": 475.235,
+    "application_kib_per_second": 2.489,
+    "scheduled_pacing_seconds": 59.15,
+    "rc_linked_before": true,
+    "rc_linked_after": true,
+    "rssi_before": -64,
+    "rssi_after": -57
+  },
+  {
+    "release": "v9",
+    "evidence": "evidence/lowering-v9-integration/deployment.json",
+    "application_bytes": 1211568,
+    "seconds": 392.262,
+    "application_kib_per_second": 3.016,
+    "scheduled_pacing_seconds": 59.2,
+    "rc_linked_before": true,
+    "rc_linked_after": true,
+    "rssi_before": -53,
+    "rssi_after": -57
+  },
+  {
+    "release": "v10",
+    "evidence": "evidence/lowering-v10-integration/deployment.json",
+    "application_bytes": 1212352,
+    "seconds": 90.96,
+    "application_kib_per_second": 13.016,
+    "scheduled_pacing_seconds": 59.25,
+    "rc_linked_before": false,
+    "rc_linked_after": false,
+    "rssi_before": -53,
+    "rssi_after": -70
+  }
+]

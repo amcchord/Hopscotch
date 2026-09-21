@@ -1,0 +1,6 @@
+{
+  "source": "operator report in task",
+  "question": "If the robot is in view, is the OTA percentage on its screen still increasing? This would also confirm the progress display is working.",
+  "answer": "Yes, it\u2019s increasing",
+  "scope": "Observed during first transfer; physical confirmation of advancing percentage. No visual inspection by the assistant."
+}

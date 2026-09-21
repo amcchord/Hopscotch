@@ -650,3 +650,126 @@ private v10 recovery in place; no secret/log/binary copies between worktrees.
 This task waits for the OTA owner to report exact installed identity/outcome
 and return ownership before any subsequent device operation. Physical fast
 laydown acceptance remains pending unless a newer archived run establishes it.
+
+
+## 2026-09-20 — Investigate AP choice and prepare faster OTA sender
+
+Austin asked whether the ESP32 connects to the first AP instead of the strongest,
+and requested investigation/improvement of approximately 5 kB/s uploads. Created
+`worktrees/ota-throughput` / `codex/ota-throughput` from v10 record `d5f18fa`;
+root and other task checkouts remain untouched. The lowering task retains robot
+and release ownership and received a coordination notice before implementation.
+
+Pinned Arduino 2.0.16 code confirms FAST_SCAN by default. Added explicit
+ALL_CHANNEL_SCAN and signal sorting before first association, retained for
+maintenance-only reconnects. No roaming during motion/upload. Existing Wi-Fi
+sleep is already off. Host 1 KiB/50 ms pacing adds approximately 59 seconds to
+current images and caps the sender at 20 KiB/s. Recorded v7/v8/v9 transfers were
+2.49–3.02 KiB/s with RC linked; v10 was 13.016 KiB/s unlinked. Conditions differ;
+this is not causal RF/AP evidence. Existing Update uses buffered writes/block
+erases; no flash or control scheduling change was justified without timings.
+
+Added optional fast profile (16 KiB sends, no artificial sleep) with TCP
+backpressure, preserved paced default, manifest/preflight/log/health validation
+and no implicit retry. Added AP BSSID/channel, receiver flash-write/verification/
+receive-gap timing, and host send/sleep/response timing. Success timing headers
+are captured in deployment records before reboot clears device RAM. These
+measurements need no extra stress test or in-flight polling.
+
+Consolidated 12 native / 42 Python checks, syntax/whitespace and configured pinned
+ESP32 build pass. Production lifecycle harness verifies response timing headers,
+metrics and safety ordering; pinned TCP/OTA transport, radio C++/Lua and dashboard
+checks pass. Only the established event-core macro warning remains. Local build
+configuration reads the existing root private header in place; no secrets,
+dependency trees or private binaries were copied/published. Motion/control/RC/
+display/dashboard source is unchanged from the v10 baseline.
+
+[Investigation and release procedure](../OTA_THROUGHPUT_2026-09.md),
+[evidence and validation](../../evidence/ota-throughput/README.md),
+[derived baseline rates](../../evidence/ota-throughput/baseline-rates.json).
+No robot requests, uploads, reconnects, restarts, settings changes, motion or
+GitHub pushes occurred. Candidate is not installed; speedup and strongest-AP
+selection await observation. Next: send focused commit to the integration owner
+for the next authorized combined release and opt-in fast-profile comparison.
+
+Candidate source/test/evidence commit `45c1a94` was sent to the lowering/integration
+owner with exact checks, opt-in fast command, limitations and no-robot-action
+status. Shared operating/current/journal records follow in a separate commit.
+
+## 2026-09-20 — Deploy strongest-AP / OTA throughput update
+
+Austin authorized pushing the prepared firmware while the robot was powered.
+The lowering/integration owner confirmed installed v10 source `7917543` and
+transferred exclusive device/release ownership for this release. All work stayed
+in `worktrees/ota-throughput` / `codex/ota-throughput`; root and other checkouts
+were not edited. Reused the exact validated configured candidate at source
+`45c1a94`, with 12 native / 42 Python, pinned build, TCP, radio and dashboard
+checks. Verified existing private configuration in the binary without exposing
+values. Application 1,214,928 bytes, whole SHA
+`b3f12485e2b61dcc1f4dd11c120beffbac46a41e18bfe8847bdb77221d948109`, ESP digest
+`a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61`.
+Private frozen package is `artifacts/ota-throughput/release/`; immediate v10
+rollback verified in place in the lowering worktree without copying it.
+
+Fresh preflight verified healthy powered disabled motors, disarmed IDLE, fresh
+IMU and RC link up. Each attempt archived the identical 1,462-row saved run.
+The first fast-profile transfer queued the image locally but the 120-second
+HTTP response wait timed out; the old helper retried the response wait then
+closed. Postflight timed out while the old app was still receiving. Read-only
+recovery observed 1,071,102 bytes and active motor/RC suppression; Austin
+confirmed the physical display percentage was increasing. The device later
+aborted with inactivity_timeout at 1,082,590 bytes. V10/app1, released maintenance,
+RC return and all six healthy disabled motors were verified before retry.
+
+Host-only fix `243bff2` allows 900 seconds for the receiver's final response,
+retains 120-second connect/send timeouts, and avoids reusing a timed-out HTTP
+reader. All 16 focused helper regressions passed, including actual delayed
+localhost acknowledgment, early HTTP rejection and one-close failure handling.
+Firmware was neither changed nor rebuilt. A deliberate retry of identical bytes
+received HTTP 200 after 305.815 seconds, 3.880 KiB/s; send blocking 275.442 s,
+max send 15.213 s, response wait 30.363 s, zero pacing sleep. This is not a
+controlled comparison and still used the old firmware/AP connection.
+
+Exact target digest verified in app0 at 2026-09-21T00:57:10.360018+00:00. All six
+powered motors healthy and disabled, fresh IMU, disarmed groups, released
+maintenance and RC link restored. Saved CSV/wire byte-identical before/after.
+The new image reports all-channel strongest-signal selection and metrics v1.
+Its initial association was about -70 dBm/channel 6; one maintenance-only
+reconnect after fresh safety checks selected a different BSSID on channel 1,
+improving -69 to -55 dBm. Image/health/RC reverified at
+2026-09-21T00:57:59.334995+00:00. No repeated scans or motion were initiated.
+
+[Deployment evidence](../../evidence/ota-throughput-deployment/README.md)
+retains both attempts, safe recovery, AP comparison, screen observation and
+source preservation. No settings/filesystem writes or GitHub push requested.
+Motion/RC/display production source remains v10-identical. Next: hand exact
+identity, helper fix and records back to the lowering/device owner for source
+integration before any later firmware build. Observe speed/receiver timings
+on the next normal authorized OTA rather than adding a benchmark reflash.
+
+Completed release records committed as `a2c783b`; exact installed identity,
+recovery/verification results, AP comparison, host fix and source-integration
+requirement were sent to the lowering task. Exclusive device/release ownership
+has returned to that task. No further robot requests are planned here.
+
+## 2026-09-20 — Integrate verified networking release and resume device ownership
+
+Merged codex/ota-throughput through 804fa5d into codex/balance-lower, including
+installed firmware 45c1a94, host response-timeout fix 243bff2 and deployment/AP
+records. Only CURRENT/JOURNAL conflicted; preserved both task histories and
+reconciled current installed identity and ownership. Device ownership has
+returned here. Firmware src/data/build inputs exactly match the installed
+source, and scripts/tests exactly match the reviewed OTA branch. Existing
+candidate validation and 16 focused host-fix tests are reused; no firmware
+rebuild, benchmark reflash or robot request was performed for integration.
+
+Installed app0 ESP digest a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61,
+verified by the OTA owner at 2026-09-21T00:57:10.360018+00:00. Six healthy powered
+disabled motors, fresh IMU, released maintenance, RC return and exact 1,462-row
+CSV/wire retention passed. A safe reconnect selected channel 1 at -55 dBm after
+channel 6 at -69 dBm; post-reconnect health passed at 00:57:59.334995 UTC. No
+throughput improvement on the selected AP is claimed yet. Private package
+remains in ota-throughput; no package, private header or raw export was copied.
+
+Next: operator CH6 HIGH / CH11 fast-laydown trial, disarm and archive. Future
+ordinary OTA can collect new receiver timings without an extra benchmark run.

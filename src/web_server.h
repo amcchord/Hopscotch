@@ -6,6 +6,7 @@
 #include <memory>
 #include "network_snapshot.h"
 #include "ota_progress.h"
+#include "ota_metrics.h"
 
 class WebUI {
 public:
@@ -24,6 +25,7 @@ private:
     QueueHandle_t _snapshots = nullptr;
     QueueHandle_t _otaProgress = nullptr;
     OtaProgress _ota_progress;
+    OtaMetrics _ota_metrics;
     SemaphoreHandle_t _mutex = nullptr;
     ExportCallback _export = nullptr;
     DisarmCallback _disarm = nullptr;
