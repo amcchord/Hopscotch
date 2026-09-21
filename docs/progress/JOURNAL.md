@@ -787,3 +787,23 @@ Sent exact read-in-place paths, hashes and image identity to fast-tip task,
 which owns analysis. No raw log copies between worktrees, no autonomous motion,
 settings change or OTA. This task retains device ownership and holds updates
 until the trace diagnosis is reviewed. No cause inferred from exit reason alone.
+
+## 2026-09-20 — Integrate failed fast-stand analysis without tuning
+
+Cherry-picked fast owner's evidence/script-only 8ffece2 as f191d9c. Quiet capture
+at 2.981 s precedes the failure. At 5.506 s rear-left command/measured speed is
+-21.276/-7.307 rad/s, right -18.276/-17.951, both feedback ages 1 ms. Left response
+fits -9.607 rad/s² (R² 0.9983); the successful v9 comparison tracks symmetrically.
+Austin confirms twisting and cannot fully exclude an obstacle. No contemporaneous
+setup serial was found. Unapplied acceleration setup, physical resistance or
+another motor-side issue remain hypotheses; fitted response is not register
+readback. No timing stall or networking cause is established.
+
+[Derived evidence](../../evidence/fast-tip-up/fall-20260921/README.md) and plot
+reviewed, input hashes and representative sample checked against original files,
+script syntax checked, production inputs still exactly match installed 45c1a94.
+No raw exports copied between worktrees, no code tuning, firmware build, motor
+probe, run or OTA performed. Existing firmware tests need no repeat for evidence
+integration. Device ownership remains here; investigate the left response before
+choosing a correction, retaining valid current-limit checks and the write-only
+ACC_RAD constraint. The download/review request is complete.

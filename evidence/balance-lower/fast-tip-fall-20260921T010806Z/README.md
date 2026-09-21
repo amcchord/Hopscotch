@@ -18,3 +18,8 @@ task owns analysis using these files in place. Balance-lower retains device
 ownership and holds updates pending that analysis. No autonomous motion,
 settings write, firmware update or log deletion was performed. Export completed
 and maintenance released with fresh disarmed health verified afterward.
+
+The [completed comparative analysis](../../fast-tip-up/fall-20260921/README.md)
+identifies asymmetric rear-left response after a quiet capture. Austin confirmed
+twisting; the underlying motor/setup versus physical cause remains unresolved.
+The evidence and analysis script are integrated without firmware changes.
