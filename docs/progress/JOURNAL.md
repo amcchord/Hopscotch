@@ -616,3 +616,20 @@ and exact successful CSV/wire retention verified. No autonomous motion or
 settings/filesystem writes. Successful v9 recovery and older packages retained.
 [Release](../../evidence/lowering-v10-integration/README.md). Next: operator
 CH6 HIGH / CH11 trial, disarm and archive before another run.
+
+## 2026-09-20 — Queue OTA throughput handoff without changing installed v10
+
+OTA owner supplied local candidate 45c1a94 on codex/ota-throughput, isolated
+worktrees/ota-throughput, based on d5f18fa. Reviewed the focused diff and handoff:
+all-channel strongest-signal association, AP/channel diagnostics, receiver
+write/verify/gap metrics and optional 16 KiB unpaced host sends; paced default,
+control-owned maintenance, saved-log/image/health checks and no automatic retry
+remain. Owner reports 12 native/42 Python, pinned build, transport, radio and
+dashboard validation; no hardware speedup or strongest-AP observation claimed.
+
+Integration checkout is clean at d5f18fa before this record; network source
+matches installed 7917543. No OTA is in flight. Candidate is queued, not merged,
+built here or installed. No robot request, reconnect or upload performed for
+this handoff. Next remains Austin's manual CH6 fast-laydown trial; integrate
+network candidate with the next authorized combined release and retain the
+proven v10 package until that deployment is verified.
