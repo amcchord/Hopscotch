@@ -1038,3 +1038,52 @@ delivery and receiver scheduling/parsing, without isolating RF/TCP/flow-control
 causes. No flash or control-priority change is justified by these timings.
 Next useful evidence is TCP retransmission/receive-window behavior during an
 already-authorized update; no benchmark reflash requested or performed.
+
+## 2026-09-20 — Queue on-device OTA progress and RC suspension
+
+Austin requested a large OTA upload percentage with raw transfer information,
+all drive functions stopped and RC input ignored during updates, for the next
+firmware release. Implemented focused source/test commit `f58f0d9` on root
+`codex/wifi-ota` from `045e956`. The root was initially clean; the task uses its
+existing integration checkout and preserves other worktrees.
+
+The entire robot screen now shows preparation, uploading, verification and
+reboot with a large percentage, exact written/expected bytes, average KiB/s and
+elapsed seconds. A bounded snapshot queue avoids the HTTP/flash mutex and lets
+the screen refresh at 10 Hz during maintenance. Completion reaches 100 only
+after hash/ESP verification; errors retain partial bytes for five seconds.
+
+Control-owned OTA preparation resets pending triggers and targets, stops all
+six motors and removes the CRSF UART driver before publishing flash permission.
+No RC RX interrupts, parsing or transmitter telemetry run during OTA. The
+maintenance early return excludes ordinary motion controllers; abort restores
+an empty receiver/parser with invalid link freshness and switch-low rearm still
+required. Non-OTA maintenance retains its previous RC behavior. Captured request
+kind and atomic grant prevent cancellation from granting a replacement OTA
+request without its preparation.
+
+Validation passed: 11 native executables, 38 Python tests, syntax/whitespace,
+full pinned ESP32 build, radio C++/Lua and dashboard syntax/eight SHA vectors.
+New actual-source lifecycle tests cover flash permission ordering, stopped
+motion, progress, ownership, verification/reboot, begin/write/hash/ESP errors,
+disconnect/timeout, invalid offsets, multiple files, late chunks and recovery.
+Flash/SHA/hardware queues are stubbed; physical screen/UART behavior remains
+unverified. Existing event-core macro warning remains. [Evidence and handoff
+notes](../../evidence/ota-progress/README.md); full output is local ignored
+`output/ota-progress-validation.txt`.
+
+The fast-tip-up owner coordinated device ownership with the lowering task,
+which reports its current installed baseline as `a772ecc`, app1, already
+including transport v2, cooperative export `8449ddb` and schema 6. Sent the
+exact focused commit and test/risk notes to that owner for the next combined
+release, explicitly preserving its newer feedback scheduling, cached status
+JSON and published OTA interlock across conflicts. Do not reapply the earlier
+transport candidate. Root-only guide/current/journal updates are separate from
+the source handoff to avoid competing shared-record merges.
+
+No robot requests, upload, reboot, arming, motion, settings change or GitHub
+push occurred here. Configured build output remains private and ignored; no
+combined release package was frozen. Next: owner integrates this feature with
+the current trial corrections and validates the final combined scope. The first
+upload installing this feature uses the old receiver firmware; the new screen
+and RC suspension become available for subsequent uploads after reboot.
