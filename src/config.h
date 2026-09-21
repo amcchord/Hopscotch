@@ -169,7 +169,7 @@ static constexpr float    BALANCE_ARM_TIP_LEFT          = 2.71f;   // arm delta 
 static constexpr float    BALANCE_ARM_TIP_RIGHT         = 1.96f;   // arm delta to tip robot up (right)
 static constexpr float    BALANCE_ARM_TIP_SPEED         = 0.7f;    // rad/s ramp rate for tip-up (slower = less overshoot)
 // CH6 high selects the experimental fast trajectory for the next CH11 stand-up.
-// Slow mode, endpoint poses, balance gains and arm-return policy stay identical.
+// Slow mode and the established endpoint poses/arm-return policy are preserved.
 static constexpr uint8_t  CH_FAST_TIP_UP = 5; // physical CH6, independent of legacy arm-group mapping
 static constexpr float    BALANCE_FAST_TIP_DURATION_S = 2.6f;
 static constexpr float    BALANCE_FAST_TIP_MOTOR_RAD_S = 2.2f;
