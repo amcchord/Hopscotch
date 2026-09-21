@@ -10,11 +10,6 @@ inline bool fastTipSelected(float channel6) {
     return std::isfinite(channel6) && channel6 > 0.5f;
 }
 
-inline float tipRecoveryKi(bool fast_run, bool boosting, float normal_ki) {
-    if (!boosting) return normal_ki;
-    return fast_run ? BALANCE_FAST_START_RECOVERY_KI : BALANCE_START_RECOVERY_KI;
-}
-
 struct TipInput {
     float tilt = 0, rate = 0;
     float left = 0, right = 0; // radians relative to calibrated forward pose
