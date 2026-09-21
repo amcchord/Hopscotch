@@ -7,7 +7,7 @@ owns only `worktrees/ota-reliability`; root shared records and the other
 worktrees remain with their owners. **No device request, upload, restart,
 configuration change or motion occurred during this work.**
 
-The [change and hardware plan](../../docs/OTA_RELIABILITY_2026-09.md) address a
+The [change and hardware plan](../../docs/archive/2026-09/OTA_RELIABILITY_2026-09.md) address a
 concrete mismatch: pinned HTTP connections expire after three seconds without
 data, whereas OTA permits 15 seconds. Authenticated eligible uploads now have
 a 20-second receive timeout, 15-second ACK timeout and TCP_NODELAY. OTA's own

@@ -6,7 +6,7 @@ its assumed-stable preparation missed the observed backward lean. These v1
 artifacts are retained as history, not current release validation.
 
 This is offline simulation/test evidence. No physical maneuver was performed.
-See the [behavior, model limits and first-test procedure](../../docs/BALANCE_LOWER_2026-09.md).
+See the [behavior, model limits and first-test procedure](../../docs/archive/2026-09/BALANCE_LOWER_2026-09.md).
 
 - [Simulation results and all input assumptions](simulation.json): 81 cases;
   72 geometry/compliance/servo/body variants plus nine nominal/fault scenarios.

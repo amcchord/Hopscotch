@@ -10,7 +10,7 @@ no motor motion or OTA was initiated for this investigation.
 
 ## What the physical run establishes
 
-The [372-row archive](../../balance-lower/standup-rollaway-20260921T023411Z/)
+The [372-row archive](../../balance-lower/standup-rollaway-20260921T023411Z)
 ends at 7.424 s with `bailout_angle_error`. CSV SHA256:
 `c2ee34b480f8cc5f801b8e3d7d0ac431989aa184202493c8df4548fb886b3bc4`.
 Original wire SHA256:

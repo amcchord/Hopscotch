@@ -2,7 +2,7 @@
 
 This is a software/model candidate, **not an installed or physically validated
 maneuver**. It implements Austin's clarified forward fall and arm catch while
-preserving the deployed driving controls. See the [operator/design guide](../../../docs/BALANCE_LOWER_2026-09.md)
+preserving the deployed driving controls. See the [operator/design guide](../../../docs/archive/2026-09/BALANCE_LOWER_2026-09.md)
 and [failed physical v1 trial](../trial-20260920/README.md).
 
 - [Measured failure versus nominal candidate model](comparison.png).

@@ -75,7 +75,7 @@ and a stalled WebSocket client. `/api/info` also reports the ESP reset reason.
 
 The installed firmware scans all channels and prefers the strongest matching
 AP when associating. It includes AP/channel telemetry and OTA timing diagnostics.
-See [OTA throughput investigation](OTA_THROUGHPUT_2026-09.md) for observations
+See [OTA throughput investigation](archive/2026-09/OTA_THROUGHPUT_2026-09.md) for observations
 and the optional fast upload profile. Paced remains the default; no live roaming
 is added during motion.
 
@@ -109,10 +109,10 @@ private header is read in place through `--secrets-file`.
 
 ```bash
 # Read the latest snapshot; this command is a single read, not a stream.
-python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h status
+python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h status
 
 # After a run: disarm both groups and wait for log saving to finish.
-python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h log
+python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h log
 ```
 
 The browser receives live pose, motor feedback, RC channels, timing and memory
@@ -143,13 +143,13 @@ Keep both files and your operator observations. Run analysis separately using
 the downloaded filename:
 
 ```bash
-python3 worktrees/balance-lower/scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
+python3 scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details
 # Optional plot requires matplotlib:
-python3 worktrees/balance-lower/scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details --plot
+python3 scripts/analyze_balance_logs.py telemetry_logs/<run>.csv --details --plot
 ```
 
 The browser's **Download latest run** saves the raw export. For a validated
-archive, use the CLI or run `python3 worktrees/balance-lower/scripts/validate_telemetry.py <raw-download>
+archive, use the CLI or run `python3 scripts/validate_telemetry.py <raw-download>
 <new-clean-output.csv>` afterward. Choose a new output path: the standalone
 validator can overwrite its output. Failed Wi-Fi downloads do not automatically
 create a diagnostic archive; retry before starting another run. The request
@@ -160,10 +160,10 @@ timeout is 120 seconds. USB fallback is `./scripts/save_telemetry.sh --label
 
 ```bash
 # Request disarm; confirm both groups are disarmed in fresh telemetry afterward.
-python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm
+python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm
 
 # Reconnect only while disarmed; the connection drops while rejoining.
-python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h reconnect
+python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h reconnect
 ```
 
 HTTP 202 acknowledges the request, not completion. Keep the radio disarm control
@@ -190,16 +190,17 @@ package for recovery.
    current v13 contact-correction package, from the project root:
 
    ```bash
-   python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
+   python3 scripts/robot_wifi.py --host http://192.168.1.172 \
      --secrets-file src/network_secrets.h ota \
-     worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/manifest.json \
+     artifacts/retired-worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/firmware.bin \
+     --manifest artifacts/retired-worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/manifest.json \
      --upload-profile fast
    ```
 
-   Use the integrated helper and the frozen package in its original worktree
-   as shown; keep private packages in place rather than copying them.
-   Other tasks may own different root source; the private header is read in place.
+   Use the root helper and retained frozen package as shown. The old worktrees
+   were retired during consolidation; local `artifacts/README.md` maps all
+   preserved paths. Manifests retain historical paths and original hashes.
+   The configured private header is read in place.
 
    The helper verifies file size, whole-file hash and ESP digest, checks fresh
    disarmed maintenance eligibility, archives and validates the saved run, then
@@ -318,7 +319,7 @@ saved-run hashes. The transmitter remained linked for v12 and v13; v10 used an u
 retains the old transport's interrupted attempts and transmitter-off success.
 Frozen manifests record preparation; deployment records establish installation.
 
-[OTA transport version 2](OTA_RELIABILITY_2026-09.md) extends the upload socket's
+[OTA transport version 2](archive/2026-09/OTA_RELIABILITY_2026-09.md) extends the upload socket's
 receive timeout and pauses dashboard streaming during uploads. Its first
 transmitter-on hardware acceptance passed. The slower measured throughput and
 read-only monitor timeouts are retained in the evidence; one test does not
@@ -370,24 +371,15 @@ maintenance request.
 The complete pre-upgrade 8 MiB device readback is stored privately in
 `artifacts/wifi-ota/pre-upgrade-flash.bin`. Its SHA-256 and the installed release
 identity are recorded in [release evidence](../evidence/wifi-ota/README.md).
-The current frozen application package is
-`worktrees/balance-lower/artifacts/lowering-v10-fast/candidate/` from the project
-root. The successful previous v9 image is retained at
-`worktrees/balance-lower/artifacts/lowering-v9-catch/candidate/`, source `b9763c2`.
-The successful earlier v7 image is retained at
-`worktrees/balance-lower/artifacts/lowering-v7-ota/candidate/`, source `c442e12`.
-The older exact v6 image is retained at
-`worktrees/balance-lower/artifacts/lowering-v6-fast/candidate/`, source `a772ecc`.
-The older exact v5 image is retained at
-`worktrees/balance-lower/artifacts/lowering-v5-final/candidate/`.
-The older exact v4 image is retained at
-`worktrees/balance-lower/artifacts/lowering-v4-fast/candidate/`.
-The earlier combined driving/v1-lowering application remains at
-`worktrees/drive-braking/artifacts/drive-braking-v5/release/`; its driving was
-reported good, but its lowering failed. The older Wi-Fi application at `artifacts/wifi-ota/release/` is the
-known-good rollback package; other directories preserve earlier iterations. The full original backup
-contains the pre-Wi-Fi driving-v4 firmware. Restoring it removes Wi-Fi/OTA and
-reverts saved data to that backup's state.
+The last verified v13 application remains in
+`artifacts/retired-worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/`.
+The last physically successful `45c1a94` package remains in
+`artifacts/retired-worktrees/ota-throughput/artifacts/ota-throughput/release/`.
+Earlier frozen packages are also retained. The local `artifacts/README.md`
+indexes them and records their original checkout paths. Do not infer suitability
+from a directory name: inspect CURRENT, the release record and manifest, and
+verify bytes/identity before using a package. Restoring the original full-flash
+backup removes Wi-Fi/OTA and reverts saved data to that backup's state.
 
 After OTA, do **not** assume app0 is running: inspect `/api/info` for
 `running_slot` or inspect OTA data over USB. The old

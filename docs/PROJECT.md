@@ -195,9 +195,9 @@ Use USB `bal note <text>` before a run, or keep operator observations alongside 
 
 ## Software Architecture
 
-The current application also includes [progressive reference braking](BALANCE_DRIVE_BRAKING_2026-09.md),
-[ground-drive ownership gating](GROUND_DRIVE_2026-09.md) and
-[experimental CH11 forward-fall/catch v2](BALANCE_LOWER_2026-09.md). New captures
+The current application also includes [progressive reference braking](archive/2026-09/BALANCE_DRIVE_BRAKING_2026-09.md),
+[ground-drive ownership gating](archive/2026-09/GROUND_DRIVE_2026-09.md) and
+[experimental CH11 forward-fall/catch v2](archive/2026-09/BALANCE_LOWER_2026-09.md). New captures
 use schema 4 with feature flags 8191; the sample layout remains 240 bytes.
 Further lowering trials are on hold after the failed v2 attempt; see
 [current state](progress/CURRENT.md).

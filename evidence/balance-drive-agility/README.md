@@ -2,7 +2,7 @@
 
 > **Historical record:** this document describes the dated release or trial below. For the installed firmware, see [current state](../../docs/progress/CURRENT.md). Use [OTA updates and Wi-Fi telemetry](../../docs/WIFI_OTA.md) and the [current test guide](../../docs/BALANCE_TESTING.md) for new work. Older package paths, app0-only USB commands and “next” actions below are preserved as history; they are not instructions for updating the current robot.
 
-The actual physical trial in this directory is **installed response-v2**, not the new candidate. See [findings](../../docs/BALANCE_DRIVE_AGILITY_2026-09.md).
+The actual physical trial in this directory is **installed response-v2**, not the new candidate. See [findings](../../docs/archive/2026-09/BALANCE_DRIVE_AGILITY_2026-09.md).
 
 - `attached.serial/.txt`: read-only USB retrieval status; IDLE/disarmed, no live motor/receiver traffic.
 - `download.txt`: validated 1,666-sample download; raw transfer/CSV are in `telemetry_logs/`.
@@ -16,4 +16,4 @@ The preceding `balance-drive-response/first-trial.serial` observer is preserved 
 
 Upload evidence: `preflash.*`, `reconnected-preflash.*`, `upload.txt`, `postflash.*` and `device-checks.json` identify the programmed source/image and powered disarmed health. USB was briefly absent during power preparation; no flash started until a new preflight passed. `compat-download.txt` and `compat-check.json` establish historical schema-3 compatibility. `record_trial.py` is a four-minute passive observer with a descriptive note; it never commands motors. Its future capture is not part of the completed v2 physical trial.
 
-Physical v3 trials: `runaway-*` and `wobble-*` files, plus `analyze_runaway.py` and `analyze_wobble.py`, archive the first failed stand-up and second successful stand-up/oscillatory drive. Both schema4 logs and exact transfers are in telemetry_logs. See [trial findings](../../docs/BALANCE_DRIVE_TRIALS_2026-09-19.md). The passive observer was not started before either trial; note=none. No firmware changed between or after them.
+Physical v3 trials: `runaway-*` and `wobble-*` files, plus `analyze_runaway.py` and `analyze_wobble.py`, archive the first failed stand-up and second successful stand-up/oscillatory drive. Both schema4 logs and exact transfers are in telemetry_logs. See [trial findings](../../docs/archive/2026-09/BALANCE_DRIVE_TRIALS_2026-09-19.md). The passive observer was not started before either trial; note=none. No firmware changed between or after them.

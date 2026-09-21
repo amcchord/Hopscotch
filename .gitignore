@@ -12,3 +12,11 @@ output/
 artifacts/
 scratch/
 src/network_secrets.h
+worktrees/
+tmp/
+.env
+.env.*
+!.env.example
+*.bin
+*.elf
+*.map

@@ -1,11 +1,42 @@
-# Current state — September 20, 2026 (EDT)
+# Current state — September 21, 2026
 
-- **Installed:** lowering v13 / fast stand-up v2, source `7c32bd7a6e48e641345a7fbc067a11d46a0643bf`, app0. ESP digest `2cba5a84594a703bb377b6697791fca4da790e8b6c8d4fe5ddf0f2181461cdae`. No newer controller or OTA was accepted during the latest investigation. [Release evidence](../../evidence/lowering-v13-integration/README.md).
-- **Latest operator result:** stand-up rolled away. Saved372 schema13 samples over7.424s, ending `bailout_angle_error`. Both wheels tracked together before the large fall; no deadline, IMU-stale or CAN-transmit fault. Existing startup recovery triggered3.625s, overshot and never settled. [Archive](../../evidence/balance-lower/standup-rollaway-20260921T023411Z/README.md).
-- **Arm finding:** after the return ramp5.145s, full negative assist demand was blocked by COOLDOWN for62 samples/1.239s. Emergency assistance began6.384s at wheel command−13.598rad/s. Residual measured arm velocity at ramp completion also requires a synchronized handoff. No quiet Forward equilibrium exists in this failure, so a stored-angle error is not established. [Investigation and plots](../../evidence/balance-recovery/rollaway-20260921/README.md).
-- **Offline experiments:** retained acceleration recovery improves no-fall114→272/385 approximate planar cases but regresses8. Simply enabling arms earlier regresses35. A second screen explicitly adds hypothesized arm inertia and servo lag: combined recovery improves193→250/648 but regresses61. All candidates remain offline; aggregate improvements do not justify upload. Arms' static COM shift and dynamic reaction must be modeled separately.
-- **Investigation checks:** source-backed C++ bridge,1,925 planar/1,944 dynamic-arm episodes, focused balance-drive/native/startup suites, Python syntax, recorded source/telemetry hashes and plots checked. Firmware source is unchanged; no firmware rebuild or OTA for this investigation. Independent fast-tip task review confirms the arm lifecycle and angle-identification findings.
-- **Lowering status:** v13 corrects v12's low-holding-torque contact stop, retaining normal0.24rad/s return under weak load within normal body-rate bounds. Fast loaded return, precontact/catch and landing remain as documented. V13 physical lowering completion is still unverified; latest run failed during stand-up. [Procedure](../BALANCE_LOWER_V13_2026-09.md).
-- **Latest archived health:** IDLE/disarmed, all six powered motors healthy/disabled, fresh IMU, log saving finished, maintenance released. No autonomous motion, settings write or device operation in flight. This is the post-archive snapshot, not continuous monitoring.
-- **Recovery packages:** own `artifacts/lowering-v13-contact/candidate/`; last physically successful45c1a94 remains in `worktrees/ota-throughput/artifacts/ota-throughput/release/`. Earlier own v12/v10/v9/v7 retained. No private files copied between worktrees. [OTA/recovery guide](../WIFI_OTA.md); no automatic boot rollback.
-- **Ownership / next:** balance-lower owns device/integration. Other task checkouts remain independent. Next engineering step is a bounded arm/wheel recovery prototype with measured-return handoff and an uncertain arm-reaction model, validated against successful runs and known failures before another motion-control OTA. Do not flash the rejected screen policies or change persistent trim from this failed run.
+**Development baseline:** the root checkout / GitHub `main` consolidates all ten
+former development branches. ESP32 source, dashboard and build configuration
+match the latest `codex/balance-lower` checkpoint; the GX12 Lua v3.1 fixes are
+also integrated. The [journal](JOURNAL.md) records consolidation and validation.
+
+**Last verified robot:** lowering v13 / fast stand-up v2, source
+`7c32bd7a6e48e641345a7fbc067a11d46a0643bf`, app0, telemetry schema 13.
+[Release identity and checks](../../evidence/lowering-v13-integration/README.md).
+This is archived installation evidence, not a live status check. Consolidation
+did not contact, flash, reset or move the robot.
+
+**Latest trials:** fast stand-up failed twice (`bailout_angle_error`). The later
+slow comparison settled upright but subsequently failed lowering
+(`lower_wrong_direction`). [Latest captures and unfinished analysis](../../evidence/balance-recovery/repeat-20260921/README.md)
+are now committed. Earlier successes do not establish reliability. V13 fast
+lowering completion remains unverified.
+
+**Next engineering action:** review that comparison and the
+[arm/wheel recovery investigation](../../evidence/balance-recovery/rollaway-20260921/README.md),
+then develop a bounded recovery prototype that accounts for measured arm-return
+handoff, wheel headroom, static arm COM shift and uncertain inertial reaction.
+Screen against both successful and failed trials. Prior recovery experiments
+regressed cases; none is accepted for upload. Do not reset trim based only on
+the failed run. New robot operations require task-specific authorization.
+
+**Other open checks:** OTA works with the transmitter linked but remains slow;
+[timing analysis](../archive/2026-09/OTA_THROUGHPUT_2026-09.md) does not isolate the
+transport cause. Lua v3.1 was verified on GX12 storage; handset boot/runtime and
+structured RF display still need confirmation ([installation record](../archive/2026-09/RADIO_HANDOFF.md)).
+
+**Recovery and ownership:** no parallel checkout retains device ownership after
+consolidation. Coordinate device access explicitly for the next hardware task.
+Use [OTA/recovery](../WIFI_OTA.md); never `uploadfs`. Private packages and backups
+are indexed in local `artifacts/README.md`, including installed v13 and the last
+physically successful `45c1a94` package. Historical worktree paths were retired;
+use the index and verify manifest/image hashes before reuse.
+
+**Security follow-up:** the Wi-Fi password appears in already-published historical
+Git documentation (removed from current files). Coordinate credential rotation;
+[details](../archive/2026-09/CONSOLIDATION.md#existing-credential-history).

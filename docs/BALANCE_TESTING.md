@@ -1,15 +1,17 @@
 # Balance Mode Test Guide
 
-**September 20 update:** [V9 completed fast standing and lowering](../evidence/balance-lower/trial-v9-success-20260920/README.md).
-[V13](BALANCE_LOWER_V13_2026-09.md) corrects a stop after contact in fast supported return. Select HIGH
-before the lowering CH11 pulse for fast supported return; LOW/center retain
-normal v9. The choice latches separately at each maneuver request. Check
-[current installed identity](progress/CURRENT.md), perform one trial, then
-disarm and archive before another attempt.
+Check [CURRENT](progress/CURRENT.md) for installed identity, latest failures and
+whether a physical trial is appropriate. Historical successes do not establish
+reliability. [V13 policy](BALANCE_LOWER_V13_2026-09.md) documents CH6 HIGH fast
+supported return; LOW/center retains normal speed. The choice latches separately
+at each CH11 request. Stop on a fault and archive before another attempt.
 
-This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
-
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH6 fast laydown](BALANCE_LOWER_V13_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; normal v9 lowering and fast v2 standing have operator-confirmed success; fast v10 lowering has two archived successful trials. The latest stand-up was reported perfect, so v13 preserves its installed fast v2 policy and changes only fast supported lowering. Check current state for v13 installation and physical acceptance.
+The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and
+saves to LittleFS after balance ends and **both drive and arms are disarmed**.
+Only the latest run is stored on the robot. Download its checksummed CSV after
+every run. Capture reaching its limit does not stop the robot; end initial
+tests before that point to retain the outcome. Use the [OTA guide](WIFI_OTA.md)
+for updates and recovery; dated reports are historical evidence.
 
 ## Safety and Test Area
 
@@ -32,7 +34,7 @@ Transport version 2 passed a full transmitter-on update with a four-second
 receive gap. The transmitter may stay on while disarmed; transmitter-off was
 faster in the recorded tests. Wait for the final verified report before testing.
 
-Use the current v13 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
+Follow the task-specific trial plan; stop further attempts on a fault and retrieve the log.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -78,7 +80,7 @@ Allow at least two seconds after raising the arm switches and confirm both group
 
 After stand-up settles, keep CH1/CH2 centered for at least one second. CH2 requests forward/back travel and CH1 steers; keep CH7/CH9/CH10 HIGH. Begin with small, separate forward, backward and steering inputs. Center the sticks between each and wait for a stop. Driving limits remain 20 rad/s average wheel request and 4.5 rad/s per-wheel differential turn. Acceleration stays 6 rad/s²; v5 braking stays 8 rad/s² below 4 rad/s, rises smoothly to 20 between 4 and 8 rad/s, then stays at 20. Start around 10% stick (about 0.85 rad/s forward request after deadband). Planned arm movements assist acceleration/braking; confirm clean starts/stops before increasing input. The controller holds the new position/heading after stopping. Physical stopping distance with v5 remains unverified.
 
-A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. When the controller is Idle, CH1/CH2 can now drive on the ground even with CH7 HIGH; pending stand-up, active balance/lowering and arm return own the wheels exclusively. Center both sticks after a balance handoff before ground drive resumes. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [progressive braking findings](BALANCE_DRIVE_BRAKING_2026-09.md) for behavior, evidence and limits.
+A held stick through startup cannot unlock standing drive. If control pauses after stale input or a large balance disturbance, center both sticks and let it settle before trying again. When the controller is Idle, CH1/CH2 can now drive on the ground even with CH7 HIGH; pending stand-up, active balance/lowering and arm return own the wheels exclusively. Center both sticks after a balance handoff before ground drive resumes. Support and lower CH9/CH10 to end; leave power connected for log save/download. See [progressive braking findings](archive/2026-09/BALANCE_DRIVE_BRAKING_2026-09.md) for behavior, evidence and limits.
 
 ## Supported return to flat
 
@@ -101,13 +103,13 @@ helper and the existing private header in place.
 
 | Action | Command/control | Behavior |
 |---|---|---|
-| Live state | Dashboard or `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h status` | Latest best-effort pose, motors, RC and maintenance state |
+| Live state | Dashboard or `python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h status` | Latest best-effort pose, motors, RC and maintenance state |
 | Tag a run over USB | `bal note baseline-hard-floor` | Stores up to 63 characters in the next/current log; untethered, keep observations in a sidecar note |
 | Detailed USB controller state | `bal status` | Shows gains, setpoint state, buffered samples, and pending-save state |
 | Mark a disturbance | Press CH12 while balance is active | Increments the `marker` column on the same 50 Hz control tick; CH12 arm-home behavior is suppressed while balancing |
 | USB marker | `bal mark` | Equivalent marker for bench tests |
-| Download latest run | `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h log` | Validates schema/checksums/row count and saves `.csv` plus `.wire`; run analysis separately |
-| Disarm over Wi-Fi | `python3 worktrees/balance-lower/scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm` | Authenticated request; verify the control task has disarmed both groups in fresh telemetry |
+| Download latest run | `python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h log` | Validates schema/checksums/row count and saves `.csv` plus `.wire`; run analysis separately |
+| Disarm over Wi-Fi | `python3 scripts/robot_wifi.py --secrets-file src/network_secrets.h disarm` | Authenticated request; verify the control task has disarmed both groups in fresh telemetry |
 | Delete latest run over USB | `bal log clear` | Requires inactive balance and both motor groups disarmed; download first |
 
 Set gains over USB between attempts. Wi-Fi has no gain, note, marker or motion

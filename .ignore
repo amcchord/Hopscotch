@@ -1,0 +1,10 @@
+# Search policy only: these files remain tracked and available explicitly.
+/evidence/
+/telemetry_logs/
+/docs/archive/
+/docs/OtherProjects/
+/artifacts/
+/output/
+/scratch/
+/tmp/
+/worktrees/

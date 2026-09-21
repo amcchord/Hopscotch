@@ -4,7 +4,7 @@ This is the original preparation record. Later authorized hardware work is
 recorded in the [deployment evidence](../ota-throughput-deployment/README.md).
 
 Worktree: `worktrees/ota-throughput`, branch `codex/ota-throughput`, baseline
-`d5f18fa` (v10 deployment record). [Findings, changes and release handoff](../../docs/OTA_THROUGHPUT_2026-09.md).
+`d5f18fa` (v10 deployment record). [Findings, changes and release handoff](../../docs/archive/2026-09/OTA_THROUGHPUT_2026-09.md).
 
 Production changes are limited to `src/web_server.cpp`, `src/web_server.h`,
 new `src/ota_metrics.h` and the host uploader `scripts/robot_wifi.py`.

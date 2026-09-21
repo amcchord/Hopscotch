@@ -23,7 +23,7 @@ The committed CSV and original wire bytes are unchanged.
 The [v2 candidate](../balance-lower/forward-catch-v2/README.md) stages the arms,
 transfers wheel ownership out of upright balance to initiate forward rotation,
 holds each arm on first qualifying load, verifies the catch, then lowers under
-support. The [design and trial guide](../../docs/BALANCE_LOWER_2026-09.md)
+support. The [design and trial guide](../../docs/archive/2026-09/BALANCE_LOWER_2026-09.md)
 documents the thresholds, failure behavior and limitations.
 
 Only `src/balance_lower.h`, `src/balance_controller.cpp` and

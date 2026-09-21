@@ -12,7 +12,7 @@ The frozen manifest records preparation; the deployment record proves installati
 
 The [lowering trial](../balance-lower/trial-v5-20260920/README.md) ended before
 catch: a rear wheel exceeded 6 rad/s while upright control waited for the final
-arm travel. [V6](../../docs/BALANCE_LOWER_V6_2026-09.md) hands off earlier with
+arm travel. [V6](../../docs/archive/2026-09/BALANCE_LOWER_V6_2026-09.md) hands off earlier with
 measured forward departure and two moving, unloaded arms, retaining all limits.
 The existing contact/continuous-return sequence remains responsible for the
 flat/Forward finish. Recorded replay reaches handoff 39 ms before the old fault;

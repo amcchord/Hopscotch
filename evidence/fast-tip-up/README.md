@@ -15,7 +15,7 @@ device access, shared records, final combined validation and deployment.
 The feature adds CH6 high/low selection, a finite 2.6-second tip-up trajectory,
 measured quiet capture and tracking/freshness/motion guards. The old slow
 trajectory and all ordinary balance, drive, return and lowering control are
-preserved. [Behavior and operator notes](../../docs/FAST_TIP_UP_2026-09.md).
+preserved. [Behavior and operator notes](../../docs/archive/2026-09/FAST_TIP_UP_2026-09.md).
 
 ## Evidence
 

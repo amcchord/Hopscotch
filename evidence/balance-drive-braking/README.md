@@ -1,6 +1,6 @@
 # Progressive braking v5 evidence
 
-See [findings and candidate behavior](../../docs/BALANCE_DRIVE_BRAKING_2026-09.md). The installed v4 run was downloaded and both checksums validated; `info-before.json` identifies that firmware. Combined source `43b1967` is installed in app1 and verified by its ESP image digest. All six motors remained disarmed/healthy; the retained 2,981-sample CSV and wire export are byte-identical. Physical testing is pending.
+See [findings and candidate behavior](../../docs/archive/2026-09/BALANCE_DRIVE_BRAKING_2026-09.md). The installed v4 run was downloaded and both checksums validated; `info-before.json` identifies that firmware. Combined source `43b1967` is installed in app1 and verified by its ESP image digest. All six motors remained disarmed/healthy; the retained 2,981-sample CSV and wire export are byte-identical. Physical testing is pending.
 
 ![Recorded physical stops](physical-v4-stops.png)
 

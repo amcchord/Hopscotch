@@ -30,10 +30,10 @@ this monitoring workload; the cause of slower throughput is not isolated.
 
 ## Behavior and validation
 
-[Lowering v4](../../docs/BALANCE_LOWER_V4_2026-09.md) continues the return toward
+[Lowering v4](../../docs/archive/2026-09/BALANCE_LOWER_V4_2026-09.md) continues the return toward
 Forward once both arms contact, rather than stopping upright after the v3
 capped retreat/fault. It confirms measured level body and Forward arms before
-completion. [CH6 fast tip-up](../../docs/FAST_TIP_UP_2026-09.md) is a separate
+completion. [CH6 fast tip-up](../../docs/archive/2026-09/FAST_TIP_UP_2026-09.md) is a separate
 experimental option: high selects fast, center/low preserves the existing slow
 trajectory. First test lowering with CH6 low; test fast standing separately.
 Neither new maneuver has physical acceptance yet.

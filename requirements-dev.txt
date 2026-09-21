@@ -1,0 +1,5 @@
+# Versions present in the verified analysis environment on 2026-09-21.
+numpy==2.5.0
+matplotlib==3.11.0
+pillow==12.3.0
+pyserial==3.5

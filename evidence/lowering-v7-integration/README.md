@@ -15,7 +15,7 @@ The manifest records preparation; the deployment record proves installation.
 
 The [1,519-row v6 run](../balance-lower/trial-v6-20260920/README.md) shows a successful
 fast stand-up followed by a 12.525-second lower stop gate and rocking contact
-that never qualified support. [V7](../../docs/BALANCE_LOWER_V7_2026-09.md) completes
+that never qualified support. [V7](../../docs/archive/2026-09/BALANCE_LOWER_V7_2026-09.md) completes
 the existing drive-reference ramps, then hands explicit CH11 requests back to
 stationary PD through the existing slew. The independent 500 ms calm gate remains.
 After both arms contact, existing bounded wheel braking begins. Qualification

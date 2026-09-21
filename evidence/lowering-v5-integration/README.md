@@ -2,7 +2,7 @@
 
 Installed and verified on September 20, 2026 at 20:35:49 UTC from the integration
 owner's `worktrees/balance-lower`, branch `codex/balance-lower`.
-[Motion behavior](../../docs/BALANCE_LOWER_V5_2026-09.md),
+[Motion behavior](../../docs/archive/2026-09/BALANCE_LOWER_V5_2026-09.md),
 [physical v4 evidence](../balance-lower/trial-v4-20260920/README.md),
 [paired model and limits](../balance-lower/forward-preparation-v5/README.md),
 [source preservation](../balance-lower/forward-preparation-v5/source-preservation.json).

@@ -50,7 +50,7 @@ motor-side problem. It is not proven. The installed controller requests
 `ACC_RAD=100` at Speed-mode setup but can verify only transmission enqueue:
 RS05 acceleration is write-only under the repository's documented protocol.
 Current-limit setup does require readback. See the existing
-[motor setup investigation](../../../docs/BALANCE_START_FIX_2026-09.md).
+[motor setup investigation](../../../docs/archive/2026-09/BALANCE_START_FIX_2026-09.md).
 Do not restore the previously rejected acceleration-readback requirement.
 
 The installed `balance_tip_up.h`, `balance_math.h` and `motor_manager.cpp` are
