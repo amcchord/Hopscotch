@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from unittest.mock import patch
 
@@ -170,6 +171,34 @@ class DeploymentTests(unittest.TestCase):
             self.assertEqual(conn.send.call_count, 1)
             self.assertEqual(connection.call_count, 1)
 
+    def test_response_timeout_closes_once_without_reusing_failed_reader(self):
+        with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                patch.object(wifi.http.client, 'HTTPConnection') as connection:
+            conn = connection.return_value
+            conn.getresponse.side_effect = TimeoutError('timed out')
+            result = wifi.upload_application('http://robot', image_bytes(), self.identity,
+                                             **wifi.UPLOAD_PROFILES['fast'])
+            self.assertEqual(result['transport_error'], 'timed out')
+            self.assertGreater(result['sent_bytes'], len(image_bytes()))
+            conn.getresponse.assert_called_once()
+            conn.close.assert_called_once()
+            self.assertEqual(connection.call_count, 1)
+
+    def test_early_http_rejection_is_retained_after_body_send_failure(self):
+        with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                patch.object(wifi.http.client, 'HTTPConnection') as connection:
+            conn = connection.return_value
+            conn.send.side_effect = BrokenPipeError('body rejected')
+            response = conn.getresponse.return_value
+            response.status = 409
+            response.read.return_value = b'Maintenance denied'
+            response.getheader.return_value = None
+            result = wifi.upload_application('http://robot', image_bytes(), self.identity)
+            self.assertEqual(result['status'], 409)
+            self.assertEqual(result['response'], 'Maintenance denied')
+            conn.getresponse.assert_called_once()
+            self.assertEqual(result['sent_bytes'], 0)
+
     def test_lost_upload_response_verifies_without_retransmitting(self):
         record, archives, uploads = self.run_deploy(transfer=dict(transport_error='connection reset'))
         self.assertEqual(record['status'], 'installed_verified')
@@ -200,12 +229,15 @@ class DeploymentTests(unittest.TestCase):
         self.assertTrue(record['absent'])
         self.assertEqual(record['samples'], 0)
 
-    def test_transport_sends_exact_authenticated_multipart(self):
+    def test_transport_sends_exact_multipart_and_waits_for_slow_receiver(self):
         captured = {}
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
                 captured.update(path=self.path, headers=dict(self.headers),
                                 body=self.rfile.read(int(self.headers['Content-Length'])))
+                # The image is queued locally, but the receiver still needs
+                # longer than the connection/send timeout to finish it.
+                time.sleep(0.15)
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(b'Firmware verified; rebooting')
@@ -215,7 +247,9 @@ class DeploymentTests(unittest.TestCase):
         thread = threading.Thread(target=server.handle_request, daemon=True)
         thread.start()
         try:
-            with patch.object(wifi, 'device_token', return_value='private-test-token'):
+            with patch.object(wifi, 'device_token', return_value='private-test-token'), \
+                    patch.object(wifi, 'UPLOAD_SOCKET_TIMEOUT_SECONDS', 0.03), \
+                    patch.object(wifi, 'UPLOAD_RESPONSE_TIMEOUT_SECONDS', 2):
                 result = wifi.upload_application(f'http://127.0.0.1:{server.server_port}',
                                                  image_bytes(), self.identity, interval=0)
             thread.join(timeout=3)

@@ -62,6 +62,14 @@ priorities. Changing those without timing evidence would obscure the diagnosis.
 - Measure host time inside socket sends, the longest send, pacing sleep and
   final response wait. A completed `send()` means accepted by the local TCP
   stack, not confirmed written on the ESP; socket buffering limits inference.
+  The first live fast attempt exposed a separate timeout problem: the computer
+  queued the image in about 11 seconds, timed out waiting for the response and
+  closed while the robot was still receiving. The robot eventually aborted at
+  1,082,590 bytes and safely retained v10. The helper now allows 900 seconds for
+  the final response, while keeping the 120-second connect/send timeout. It
+  never reuses a timed-out HTTP response reader or resends automatically.
+  Local regression coverage includes a delayed receiver acknowledgment and
+  single-close timeout handling. Firmware bytes are unchanged by this fix.
 - Measure receiver Update.write call count, cumulative/max write time, longest
   gap between upload callbacks (excluding prior write/hash work), and final
   verification time. Counters remain in live telemetry on failure. Successful

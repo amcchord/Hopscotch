@@ -15,6 +15,11 @@ import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+UPLOAD_SOCKET_TIMEOUT_SECONDS = 120
+# send() can queue the full image locally long before a slow receiver finishes.
+# Keep that connection alive for the observed multi-minute transfers and verify
+# the installed image after any ambiguous response; never automatically resend.
+UPLOAD_RESPONSE_TIMEOUT_SECONDS = 900
 UPLOAD_PROFILES = {
     'paced': dict(chunk_bytes=1024, interval=0.05),
     # TCP provides backpressure; no application-level sleep between sends.
@@ -105,18 +110,21 @@ def upload_application(host, image, identity, secrets_file=None, interval=0.05, 
     if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.path not in ('', '/'):
         raise ValueError('Use an http(s) robot host without a path')
     connection_type = http.client.HTTPSConnection if parsed.scheme == 'https' else http.client.HTTPConnection
-    conn = connection_type(parsed.hostname, parsed.port, timeout=120)
+    conn = connection_type(parsed.hostname, parsed.port, timeout=UPLOAD_SOCKET_TIMEOUT_SECONDS)
     boundary = 'hopscotch-' + os.urandom(12).hex()
     body = (f'--{boundary}\r\nContent-Disposition: form-data; name="firmware"; filename="firmware.bin"\r\n'
             'Content-Type: application/octet-stream\r\n\r\n').encode() + image + f'\r\n--{boundary}--\r\n'.encode()
     headers = {'Authorization': 'Bearer ' + device_token(secrets_file),
                'Content-Type': f'multipart/form-data; boundary={boundary}', 'Content-Length': str(len(body)),
                'X-Firmware-Size': str(len(image)), 'X-Firmware-SHA256': identity['application_sha256']}
-    result = dict(chunk_bytes=chunk_bytes, interval_seconds=interval, timeout_seconds=120, tcp_nodelay=True)
+    result = dict(chunk_bytes=chunk_bytes, interval_seconds=interval,
+                  timeout_seconds=UPLOAD_SOCKET_TIMEOUT_SECONDS,
+                  response_timeout_seconds=UPLOAD_RESPONSE_TIMEOUT_SECONDS, tcp_nodelay=True)
     started = time.monotonic()
     sent = 0
     send_seconds = max_send_seconds = sleep_seconds = 0.0
     next_progress = 256 * 1024
+    response_attempted = False
     def capture_response(response):
         result.update(status=response.status, response=response.read().decode(errors='replace'))
         timings = {}
@@ -150,7 +158,9 @@ def upload_application(host, image, identity, secrets_file=None, interval=0.05, 
             if sent >= next_progress:
                 print(f'Sent {sent}/{len(body)} bytes', flush=True)
                 next_progress += 256 * 1024
+        conn.sock.settimeout(UPLOAD_RESPONSE_TIMEOUT_SECONDS)
         response_started = time.monotonic()
+        response_attempted = True
         try:
             response = conn.getresponse()
             capture_response(response)
@@ -158,12 +168,15 @@ def upload_application(host, image, identity, secrets_file=None, interval=0.05, 
             result['response_wait_seconds'] = round(time.monotonic() - response_started, 6)
     except (OSError, http.client.HTTPException) as exc:
         result['transport_error'] = str(exc)
-        # An early HTTP rejection may be readable even when the body send failed.
-        try:
-            response = conn.getresponse()
-            capture_response(response)
-        except (OSError, http.client.HTTPException):
-            pass
+        # An early HTTP rejection may be readable when the body send failed.
+        # A timed-out response reader cannot safely be reused, and retrying it
+        # only hides a second full timeout from the response timing record.
+        if not response_attempted:
+            try:
+                response = conn.getresponse()
+                capture_response(response)
+            except (OSError, http.client.HTTPException):
+                pass
     finally:
         conn.close()
         result.update(sent_bytes=sent, seconds=round(time.monotonic() - started, 3),
