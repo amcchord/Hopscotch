@@ -969,3 +969,52 @@ copies acrossworktrees. Docs identify currentpackage/procedure and diagnosis.
 
 User can retry CH6 HIGH/CH11, then disarm and archive. Source correction is
 installed; physical maneuver success remains for the operator to establish.
+
+## 2026-09-20 — Investigate stand-up roll-away and arm recovery ownership
+
+Austin reported a stand-up roll-away and asked for smarter balance recovery,
+then emphasized that the arms provide both COM shift and inertia. Work remains
+isolated to codex/balance-lower; fast-tip owner performs independent read-only
+review, other task source and robot operations remain undisturbed.
+
+Archived372 samples on installed7c32bd7/app0, schema13,7.424s,
+bailout_angle_error. Powered healthy/disarmed preflight and post-archive passed;
+maintenance released. CSV and wire identities are retained with health evidence.
+Both wheels track together before the large fall, unlike the earlier unilateral
+motor-tracking failure. No deadline, IMU-stale or CAN-transmit fault appears.
+Startup recovery begins3.625s, builds+3.5579degrees integral then overshoots.
+There are no quiet Forward samples to establish a new equilibrium calibration.
+
+The arm lifecycle blocks full negative recovery demand for62 samples/1.239s
+following ramp completion5.145s. Calm remains zero, so COOLDOWN cannot reach
+READY until emergency bypass6.384s at−13.598rad/s. Measured arms respond after
+command; residual return velocity at ramp completion makes an immediate reversal
+unsafe to assume. Current scheduling models measured arm position/COM shift,
+without an explicit inertial reaction term. Successful lowering is plotted with
+upright-control handoff and support confirmation so floor-contact dynamics are
+not mistaken for a free-balance inertia calibration.
+
+Implemented reproducible offline experiments using the actual C++ acceleration
+controller/rate filter and approximate existing outer-loop model. Across385
+planar cases, retained acceleration improves no-fall114→272 but regresses8;
+naively enabling arms earlier regresses35. Across648 cases with hypothesized
+arm inertia, bounded servo acceleration and lag, combined recovery improves
+193→250 but regresses61. These are uncertainty screens, not fitted physical
+success predictions; the nominal planar case does not reproduce the real fall.
+No candidate accepted into firmware or uploaded. No settings/trim writes or
+autonomous motion. Installed lowering v13/fast-tip v2 remains unchanged.
+
+[Evidence and design boundary](../../evidence/balance-recovery/rollaway-20260921/README.md)
+retain raw identities, plots, case-level outcomes, source hashes, reproducible
+analysis/model scripts and rejection reasons. Verification: bridge compiles with
+C++17 warning errors,1,925 planar/1,944 dynamic-arm episodes, focused existing
+balance-drive/native/startup suites, Python syntax, telemetry/source identities,
+output completeness, whitespace and plot inspection. No ESP32 rebuild because
+firmware source is unchanged. Independent peer confirms the lifecycle gap,
+measured-return issue and limits on diagnosing a balance-angle error.
+
+Next: bounded synchronized recovery ownership, separate static/inertial arm
+model with uncertainty, wheel headroom and qualified equilibrium learning.
+Resolve regressions against successful and failed trials before freezing a new
+motion-control candidate. Physical v13 lowering acceptance remains pending;
+this latest run ended during stand-up.

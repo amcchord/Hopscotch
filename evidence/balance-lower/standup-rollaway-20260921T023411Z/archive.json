@@ -1,0 +1,9 @@
+{
+  "samples": 372,
+  "csv_sha256": "c2ee34b480f8cc5f801b8e3d7d0ac431989aa184202493c8df4548fb886b3bc4",
+  "wire_sha256": "48712f4fe2b691cebd3586ba6c8551de94d6a88f5ef8cf7ab651d585d875b09e",
+  "csv_path": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260921T023411Z_standup_rollaway_wifi.csv",
+  "wire_path": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260921T023411Z_standup_rollaway_wifi.wire",
+  "image_sha256": "2cba5a84594a703bb377b6697791fca4da790e8b6c8d4fe5ddf0f2181461cdae",
+  "running_slot": "app0"
+}
