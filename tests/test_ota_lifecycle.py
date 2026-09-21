@@ -27,7 +27,11 @@ class OtaLifecycleTests(unittest.TestCase):
         self.assertIsNotNone(watchdog)
         constants = re.findall(r"constexpr uint32_t OTA_[A-Z_]+ = [0-9]+;", source)
         self.assertEqual(len(constants), 3)
+        ota_route = source[source.index('_server.on("/api/ota"'):]
+        response = function(ota_route, '[this](AsyncWebServerRequest* r)')
+        response = response.replace('[this](AsyncWebServerRequest* r)', 'void WebUI::respondOta(AsyncWebServerRequest* r)', 1)
         implementations = "\n".join(constants + [
+            response,
             function(source, "OtaProgress WebUI::otaProgress("),
             function(source, "void WebUI::publishOta("),
             function(source, "void WebUI::failOta("),

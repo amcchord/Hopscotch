@@ -4,6 +4,7 @@
 #include "crsf.h"
 #include "network_safety.h"
 #include "ota_progress.h"
+#include "ota_metrics.h"
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
@@ -11,15 +12,22 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 struct String : std::string {
     using std::string::string;
+    explicit String(uint64_t value) : std::string(std::to_string(value)) {}
     bool isEmpty() const { return empty(); }
     void toLowerCase() { std::transform(begin(), end(), begin(), [](unsigned char c) { return std::tolower(c); }); }
 };
 struct Header { String text; String value() const { return text; } };
+struct AsyncWebServerResponse {
+    int code;
+    std::map<std::string, std::string> headers;
+    void addHeader(const char* name, const String& value) { headers[name] = value; }
+};
 struct AsyncClient {
     uint32_t rx_timeout = 0, ack_timeout = 0;
     bool no_delay = false;
@@ -34,6 +42,9 @@ struct AsyncWebServerRequest {
     std::map<std::string, Header> headers;
     std::function<void()> disconnect;
     bool token_ok = true;
+    std::unique_ptr<AsyncWebServerResponse> response;
+    AsyncWebServerResponse* beginResponse(int code, const char*, const char*) { return new AsyncWebServerResponse{code, {}}; }
+    void send(AsyncWebServerResponse* value) { response.reset(value); }
     AsyncWebServerRequest() {
         headers["X-Firmware-Size"].text = "4096";
         headers["X-Firmware-SHA256"].text = String(64, '0');
@@ -78,11 +89,13 @@ struct Flash {
     size_t write(uint8_t*, size_t count) {
         assert(crsfRx.suspended() && !uart.begun);
         controlOnce(); assert(motionTicks == 0);
+        fake_us += 2500; // Timed flash API; receive gaps must stay separate.
         if (!write_ok) return 0;
         bytes += count; return count;
     }
     bool end() {
         assert(queue.value.phase == OtaPhase::Verifying && queue.value.percent() == 99);
+        fake_us += 4000;
         ended = end_ok; return end_ok;
     }
     void abort() { aborted = true; }
@@ -110,6 +123,7 @@ struct WebUI {
     mbedtls_sha256_context _sha;
     ProgressQueue* _otaProgress = &queue;
     OtaProgress _ota_progress;
+    OtaMetrics _ota_metrics;
     bool authorized(AsyncWebServerRequest* r) { return r->token_ok; }
     bool acquireMaintenance(bool ota) {
         if (!maintenance.request(ota)) return false;
@@ -123,6 +137,7 @@ struct WebUI {
     void failOta(const char*);
     void upload(AsyncWebServerRequest*, size_t, uint8_t*, size_t, bool);
     void watchdog();
+    void respondOta(AsyncWebServerRequest*);
 } webUI;
 
 // IMPLEMENTATIONS
@@ -154,6 +169,17 @@ int main() {
     p = webUI.otaProgress();
     assert(Update.ended && p.phase == OtaPhase::Rebooting && p.percent() == 100);
     assert(p.received == 4096 && p.total == 4096 && p.bytesPerSecond(fake_ms) == 4096);
+    assert(webUI._ota_metrics.write_calls == 2 && webUI._ota_metrics.write_us == 5000);
+    assert(webUI._ota_metrics.max_write_us == 2500 && webUI._ota_metrics.verify_us == 4000);
+    assert(webUI._ota_metrics.max_receive_gap_ms == 1000);
+    webUI.respondOta(&upload);
+    assert(upload.response && upload.response->code == 200);
+    assert(upload.response->headers.at("X-OTA-Write-Us") == "5000");
+    assert(upload.response->headers.at("X-OTA-Max-Write-Us") == "2500");
+    assert(upload.response->headers.at("X-OTA-Max-Receive-Gap-Ms") == "1000");
+    assert(upload.response->headers.at("X-OTA-Verify-Us") == "4000");
+    assert(upload.response->headers.at("X-OTA-Elapsed-Ms") == "1000");
+    assert(!webUI._ota_request); // HTTP completion clears ownership, not the reboot inhibit.
     upload.disconnect(); controlOnce();
     assert(crsfRx.suspended() && webUI.maintenance.granted() && motionTicks == 0);
 

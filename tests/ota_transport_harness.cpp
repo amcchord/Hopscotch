@@ -14,9 +14,12 @@
 #include <string>
 #include "network_safety.h"
 #include "ota_progress.h"
+#include "ota_metrics.h"
 
 uint32_t now_ms = 100;
 uint32_t millis() { return now_ms; }
+uint32_t micros() { return now_ms * 1000; }
+struct SerialStub { template<typename... Args> void printf(const char*, Args...) {} } Serial;
 struct String : std::string {
     using std::string::string;
     String(const std::string& s) : std::string(s) {}
@@ -87,6 +90,8 @@ struct WebUI {
     const char* _ota_failure = "";
     String _ota_sha;
     mbedtls_sha256_context _sha;
+    OtaProgress _ota_progress;
+    OtaMetrics _ota_metrics;
     bool authorized(AsyncWebServerRequest* r) { return r->token_ok; }
     bool acquireMaintenance(bool ota = false) { if (!maintenance.request(ota)) return false; maintenance.service(eligible); return maintenance.granted(); }
     void releaseMaintenance() { maintenance.release(); }
