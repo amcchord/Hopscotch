@@ -113,3 +113,23 @@ Reproduce the screen from the fast-tip checkout:
 `scripts/analyze_fast_tip_drift.py` takes the archived CSV, optional
 `--references` CSV paths and `--output`; exact read-in-place paths and their
 checksums are retained in `observed.json`.
+
+## Integration review
+
+The device/integration owner reviewed the runtime scope and retained this as
+an experimental operator-test candidate. The 20 modeled regressions include
+case 223 (A=23, B=8, lag=0.035, arm equilibrium delta=-3.5, Forward equilibrium
+88.7, release fraction=0.99), so they cannot be dismissed as only extreme motor
+lag. Poor modeled settling limits conclusions in either direction. The observed
+transient correction/recoil motivates the trial; no physical improvement or
+sensor-drift cause has been demonstrated.
+
+Focused commits e08184d/cf7db90/32c4b68 integrated as
+2c90263/a0243d9/db437fa on codex/balance-lower; baseline alignment df5ed26 was
+excluded. Production src/data/platformio inputs match the reviewed candidate.
+The consolidated check at db437fa passes all 12 native suites, 44 Python tests,
+script syntax/whitespace and the pinned configured ESP32 build (application
+section 1,214,905 bytes, RAM 53,600 bytes). Existing Arduino macro-redefinition
+warnings remain. No OTA, robot request, settings write or autonomous motion
+was performed; installed firmware remains 45c1a94. Candidate is queued,
+unflashed and awaiting the next operator-test decision.

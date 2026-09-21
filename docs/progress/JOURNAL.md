@@ -829,3 +829,35 @@ is a hypothesis to test against the recordings. This task retains device and
 integration ownership; no overlapping motor/stand-up changes, motion, settings
 writes or OTA. Current download/record work is complete; await the owner's
 justified candidate before release work.
+
+## 2026-09-20 — Review and queue fast stand-up drift experiment, no OTA
+
+Reviewed fast-tip owner's e08184d/cf7db90/32c4b68 against installed 45c1a94.
+Only runtime gain change is the latched fast stand-up's existing maximum 800 ms
+recovery boost, 1.0 to 0.5. Slow and ordinary learning, freshness/bounds/recoil,
+capture/trim, motion trajectories, lowering and networking remain unchanged.
+Schema 11 identifies the policy with the existing 240-byte layout. Found and
+reproduced the old pilot test rejecting schema 11; owner corrected it before
+handoff. No files in the owner's checkout were edited here.
+
+The successful recorded run accumulated +2.8529 degrees before a larger backward
+recoil with healthy symmetric wheel tracking. That supports a focused gain trial,
+not an accelerometer-drift diagnosis. The unvalidated planar screen has 57 fall
+improvements and 20 regressions (116→153 no-fall of 385); many no-fall cases do
+not settle. Regressions include case 223 at A23/B8/lag .035/arm delta -3.5/
+Forward equilibrium 88.7/release .99, so they are not exclusively extreme motor
+lag. Review recommendation: queue an explicit operator-test experiment, with
+no demonstrated general robustness or physical drift improvement claimed.
+
+Cherry-picked only the focused commits as 2c90263/a0243d9/db437fa, excluding the
+peer's baseline-alignment commit df5ed26. Production src/data/platformio inputs
+match the peer candidate exactly. One combined validation at db437fa passes all
+12 native suites, 44 Python tests, script syntax and whitespace checks, and
+the configured pinned ESP32 build (application section 1,214,905 bytes,
+RAM 53,600 bytes). Local output/fast-tip-v3-integration-check.log retains the
+console record. Existing Arduino macro-redefinition warnings remain.
+
+No raw logs, secrets or firmware packages copied between worktrees. No robot
+request, OTA, settings write or autonomous motion. Installed source remains
+45c1a94/app0 with successful v10 fast laydown. Candidate is queued and unflashed;
+return actual status to the fast-tip task for Austin's next-test decision.
