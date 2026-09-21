@@ -1,5 +1,12 @@
 # Fast stand-up drift: reduced transient-learning candidate
 
+**Deferred:** Austin subsequently reported a perfect run and requested only
+faster postcontact laydown. Its fresh archive (`013959Z_fast_lower_speed` in
+the balance-lower checkout) confirms installed 45c1a94 / fast v2, with capture
+83.523 degrees and stand-up wheel excursion -0.059 to +0.746 rad. The unflashed
+gain experiment was removed from the next release to preserve that successful
+stand-up. The following candidate and model records remain historical evidence.
+
 Austin's successful September 20 evening trial is archived as 1,325 samples /
 26.660 seconds, schema 10, `lower_complete`. Device owner retains raw CSV/wire
 in `worktrees/balance-lower/telemetry_logs/` with stem
