@@ -633,3 +633,20 @@ built here or installed. No robot request, reconnect or upload performed for
 this handoff. Next remains Austin's manual CH6 fast-laydown trial; integrate
 network candidate with the next authorized combined release and retain the
 proven v10 package until that deployment is verified.
+
+## 2026-09-20 — Hand authorized network deployment to OTA owner
+
+OTA task reports Austin explicitly authorized uploading the strongest-AP /
+throughput changes. Confirmed no robot operation or newer motion candidate
+is underway here: src/data/build/helper are unchanged from installed v10
+source 7917543; a557e62 is a documentation-only queue record. Handed exclusive
+release/device ownership to worktrees/ota-throughput, codex/ota-throughput,
+for its unchanged 45c1a94 candidate on the same motion baseline. It owns fresh
+preflight, latest-run archive, source/image freeze, authorized fast upload,
+complete image/health/log verification and its deployment/current-state record.
+
+No robot requests or deployment were performed by this task. Preserve exact
+private v10 recovery in place; no secret/log/binary copies between worktrees.
+This task waits for the OTA owner to report exact installed identity/outcome
+and return ownership before any subsequent device operation. Physical fast
+laydown acceptance remains pending unless a newer archived run establishes it.
