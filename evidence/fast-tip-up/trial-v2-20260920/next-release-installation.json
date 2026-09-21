@@ -1,0 +1,34 @@
+{
+  "status": "installed_verified",
+  "completed_utc": "2026-09-20T21:36:50.532600+00:00",
+  "source_commit": "c442e1271eaf9f38cfbeab27c2e435fe6b8e3eb3",
+  "application": {
+    "application_bytes": 1210736,
+    "application_sha256": "aaef0c5f2c768ff36cd51f3d41ec7ff08a55bb682c2995be958c55901635b59a",
+    "esp_image_digest": "5affbef55fc259591b2737cf1f17226b5878f5ac2ce847c7694919d755c975a4"
+  },
+  "saved_run_after": {
+    "samples": 1519,
+    "csv_sha256": "eb4455fcb12291c111761d5bfe15daac550bb44014af3b84f588ea78e44e4e9e",
+    "wire_sha256": "0f856d5d8d3a0e7341de203ac4d1d840823741674c7463611a0cc96e8cd5f245"
+  },
+  "motion_initiated": false,
+  "deployment_evidence": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/output/lowering-v7-deployment/deployment.json",
+  "running_slot": "app0",
+  "transfer_seconds": 421.475,
+  "powered_disarmed_health": true,
+  "fast_source_preservation": {
+    "previous_source": "a772ecc",
+    "combined_source": "660634a0e99b53730839e91492a706ca8c695120",
+    "fast_source_preserved": {
+      "src/balance_tip_up.h": true,
+      "src/balance_math.h": true,
+      "src/config.h": true,
+      "src/balance_controller.h": true,
+      "tests/test_balance_tip_up.cpp": true,
+      "enter_balancing": true,
+      "capture_release": true
+    }
+  },
+  "physical_lowering_acceptance": "Pending next operator trial; fast v2 unchanged"
+}
