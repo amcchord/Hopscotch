@@ -890,3 +890,27 @@ impact peaks, before the modified phase; sampledguard is not a continuous bound.
 
 Next: sourcefreeze, singlecombinedvalidation, configuredpackage and authorized
 OTA under deviceowner. No motion/settings writes or deployment performed yet.
+
+## 2026-09-20 — Deploy lowering v12 with successful stand-up preserved
+
+Frozen source 09d2e01 passed 12 native suites, 44 Python tests, configured pinned
+ESP32 build, radio C++/Lua and dashboard checks. Private package stays in
+balance-lower/artifacts/lowering-v12-fast/candidate. Image 1,215,936 bytes,
+SHA256 702508c46121c3a01bbd49fad6655ae2888b23950a5772c6793cb43acd60f4e9.
+No firmware rebuild after freeze; documentation-only updates need none.
+
+Authorized OTA completed HTTP 200 in 438.820 s with transmitter linked, disarmed
+powered motors and no pacing sleeps. Receiver writes totaled 5.215 s, largest
+receive gap 13.487 s, response wait 33.047 s. Installed app1 ESP digest
+3b5c5f5601ffdac322e0c9bd6ddf06934821f71d9b90f6549c12a172844772f3 verified
+at 2026-09-21T02:00:40.530835+00:00. Postflight: fresh idle/disarmed, all six
+powered motors healthy/disabled, fresh IMU, released maintenance and returned
+RC link (0 ms age). Wi-Fi channel 1/-56 dBm. Latest 1,192-row CSV/wire remained
+byte-identical before/after. No autonomous motion, settings or filesystem write.
+
+[Release evidence](../../evidence/lowering-v12-integration/README.md) retains
+manifest, checks summary, timings, identities and preservation. Preceding
+45c1a94 recovery package stays in the OTA task's checkout; no private package
+or secret header copied between worktrees. Other tasks remain independent.
+This lowering-only update is installed and ready for Austin's CH6 HIGH / CH11
+manual trial. Physical speed/robustness still require the resulting telemetry.
