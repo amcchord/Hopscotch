@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 5;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 10;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -798,9 +798,11 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
 
     if (_state == BalanceState::Balancing && ch11_edge && !_lowering.active()) {
         const auto& cal = _arms->getCalibration();
-        if (_ramp_complete && _lowering.request(millis(), lowerInput(pilot_valid), cal.center_left, cal.center_right)) {
+        if (_ramp_complete && _lowering.request(millis(), lowerInput(pilot_valid),
+                                               cal.center_left, cal.center_right, fast_tip_selected)) {
             persistLearnedTrim(); // Save only the already-qualified ordinary balance estimate.
-            Serial.println("[Balance] LOWER requested: stop, prepare, fall forward, catch, descend");
+            Serial.printf("[Balance] %s LOWER requested: stop, prepare, fall forward, catch, descend\n",
+                          _lowering.fast() ? "FAST" : "NORMAL");
         } else {
             Serial.println("[Balance] LOWER refused: wait for settled startup and healthy armed feedback");
         }
@@ -1327,6 +1329,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
         const bool pilot_was_ready = _pilot.ready();
         const bool pilot_was_moving = _pilot.moving();
         _pilot.update(pilot_allowed, pilot_calm, pilot_forward, pilot_turn, dt, pilot_config);
+        if (_lowering.active()) _pilot.handoffStoppedForLowering();
         _pilot_velocity_ff = _pilot.moving() ? _pilot.velocity() : 0;
         _pilot_measured_vel = _filtered_wheel_vel;
         _pilot_driving = _pilot.moving();
@@ -1958,6 +1961,7 @@ void BalanceController::logSample(float roll_deg, float roll_rate_dps) {
                   | (_pilot_drive_active ? 16 : 0) | (_pilot.fastBraking() ? 32 : 0)
                   | (_lowering.active() ? 64 : 0)
                   | (_fast_tip_run ? 128 : 0)
+                  | (_lowering.fast() ? 4096 : 0)
                   | (static_cast<uint32_t>(_lowering.phase()) << 8);
     s.pilot_arm = _pilot_arm_applied;
     _log_count++;
@@ -2137,27 +2141,59 @@ void BalanceController::dumpLog(Print* sink) {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 16384) {
         // Versioned literals describe the saved policy, including after a future OTA.
-        out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        if (header.schema_version >= 6)
+            out.println("# tip_up=ch6_fast_v2 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        else
+            out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
         out.println("# fast_tip_trajectory=duration_s:2.6 motor_limit_rad_s:2.2 lead_rad:0.18 legacy_geometric_path:1 quintic_progress:1");
         out.println("# fast_tip_start=forward_tolerance_rad:0.15 abs_tilt_deg:12 arm_rate_rad_s:0.3 wheel_rate_rad_s:0.75 neutral_CH1_CH2:1");
-        out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
+        if (header.schema_version >= 6) {
+            out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 wheel_rate_rad_s:0.75 confirm_ms:120 measured_arrival_required:1");
+            out.println("# fast_tip_release=preserve_stored_trim:1 supported_capture_calibration:0 measured_tip_fraction_span:0.1 monotonic_capture_fade:1 base_slew:existing");
+        } else {
+            out.println("# fast_tip_capture=rate_dps:8 arm_rate_rad_s:0.3 confirm_ms:120 measured_arrival_required:1");
+        }
         out.println("# fast_tip_limits=timeout_ms:4500 stall_ms:400 control_dt_ms:40 feedback_ms:100 tilt_deg:-20:100 abs_rate_dps:100");
         out.println("# fast_tip_rate=roll_rate_uses_fast_tau_s:0.006 only_state:1 and_fast_run:1 ordinary_balance_filter_unchanged:1");
         if (header.schema_version >= 5)
             out.println("# fast_tip_startup=wait_ms:1000 quiet_ms:100 post_setup_feedback:real requests_per_tick:2 feedback_cycle_ms:60 parked_during_wait:1 total_timeout_ms:4500");
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
-        // Schema 5 keeps the 240-byte samples/header; all 16 feature bits were
-        // allocated. Historical schema-4 exports keep their exact v4 literals.
-        out.println("# lowering=experimental_ch11_forward_catch_v5 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        // Metadata-only policy revisions retain historical exports exactly.
+        if (header.schema_version >= 10)
+            out.println("# lowering=experimental_ch11_forward_catch_v10 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 9)
+            out.println("# lowering=experimental_ch11_forward_catch_v9 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 8)
+            out.println("# lowering=experimental_ch11_forward_catch_v8 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 7)
+            out.println("# lowering=experimental_ch11_forward_catch_v7 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 6)
+            out.println("# lowering=experimental_ch11_forward_catch_v6 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else
+            out.println("# lowering=experimental_ch11_forward_catch_v5 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         out.println("# lowering_phases=0:idle 1:stopping 2:forward_preparing 3:descending 4:ground_hold 5:retracting 6:reserved 7:complete 8:fault 9:committing 10:catching");
         out.println("# lowering_prepare=travel_rad:1.75 speed_rad_s:4 setpoint_ceiling:measured_start_tilt moving_handoff:1 timeout_ms:2000 backward_limit_deg:1.5 rate_min_dps:-35 rate_max_dps:15 wheel_limit_rad_s:6");
+        if (header.schema_version >= 6)
+            out.println("# lowering_departure=early_reach_rad:1.6 both_outward_speed_min_rad_s:0.3 both_load_below_nm:0.4 forward_drop_deg:0.5 forward_rate_min_dps:2 measured_wheel_handoff:1");
         out.println("# lowering_launch=rear_accel_rad_s2:2 rear_speed_rad_s:-2 forward_drop_deg:1 forward_rate_dps:2 accel_pause_rate_dps:6 coast_min_arm_rad:1.8 timeout_ms:1800 initial_coast:measured_wheel_speed");
         out.println("# lowering_catch=park_rad:1.85 speed_rad_s:2 probe_after_forward_deg:6 probe_rad:2.4 probe_speed_rad_s:0.5 first_load_nm:0.4 first_load_deceleration_dps:1 first_load_delay_ms:100 sustained_load_nm:0.2 confirm_ms:80 timeout_ms:2500");
         out.println("# lowering_return=first_contact_reverse_both:1 speed_limit_rad_s:0.5 single_contact_limit_rad:0.06 both_contacts_goal:calibrated_forward rate_taper_limit_dps:12 loaded_rebound_ms:300 support_age_ms:60");
+        if (header.schema_version >= 7) {
+            out.println("# lowering_stop=drive_handoff:after_reference_zero pd_handoff_slew:existing prepare_calm_ms:500");
+            out.println("# lowering_support=both_arms measured_forward_fall_loaded_return support_age_ms:60 confirm_ms:80 min_elapsed_from_both_contacts_ms:80 reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:12 wheel_stop:after_both_contacts");
+            if (header.schema_version >= 9)
+                out.println("# lowering_support_rebound=within_first_impact_ms:300 body_rate_max_dps:20 max_rise_from_impact_min_deg:1.5 requires_recent_both_support:1 unchanged_dwell_and_arm_velocity:1");
+        } else {
         out.println("# lowering_support=both_arms measured_forward_fall_loaded_return required reverse_velocity_min_rad_s:-0.1 max_rad_s:0.7 body_rate_min_dps:-12 max_dps:4");
+        }
         out.println("# lowering_rate=roll_rate_uses_fast_tau_s:0.006 while_pilot_phase_nonzero:1 ordinary_balance_filter_unchanged:1");
-        out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        if (header.schema_version >= 8)
+            out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.24 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        else
+            out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
+        if (header.schema_version >= 10)
+            out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:0.60 normal_motor_rad_s:0.30 fast_motor_rad_s:0.75 normal_descent_dps:12 fast_descent_dps:20 taper_tilt_deg:35:15 catch_and_final_retraction_unchanged:1");
         out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600 arms_measured_forward_rad:0.06");
     } else if (header.reserved & 32768) {
         out.println("# lowering=experimental_ch11_forward_catch_v4 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");

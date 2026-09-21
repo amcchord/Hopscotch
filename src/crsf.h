@@ -24,6 +24,12 @@ public:
     // Call every loop iteration to process incoming bytes
     void update();
 
+    // Control-task only: remove the UART driver during OTA, including RX
+    // interrupts and telemetry. Resume with empty buffers and no valid link.
+    void suspend();
+    void resume();
+    bool suspended() const { return _suspended; }
+
     // Channel data (raw 11-bit: 172..1811)
     uint16_t getChannel(int ch) const;
 
@@ -61,6 +67,10 @@ public:
 
 private:
     HardwareSerial* _serial = nullptr;
+    int _rx_pin = -1, _tx_pin = -1;
+    uint32_t _baudrate = 0;
+    bool _suspended = false;
+    void resetInput();
     uint16_t _channels[CRSF_MAX_CHANNELS] = {0};
     uint32_t _last_frame_time = 0;
     uint8_t  _buf[CRSF_MAX_PACKET_SIZE];

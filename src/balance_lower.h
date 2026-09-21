@@ -1,5 +1,6 @@
 #pragma once
 #define BALANCE_LOWER_FORWARD_PREPARE_V5 1
+#define BALANCE_LOWER_FAST_RETURN_V10 1
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -26,8 +27,13 @@ struct LowerInput {
 
 struct LowerConfig {
     float prepare_rad = 1.75f, prepare_speed = 4.0f;
+    float moving_handoff_rad = 1.60f;
     float catch_rad = 1.85f, catch_speed = 2.0f;
-    float lower_speed = .16f, retract_speed = .30f;
+    // Normal mode preserves the successful v9 supported return and landing.
+    float lower_speed = .24f, retract_speed = .30f;
+    // CH6 fast mode accelerates only confirmed support, then tapers near floor.
+    float fast_lower_speed = .60f, fast_motor_speed = .75f, fast_descent_rate = 20.f;
+    uint32_t fast_blend_ms = 600;
     float catch_return_speed = .50f;
     float one_arm_return = .06f;
     float max_target_lead = .24f;
@@ -42,6 +48,7 @@ struct LowerConfig {
     uint32_t stop_timeout_ms = 14000, prepare_timeout_ms = 2000;
     uint32_t launch_timeout_ms = 1800, catch_timeout_ms = 2500;
     uint32_t impact_settle_ms = 300;
+    float impact_confirm_rate = 20.f, impact_confirm_rebound = 1.5f;
     uint32_t descent_timeout_ms = 20000, retract_timeout_ms = 6000;
     uint32_t progress_timeout_ms = 3000;
 };
@@ -58,6 +65,7 @@ public:
     LowerPhase phase() const { return _phase; }
     bool active() const { return _phase != LowerPhase::Idle && _phase != LowerPhase::Complete && _phase != LowerPhase::Fault; }
     bool committed() const { return _committed; } // owns wheels, even before catch
+    bool fast() const { return _fast; }
     bool supported() const { return _supported; } // catch observed, not just commanded
     bool overridesArms() const { return active() && _phase != LowerPhase::Stopping; }
     float left() const { return _left; }
@@ -69,6 +77,8 @@ public:
     float armSpeed() const {
         const LowerConfig c;
         if (_phase == LowerPhase::Reaching) return c.prepare_speed;
+        if (_phase == LowerPhase::Descending)
+            return c.retract_speed + _return_blend*(c.fast_motor_speed-c.retract_speed);
         return _phase == LowerPhase::Committing || _phase == LowerPhase::Catching
             ? ((_left_touched || _right_touched) ? c.catch_return_speed : (_probing ? .5f : c.catch_speed))
             : c.retract_speed;
@@ -76,7 +86,7 @@ public:
     const char* reason() const { return _reason; }
     void reset() { *this = BalanceLower{}; }
 
-    bool request(uint32_t now, const LowerInput& in, float center_left, float center_right) {
+    bool request(uint32_t now, const LowerInput& in, float center_left, float center_right, bool fast = false) {
         if (active() || !valid(in) || !in.healthy
             || !std::isfinite(center_left) || !std::isfinite(center_right)
             || center_left * center_right >= 0
@@ -84,6 +94,7 @@ public:
             || std::fabs(center_right) < 1 || std::fabs(center_right) > 2.5f
             || in.tilt < 65 || in.tilt > 105) return false;
         reset();
+        _fast = fast; // Latched only on an accepted request; RC changes cannot alter a fall.
         _sign_left = std::copysign(1.f, center_left);
         _sign_right = std::copysign(1.f, center_right);
         _left = in.arm_left; _right = in.arm_right;
@@ -142,7 +153,19 @@ public:
             }
             const bool ready = std::fabs(in.arm_left + _sign_left*c.prepare_rad) < .04f
                 && std::fabs(in.arm_right + _sign_right*c.prepare_rad) < .04f;
-            if (ready) {
+            // The v5 trial was already falling forward while upright PD drove
+            // a wheel past 6 rad/s waiting for the final arm travel.
+            // Once both arms provide useful reach and departure is measured,
+            // release upright control; finish placing the catch during flight.
+            const bool departing = in.arm_left*_sign_left <= -c.moving_handoff_rad
+                && in.arm_right*_sign_right <= -c.moving_handoff_rad
+                && in.velocity_left*_sign_left <= -.30f
+                && in.velocity_right*_sign_right <= -.30f
+                && std::fabs(in.torque_left) < c.contact_torque
+                && std::fabs(in.torque_right) < c.contact_torque
+                && in.tilt <= _prepare_tilt-c.forward_drop*.5f
+                && in.rate <= -c.forward_rate;
+            if (ready || departing) {
                 _launch_tilt = in.tilt;
                 _wheel_command = (in.wheel_left + in.wheel_right)*.5f;
                 _committed = true; _committed_ms = now;
@@ -184,9 +207,15 @@ public:
                 _right = in.arm_right;
                 _touch_left = in.arm_left; _touch_right = in.arm_right;
                 _impact_ms = now;
+                _impact_min_tilt = in.tilt;
             }
+            if (_left_touched || _right_touched)
+                _impact_min_tilt = std::min(_impact_min_tilt, in.tilt);
+            const bool had_both_contacts = _left_touched && _right_touched;
             if (left_load) _left_touched = true;
             if (right_load) _right_touched = true;
+            if (!had_both_contacts && _left_touched && _right_touched)
+                _both_contact_ms = now;
             if (_left_touched && std::fabs(in.torque_left) >= c.contact_torque*.5f) _left_support_ms = now;
             if (_right_touched && std::fabs(in.torque_right) >= c.contact_torque*.5f) _right_support_ms = now;
             if ((_left_touched || _right_touched) && _phase == LowerPhase::Committing
@@ -201,15 +230,17 @@ public:
                 _left = approach(_left, -_sign_left*catch_goal, in.arm_left, catch_speed*dt, c.max_target_lead);
                 _right = approach(_right, -_sign_right*catch_goal, in.arm_right, catch_speed*dt, c.max_target_lead);
             }
-            const bool both_loaded = _left_touched && _right_touched
-                && std::fabs(in.torque_left) >= c.contact_torque*.5f
-                && std::fabs(in.torque_right) >= c.contact_torque*.5f;
             // A measured loaded impact can briefly reverse body rate before
             // the motor reverses. Keep returning rather than freeze upright.
             // Never excuse an unsupported rebound, backward displacement, the
             // global motion limits or an impact that does not settle promptly.
             const bool recent_support = _left_touched && _right_touched
                 && now - _left_support_ms <= 60 && now - _right_support_ms <= 60;
+            // First independently observed two-arm contact starts the bounded
+            // wheel stop. Waiting for a perfectly quiet supported pose kept
+            // the v6 trial coasting through repeated impacts.
+            if (_left_touched && _right_touched)
+                _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             const bool settling_impact = recent_support && now - _impact_ms <= c.impact_settle_ms
                 && _peak_fall_rate < -c.forward_rate && in.tilt < _launch_tilt-c.forward_drop*.5f;
             if (in.tilt > _launch_tilt + 2 || (in.rate > 12 && !settling_impact)) {
@@ -232,14 +263,25 @@ public:
             }
             // Return motion is intentional; requiring zero arm velocity here
             // would prevent support confirmation throughout a successful return.
-            const bool caught = both_loaded
+            // Rocking contact briefly unloads either arm during reversal.
+            // Require each independent support observation within 60 ms over
+            // the full dwell; a one-off impact cannot pass an 80 ms dwell.
+            // V8 caught both arms, but a 17deg/s, <1deg loaded rebound
+            // repeatedly reset the 80ms dwell. Permit that brief rocking only
+            // inside the existing impact window and measured excursion bound.
+            // High/large/late rebounds cannot use this confirmation path.
+            const bool bounded_rebound = settling_impact
+                && in.rate <= c.impact_confirm_rate
+                && in.tilt <= _impact_min_tilt+c.impact_confirm_rebound;
+            const bool caught = recent_support
                 && in.tilt <= _launch_tilt-c.forward_drop*.5f
                 && in.velocity_left*_sign_left >= -.10f && in.velocity_right*_sign_right >= -.10f
                 && in.velocity_left*_sign_left <= c.catch_return_speed+.20f
                 && in.velocity_right*_sign_right <= c.catch_return_speed+.20f
-                && in.rate >= -c.descent_rate && in.rate <= c.calm_rate
+                && in.rate >= -c.descent_rate && (in.rate <= 12.f || bounded_rebound)
                 && _peak_fall_rate < -c.forward_rate;
-            if (confirmed(caught, dt, c.contact_ms)) {
+            if (confirmed(caught, dt, c.contact_ms)
+                && now - _both_contact_ms >= c.contact_ms) {
                 _supported = true;
                 _left = in.arm_left; _right = in.arm_right;
                 _progress_tilt = in.tilt; _progress_ms = now;
@@ -249,7 +291,15 @@ public:
             }
             break;
         }
-        case LowerPhase::Descending:
+        case LowerPhase::Descending: {
+            // Keep the demonstrated catch unchanged. Build speed over 600 ms
+            // after support, then return to normal between 35 and 15 degrees.
+            _return_blend = _fast
+                ? std::min(1.f, float(elapsed)/c.fast_blend_ms)
+                    * std::max(0.f, std::min(1.f, (in.tilt-15.f)/20.f))
+                : 0.f;
+            const float return_speed = c.lower_speed + _return_blend*(c.fast_lower_speed-c.lower_speed);
+            const float descent_rate = c.descent_rate + _return_blend*(c.fast_descent_rate-c.descent_rate);
             _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             if (flat) { enter(LowerPhase::GroundHold, now); break; }
             _support_lost_ms = in.tilt > 15 && in.rate < -25
@@ -260,11 +310,12 @@ public:
             if (now - _committed_ms > c.descent_timeout_ms || now - _progress_ms > c.progress_timeout_ms) {
                 fail("lower_descent_timeout"); break;
             }
-            if (in.rate >= -c.descent_rate && in.rate <= c.calm_rate) {
-                _left = approach(_left, 0, in.arm_left, c.lower_speed*dt, c.max_target_lead);
-                _right = approach(_right, 0, in.arm_right, c.lower_speed*dt, c.max_target_lead);
+            if (in.rate >= -descent_rate && in.rate <= c.calm_rate) {
+                _left = approach(_left, 0, in.arm_left, return_speed*dt, c.max_target_lead);
+                _right = approach(_right, 0, in.arm_right, return_speed*dt, c.max_target_lead);
             }
             break;
+        }
         case LowerPhase::GroundHold:
             _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             if (now - _committed_ms > c.descent_timeout_ms) { fail("lower_descent_timeout"); break; }
@@ -288,15 +339,16 @@ public:
 
 private:
     volatile LowerPhase _phase = LowerPhase::Idle;
-    bool _probing = false;
+    bool _probing = false, _fast = false;
+    float _return_blend = 0;
     bool _committed = false, _supported = false, _left_touched = false, _right_touched = false, _catch_started = false;
     float _left = 0, _right = 0, _sign_left = 0, _sign_right = 0, _wheel_command = 0;
     float _wheel_opposite_ms = 0;
     float _confirm_ms = 0, _progress_tilt = 0, _support_lost_ms = 0;
     float _prepare_tilt = 0, _launch_tilt = 0, _peak_fall_rate = 0;
-    float _touch_left = 0, _touch_right = 0;
+    float _touch_left = 0, _touch_right = 0, _impact_min_tilt = 0;
     uint32_t _phase_ms = 0, _progress_ms = 0, _committed_ms = 0, _catch_start_ms = 0, _impact_ms = 0;
-    uint32_t _left_support_ms = 0, _right_support_ms = 0;
+    uint32_t _left_support_ms = 0, _right_support_ms = 0, _both_contact_ms = 0;
     const char* _reason = "lower_requested";
     static bool at(float a, float b) { return std::fabs(a-b) < .001f; }
     static bool valid(const LowerInput& i) {

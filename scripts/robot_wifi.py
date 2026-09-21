@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import http.client
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -14,6 +15,16 @@ import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+UPLOAD_PROFILES = {
+    'paced': dict(chunk_bytes=1024, interval=0.05),
+    # TCP provides backpressure; no application-level sleep between sends.
+    'fast': dict(chunk_bytes=16 * 1024, interval=0.0),
+}
+OTA_TIMING_HEADERS = {
+    'elapsed_ms': 'X-OTA-Elapsed-Ms', 'write_us': 'X-OTA-Write-Us',
+    'max_write_us': 'X-OTA-Max-Write-Us', 'max_receive_gap_ms': 'X-OTA-Max-Receive-Gap-Ms',
+    'verify_us': 'X-OTA-Verify-Us',
+}
 
 
 def device_token(secrets_file=None):
@@ -86,8 +97,10 @@ def archive_log(host, directory, name, secrets_file=None):
                 wire_sha256=hashlib.sha256(raw).hexdigest())
 
 
-def upload_application(host, image, identity, secrets_file=None, interval=0.05):
-    """Paced multipart upload. Never retry writes after an ambiguous disconnect."""
+def upload_application(host, image, identity, secrets_file=None, interval=0.05, chunk_bytes=1024):
+    """Bounded multipart sends. Never retry after an ambiguous disconnect."""
+    if not math.isfinite(interval) or not 0 <= interval <= 5 or not 1 <= chunk_bytes <= 65536:
+        raise ValueError('Invalid upload pacing or chunk size')
     parsed = urllib.parse.urlsplit(host)
     if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.path not in ('', '/'):
         raise ValueError('Use an http(s) robot host without a path')
@@ -99,9 +112,20 @@ def upload_application(host, image, identity, secrets_file=None, interval=0.05):
     headers = {'Authorization': 'Bearer ' + device_token(secrets_file),
                'Content-Type': f'multipart/form-data; boundary={boundary}', 'Content-Length': str(len(body)),
                'X-Firmware-Size': str(len(image)), 'X-Firmware-SHA256': identity['application_sha256']}
-    result = dict(chunk_bytes=1024, interval_seconds=interval, timeout_seconds=120, tcp_nodelay=True)
+    result = dict(chunk_bytes=chunk_bytes, interval_seconds=interval, timeout_seconds=120, tcp_nodelay=True)
     started = time.monotonic()
     sent = 0
+    send_seconds = max_send_seconds = sleep_seconds = 0.0
+    next_progress = 256 * 1024
+    def capture_response(response):
+        result.update(status=response.status, response=response.read().decode(errors='replace'))
+        timings = {}
+        for field, header in OTA_TIMING_HEADERS.items():
+            value = response.getheader(header)
+            if value is not None and re.fullmatch(r'[0-9]{1,20}', value):
+                timings[field] = int(value)
+        if timings:
+            result['server_timings'] = timings
     try:
         conn.connect()
         conn.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -109,26 +133,42 @@ def upload_application(host, image, identity, secrets_file=None, interval=0.05):
         for key, value in headers.items():
             conn.putheader(key, value)
         conn.endheaders()
-        for offset in range(0, len(body), 1024):
-            chunk = body[offset:offset + 1024]
-            conn.send(chunk)
+        for offset in range(0, len(body), chunk_bytes):
+            chunk = body[offset:offset + chunk_bytes]
+            send_started = time.monotonic()
+            try:
+                conn.send(chunk)
+            finally:
+                duration = time.monotonic() - send_started
+                send_seconds += duration
+                max_send_seconds = max(max_send_seconds, duration)
             sent += len(chunk)
-            time.sleep(interval)
-            if sent % (256 * 1024) == 0:
+            if interval and sent < len(body):
+                sleep_started = time.monotonic()
+                time.sleep(interval)
+                sleep_seconds += time.monotonic() - sleep_started
+            if sent >= next_progress:
                 print(f'Sent {sent}/{len(body)} bytes', flush=True)
-        response = conn.getresponse()
-        result.update(status=response.status, response=response.read().decode(errors='replace'))
+                next_progress += 256 * 1024
+        response_started = time.monotonic()
+        try:
+            response = conn.getresponse()
+            capture_response(response)
+        finally:
+            result['response_wait_seconds'] = round(time.monotonic() - response_started, 6)
     except (OSError, http.client.HTTPException) as exc:
         result['transport_error'] = str(exc)
         # An early HTTP rejection may be readable even when the body send failed.
         try:
             response = conn.getresponse()
-            result.update(status=response.status, response=response.read().decode(errors='replace'))
+            capture_response(response)
         except (OSError, http.client.HTTPException):
             pass
     finally:
         conn.close()
-        result.update(sent_bytes=sent, seconds=round(time.monotonic() - started, 3))
+        result.update(sent_bytes=sent, seconds=round(time.monotonic() - started, 3),
+                      send_block_seconds=round(send_seconds, 6), max_send_block_seconds=round(max_send_seconds, 6),
+                      pacing_sleep_seconds=round(sleep_seconds, 6))
     return result
 
 
@@ -154,7 +194,9 @@ def wait_for_image(host, expected, previous_slot=None, powered_ids=(), seconds=6
     raise ValueError(f'Installed image/health not verified: {last}. Inspect before retrying or testing.')
 
 
-def deploy(host, firmware, manifest_path=None, record_dir=None, secrets_file=None):
+def deploy(host, firmware, manifest_path=None, record_dir=None, secrets_file=None, upload_profile='paced'):
+    if upload_profile not in UPLOAD_PROFILES:
+        raise ValueError('Unknown upload profile')
     image = firmware.read_bytes()
     manifest = json.loads(manifest_path.read_text()) if manifest_path else None
     identity = application_identity(image, manifest)
@@ -164,7 +206,7 @@ def deploy(host, firmware, manifest_path=None, record_dir=None, secrets_file=Non
     directory.mkdir(parents=True, exist_ok=False)
     record = dict(started_utc=datetime.now(timezone.utc).isoformat(), application=identity,
                   source_commit=manifest.get('source_commit') if manifest else None, status='preflight',
-                  motion_initiated=False)
+                  motion_initiated=False, upload_profile=upload_profile)
     def save():
         (directory / 'deployment.json').write_text(json.dumps(record, indent=2) + '\n')
     save()
@@ -188,8 +230,8 @@ def deploy(host, firmware, manifest_path=None, record_dir=None, secrets_file=Non
             record.update(postflight_info=info, postflight_state=state, status='already_installed_verified')
         else:
             require_idle(json.loads(request(host, '/api/telemetry', timeout=5)), powered_ids)
-            print(f'Uploading {len(image)} bytes (about one minute at default pacing)', flush=True)
-            record['transfer'] = upload_application(host, image, identity, secrets_file)
+            print(f'Uploading {len(image)} bytes with {upload_profile} profile; duration depends on link/flash', flush=True)
+            record['transfer'] = upload_application(host, image, identity, secrets_file, **UPLOAD_PROFILES[upload_profile])
             save()
             print(json.dumps(record['transfer']), flush=True)
             # A lost HTTP response can still mean a successful installation. Read before any retry.
@@ -226,6 +268,8 @@ def main():
     ota.add_argument('firmware', type=Path)
     ota.add_argument('--manifest', type=Path, help='Verify size and both digests against the frozen release manifest')
     ota.add_argument('--record-dir', type=Path, help='New directory for pre/post state and validated saved-run exports')
+    ota.add_argument('--upload-profile', choices=UPLOAD_PROFILES, default='paced',
+                     help='paced: proven 1 KiB/50 ms; fast: 16 KiB sends without artificial sleeps (hardware trial pending)')
     a = p.parse_args()
     if a.command == 'status':
         print(json.dumps(json.loads(request(a.host, '/api/telemetry')), indent=2))
@@ -246,7 +290,7 @@ def main():
         print(f'Validated {count} samples; saved {dest}')
     elif a.command == 'ota':
         try:
-            deploy(a.host, a.firmware, a.manifest, a.record_dir, a.secrets_file)
+            deploy(a.host, a.firmware, a.manifest, a.record_dir, a.secrets_file, a.upload_profile)
         except (OSError, ValueError, http.client.HTTPException) as exc:
             raise SystemExit(str(exc)) from None
 

@@ -52,8 +52,9 @@ void timingJson(JsonObject o, const LoopTiming& t) {
 void WebUI::begin(ExportCallback export_log, DisarmCallback disarm) {
     _export = export_log; _disarm = disarm;
     _snapshots = xQueueCreate(1, sizeof(NetworkSnapshot));
+    _otaProgress = xQueueCreate(1, sizeof(OtaProgress));
     _mutex = xSemaphoreCreateMutex();
-    if (!_snapshots || !_mutex) { Serial.println("[Network] Allocation failed; networking disabled"); return; }
+    if (!_snapshots || !_otaProgress || !_mutex) { Serial.println("[Network] Allocation failed; networking disabled"); return; }
     mbedtls_sha256_init(&_sha);
     if (xTaskCreatePinnedToCore([](void* p) { static_cast<WebUI*>(p)->run(); },
             "NetworkTask", 12288, this, 2, nullptr, 0) != pdPASS)
@@ -72,10 +73,23 @@ bool WebUI::authorized(AsyncWebServerRequest* r) {
     r->send(401, "application/json", "{\"error\":\"device token required\"}");
     return false;
 }
-bool WebUI::acquireMaintenance() {
-    if (!maintenance.request()) return false;
+OtaProgress WebUI::otaProgress() const {
+    OtaProgress progress;
+    if (_otaProgress) xQueuePeek(_otaProgress, &progress, 0);
+    return progress;
+}
+void WebUI::publishOta(OtaPhase phase) {
+    _ota_progress.phase = phase;
+    _ota_progress.received = _ota_received;
+    _ota_progress.total = _ota_size;
+    _ota_progress.updated_ms = millis();
+    if (phase == OtaPhase::Preparing) _ota_progress.started_ms = _ota_progress.updated_ms;
+    xQueueOverwrite(_otaProgress, &_ota_progress);
+}
+bool WebUI::acquireMaintenance(bool ota) {
+    if (!maintenance.request(ota)) return false;
     const auto start = millis();
-    while (maintenance.state() == MaintenanceGate::Requested && millis() - start < 300) delay(1);
+    while (maintenance.pending() && millis() - start < 300) delay(1);
     if (maintenance.granted()) return true;
     maintenance.release();
     return false;
@@ -85,6 +99,7 @@ void WebUI::failOta(const char* reason) {
     _ota_failure = reason;
     _ota_failed_bytes = _ota_received;
     _ota_failed_idle_ms = millis() - _ota_last_ms;
+    publishOta(OtaPhase::Failed);
     Update.abort(); _ota_request = nullptr; _ota_received = 0;
     mbedtls_sha256_free(&_sha); mbedtls_sha256_init(&_sha);
     releaseMaintenance();
@@ -112,6 +127,8 @@ void WebUI::setupRoutes() {
         d["free_psram"] = ESP.getFreePsram();
         d["automatic_boot_rollback"] = false;
         d["ota_transport_version"] = 2;
+        d["wifi_ap_selection"] = "all_channels_strongest_signal";
+        d["ota_metrics_version"] = 1;
         d["ota_rx_timeout_s"] = OTA_RX_TIMEOUT_S;
         d["ota_ack_timeout_ms"] = OTA_ACK_TIMEOUT_MS;
         d["ota_idle_timeout_ms"] = OTA_IDLE_TIMEOUT_MS;
@@ -174,7 +191,17 @@ void WebUI::setupRoutes() {
             if (!result) {
                 if (authorized(r)) r->send(400, "text/plain", "One firmware file is required");
             } else if (result->code) {
-                r->send(result->code, "text/plain", result->message);
+                auto* response = r->beginResponse(result->code, "text/plain", result->message);
+                if (r == _ota_request && _restart_ms) {
+                    // Persist receiver timings in the uploader's deployment
+                    // record before reboot clears RAM. Older clients ignore these.
+                    response->addHeader("X-OTA-Elapsed-Ms", String(_ota_progress.elapsedMs(millis())));
+                    response->addHeader("X-OTA-Write-Us", String(static_cast<unsigned long long>(_ota_metrics.write_us)));
+                    response->addHeader("X-OTA-Max-Write-Us", String(_ota_metrics.max_write_us));
+                    response->addHeader("X-OTA-Max-Receive-Gap-Ms", String(_ota_metrics.max_receive_gap_ms));
+                    response->addHeader("X-OTA-Verify-Us", String(_ota_metrics.verify_us));
+                }
+                r->send(response);
                 if (r == _ota_request && _restart_ms) _ota_request = nullptr;
             }
         },
@@ -212,7 +239,7 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         if (!result) { r->send(503, "text/plain", "Insufficient memory"); return; }
         r->_tempObject = result; // Freed by AsyncWebServerRequest, including disconnects.
         if (!authorized(r)) return;
-        if (_ota_request || _restart_ms || !acquireMaintenance()) {
+        if (_ota_request || _restart_ms || !acquireMaintenance(true)) {
             result->code = 409; result->message = "Update busy or robot not disarmed"; return;
         }
         String sizeText = r->hasHeader("X-Firmware-Size") ? r->getHeader("X-Firmware-Size")->value() : "";
@@ -233,13 +260,16 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
         r->client()->setNoDelay(true);
         _ota_received = 0;
         _ota_last_ms = millis();
+        _ota_metrics.start(_ota_last_ms);
         _ota_failure = ""; _ota_failed_bytes = 0; _ota_failed_idle_ms = 0;
+        publishOta(OtaPhase::Preparing);
         if (!Update.begin(_ota_size, U_FLASH)) {
             failOta("begin_failed"); result->code = 500; result->message = "Cannot begin update"; return;
         }
         _ota_request = r; _ota_received = 0;
         result->code = 408; result->message = "Update did not complete";
         mbedtls_sha256_starts_ret(&_sha, 0);
+        _ota_metrics.last_callback_end_ms = millis();
         r->onDisconnect([this, r]() {
             Guard guard(_mutex);
             if (_ota_request == r && !_restart_ms) failOta("client_disconnect");
@@ -247,20 +277,37 @@ void WebUI::upload(AsyncWebServerRequest* r, size_t index, uint8_t* data, size_t
     }
     if (_ota_request != r || _restart_ms) return;
     _ota_last_ms = millis();
-    if (index != _ota_received || len > _ota_size - _ota_received || Update.write(data, len) != len) {
+    _ota_metrics.received(_ota_last_ms);
+    if (index != _ota_received || len > _ota_size - _ota_received) {
+        failOta("write_or_length"); result->code = 400; result->message = "Update write or length failed"; return;
+    }
+    const uint32_t writeStart = micros();
+    const size_t written = Update.write(data, len);
+    _ota_metrics.wrote(uint32_t(micros() - writeStart));
+    if (written != len) {
         failOta("write_or_length"); result->code = 400; result->message = "Update write or length failed"; return;
     }
     mbedtls_sha256_update_ret(&_sha, data, len); _ota_received += len;
+    publishOta(final ? OtaPhase::Verifying : OtaPhase::Receiving);
+    _ota_metrics.last_callback_end_ms = millis();
     if (final) {
+        const uint32_t verifyStart = micros();
         uint8_t digest[32]; char hex[65];
         mbedtls_sha256_finish_ret(&_sha, digest);
         for (int i=0; i<32; ++i) snprintf(hex + i*2, 3, "%02x", digest[i]);
         if (_ota_received != _ota_size || _ota_sha != hex) {
             failOta("hash_mismatch"); result->code = 400; result->message = "Application size or SHA-256 mismatch"; return;
         }
-        if (!Update.end()) { failOta("esp_verification"); result->code = 400; result->message = "ESP application verification failed"; return; }
+        const bool verified = Update.end();
+        _ota_metrics.verify_us = uint32_t(micros() - verifyStart);
+        if (!verified) { failOta("esp_verification"); result->code = 400; result->message = "ESP application verification failed"; return; }
+        Serial.printf("[OTA] %u bytes, %lu ms, flash writes %llu us (max %lu us), max receive gap %lu ms, verify %lu us\n",
+                      static_cast<unsigned>(_ota_received), static_cast<unsigned long>(_ota_progress.elapsedMs(millis())),
+                      static_cast<unsigned long long>(_ota_metrics.write_us), static_cast<unsigned long>(_ota_metrics.max_write_us),
+                      static_cast<unsigned long>(_ota_metrics.max_receive_gap_ms), static_cast<unsigned long>(_ota_metrics.verify_us));
         result->code = 200; result->message = "Firmware verified; rebooting";
         _restart_ms = millis() + 1000;
+        publishOta(OtaPhase::Rebooting);
         // Maintenance remains latched through reboot; boot requires switch-low.
     }
 }
@@ -300,6 +347,8 @@ void WebUI::refreshTelemetry() {
     auto wifi = d["wifi"].to<JsonObject>();
     wifi["connected"] = WiFi.status() == WL_CONNECTED;
     wifi["rssi"] = WiFi.status() == WL_CONNECTED ? WiFi.RSSI() : 0;
+    wifi["bssid"] = WiFi.status() == WL_CONNECTED ? WiFi.BSSIDstr() : "";
+    wifi["channel"] = WiFi.status() == WL_CONNECTED ? WiFi.channel() : 0;
     wifi["ip"] = _ip; wifi["recovery_ap"] = _ap;
     d["ws_dropped"] = _dropped;
     auto ota = d["ota"].to<JsonObject>();
@@ -309,6 +358,12 @@ void WebUI::refreshTelemetry() {
     ota["last_failure"] = _ota_failure;
     ota["failed_bytes"] = _ota_failed_bytes;
     ota["failed_idle_ms"] = _ota_failed_idle_ms;
+    ota["elapsed_ms"] = _ota_progress.elapsedMs(millis());
+    ota["write_calls"] = _ota_metrics.write_calls;
+    ota["write_us"] = _ota_metrics.write_us;
+    ota["max_write_us"] = _ota_metrics.max_write_us;
+    ota["max_receive_gap_ms"] = _ota_metrics.max_receive_gap_ms;
+    ota["verify_us"] = _ota_metrics.verify_us;
     _json = ""; serializeJson(d, _json);
     _ws.cleanupClients(4);
     // Keep fresh GET diagnostics in RAM, but reserve radio airtime for the
@@ -339,6 +394,10 @@ void WebUI::run() {
     _otaCapacity = next ? next->size : 0;
     WiFi.persistent(false); WiFi.setAutoReconnect(false);
     WiFi.mode(WIFI_STA); WiFi.setHostname("hopscotch"); WiFi.setSleep(false);
+    // Arduino 2.0.16 defaults to FAST_SCAN, which stops at the first SSID
+    // match. Retain these policies for boot and all maintenance-only reconnects.
+    WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
+    WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
     WiFi.begin(HOPSCOTCH_WIFI_SSID, HOPSCOTCH_WIFI_PASSWORD);
     _networkCore = xPortGetCoreID();
     const auto events = xTaskGetHandle("arduino_events");

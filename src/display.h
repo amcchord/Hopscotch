@@ -5,10 +5,12 @@
 #include "motor_manager.h"
 #include "crsf.h"
 #include "arm_controller.h"
+#include "ota_progress.h"
 
 class Display {
 public:
     void begin();
+    void renderOta(const OtaProgress& progress, uint32_t now);
 
     // Render a full frame to the sprite then push to screen
     void render(const MotorManager& motors,

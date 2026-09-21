@@ -69,7 +69,8 @@ class Model:
 
 
 class Policy:
-    def __init__(self, header_dir=None):
+    def __init__(self, header_dir=None, fast=False):
+        self.fast = fast
         out = ROOT/'output'
         out.mkdir(exist_ok=True)
         header_dir = Path(header_dir) if header_dir else ROOT/'src'
@@ -84,6 +85,8 @@ class Policy:
         self.lib.lower_delete.argtypes = [C.c_void_p]
         self.lib.lower_request.argtypes = [C.c_void_p,C.c_uint32,C.POINTER(C.c_float),C.c_bool,C.c_float,C.c_float]
         self.lib.lower_request.restype = C.c_bool
+        self.lib.lower_request_mode.argtypes = self.lib.lower_request.argtypes + [C.c_bool]
+        self.lib.lower_request_mode.restype = C.c_bool
         self.lib.lower_step.argtypes = [C.c_void_p,C.c_uint32,C.c_float,C.POINTER(C.c_float),C.c_bool,C.POINTER(C.c_float)]
         self.lib.lower_reason.argtypes = [C.c_void_p]
         self.lib.lower_reason.restype = C.c_char_p
@@ -123,7 +126,7 @@ def simulate(policy,m,name):
     first_impact = None
     peak_rate = peak_lead = peak_wheel = peak_torque = 0.
     values = lambda: (C.c_float*11)(theta,catch_rate,sp-theta,wheel,wheel,*arms,*velocities,*torques)
-    assert policy.lib.lower_request(handle,0,values(),True,*centers)
+    assert policy.lib.lower_request_mode(handle,0,values(),True,*centers,policy.fast)
     try:
         for tick in range(2500):
             t = tick*DT
@@ -227,7 +230,7 @@ def simulate(policy,m,name):
                 peak_torque=max(peak_torque,*map(abs,torques))
             velocities=[(a-b)/DT for a,b in zip(arms,old_arms)]
             if theta<=5 and committed and first_flat is None:first_flat=t
-        result=dict(name=name,model=asdict(m),outcome=policy.lib.lower_reason(handle).decode(),
+        result=dict(name=name,fast_selected=policy.fast,model=asdict(m),outcome=policy.lib.lower_reason(handle).decode(),
                     final_phase=PHASES[phase],commit_s=commit_time,catch_s=contact_time,
                     first_flat_s=first_flat,elapsed_s=round(t,3),peak_rate_dps=round(peak_rate,3),
                     peak_wheel_rad_s=round(peak_wheel,3),peak_model_torque_nm=round(peak_torque,3),
@@ -241,9 +244,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,default=ROOT/'output/lowering-catch')
     parser.add_argument('--nominal-only',action='store_true')
+    parser.add_argument('--fast',action='store_true',help='Select candidate fast supported return; baseline stays normal')
     parser.add_argument('--baseline-ref',help='Also screen a pinned historical policy through the SAME model/cases')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
-    policy=Policy();base=Model()
+    policy=Policy(fast=args.fast);base=Model()
     cases=[('nominal',base)]
     if not args.nominal_only:
         cases += [('no_floor',replace(base,floor=False)),('one_arm_only',replace(base,right_contact=False)),
