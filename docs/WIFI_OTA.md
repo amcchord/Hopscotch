@@ -8,7 +8,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/lowering-v12-integration/README.md) records
+[latest deployment evidence](../evidence/lowering-v13-integration/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -119,8 +119,8 @@ The browser receives live pose, motor feedback, RC channels, timing and memory
 through `/ws`. Offers are 10 Hz; network delivery is best-effort, can skip frames,
 and is not a real-time control channel. The dashboard marks stale data. The full
 onboard balance capture runs independently at 50 Hz with 200 Hz aggregates;
-new captures are schema 12 (240-byte samples, unchanged since v4), up to 6,000 samples/120 seconds. Live JSON schema 1
-and saved-log schema 12 are different formats. Existing older saved runs retain
+new captures are schema 13 (240-byte samples, unchanged since v4), up to 6,000 samples/120 seconds. Live JSON schema 1
+and saved-log schema 13 are different formats. Existing older saved runs retain
 their original schema and metadata when exported by the new firmware.
 
 After supporting the robot, lower both arm switches and release CH11. Wait for
@@ -187,13 +187,14 @@ package for recovery.
    it off remains an option when speed matters. The exact throughput cause is
    unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 OTA-throughput package (preserving v10 motion), from the project root:
+   current v13 contact-correction package, from the project root:
 
    ```bash
    python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
      --secrets-file src/network_secrets.h ota \
-     worktrees/ota-throughput/artifacts/ota-throughput/release/firmware.bin \
-     --manifest worktrees/ota-throughput/artifacts/ota-throughput/release/manifest.json
+     worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/firmware.bin \
+     --manifest worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/manifest.json \
+     --upload-profile fast
    ```
 
    Use the integrated helper and the frozen package in its original worktree
@@ -311,9 +312,9 @@ or interrupted uploads preserve the active image, but a valid image with a boot
 bug can still require USB recovery. Do not confuse integrity checking with a
 signed firmware trust chain or automatic health rollback.
 
-The [current combined deployment record](../evidence/lowering-v12-integration/README.md)
+The [current combined deployment record](../evidence/lowering-v13-integration/README.md)
 identifies the installed image and verified routine update, including unchanged
-saved-run hashes. The transmitter remained linked for v12; v10 used an unlinked transmitter. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
+saved-run hashes. The transmitter remained linked for v12 and v13; v10 used an unlinked transmitter. The [historical v2 record](../evidence/ota-lowering-v2/README.md)
 retains the old transport's interrupted attempts and transmitter-off success.
 Frozen manifests record preparation; deployment records establish installation.
 

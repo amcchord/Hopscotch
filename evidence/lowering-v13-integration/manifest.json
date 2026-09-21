@@ -1,0 +1,28 @@
+{
+  "status": "queued_not_installed",
+  "prepared_utc": "2026-09-21T02:14:22.468124+00:00",
+  "source_commit": "7c32bd7a6e48e641345a7fbc067a11d46a0643bf",
+  "application_bytes": 1216640,
+  "application_sha256": "3f6346766a7f8e2e1a3856e03e9b8daa884c22682ea7b8ffe92a4e29a0e6a7df",
+  "esp_image_digest": "2cba5a84594a703bb377b6697791fca4da790e8b6c8d4fe5ddf0f2181461cdae",
+  "schema": 13,
+  "sample_bytes": 240,
+  "private_configuration_verified": true,
+  "secret_header_copied": false,
+  "package_path": "worktrees/balance-lower/artifacts/lowering-v13-contact/candidate/",
+  "previous_package_path": "worktrees/balance-lower/artifacts/lowering-v12-fast/candidate/",
+  "previous_source": "09d2e01b6ef89a357319a8eeea2fa11db8221932",
+  "rollback_package_path": "worktrees/ota-throughput/artifacts/ota-throughput/release/",
+  "rollback_source": "45c1a94aa82aab952be420e5472c5ae8e377bef1",
+  "rollback_esp_digest": "a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61",
+  "checks": {
+    "native_suites": 12,
+    "python_tests": 44,
+    "configured_pinned_build": "passed",
+    "radio_cpp_lua": "passed",
+    "dashboard": "passed",
+    "model_cases_per_mode": 329,
+    "low_torque_cases": 40,
+    "normal_replays": 6
+  }
+}

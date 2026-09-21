@@ -943,3 +943,29 @@ moves1mrad during a backward pause; this is recorded rather than hidden.
 Peer independently confirms trace diagnosis, runtime scope and held-target
 explanation. Next: freeze/check/build once, preserve the run and deploy corrective
 v13 through existing authorized OTA scope. No autonomous motion/settings writes.
+
+## 2026-09-20 — Deploy verified v13 contact-stop correction
+
+Frozen source7c32bd7 passed12 native suites,44 Python tests, configured pinned
+ESP32 build, radio C++/Lua and dashboard checks once. Independent peer source,
+trace and model review passed. All329 normal cases and six normal replays remain
+identical; fast258/329 completion classification and fault reasons unchanged;
+40/40 new low-torque stresses complete versus21/40 onv12. Physical retry pending.
+
+Authorized OTA installs app0, source7c32bd7a6e48e641345a7fbc067a11d46a0643bf,
+ESP digest2cba5a84594a703bb377b6697791fca4da790e8b6c8d4fe5ddf0f2181461cdae,
+verified2026-09-21T02:22:24.302135+00:00. Frozenapplication1,216,640bytes,
+SHA2563f6346766a7f8e2e1a3856e03e9b8daa884c22682ea7b8ffe92a4e29a0e6a7df.
+HTTP200 in431.250s with transmitter linked; receiver writes5.699s,
+maxreceivegap9.669s,responsewait50.121s,no host pacing sleeps. No rebuild after
+freeze and no autonomous motion/settings/filesystem write.
+
+Postflight exactimage/slot, allsix powered motors healthy/disabled, freshIMU,
+IDLE/disarmed, savingfinished, releasedmaintenance andRCreturn passed. Saved
+1,140-row failedrun CSV/wire byte-identical. [Release record](../../evidence/lowering-v13-integration/README.md).
+Private package stays inbalance-lower/artifacts/lowering-v13-contact/candidate;
+lastphysicallysuccessful45c1a94 recovery stays inOTA task checkout. No private
+copies acrossworktrees. Docs identify currentpackage/procedure and diagnosis.
+
+User can retry CH6 HIGH/CH11, then disarm and archive. Source correction is
+installed; physical maneuver success remains for the operator to establish.
