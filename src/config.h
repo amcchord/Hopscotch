@@ -389,6 +389,11 @@ static constexpr uint32_t BALANCE_START_RECOVERY_CONFIRM_MS = 60;
 static constexpr float    BALANCE_START_RECOVERY_TIP_MAX = 0.90f;
 static constexpr uint32_t BALANCE_START_RECOVERY_FEEDBACK_MS = 30;
 static constexpr float    BALANCE_START_RECOVERY_KI = 1.0f;
+// Fast lift already has a measured capture and the saved equilibrium trim.
+// Learning the short arm-release transient at the slow-start boost gain built
+// +2.85 degrees of correction, then a -7.0 rad/s recoil (Sept 20 fast trial).
+// Retain the same detector, 800 ms window and bounds; halve only its fast gain.
+static constexpr float    BALANCE_FAST_START_RECOVERY_KI = 0.5f;
 static constexpr uint32_t BALANCE_START_RECOVERY_BOOST_MS = 800;
 static constexpr float    BALANCE_START_RECOVERY_LIMIT_DEG = 6.0f;
 static constexpr float    BALANCE_START_RECOVERY_RATE_DPS = 6.0f;

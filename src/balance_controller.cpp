@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 10;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 11;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -1371,7 +1371,7 @@ void BalanceController::update(float roll_deg, float roll_rate_dps,
             // One integrator, bounded gain/time/angle/rate. The initial catch
             // is not suppressed by angle-error gating; normal P damping still
             // respects that gate. End the boost at 800 ms or ramp completion.
-            const float ki = recovery_boost ? BALANCE_START_RECOVERY_KI : _vel_sp_ki;
+            const float ki = balance_math::tipRecoveryKi(_fast_tip_run, recovery_boost, _vel_sp_ki);
             const auto next = balance_math::recoveryIntegral(
                 _vel_sp_integral, vel_err, ki, dt, _sp_offset,
                 BALANCE_START_RECOVERY_LIMIT_DEG, BALANCE_START_RECOVERY_RATE_DPS,
@@ -2141,7 +2141,9 @@ void BalanceController::dumpLog(Print* sink) {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 16384) {
         // Versioned literals describe the saved policy, including after a future OTA.
-        if (header.schema_version >= 6)
+        if (header.schema_version >= 11)
+            out.println("# tip_up=ch6_fast_v3 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        else if (header.schema_version >= 6)
             out.println("# tip_up=ch6_fast_v2 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
         else
             out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
@@ -2288,6 +2290,8 @@ void BalanceController::dumpLog(Print* sink) {
         // Versioned constants: these describe v1, never the running config of
         // firmware that happens to download an older stored log.
         out.println("# startup_recovery_ki=1.0 boost_ms=800 integral_rate_dps=6 limit_deg=6");
+        if (header.schema_version >= 11)
+            out.println("# fast_startup_recovery_ki=0.5 boost_ms:800 normal_ki:unchanged trigger:unchanged recoil:unchanged");
         out.println("# startup_recovery_hold=settled_position calm_ms=400");
     }
     if (header.reserved & 8) {

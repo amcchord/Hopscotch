@@ -1,5 +1,6 @@
 #include "balance_tip_up.h"
 #include "balance_math.h"
+#include "balance_telemetry.h"
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -39,10 +40,44 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    for (uint16_t schema=4;schema<=11;++schema) {
+        assert(balance_log::supported(schema,240));
+        assert(!balance_log::supported(schema,236));
+    }
+    assert(balance_log::supported(2,220) && balance_log::supported(3,236));
+    assert(!balance_log::supported(12,240));
+
     for (float v : {-1.0f, 0.0f, .5f, std::numeric_limits<float>::quiet_NaN(),
                     std::numeric_limits<float>::infinity()}) assert(!balance_math::fastTipSelected(v));
     assert(balance_math::fastTipSelected(.501f));
     assert(balance_math::fastTipSelected(1));
+
+    // Only the latched fast run's 800 ms boost uses the lower gain. Normal
+    // learning, slow starts and post-boost recoil retain their exact gains.
+    for (float normal : {0.f,.231f,.5f,1.f}) {
+        assert(balance_math::tipRecoveryKi(false,true,normal)==1.f);
+        assert(balance_math::tipRecoveryKi(true,true,normal)==.5f);
+        assert(balance_math::tipRecoveryKi(false,false,normal)==normal);
+        assert(balance_math::tipRecoveryKi(true,false,normal)==normal);
+    }
+    for (int sign : {-1,1}) {
+        float baseline=0, fast=0;
+        for(int i=0;i<40;++i) {
+            baseline=balance_math::recoveryIntegral(baseline,sign*3.f,
+                balance_math::tipRecoveryKi(false,true,.231f),.02f,baseline,6,6,true).value;
+            fast=balance_math::recoveryIntegral(fast,sign*3.f,
+                balance_math::tipRecoveryKi(true,true,.231f),.02f,fast,6,6,true).value;
+        }
+        assert(std::fabs(fast-baseline*.5f)<.00001f);
+        // Expiry preserves the state, and opposite velocity still unwinds it.
+        const auto hold=balance_math::recoveryIntegral(fast,0,
+            balance_math::tipRecoveryKi(true,false,.231f),.02f,fast,6,6,true);
+        assert(hold.value==fast);
+        const auto unwind=balance_math::recoveryIntegral(fast,-sign*3.f,
+            balance_math::tipRecoveryKi(true,false,.231f),.02f,fast,6,6,true,2);
+        assert(std::fabs(unwind.value)<std::fabs(fast));
+        assert(balance_math::recoveryIntegral(fast,sign*3.f,.5f,.02f,fast,6,6,false).value==fast);
+    }
 
     // Integration regression: wheel setup blocked the feedback owner long
     // enough that the old immediate begin() rejected a healthy stationary pose.
