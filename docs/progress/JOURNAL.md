@@ -712,3 +712,8 @@ Motion/RC/display production source remains v10-identical. Next: hand exact
 identity, helper fix and records back to the lowering/device owner for source
 integration before any later firmware build. Observe speed/receiver timings
 on the next normal authorized OTA rather than adding a benchmark reflash.
+
+Completed release records committed as `a2c783b`; exact installed identity,
+recovery/verification results, AP comparison, host fix and source-integration
+requirement were sent to the lowering task. Exclusive device/release ownership
+has returned to that task. No further robot requests are planned here.
