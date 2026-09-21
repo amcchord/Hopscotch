@@ -1,0 +1,165 @@
+{
+  "installed_source": "45c1a94aa82aab952be420e5472c5ae8e377bef1",
+  "failed": {
+    "source": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260921T010806Z_fast_tip_fall_wifi.csv",
+    "sha256": "57e62cd546ad52d8372f676b5e2382dbb99d3940dbbfdd2b291dd756ba4379e4",
+    "rows": 291,
+    "end_reason": "bailout_angle_error",
+    "capture": {
+      "t_ms": 2981.0,
+      "roll": 82.787,
+      "roll_rate": -0.028,
+      "setpoint": 82.787,
+      "arm_tip_frac": 1.0,
+      "cmd_left": 0.0,
+      "cmd_right": 0.0,
+      "bl_vel": 0.047,
+      "br_vel": 0.013,
+      "yaw_diff": 0.0,
+      "vel_integral": 0.0,
+      "capture_shift": 0.0,
+      "run_curve_shift": 0.0
+    },
+    "arm_return": {
+      "t_ms": 3401.0,
+      "roll": 82.8,
+      "roll_rate": -0.005,
+      "setpoint": 82.785,
+      "arm_tip_frac": 1.0,
+      "cmd_left": -0.024,
+      "cmd_right": -0.023,
+      "bl_vel": -0.01,
+      "br_vel": -0.022,
+      "yaw_diff": 0.0,
+      "vel_integral": 0.0,
+      "capture_shift": -2.528,
+      "run_curve_shift": 0.0
+    },
+    "final_sample": {
+      "t_ms": 5905.0,
+      "roll": 134.94,
+      "roll_rate": 234.116,
+      "setpoint": 88.507,
+      "arm_tip_frac": 0.0,
+      "cmd_left": -30.0,
+      "cmd_right": -30.0,
+      "bl_vel": -11.102,
+      "br_vel": -27.357,
+      "yaw_diff": 9.058,
+      "vel_integral": -0.6228,
+      "capture_shift": -0.0,
+      "run_curve_shift": 0.0
+    },
+    "comparison_window_ms": [
+      2981.0,
+      5905.0
+    ],
+    "max_wheel_speed_difference_rad_s": 18.524,
+    "peak_recovery_integral_deg": 2.6856,
+    "timing_maxima": {
+      "inner_dt_max_us": 5201.0,
+      "update_age_ms": 24.0,
+      "imu_age_ms": 10.0,
+      "feedback_age_l_ms": 46.0,
+      "feedback_age_r_ms": 21.0
+    }
+  },
+  "successful_reference": {
+    "source": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260920_forward_catch_v9_success_wifi.csv",
+    "sha256": "2aa0e23d3d25633bedf29f8655c84b9fea765772e8bb22d42d690a1bd1eaaa71",
+    "rows": 1462,
+    "end_reason": "lower_complete",
+    "capture": {
+      "t_ms": 3026.0,
+      "roll": 83.061,
+      "roll_rate": -0.403,
+      "setpoint": 83.061,
+      "arm_tip_frac": 1.0,
+      "cmd_left": 0.0,
+      "cmd_right": 0.0,
+      "bl_vel": 0.054,
+      "br_vel": -0.021,
+      "yaw_diff": 0.0,
+      "vel_integral": 0.0,
+      "capture_shift": 0.0,
+      "run_curve_shift": 0.0
+    },
+    "arm_return": {
+      "t_ms": 3457.0,
+      "roll": 83.08,
+      "roll_rate": -0.187,
+      "setpoint": 83.048,
+      "arm_tip_frac": 1.0,
+      "cmd_left": -0.045,
+      "cmd_right": -0.04,
+      "bl_vel": -0.039,
+      "br_vel": -0.056,
+      "yaw_diff": 0.003,
+      "vel_integral": 0.0,
+      "capture_shift": -2.253,
+      "run_curve_shift": 0.0
+    },
+    "final_sample": {
+      "t_ms": 29750.0,
+      "roll": -2.368,
+      "roll_rate": -0.396,
+      "setpoint": 0.0,
+      "arm_tip_frac": 0.0,
+      "cmd_left": 0.0,
+      "cmd_right": 0.0,
+      "bl_vel": 0.018,
+      "br_vel": -0.021,
+      "yaw_diff": 0.0,
+      "vel_integral": 0.5766,
+      "capture_shift": -0.0,
+      "run_curve_shift": 0.0
+    },
+    "comparison_window_ms": [
+      3026.0,
+      6026.0
+    ],
+    "max_wheel_speed_difference_rad_s": 0.673,
+    "peak_recovery_integral_deg": 2.8093,
+    "timing_maxima": {
+      "inner_dt_max_us": 5011.0,
+      "update_age_ms": 25.0,
+      "imu_age_ms": 9.0,
+      "feedback_age_l_ms": 36.0,
+      "feedback_age_r_ms": 56.0
+    }
+  },
+  "measured_left_wheel_fit": {
+    "requested_window_s": [
+      4.7,
+      5.6
+    ],
+    "actual_window_s": [
+      4.701,
+      5.586
+    ],
+    "samples": 45,
+    "acceleration_rad_s2": -9.607143404989442,
+    "r_squared": 0.998299612726532,
+    "rmse_rad_s": 0.10382609975776423
+  },
+  "representative_tracking_sample": {
+    "t_ms": 5506.0,
+    "roll": 97.402,
+    "cmd_left": -21.276,
+    "cmd_right": -18.276,
+    "bl_vel": -7.307,
+    "br_vel": -17.951,
+    "bl_torque": -0.066,
+    "br_torque": -0.156,
+    "feedback_age_l_ms": 1.0,
+    "feedback_age_r_ms": 1.0,
+    "yaw_diff": 2.989,
+    "yaw_corr": 1.5
+  },
+  "limits": [
+    "A fitted wheel acceleration is not a motor-register readback.",
+    "The log does not measure tire slip, ground contact, obstruction or applied ACC_RAD.",
+    "The successful run is a physical reference, not a controlled experiment.",
+    "No production change or physical intervention is tested by this comparison."
+  ]
+}
