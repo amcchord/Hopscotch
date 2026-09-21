@@ -69,23 +69,41 @@ int main() {
       assert(normal.lower.wheelCommand()==fast.lower.wheelCommand());
       assert(fast.lower.armSpeed()==normal.lower.armSpeed());
       for(int i=0;i<30;++i) { normal.in.tilt-=.1f;fast.in.tilt-=.1f;normal.tick();fast.tick(); }
-      assert(std::fabs(fast.lower.armSpeed()-.75f)<.0001f);
+      assert(std::fabs(fast.lower.armSpeed()-2.25f)<.0001f);
       assert(fast.lower.left()>normal.lower.left()+.10f);
       normal.in.rate=fast.in.rate=-15;
       float a=normal.lower.left(),b=fast.lower.left(); normal.tick();fast.tick();
-      assert(normal.lower.left()==a && std::fabs(fast.lower.left()-b-.012f)<.0001f);
-      for(float rate:{-20.01f,4.01f}) {
+      assert(normal.lower.left()==a && std::fabs(fast.lower.left()-b-.036f)<.0001f);
+      fast.in.rate=-40;b=fast.lower.left();fast.tick();
+      assert(std::fabs(fast.lower.left()-b-.018f)<.0001f); // smooth rate reduction
+      for(float rate:{-50.f,-50.01f,4.01f}) {
         fast.in.rate=rate;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
       }
-      fast.in.tilt=25;fast.in.rate=-8;b=fast.lower.left();fast.tick();
-      assert(std::fabs(fast.lower.armSpeed()-.525f)<.0001f);
-      assert(std::fabs(fast.lower.left()-b-.0084f)<.0001f);
-      fast.in.tilt=15;b=fast.lower.left();fast.tick();
+      // Losing either loaded support pauses early, before the fault timer.
+      fast.in.rate=-10;
+      for(int side=0;side<2;++side) {
+        fast.in.torque_left=side==0?0:.3f;fast.in.torque_right=side==1?0:-.3f;
+        b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
+      }
+      fast.in.torque_left=.3f;fast.in.torque_right=-.3f;
+      // A delayed arm cannot accumulate more than 0.06 rad of fast travel.
+      const float measured=fast.in.arm_left;
+      for(int i=0;i<8;++i)fast.tick(false);
+      assert(fast.lower.left()<=measured+.06001f);
+      fast.in.arm_left=fast.lower.left();fast.in.arm_right=fast.lower.right();
+      fast.in.tilt=12.5f;fast.in.rate=-8;b=fast.lower.left();fast.tick();
+      assert(std::fabs(fast.lower.armSpeed()-1.275f)<.0001f);
+      assert(std::fabs(fast.lower.left()-b-.0204f)<.0001f);
+      fast.in.tilt=5;b=fast.lower.left();fast.tick();
       assert(fast.lower.armSpeed()==.30f);
-      assert(std::fabs(fast.lower.left()-b-.0048f)<.0001f);
+      assert(std::fabs(fast.lower.left()-b-.004f)<.0001f);
       fast.in.rate=-12.01f;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
       fast.in.tilt=0;fast.in.rate=0;fast.in.wheel_left=fast.in.wheel_right=0;
       fast.tick(); assert(fast.lower.phase()==LowerPhase::GroundHold);
+      fast.in.tilt=4;fast.in.rate=-6;fast.tick();
+      assert(fast.lower.phase()==LowerPhase::Descending);
+      fast.tick();assert(fast.lower.armSpeed()==.30f); // no fast restart near floor
+      fast.in.rate=0;fast.tick();assert(fast.lower.phase()==LowerPhase::GroundHold);
       for(int i=0;i<29;++i)fast.tick();
       assert(fast.lower.phase()==LowerPhase::GroundHold);fast.tick();
       assert(fast.lower.phase()==LowerPhase::Retracting && fast.lower.armSpeed()==.30f);

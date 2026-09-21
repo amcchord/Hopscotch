@@ -1,0 +1,9 @@
+{
+  "samples": 1192,
+  "csv_sha256": "e79cfe64d1bb507455097198edf027db0da21ccbadd282a502958ccc49a274aa",
+  "wire_sha256": "fa1e67fadb87cbca8dda08befab780e7099f328af9e154d29b8cc1480f9e8251",
+  "csv_path": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260921T013959Z_fast_lower_speed_wifi.csv",
+  "wire_path": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/telemetry_logs/bal_20260921T013959Z_fast_lower_speed_wifi.wire",
+  "image_sha256": "a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61",
+  "running_slot": "app0"
+}

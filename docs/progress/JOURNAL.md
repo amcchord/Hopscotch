@@ -861,3 +861,32 @@ No raw logs, secrets or firmware packages copied between worktrees. No robot
 request, OTA, settings write or autonomous motion. Installed source remains
 45c1a94/app0 with successful v10 fast laydown. Candidate is queued and unflashed;
 return actual status to the fast-tip task for Austin's next-test decision.
+
+## 2026-09-20 — Preserve perfect run; prepare faster supported return only
+
+Austin reported the latest run was perfect and requested roughly three times
+faster laydown after contact. Archived 1,192 schema10 samples on verified
+45c1a94/app0, fresh disarmed/healthy pre/post checks. Supported descent5.910s,
+total8.508s, finaltilt-1.783 andForwarderrors-.027/+.009rad. Fast v2 stand-up
+needed no early recovery. Reverted unflashed fast-v3 runtime as6106e77; preserve
+its historical evidence, not its gains in this lowering-only release.
+
+V12 raises fast supported target .6→1.8rad/s andcap.75→2.25, preserves600msblend,
+smooths rate response to50degrees/s, tightens fast targetlead to.06rad and pauses
+on either unloaded arm above15degrees. Floor taper moves35–15→20–5degrees.
+Normal mode, precontact/catch, global65/wheel/time/support guards, finaldwell,
+retraction and successful stand-up remain unchanged. Schema12 recordsv12lower
+andv2standup; reserved11 remains readable with its historical unflashed policy.
+
+Naive tripling and easing alone introduced simulated support losses. The added
+proactive load pause preserves all258completions in329cases and rejects all71
+baseline failures. One injectedcontactloss abort reason changes supportloss→
+globalmotionlimit. Normal results identical; five normal recorded command
+replays identical, fast divergence only aftersupport. Median modeled supported
+speed ratio1.996, range1.169–2.648; nominal4.44→2.30s. Physical ratio unmeasured.
+Peer fast-tip owner independently reviewed source/results with no blocker.
+Continuous model peaks above65 on some successful cases are unchanged initial
+impact peaks, before the modified phase; sampledguard is not a continuous bound.
+
+Next: sourcefreeze, singlecombinedvalidation, configuredpackage and authorized
+OTA under deviceowner. No motion/settings writes or deployment performed yet.

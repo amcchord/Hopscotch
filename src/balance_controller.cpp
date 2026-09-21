@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 10;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 12;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -2141,7 +2141,9 @@ void BalanceController::dumpLog(Print* sink) {
     out.printf("# telemetry_features=%u\n", header.reserved);
     if (header.reserved & 16384) {
         // Versioned literals describe the saved policy, including after a future OTA.
-        if (header.schema_version >= 6)
+        if (header.schema_version == 11)
+            out.println("# tip_up=ch6_fast_v3 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
+        else if (header.schema_version >= 6)
             out.println("# tip_up=ch6_fast_v2 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
         else
             out.println("# tip_up=ch6_fast_v1 high_above:0.5 low_or_center:slow latched_at_CH11_accept:1 fast_run_pilot_flag:128");
@@ -2160,7 +2162,9 @@ void BalanceController::dumpLog(Print* sink) {
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
         // Metadata-only policy revisions retain historical exports exactly.
-        if (header.schema_version >= 10)
+        if (header.schema_version >= 12)
+            out.println("# lowering=experimental_ch11_forward_catch_v12 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 10)
             out.println("# lowering=experimental_ch11_forward_catch_v10 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         else if (header.schema_version >= 9)
             out.println("# lowering=experimental_ch11_forward_catch_v9 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
@@ -2192,7 +2196,9 @@ void BalanceController::dumpLog(Print* sink) {
             out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.24 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
         else
             out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
-        if (header.schema_version >= 10)
+        if (header.schema_version >= 12)
+            out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:1.80 normal_motor_rad_s:0.30 fast_motor_rad_s:2.25 normal_descent_dps:12 fast_descent_dps:50 taper_tilt_deg:20:5 rate_ease_start_fraction:0.6 fast_target_lead_rad:0.06 unloaded_pause_above_deg:15 unloaded_below_nm:0.2 catch_and_final_retraction_unchanged:1");
+        else if (header.schema_version >= 10)
             out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:0.60 normal_motor_rad_s:0.30 fast_motor_rad_s:0.75 normal_descent_dps:12 fast_descent_dps:20 taper_tilt_deg:35:15 catch_and_final_retraction_unchanged:1");
         out.println("# lowering_flat=angle_deg:5 rate_dps:5 wheel_rad_s:0.65 confirm_ms:600 arms_measured_forward_rad:0.06");
     } else if (header.reserved & 32768) {
@@ -2288,6 +2294,8 @@ void BalanceController::dumpLog(Print* sink) {
         // Versioned constants: these describe v1, never the running config of
         // firmware that happens to download an older stored log.
         out.println("# startup_recovery_ki=1.0 boost_ms=800 integral_rate_dps=6 limit_deg=6");
+        if (header.schema_version == 11)
+            out.println("# fast_startup_recovery_ki=0.5 boost_ms:800 normal_ki:unchanged trigger:unchanged recoil:unchanged");
         out.println("# startup_recovery_hold=settled_position calm_ms=400");
     }
     if (header.reserved & 8) {

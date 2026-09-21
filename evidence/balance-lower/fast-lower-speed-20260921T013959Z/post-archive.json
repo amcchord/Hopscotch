@@ -1,0 +1,166 @@
+{
+  "captured_utc": "2026-09-21T01:40:19.101057+00:00",
+  "state": {
+    "schema": 1,
+    "sequence": 127546,
+    "uptime_ms": 2610738,
+    "age_ms": 19,
+    "drive_armed": false,
+    "arm_armed": false,
+    "arming": false,
+    "link_up": true,
+    "rssi": -83,
+    "lq": 100,
+    "rc_age_ms": 1,
+    "rearm_required": false,
+    "maintenance": false,
+    "maintenance_allowed": true,
+    "saving_log": false,
+    "calibration": false,
+    "test_mode": false,
+    "simulation": false,
+    "balance": {
+      "state": "IDLE",
+      "active": false,
+      "tilt": -1.92464,
+      "rate": -0.010969,
+      "setpoint": 87.42014,
+      "imu_age_us": 1209,
+      "fault": 0,
+      "end_reason": "lower_complete",
+      "start_status": "Fast tip-up started"
+    },
+    "power": {
+      "voltage": 24.10628,
+      "current": 0,
+      "voltage_fresh": true,
+      "current_fresh": true
+    },
+    "motors": [
+      {
+        "id": 10,
+        "pos": 20.10396,
+        "vel": -0.052643,
+        "torque": -8.4e-05,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 175
+      },
+      {
+        "id": 20,
+        "pos": -19.41516,
+        "vel": 0.009918,
+        "torque": -8.4e-05,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 155
+      },
+      {
+        "id": 30,
+        "pos": -2.778201,
+        "vel": 0.041962,
+        "torque": 8.4e-05,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 130
+      },
+      {
+        "id": 40,
+        "pos": 3.037899,
+        "vel": -0.041962,
+        "torque": 8.4e-05,
+        "temp": 26,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 110
+      },
+      {
+        "id": 1,
+        "pos": 3.908813,
+        "vel": 0.022659,
+        "torque": -0.000214,
+        "temp": 25,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 85
+      },
+      {
+        "id": 2,
+        "pos": 3.550437,
+        "vel": 0.002518,
+        "torque": -0.000214,
+        "temp": 25,
+        "error": 0,
+        "online": true,
+        "enabled": false,
+        "age_ms": 60
+      }
+    ],
+    "channels": [
+      992,
+      992,
+      174,
+      992,
+      1792,
+      1792,
+      1792,
+      1792,
+      191,
+      191,
+      191,
+      191,
+      0,
+      0,
+      1811,
+      798
+    ],
+    "timing": {
+      "balance_200hz": {
+        "ticks": 3241,
+        "max_us": 5498,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      },
+      "control_200hz": {
+        "ticks": 3241,
+        "max_us": 5959,
+        "over_7500_us": 0,
+        "over_10000_us": 0
+      }
+    },
+    "free_heap": 175432,
+    "min_free_heap": 142144,
+    "free_psram": 6930459,
+    "wifi": {
+      "connected": true,
+      "rssi": -55,
+      "bssid": "8C:30:66:7A:2E:DD",
+      "channel": 1,
+      "ip": "192.168.1.172",
+      "recovery_ap": false
+    },
+    "ws_dropped": 5289,
+    "ota": {
+      "active": false,
+      "received_bytes": 0,
+      "expected_bytes": 0,
+      "last_failure": "",
+      "failed_bytes": 0,
+      "failed_idle_ms": 0,
+      "elapsed_ms": 0,
+      "write_calls": 0,
+      "write_us": 0,
+      "max_write_us": 0,
+      "max_receive_gap_ms": 0,
+      "verify_us": 0
+    }
+  }
+}

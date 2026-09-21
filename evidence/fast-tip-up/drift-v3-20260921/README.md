@@ -1,5 +1,10 @@
 # Fast stand-up drift: reduced transient-learning candidate
 
+**Deferred, never uploaded:** Austin's next run was perfect on installed fast
+v2 and requested only faster lowering. Runtime experiment reverted in 6106e77;
+the historical candidate/evidence remain here. To reproduce this stand-up
+screen use its recorded db437fa source revision, not the later v12 checkout.
+
 Austin's successful September 20 evening trial is archived as 1,325 samples /
 26.660 seconds, schema 10, `lower_complete`. Device owner retains raw CSV/wire
 in `worktrees/balance-lower/telemetry_logs/` with stem

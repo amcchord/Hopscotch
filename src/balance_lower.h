@@ -32,7 +32,8 @@ struct LowerConfig {
     // Normal mode preserves the successful v9 supported return and landing.
     float lower_speed = .24f, retract_speed = .30f;
     // CH6 fast mode accelerates only confirmed support, then tapers near floor.
-    float fast_lower_speed = .60f, fast_motor_speed = .75f, fast_descent_rate = 20.f;
+    float fast_lower_speed = 1.80f, fast_motor_speed = 2.25f, fast_descent_rate = 50.f;
+    float fast_target_lead = .06f;
     uint32_t fast_blend_ms = 600;
     float catch_return_speed = .50f;
     float one_arm_return = .06f;
@@ -293,13 +294,25 @@ public:
         }
         case LowerPhase::Descending: {
             // Keep the demonstrated catch unchanged. Build speed over 600 ms
-            // after support, then return to normal between 35 and 15 degrees.
+            // after support, then taper to normal between 20 and 5 degrees.
             _return_blend = _fast
                 ? std::min(1.f, float(elapsed)/c.fast_blend_ms)
-                    * std::max(0.f, std::min(1.f, (in.tilt-15.f)/20.f))
+                    * std::max(0.f, std::min(1.f, (in.tilt-5.f)/15.f))
                 : 0.f;
-            const float return_speed = c.lower_speed + _return_blend*(c.fast_lower_speed-c.lower_speed);
+            float return_speed = c.lower_speed + _return_blend*(c.fast_lower_speed-c.lower_speed);
             const float descent_rate = c.descent_rate + _return_blend*(c.fast_descent_rate-c.descent_rate);
+            // Do not withdraw a temporarily unloaded support. Ease the fast
+            // target before its rate pause, and limit pending travel so motor
+            // lag cannot keep pulling the arms away after a pause.
+            if (_fast) {
+                if (in.tilt > 15.f
+                    && (std::fabs(in.torque_left) < c.contact_torque*.5f
+                        || std::fabs(in.torque_right) < c.contact_torque*.5f))
+                    return_speed = 0;
+                return_speed *= std::max(0.f, std::min(1.f,
+                    (in.rate+descent_rate)/(descent_rate*.4f)));
+            }
+            const float lead = _fast ? c.fast_target_lead : c.max_target_lead;
             _wheel_command = toward(_wheel_command, 0, c.wheel_stop_accel*dt);
             if (flat) { enter(LowerPhase::GroundHold, now); break; }
             _support_lost_ms = in.tilt > 15 && in.rate < -25
@@ -311,8 +324,8 @@ public:
                 fail("lower_descent_timeout"); break;
             }
             if (in.rate >= -descent_rate && in.rate <= c.calm_rate) {
-                _left = approach(_left, 0, in.arm_left, return_speed*dt, c.max_target_lead);
-                _right = approach(_right, 0, in.arm_right, return_speed*dt, c.max_target_lead);
+                _left = approach(_left, 0, in.arm_left, return_speed*dt, lead);
+                _right = approach(_right, 0, in.arm_right, return_speed*dt, lead);
             }
             break;
         }

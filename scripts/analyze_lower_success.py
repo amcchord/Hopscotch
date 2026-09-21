@@ -39,7 +39,7 @@ def analyze(path, output, installed_source):
             median_rate_dps=statistics.median(row['roll_rate'] for row in selected),
             max_target_error_rad=[max(abs(row['arm_'+side+'_tgt']-row['arm_'+side]) for row in selected) for side in ('l', 'r')],
             max_abs_torque_nm=[max(abs(row['arm_'+side+'_torque']) for row in selected) for side in ('l', 'r')],
-            rate_gate_pause_samples=sum(row['roll_rate'] < -12 or row['roll_rate'] > 4 for row in selected))
+            outside_normal_rate_bounds_samples=sum(row['roll_rate'] < -12 or row['roll_rate'] > 4 for row in selected))
     timing = dict(request_to_prepare_s=(first[2]['t_ms']-first[1]['t_ms'])/1000,
         prepare_to_commit_s=(first[9]['t_ms']-first[2]['t_ms'])/1000,
         commit_to_support_s=(first[3]['t_ms']-first[9]['t_ms'])/1000,
@@ -54,8 +54,10 @@ def analyze(path, output, installed_source):
                 ('arm_return', lambda r: r['state'] == 2 and int(r['flags']) & 32),
                 ('ramp_complete', lambda r: r['state'] == 2 and int(r['flags']) & 64),
                 ('recovery_settled', lambda r: r['state'] == 2 and int(r['diag_flags']) & 32768)]:
-            row = next(r for r in rows if predicate(r))
-            fast_events[name] = {key: row[key] for key in ('t_ms', 'roll', 'roll_rate', 'capture_shift', 'run_curve_shift')}
+            row = next((r for r in rows if predicate(r)), None)
+            # A clean stand-up can finish without triggering early recovery.
+            fast_events[name] = ({key: row[key] for key in ('t_ms', 'roll', 'roll_rate', 'capture_shift', 'run_curve_shift')}
+                                 if row is not None else None)
     final = rows[-1]
     result = dict(source=str(path.resolve()), installed_source=installed_source,
         csv_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -63,6 +65,7 @@ def analyze(path, output, installed_source):
         samples=len(rows), schema=int(meta['telemetry_schema']), end_reason=meta['end_reason'],
         duration_s=int(meta['run_duration_ms'])/1000, forward_rad=forward, events=events,
         timing=timing, phase_metrics=summary, fast_selected=fast, fast_events=fast_events,
+        fast_lower_selected=all(bool(int(row['pilot_flags']) & 4096) for row in active),
         final=dict(tilt_deg=final['roll'], rate_dps=final['roll_rate'],
             measured_forward_error_rad=[final['arm_l']-forward[0], final['arm_r']-forward[1]],
             wheel_rad_s=[final['bl_vel'], final['br_vel']]),
@@ -80,7 +83,7 @@ def analyze(path, output, installed_source):
     axes[0].plot(t, [r['roll'] for r in active], label='Body tilt')
     axes[0].set_ylabel('Degrees')
     axes[1].plot(t, [r['roll_rate'] for r in active], label='Measured body rate')
-    axes[1].axhline(-12, color='#b66b18', ls=':', label='Supported-return pause threshold')
+    axes[1].axhline(-12, color='#b66b18', ls=':', label='Normal return limit (fast limit varies)')
     axes[1].set_ylabel('Degrees/s')
     for side, origin, sign, color in [('l', forward[0], 1, '#287ba6'), ('r', forward[1], -1, '#ad5b85')]:
         axes[2].plot(t, [sign*(r['arm_'+side]-origin) for r in active], color=color, label=side.upper()+' arm offset')
