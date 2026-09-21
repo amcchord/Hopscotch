@@ -616,3 +616,48 @@ and exact successful CSV/wire retention verified. No autonomous motion or
 settings/filesystem writes. Successful v9 recovery and older packages retained.
 [Release](../../evidence/lowering-v10-integration/README.md). Next: operator
 CH6 HIGH / CH11 trial, disarm and archive before another run.
+
+
+## 2026-09-20 — Investigate AP choice and prepare faster OTA sender
+
+Austin asked whether the ESP32 connects to the first AP instead of the strongest,
+and requested investigation/improvement of approximately 5 kB/s uploads. Created
+`worktrees/ota-throughput` / `codex/ota-throughput` from v10 record `d5f18fa`;
+root and other task checkouts remain untouched. The lowering task retains robot
+and release ownership and received a coordination notice before implementation.
+
+Pinned Arduino 2.0.16 code confirms FAST_SCAN by default. Added explicit
+ALL_CHANNEL_SCAN and signal sorting before first association, retained for
+maintenance-only reconnects. No roaming during motion/upload. Existing Wi-Fi
+sleep is already off. Host 1 KiB/50 ms pacing adds approximately 59 seconds to
+current images and caps the sender at 20 KiB/s. Recorded v7/v8/v9 transfers were
+2.49–3.02 KiB/s with RC linked; v10 was 13.016 KiB/s unlinked. Conditions differ;
+this is not causal RF/AP evidence. Existing Update uses buffered writes/block
+erases; no flash or control scheduling change was justified without timings.
+
+Added optional fast profile (16 KiB sends, no artificial sleep) with TCP
+backpressure, preserved paced default, manifest/preflight/log/health validation
+and no implicit retry. Added AP BSSID/channel, receiver flash-write/verification/
+receive-gap timing, and host send/sleep/response timing. Success timing headers
+are captured in deployment records before reboot clears device RAM. These
+measurements need no extra stress test or in-flight polling.
+
+Consolidated 12 native / 42 Python checks, syntax/whitespace and configured pinned
+ESP32 build pass. Production lifecycle harness verifies response timing headers,
+metrics and safety ordering; pinned TCP/OTA transport, radio C++/Lua and dashboard
+checks pass. Only the established event-core macro warning remains. Local build
+configuration reads the existing root private header in place; no secrets,
+dependency trees or private binaries were copied/published. Motion/control/RC/
+display/dashboard source is unchanged from the v10 baseline.
+
+[Investigation and release procedure](../OTA_THROUGHPUT_2026-09.md),
+[evidence and validation](../../evidence/ota-throughput/README.md),
+[derived baseline rates](../../evidence/ota-throughput/baseline-rates.json).
+No robot requests, uploads, reconnects, restarts, settings changes, motion or
+GitHub pushes occurred. Candidate is not installed; speedup and strongest-AP
+selection await observation. Next: send focused commit to the integration owner
+for the next authorized combined release and opt-in fast-profile comparison.
+
+Candidate source/test/evidence commit `45c1a94` was sent to the lowering/integration
+owner with exact checks, opt-in fast command, limitations and no-robot-action
+status. Shared operating/current/journal records follow in a separate commit.

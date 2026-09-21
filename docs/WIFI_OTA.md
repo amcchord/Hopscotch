@@ -73,6 +73,11 @@ and a stalled WebSocket client. `/api/info` also reports the ESP reset reason.
 
 ## Local configuration and access
 
+The next network candidate adds strongest-signal AP selection and an optional
+fast upload profile. See [OTA throughput investigation](OTA_THROUGHPUT_2026-09.md)
+for evidence, timing diagnostics and the pending hardware comparison. The
+existing paced helper remains the default; no live roam is added during motion.
+
 For a new checkout, copy `src/network_secrets.example.h` to `src/network_secrets.h` and fill in
 SSID, Wi-Fi password, a random device API token and a distinct recovery AP
 password. The actual file is gitignored and mode 0600 on this workstation.
