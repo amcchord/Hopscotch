@@ -106,7 +106,7 @@ which is currently arm speed) before considering any changes. Do not infer full
 ## Implemented display and integrated firmware
 
 `radio/SCRIPTS/TELEMETRY/hop.lua` is a receive-only EdgeTX telemetry script with
-five pages, navigated using the roller / ENTER:
+six pages, navigated using the roller / ENTER:
 
 1. **Overview:** prominent robot status, separate drive/arm ON/OFF/WAIT,
    six-motor schematic, battery voltage, control link quality, current motion.
@@ -116,6 +116,15 @@ five pages, navigated using the roller / ENTER:
 4. **Run + events:** last ended balance run's reason, plus recent observed
    state/arming changes. This is bounded session history, not a persistent log.
 5. **Radio:** control/return link quality, RSSI, transmit power, TX battery.
+6. **Diagnostics:** script version, accepted robot/total packet counts, status
+   and sensor ages, optional SD recording controlled by a long ENTER press.
+
+Without structured status, every Basic page has distinct content: overview
+(FM/voltage), standard roll/pitch/power, explicitly unavailable motor details,
+received run reports/recent FM changes, radio link, and diagnostics. Basic does
+not establish that firmware is old: it means this script has not accepted the
+structured packet, which may instead be a transport problem. `HS 0` on page 6
+confirms no accepted robot-status packets in this script session.
 
 The pre-integration firmware supplied basic fallback (FM and voltage), but
 could not prove separate drive/arm state: its `DISARM` text was based only on
@@ -126,9 +135,20 @@ An active drive with disarmed arms is now `WHEELS READY`/`DRIVING`/`BRAKING`, no
 shown separately: `ON` is enabled, not proof that a wheel is physically moving.
 
 The Lua never writes model data, emits a CRSF command, arms, or changes channels.
-After 1.5 seconds without a new valid status sequence it hides current motor /
-arming / motion values and says **ROBOT DATA LOST / UNKNOWN**. Standard telemetry
-uses EdgeTX's individual current/fresh flags, not cached `getValue()` results.
+Each numeric reading and standard telemetry sensor keeps its last valid value
+for five seconds after the last accepted fresh sample. An asterisk marks a
+reading held longer than 0.5 seconds. Missing, stale, invalid,
+or unrelated updates do not refresh that value's hold. Standard telemetry uses
+EdgeTX's individual current/fresh flags, not cached `getValue()` results.
+Sampling runs every 50 ms. The previous 200 ms poll could completely miss the
+160–320 ms `isFresh()` window in EdgeTX 2.11; a regression test reproduces that
+phase alignment using unchanged sensor values and background callbacks.
+[EdgeTX 2.11 freshness implementation](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/telemetry/telemetry_sensors.h).
+After 1.5 seconds without a new valid status sequence the header says **HOLD**;
+after three seconds it hides motor / arming / motion values and says
+**ROBOT DATA LOST / UNKNOWN**. Duplicate status or run-detail packets cannot
+extend this hold. New arming/fault/IMU-stale flags appear immediately, even while
+the associated last numeric reading is held. Existing loss alerts stay at 1.5 seconds.
 An unsupported schema asks for a script update. Haptic alerts are transition
 based and limited to one per five seconds; they do not replace robot failsafes.
 [EdgeTX source freshness API](https://luadoc.edgetx.org/lua-api-reference/variables/getsourcevalue).
@@ -137,8 +157,35 @@ Do not display battery percentage, remaining runtime, or consumed mAh: existing
 firmware sends zero placeholders for capacity and percentage. `Curr` is the sum
 of absolute motor IQ measurements, not battery input current. The dashboard
 labels it **MOTOR IQ**. Voltage expires after two seconds without a valid VBUS
-reply; current requires fresh replies from all six online motors. Tilt is the
+reply at the sender; the Lua then applies its five-second display hold. Current
+requires fresh replies from all six online motors. Tilt is the
 balance controller's actual filtered angle, not a presumed chassis orientation.
+Basic roll/pitch instead use standard CRSF attitude, converting the sensor's
+radian unit to degrees. They are not the controller's filtered balance tilt.
+
+### Optional SD diagnostics
+
+Logging starts OFF on every script load. On page 6, hold ENTER to start/stop.
+The script appends one CSV row per second to `/LOGS/hop-<date-time-tick>.csv`,
+closing the file each time. It stops at 600 total rows per script load, or on a
+reported I/O error. Pause/resume does not reset the cap or truncate existing data.
+The LOGS directory must already exist; the update installer checks it.
+
+Rows contain radio uptime, page, received/custom/accepted/duplicate packet
+counts, sequence/status age, maximum sampling gap, robot flags/masks, and each
+standard sensor's last accepted value, age, current/fresh flags, and whether the
+value is still displayed. This diagnoses polling gaps and packet delivery; it
+does not replace the robot's high-rate onboard motion logs. Recording works in
+the script's background callback while EdgeTX schedules it, and cannot capture
+packets the radio never received. Hardware storage latency/runtime remain to be
+checked on the GX12. A diagnostic CSV is not proof of control-loop timing.
+
+EdgeTX provides a restricted `io.open/write/close` API; the host tests emulate
+its actual calling convention and no-return `close`. EdgeTX's separate built-in
+**SD Logs** function can also record configured sensors and radio controls;
+this update does not alter that function or any model configuration.
+[Lua file I/O](https://luadoc.edgetx.org/overview/version-libraries/io-library),
+[SD Logs](https://manual.edgetx.org/bw-radios/model-select/special-functions).
 
 ### Wire contract v1
 
@@ -257,6 +304,21 @@ Robot recovery: follow the [Wi-Fi/OTA recovery guide](WIFI_OTA.md#recovery),
 preserving calibration/settings and downloading the saved run first. The active
 slot can change after every OTA. Restoring pre-Wi-Fi firmware removes its OTA
 service; do not use historical app0-only commands as a generic recovery method.
+
+**GX12 runtime correction (v3.1):** the v3 installation crashed on the first FM
+event because `table.insert` is unavailable on monochrome EdgeTX. Its logger
+also used unavailable `table.concat`. Both paths now use core Lua operations.
+The complete display and logger tests load production Lua in an isolated,
+restricted environment rather than inheriting desktop libraries. This also
+removes access to os/package/debug/coroutine and limits library/API exposure.
+The pre-fix script reproduces the photographed error in this environment.
+Both suites pass on desktop Lua and Lua 5.3.6 configured with 32-bit numeric
+types, matching EdgeTX 2.11's vendored version/configuration. Full handset
+runtime, heap and scheduler verification still requires the physical radio.
+Use `HOP_LUA_BIN` and `HOP_LUAC_BIN` to select a compatible local interpreter and
+compiler for the check script; never copy the host compiler's bytecode to SD.
+[Library availability](https://luadoc.edgetx.org/overview/version-libraries),
+[EdgeTX 2.11 Lua configuration](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/thirdparty/Lua/src/luaconf.h).
 
 Host validation: `bash scripts/check_radio_telemetry.sh`, the existing consolidated
 balance checks, and PlatformIO build. The new tests feed actual C++-encoded

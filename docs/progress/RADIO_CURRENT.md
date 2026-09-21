@@ -1,4 +1,111 @@
-# Radio telemetry — September 19, 2026
+# Radio telemetry — September 20, 2026
+
+## Crash fix installed — Lua v3.1, September 20 at 14:05 EDT
+
+Austin's GX12 photo shows `attempt to index a nil value (field 'table')`.
+Reproduced on v3 at `event()` when the first fresh FM value arrives. EdgeTX
+2.11 registers the `table` library only for color-LCD builds; the earlier host
+tests incorrectly exposed the desktop library to this monochrome script.
+
+- Removed all library dependencies on `table`: bounded four-entry event shift
+  and CSV construction now use core Lua indexing/concatenation. Ordinary Lua
+  tables are supported. Retained the page/freshness fixes and opt-in logger.
+- Both existing test suites now load production code into a restricted GX12
+  environment: no table/os/package/debug/coroutine, explicit supported APIs,
+  read-only math/string libraries and EdgeTX-style I/O. Harness helpers cannot
+  leak desktop libraries into the script. Old source failed before the fix;
+  corrected display and 600-record logging/error suites pass.
+- Additionally built official Lua 5.3.6 with 32-bit integers/floats, matching
+  EdgeTX 2.11's vendored version/numeric types; all radio tests pass there.
+  Accounted for binary32 versus binary64 rounding at the -0.45 display boundary
+  in the host assertion. Native fixture/transport, CSV integrity, syntax and
+  rendered-layout checks pass. This is not a full hardware VM/scheduler test.
+- Installed `hop.lua` from source `605c66d`: 17,524 bytes, SHA-256
+  `d2674ebd99d1609c62ff9de6cf657e739c6eaa4653f8fcf490b659a9cd7bc995`.
+  Package/evidence: project-root `artifacts/radio-lua-v3.1-2026-09-20/`.
+- Austin reattached NO NAME and authorized deployment. Verified the volume UUID,
+  all six frozen-package manifest entries and source equality. Backed up v3,
+  its bytecode and current configuration to project-root
+  `artifacts/radio-lua-v3.1-2026-09-20/install-20260920T180506Z/` before replacing
+  only `SCRIPTS/TELEMETRY/hop.lua` and removing generated `hop.luac`.
+- Card readback matched the tested source after sync; Lua 5.3.6/32-bit syntax
+  check passed directly from the card. All four MODELS/RADIO files and two
+  unrelated telemetry files stayed byte-identical. Model00 still selects hop;
+  LOGS exists and logging remains OFF by default. Safe eject succeeded.
+- Firmware, mappings and other worktrees are untouched. Next: reboot the radio,
+  open telemetry screen 2 and verify the display on the handset. Diagnostics
+  page 6 should show LUA v3.1. Hardware boot/runtime verification remains pending.
+
+References: [EdgeTX library availability](https://luadoc.edgetx.org/overview/version-libraries),
+[2.11 library registration](https://github.com/EdgeTX/edgetx/blob/v2.11.0/radio/src/thirdparty/Lua/src/linit.c).
+
+## Prior installation — Lua v3, September 19 at 23:58 EDT (crashes on GX12)
+
+Austin reported residual blanking and repeated Basic page content, and asked
+for an update prepared before reconnecting the radio. The candidate was prepared
+in the radio worktree, then installed after Austin reattached the radio and
+explicitly requested copying it to the SD card. No robot firmware was changed.
+
+- Fixed the Basic fallback routing: overview, standard pose/power, unavailable
+  motor details, observed events/run report, radio link and diagnostics each
+  have their own content. Motor states are never inferred from FM text.
+- Reproduced lost updates with EdgeTX 2.11's 160–320 ms freshness window and the
+  old 200 ms sampler. Poll at 50 ms; hold individual values five seconds, mark
+  cached readings with `*`, expire them independently. Robot arming/motion still
+  becomes unknown after three seconds; explicit state/fault updates are immediate.
+- Added opt-in diagnostics on page 6: long ENTER toggles 1 Hz CSV under LOGS,
+  default OFF, 600 rows per script load, append/close each row, stop on I/O error.
+  Captures ages, freshness, sample gaps, packet counts and status flags.
+- Native radio tests, actual C++→Lua fixtures, six Basic pages, phase-aligned
+  missed-update regression, expiry/recovery, unknown/schema/duplicate handling,
+  logger lifecycle/error/limit tests, CSV parser and rendered layouts passed.
+  Radio runtime/storage timing and the physical RF path remain unverified.
+- Installed `hop.lua` from source `9c5b88d`: 17,299 bytes, SHA-256
+  `db6ca509d52780358728b18b4a59186e862c4e1195aed939415d566269e1da7f`.
+  Prepared package: project-root `artifacts/radio-lua-v3-2026-09-19/`.
+- Verified the frozen package, source hash and NO NAME volume identity before
+  replacing `SCRIPTS/TELEMETRY/hop.lua`. Backed up the prior Lua, bytecode and
+  current configuration in `artifacts/radio-lua-v3-2026-09-19/install-20260920T035847Z/`
+  at the project root. Removed old `hop.luac`, verified LOGS already exists and
+  model00 still selects hop. Card syntax/readback passed after sync; all four
+  MODELS/RADIO files and two unrelated telemetry files were unchanged. Safe
+  eject succeeded. Logging remains OFF until enabled on Diagnostics.
+- Worktree remains `codex/radio-telemetry`; no edits to other branches, firmware,
+  model configuration or channel mappings. Root integration belongs to its
+  current task owner. Next: reboot the radio, open telemetry screen 2, verify
+  distinct pages and steady values. Page 6 shows LUA v3; hold ENTER there to
+  opt into a diagnostic CSV if needed. Hardware runtime/RF checks remain pending.
+
+## Previous installed Lua update — 22:31 EDT
+
+Austin reported flickering readings and requested a Lua-only fix. Installed
+three-second holds for each standard sensor and numeric robot reading; fresh
+values replace the cache, invalid/stale values and unrelated packets cannot
+renew it. Status shows HOLD after 1.5 seconds, UNKNOWN after three; fresh fault,
+arming and IMU flags remain immediate. Existing loss alerts retain their timing.
+
+- **Source:** `codex/radio-telemetry` worktree. Root checkout is owned by the
+  Wi-Fi/OTA task and was not edited or merged into during this Lua fix.
+- **Installed:** `SCRIPTS/TELEMETRY/hop.lua`, 11,724 bytes, SHA-256
+  `49f7ea30dcafc6118c27ba626fa7d66d18a346fa70369d3b6ecfd30f62b0b7e7`.
+  Removed the old radio-generated `hop.luac` so EdgeTX rebuilds it at reload.
+- **Verified:** native encoder/transport and Lua regression tests, per-value
+  expiry, alternating updates, invalid values, zero values, recovery, clock
+  wrap, duplicate/detail rejection, immediate flags, syntax and rendered
+  layouts. Readback matched source; all four MODELS/RADIO files were unchanged.
+  Synced and safely ejected the card. Hardware screen check follows reboot.
+- **Backup:** `artifacts/radio-lua-hold-2026-09-19/20260920T023100Z/` in the
+  project root contains previous Lua/bytecode, installed Lua and installation
+  hashes. Restore the prior Lua and remove generated bytecode to undo this fix.
+- **Firmware:** no robot access or firmware changes during this fix. The separate
+  Wi-Fi/OTA task has since installed combined firmware; consult its integration
+  checkout's current state for that release. The earlier flash attempt in this
+  task stopped before writing firmware. Its old OpenOCD full-read artifact
+  failed image validation and must not be used as a restoration image.
+- **Next:** reboot the radio and check telemetry screen 2. Integrate this Lua
+  commit into the current firmware branch when its owner is ready.
+
+## Original audit and installation record
 
 **Current firmware workflow:** the Wi-Fi/OTA task installed the combined robot firmware, including the structured radio payload, on September 19. See [current robot state](CURRENT.md). Use [OTA for robot updates and Wi-Fi for full log downloads](../WIFI_OTA.md); Lua/handset storage updates remain separate. The actual GX12 screen/RF rendering remains unverified.
 
