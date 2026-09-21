@@ -110,7 +110,10 @@ only the subsequent focused candidate/evidence commits. The balance-lower
 task owns combined checks, shared progress state and the robot. No OTA,
 settings write or autonomous motion was performed here.
 
-Reproduce the screen from the fast-tip checkout:
+Reproduce this historical screen at candidate commit `32c4b68`; its production
+gain selector was removed when the experiment was deferred. The current
+fast-tip HEAD preserves installed fast v2 and cannot run this candidate bridge.
+From a checkout of the candidate:
 
 ```sh
 /Users/austinmcchord/Development/Hopscotch/.venv/bin/python scripts/screen_fast_tip_drift.py \
