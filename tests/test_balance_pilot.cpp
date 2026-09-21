@@ -212,7 +212,8 @@ int main() {
     assert(balance_log::supported(6,240) && balance_log::supported(7,240) && balance_log::supported(8,240) && balance_log::supported(9,240) && balance_log::supported(10,240));
     assert(!balance_log::supported(7,236));
     assert(balance_log::supported(11,240) && balance_log::supported(12,240));
-    assert(!balance_log::supported(3,240) && !balance_log::supported(13,240));
+    assert(balance_log::supported(13,240));
+    assert(!balance_log::supported(3,240) && !balance_log::supported(14,240));
     old.pilot_forward=.5f;old.pilot_flags=15;old.pilot_arm=.1f;
     expanded={};std::memcpy(&expanded,&old,236);
     assert(expanded.pilot_forward==.5f && expanded.pilot_flags==15 && expanded.pilot_arm==0);

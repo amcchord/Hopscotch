@@ -79,17 +79,25 @@ int main() {
       for(float rate:{-50.f,-50.01f,4.01f}) {
         fast.in.rate=rate;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
       }
-      // Losing either loaded support pauses early, before the fault timer.
+      // Quiet mechanical support can report near-zero torque. Keep the proven
+      // normal return then; pause if a weakly loaded body is falling faster.
       fast.in.rate=-10;
       for(int side=0;side<2;++side) {
         fast.in.torque_left=side==0?0:.3f;fast.in.torque_right=side==1?0:-.3f;
-        b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
+        b=fast.lower.left();fast.tick();assert(std::fabs(fast.lower.left()-b-.0048f)<.0001f);
+        fast.in.rate=-12.01f;b=fast.lower.left();fast.tick();assert(fast.lower.left()==b);
+        fast.in.rate=-10;
       }
       fast.in.torque_left=.3f;fast.in.torque_right=-.3f;
       // A delayed arm cannot accumulate more than 0.06 rad of fast travel.
       const float measured=fast.in.arm_left;
       for(int i=0;i<8;++i)fast.tick(false);
       assert(fast.lower.left()<=measured+.06001f);
+      fast.in.torque_left=fast.in.torque_right=0;
+      b=fast.lower.left();fast.tick(false);
+      assert(std::fabs(fast.lower.left()-b)<.0001f); // pending travel stays bounded
+      assert(fast.lower.phase()==LowerPhase::Descending);
+      fast.in.torque_left=.3f;fast.in.torque_right=-.3f;
       fast.in.arm_left=fast.lower.left();fast.in.arm_right=fast.lower.right();
       fast.in.tilt=12.5f;fast.in.rate=-8;b=fast.lower.left();fast.tick();
       assert(std::fabs(fast.lower.armSpeed()-1.275f)<.0001f);
@@ -107,6 +115,20 @@ int main() {
       for(int i=0;i<29;++i)fast.tick();
       assert(fast.lower.phase()==LowerPhase::GroundHold);fast.tick();
       assert(fast.lower.phase()==LowerPhase::Retracting && fast.lower.armSpeed()==.30f);
+    }
+    { // Physical v12 regression: both arms caught, then holding torque fell
+      // below 0.2 Nm. Constant targets parked at 82.7 degrees until timeout.
+      Rig r;r.fast_selected=true;r.catchFall();
+      r.in.tilt=82.825f;r.in.rate=0;r.in.torque_left=.0455f;r.in.torque_right=.030f;
+      const float initial=r.lower.left();
+      for(int i=0;i<50;++i)r.tick();
+      assert(r.lower.phase()==LowerPhase::Descending);
+      assert(std::fabs(r.lower.left()-initial-.24f)<.0001f);
+      // Both readings can be zero at rest; return still progresses, without
+      // unlocking this path before the original two-arm catch confirmation.
+      r.in.torque_left=r.in.torque_right=0;const float next=r.lower.left();
+      r.tick();assert(r.lower.left()>next);
+      r.in.rate=4.01f;const float paused=r.lower.left();r.tick();assert(r.lower.left()==paused);
     }
     { // Fast return does not waive feedback, support-loss or global rate guards.
       for(int fault=0;fault<3;++fault) {

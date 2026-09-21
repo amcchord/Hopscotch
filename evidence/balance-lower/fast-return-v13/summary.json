@@ -1,0 +1,38 @@
+{
+  "baseline_source": "09d2e01",
+  "header_sha256": "db8f8ec3c09f2b0fba6e48d93eaf5b2fc36fbe1701d496d598d616fa95c18287",
+  "simulator_sha256": "c27b88d0e4526efce26bc4512563d849fa309feb91836a4c952d56c1e66c0fca",
+  "normal_exact_cases": 329,
+  "fast_cases": 329,
+  "fast_completions": 258,
+  "changed_fault_reasons": [],
+  "low_torque_cases": 40,
+  "low_torque_old_completions": 21,
+  "low_torque_new_completions": 40,
+  "failure_replay": {
+    "source": "telemetry_logs/bal_20260921T020520Z_v12_contact_stop_wifi.csv",
+    "sha256": "03971226f22eb9c2a2eb8f789624db02eda5035469c23fead2a42dd2858ee67d",
+    "support_ms": 19790.0,
+    "old_reason": "lower_descent_timeout",
+    "new_fixed_sensor_reason": "lower_descent_timeout",
+    "old_target_constant": true,
+    "new_first_return_ms": 19810.0,
+    "new_max_target_lead": 0.060999986648559545,
+    "extra_stationary_frame_ms": 20,
+    "limits": "Recorded sensors stay parked; this verifies released command, not future physical completion.",
+    "target_updates_bounded_rad": 0.06,
+    "paused_measured_arm_motion_note": "Held target error reaches 0.061 rad after 0.001-rad measured motion during a backward-rate pause."
+  },
+  "normal_command_replays": [
+    "bal_20260920_forward_catch_v7_success_wifi",
+    "bal_20260920_forward_catch_v8_stop_wifi",
+    "bal_20260920_forward_catch_v9_success_wifi",
+    "bal_20260921T011755Z_fast_tip_success_drift_wifi",
+    "bal_20260921T013959Z_fast_lower_speed_wifi",
+    "bal_20260921T020520Z_v12_contact_stop_wifi"
+  ],
+  "limits": [
+    "Approximate contact model; no physical acceptance claimed.",
+    "Torque stress scales feedback only after support; it is not an identified sensor model."
+  ]
+}

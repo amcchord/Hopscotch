@@ -10,7 +10,7 @@
 namespace {
 
 static constexpr uint32_t BALANCE_LOG_MAGIC = 0x324C4142;  // "BAL2"
-static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 12;
+static constexpr uint16_t BALANCE_LOG_SCHEMA_VERSION = 13;
 
 struct BalanceLogFileHeader {
     uint32_t magic;
@@ -2162,7 +2162,9 @@ void BalanceController::dumpLog(Print* sink) {
     }
     if (header.schema_version >= 5 && (header.reserved & 32768)) {
         // Metadata-only policy revisions retain historical exports exactly.
-        if (header.schema_version >= 12)
+        if (header.schema_version >= 13)
+            out.println("# lowering=experimental_ch11_forward_catch_v13 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
+        else if (header.schema_version >= 12)
             out.println("# lowering=experimental_ch11_forward_catch_v12 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
         else if (header.schema_version >= 10)
             out.println("# lowering=experimental_ch11_forward_catch_v10 state:4 active_pilot_flag:64 phase_shift:8 phase_mask:15");
@@ -2196,7 +2198,9 @@ void BalanceController::dumpLog(Print* sink) {
             out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.24 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
         else
             out.println("# lowering_limits=target_lead_rad:0.24 lower_rad_s:0.16 retract_rad_s:0.30 wheel_stop_accel_rad_s2:3 wheel_command_abs_rad_s:6 body_abs_rate_dps:65 owner_timeout_ms:100 motor_feedback_ms:100 wheel_wrong_sign_ms:100 wheel_sign_start_ms:150");
-        if (header.schema_version >= 12)
+        if (header.schema_version >= 13)
+            out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:1.80 normal_motor_rad_s:0.30 fast_motor_rad_s:2.25 normal_descent_dps:12 fast_descent_dps:50 taper_tilt_deg:20:5 rate_ease_start_fraction:0.6 fast_target_lead_rad:0.06 low_load_above_deg:15 low_load_below_nm:0.2 low_load_return_rad_s:0.24 low_load_forward_rate_max_dps:12 catch_and_final_retraction_unchanged:1");
+        else if (header.schema_version >= 12)
             out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:1.80 normal_motor_rad_s:0.30 fast_motor_rad_s:2.25 normal_descent_dps:12 fast_descent_dps:50 taper_tilt_deg:20:5 rate_ease_start_fraction:0.6 fast_target_lead_rad:0.06 unloaded_pause_above_deg:15 unloaded_below_nm:0.2 catch_and_final_retraction_unchanged:1");
         else if (header.schema_version >= 10)
             out.println("# lowering_fast=ch6_high_above:0.5 low_or_center:normal latched_at_lower_CH11_accept:1 fast_lower_pilot_flag:4096 supported_only:1 blend_ms:600 normal_speed_rad_s:0.24 fast_speed_rad_s:0.60 normal_motor_rad_s:0.30 fast_motor_rad_s:0.75 normal_descent_dps:12 fast_descent_dps:20 taper_tilt_deg:35:15 catch_and_final_retraction_unchanged:1");

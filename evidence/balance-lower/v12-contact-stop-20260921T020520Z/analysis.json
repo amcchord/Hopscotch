@@ -1,0 +1,29 @@
+{
+  "installed_source": "09d2e01b6ef89a357319a8eeea2fa11db8221932",
+  "samples": 1140,
+  "schema": 12,
+  "end_reason": "lower_descent_timeout",
+  "csv_sha256": "03971226f22eb9c2a2eb8f789624db02eda5035469c23fead2a42dd2858ee67d",
+  "wire_sha256": "ba55265f2bdfde0564d71df3f5d9bf95d4b8a95a354c30d30cf7bbbc02a80822",
+  "descending_samples": 150,
+  "supported_ms": 19790.0,
+  "timeout_ms": 22790.0,
+  "left_target_unique": [
+    2.071
+  ],
+  "right_target_unique": [
+    5.37
+  ],
+  "both_load_above_threshold_samples": 0,
+  "normal_rate_eligible_samples": 132,
+  "median_tilt": 82.741,
+  "median_rate": -0.0185,
+  "median_torque": [
+    0.0455,
+    0.03
+  ],
+  "limits": [
+    "Holding motor torque is not a direct floor-contact measurement.",
+    "Replay can verify changed target commands, not actual new physical motion."
+  ]
+}

@@ -301,14 +301,15 @@ public:
                 : 0.f;
             float return_speed = c.lower_speed + _return_blend*(c.fast_lower_speed-c.lower_speed);
             const float descent_rate = c.descent_rate + _return_blend*(c.fast_descent_rate-c.descent_rate);
-            // Do not withdraw a temporarily unloaded support. Ease the fast
-            // target before its rate pause, and limit pending travel so motor
-            // lag cannot keep pulling the arms away after a pause.
+            // Low measured torque does not prove lost contact: v12 parked on
+            // the arms with almost zero holding torque. Keep the proven normal
+            // return while calm; pause a fast fall without measured support.
+            // Ease the fast target and bound travel pending after a pause.
             if (_fast) {
                 if (in.tilt > 15.f
                     && (std::fabs(in.torque_left) < c.contact_torque*.5f
                         || std::fabs(in.torque_right) < c.contact_torque*.5f))
-                    return_speed = 0;
+                    return_speed = in.rate >= -c.descent_rate ? c.lower_speed : 0.f;
                 return_speed *= std::max(0.f, std::min(1.f,
                     (in.rate+descent_rate)/(descent_rate*.4f)));
             }

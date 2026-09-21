@@ -1,7 +1,7 @@
 # Balance Mode Test Guide
 
 **September 20 update:** [V9 completed fast standing and lowering](../evidence/balance-lower/trial-v9-success-20260920/README.md).
-[V12](BALANCE_LOWER_V12_2026-09.md) accelerates CH6-selected supported return. Select HIGH
+[V13](BALANCE_LOWER_V13_2026-09.md) corrects a stop after contact in fast supported return. Select HIGH
 before the lowering CH11 pulse for fast supported return; LOW/center retain
 normal v9. The choice latches separately at each maneuver request. Check
 [current installed identity](progress/CURRENT.md), perform one trial, then
@@ -9,7 +9,7 @@ disarm and archive before another attempt.
 
 This guide is the repeatable procedure for collecting the data needed to tune Hopscotch's balance mode with the Wi-Fi/OTA firmware. The robot captures up to 120 seconds at 50 Hz, including tip-up, in PSRAM and saves it to LittleFS after balance ends and **both drive and arms are disarmed**. Download the checksummed CSV over Wi-Fi after every run. Only the latest run is stored on the robot. Capture reaching its limit does not stop the robot; end initial tests before that point to retain the outcome.
 
-The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH6 fast laydown](BALANCE_LOWER_V12_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; normal v9 lowering and fast v2 standing have operator-confirmed success; fast v10 lowering has two archived successful trials. The latest stand-up was reported perfect, so v12 preserves its installed fast v2 policy and changes only fast supported lowering. Check current state for v12 installation and physical acceptance.
+The installed combined release adds [progressive braking v5](BALANCE_DRIVE_BRAKING_2026-09.md), [flat-ground drive](GROUND_DRIVE_2026-09.md) and [CH6 fast laydown](BALANCE_LOWER_V13_2026-09.md), retaining the startup/stationary controller. Read the [current state](progress/CURRENT.md) for its identity and remaining hardware checks. The [Wi-Fi / OTA guide](WIFI_OTA.md) is the update and recovery procedure. Dated balance reports preserve earlier evidence; their old package/USB instructions do not identify the current release. OTA and powered disarmed feedback checks passed; normal v9 lowering and fast v2 standing have operator-confirmed success; fast v10 lowering has two archived successful trials. The latest stand-up was reported perfect, so v13 preserves its installed fast v2 policy and changes only fast supported lowering. Check current state for v13 installation and physical acceptance.
 
 ## Safety and Test Area
 
@@ -32,7 +32,7 @@ Transport version 2 passed a full transmitter-on update with a four-second
 receive gap. The transmitter may stay on while disarmed; transmitter-off was
 faster in the recorded tests. Wait for the final verified report before testing.
 
-Use the current v12 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
+Use the current v13 procedure for the next lowering trial; stop further attempts on a fault and retrieve the log.
 
 **Do not run `uploadfs`, even for web changes.** The dashboard is embedded in the
 application; LittleFS contains calibration, settings and the saved run. Do not
@@ -83,14 +83,14 @@ A held stick through startup cannot unlock standing drive. If control pauses aft
 ## Supported return to flat
 
 V9 completed a physical flat/Forward finish at 0.24 rad/s supported target
-speed. V12 retains that normal behavior and accelerates supported return with CH6 HIGH.
+speed. V13 retains that normal behavior and accelerates supported return with CH6 HIGH.
 Select CH6 before the lowering pulse; the choice is independent of stand-up
 and stays fixed during the maneuver.
 
 After stand-up and arm return settle, center CH1/CH2 and pulse CH11 once. The
 sequence deliberately falls forward, catches on the arms, then returns them
 until the body is flat and both arms are Forward. Follow the [current lowering
-procedure](BALANCE_LOWER_V12_2026-09.md) with the established clear-area/spotter
+procedure](BALANCE_LOWER_V13_2026-09.md) with the established clear-area/spotter
 setup. Keep CH12 assistance out of this trial so automatic completion can be
 assessed. Disarm and archive the saved run before another attempt.
 

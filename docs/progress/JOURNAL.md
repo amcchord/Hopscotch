@@ -914,3 +914,32 @@ manifest, checks summary, timings, identities and preservation. Preceding
 or secret header copied between worktrees. Other tasks remain independent.
 This lowering-only update is installed and ready for Austin's CH6 HIGH / CH11
 manual trial. Physical speed/robustness still require the resulting telemetry.
+
+## 2026-09-20 — Diagnose v12 contact deadlock and prepare narrow v13 correction
+
+Archived Austin's failed run on verified 09d2e01/app1: 1,140 schema-12 samples,
+lower_descent_timeout. Fresh powered healthy/disarmed checks and archive passed.
+At confirmed support (19.790 s/82.825 degrees), targets freeze at 2.071/5.370 rad
+until timeout at22.790 s. No Descending sample has both torque magnitudes>=0.2;
+132/150 samples satisfy the existing normal rate bounds. The v12 load veto is
+the immediate stall cause; static holding torque is not a contact measurement.
+
+V13 replaces the zero target advance under weak torque with the proven normal
+.24-rad/s return while forward rate<=12; the existing+4 backward pause remains.
+Fast falling with weak support still pauses. Only confirmed fast Descending
+changes; stand-up, normal mode, precontact/catch, bounds/timeouts and landing stay.
+Native tests cover the physical stall and weak load at full pending target lead.
+Schema13 identifies the policy while preserving historical exports.
+
+All329 normal model results and six normal command replays remain identical;
+fast retains258 completions and identical71 rejection outcomes. New feedback-only
+post-support torque stresses complete40/40 versus21/40 on v12. Failed recorded
+replay moves the target20 ms after support; fixed sensors still yield timeout,
+so no physical completion inferred. Replay harness was corrected to extend one
+stationary frame across the strict internal timeout and distinguish generated
+.06-rad lead from held-target error. The latter reaches.061 when measured arm
+moves1mrad during a backward pause; this is recorded rather than hidden.
+
+Peer independently confirms trace diagnosis, runtime scope and held-target
+explanation. Next: freeze/check/build once, preserve the run and deploy corrective
+v13 through existing authorized OTA scope. No autonomous motion/settings writes.

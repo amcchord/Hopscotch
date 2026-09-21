@@ -1,5 +1,7 @@
 # CH6 faster supported return v12
 
+V12 stopped after contact in its physical trial. See the [v13 correction](BALANCE_LOWER_V13_2026-09.md) and current state for deployment status.
+
 Select **CH6 HIGH before pulsing CH11** for the faster laydown; LOW or center
 keeps the established normal return. The choice is latched independently of
 stand-up. The successful fast stand-up remains v2, unchanged.
