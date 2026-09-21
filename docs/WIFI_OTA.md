@@ -8,7 +8,7 @@ No Internet server is required or deployed.
 
 This is the current operating guide for firmware updates and telemetry.
 [Current state](progress/CURRENT.md) identifies the installed application;
-[latest deployment evidence](../evidence/lowering-v10-integration/README.md) records
+[latest deployment evidence](../evidence/ota-throughput-deployment/README.md) records
 the current image and powered disarmed verification. The [initial network
 validation](../evidence/wifi-ota/README.md) records the earlier motor-power-off
 load and failure tests. Use [BALANCE_TESTING.md](BALANCE_TESTING.md) for
@@ -73,10 +73,11 @@ and a stalled WebSocket client. `/api/info` also reports the ESP reset reason.
 
 ## Local configuration and access
 
-The next network candidate adds strongest-signal AP selection and an optional
-fast upload profile. See [OTA throughput investigation](OTA_THROUGHPUT_2026-09.md)
-for evidence, timing diagnostics and the pending hardware comparison. The
-existing paced helper remains the default; no live roam is added during motion.
+The installed firmware scans all channels and prefers the strongest matching
+AP when associating. It includes AP/channel telemetry and OTA timing diagnostics.
+See [OTA throughput investigation](OTA_THROUGHPUT_2026-09.md) for observations
+and the optional fast upload profile. Paced remains the default; no live roaming
+is added during motion.
 
 For a new checkout, copy `src/network_secrets.example.h` to `src/network_secrets.h` and fill in
 SSID, Wi-Fi password, a random device API token and a distinct recovery AP
@@ -186,13 +187,13 @@ package for recovery.
    it off remains an option when speed matters. The exact throughput cause is
    unconfirmed. Older transport still uses the transmitter-off bootstrap path.
 2. Run one command with the frozen application and its manifest. For the
-   September 20 lowering-v10/CH6-fast-laydown package, from the project root:
+   September 20 OTA-throughput package (preserving v10 motion), from the project root:
 
    ```bash
-   python3 worktrees/balance-lower/scripts/robot_wifi.py --host http://192.168.1.172 \
+   python3 worktrees/ota-throughput/scripts/robot_wifi.py --host http://192.168.1.172 \
      --secrets-file src/network_secrets.h ota \
-     worktrees/balance-lower/artifacts/lowering-v10-fast/candidate/firmware.bin \
-     --manifest worktrees/balance-lower/artifacts/lowering-v10-fast/candidate/manifest.json
+     worktrees/ota-throughput/artifacts/ota-throughput/release/firmware.bin \
+     --manifest worktrees/ota-throughput/artifacts/ota-throughput/release/manifest.json
    ```
 
    Use the current integration worktree helper and its frozen package as shown.
@@ -200,8 +201,11 @@ package for recovery.
 
    The helper verifies file size, whole-file hash and ESP digest, checks fresh
    disarmed maintenance eligibility, archives and validates the saved run, then
-   transfers the application with 1 KiB/50 ms pacing and a 120-second socket
-   timeout. It verifies the new running digest/slot, fresh IMU, disarmed state,
+   transfers the application with default 1 KiB/50 ms pacing, a 120-second
+   connect/send timeout and up to 900 seconds for the final response. Optional
+   `--upload-profile fast` uses 16 KiB sends without artificial sleeps. Local
+   socket buffering means sent bytes can be well ahead of the robot screen.
+   It verifies the new running digest/slot, fresh IMU, disarmed state,
    return of previously online motors without errors, and identical saved-run
    exports. Observed uploads took about 64 seconds with the transmitter off, 188 seconds
    for the earlier unmonitored transmitter-on update, 250 seconds with
@@ -211,9 +215,13 @@ package for recovery.
    disconnect at 277,504 bytes. The old image and healthy idle state were verified
    before retrying the identical file. These are observations, not fixed upload
    deadlines. V10 completed in 90.96 seconds with the transmitter unlinked.
-   There is no separate
-   manual status/log/download loop to repeat. Gap injection and concurrent status
-   monitoring are acceptance tests, not routine deployment steps.
+   The throughput candidate took 305.815 seconds with the transmitter linked and
+   the fast sender, using the old receiver/AP connection. An initial host timeout
+   safely aborted; after verifying old-image health, the same frozen image was
+   retried with the corrected response wait. No speedup on the new AP is yet
+   measured. There is no separate manual status/log/download loop to repeat.
+   Gap injection and concurrent status monitoring are acceptance tests, not
+   routine deployment steps.
 3. Wait for the final verified report. The helper saves state, transfer outcome
    and `.csv`/`.wire` exports in a new `output/ota-<UTC>/` directory, printed at
    startup. `--record-dir <new-directory>` selects a durable evidence location.
@@ -230,7 +238,9 @@ update that installs this feature still runs under the preceding firmware.
 The first subsequent update completed in 475.235 s with the transmitter
 linked before/after. One in-flight snapshot confirmed active OTA, maintenance,
 disabled motors and cleared RC/link input, consistent with UART suspension.
-The physical progress screen was not independently observed.
+During the September 20 throughput deployment, Austin confirmed the physical
+percentage was increasing. A recovery snapshot independently confirmed motor
+and RC suppression, followed by healthy recovery from the interrupted attempt.
 This is one observed transfer, not a controlled performance comparison.
 
 `--host` and `--secrets-file` go before `ota`; other OTA options go after it.

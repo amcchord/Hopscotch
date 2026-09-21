@@ -1,0 +1,19 @@
+{
+  "baseline_source": "7917543beedaf4902d1661461f18380959ad100a",
+  "firmware_source": "45c1a94aa82aab952be420e5472c5ae8e377bef1",
+  "changed_production_files": [
+    "src/ota_metrics.h",
+    "src/web_server.cpp",
+    "src/web_server.h"
+  ],
+  "motion_control_display_radio_dashboard_build_dependencies_unchanged": true,
+  "host_timeout_fix_commit": "243bff2c869526b6778e21d10a6c5df7905c17d6",
+  "host_fix_changed_firmware": false,
+  "other_worktrees_modified": false,
+  "preserved_files_sha256": {
+    "src/main.cpp": "8ae0147cd6e3634defb4e7d887abc65ca1ba62f0df6d43e06c868129417c974b",
+    "src/display.cpp": "056c1a175b1d5447c2bb9cbd62e7bf2fe9324ef6d78b7f1b90c928896dcad29e",
+    "src/crsf.cpp": "23a070de87e8754a42bdb54b30bbf39d6225363851dc557fdf65672b12ab3725",
+    "src/balance_controller.cpp": "8aaebe362b0e3ad233c10931b3a0e2840b30a3435eb5ef284c57ec26113a6e07"
+  }
+}

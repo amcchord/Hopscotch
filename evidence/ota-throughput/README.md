@@ -1,4 +1,7 @@
-# OTA throughput candidate — local validation, not installed
+# OTA throughput candidate — original local validation
+
+This is the original preparation record. Later authorized hardware work is
+recorded in the [deployment evidence](../ota-throughput-deployment/README.md).
 
 Worktree: `worktrees/ota-throughput`, branch `codex/ota-throughput`, baseline
 `d5f18fa` (v10 deployment record). [Findings, changes and release handoff](../../docs/OTA_THROUGHPUT_2026-09.md).

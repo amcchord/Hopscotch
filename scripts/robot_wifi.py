@@ -282,7 +282,7 @@ def main():
     ota.add_argument('--manifest', type=Path, help='Verify size and both digests against the frozen release manifest')
     ota.add_argument('--record-dir', type=Path, help='New directory for pre/post state and validated saved-run exports')
     ota.add_argument('--upload-profile', choices=UPLOAD_PROFILES, default='paced',
-                     help='paced: proven 1 KiB/50 ms; fast: 16 KiB sends without artificial sleeps (hardware trial pending)')
+                     help='paced: 1 KiB/50 ms; fast: 16 KiB sends without artificial sleeps')
     a = p.parse_args()
     if a.command == 'status':
         print(json.dumps(json.loads(request(a.host, '/api/telemetry')), indent=2))

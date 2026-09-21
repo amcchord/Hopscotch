@@ -1,0 +1,38 @@
+{
+  "application_bytes": 1214928,
+  "application_sha256": "b3f12485e2b61dcc1f4dd11c120beffbac46a41e18bfe8847bdb77221d948109",
+  "esp_image_digest": "a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61",
+  "source_commit": "45c1a94aa82aab952be420e5472c5ae8e377bef1",
+  "record_commit": "ba17695fd2878c604a3118db7220d6200bc744e7",
+  "prepared_utc": "2026-09-21T00:40:22.570461+00:00",
+  "status": "prepared_not_installed",
+  "upload_profile": "fast",
+  "configured_image_verified": true,
+  "validation": {
+    "native_executables": 12,
+    "python_tests": 42,
+    "pinned_build": "passed",
+    "ota_transport": "passed",
+    "radio": "passed",
+    "dashboard": "passed",
+    "reused_unchanged_source": true
+  },
+  "baseline_source": "7917543beedaf4902d1661461f18380959ad100a",
+  "rollback": {
+    "application_bytes": 1212352,
+    "application_sha256": "cf873cee0c52614dd179924c41c2466cc39ba1704fc5b1f449212bc25cb18234",
+    "esp_image_digest": "42ed3918122860f6902ae0a1c8915ab771dd353b403de1de6d40fcf2d3cad4fe",
+    "path": "/Users/austinmcchord/Development/Hopscotch/worktrees/balance-lower/artifacts/lowering-v10-fast/candidate"
+  },
+  "rollback_plan": "If interrupted, verify old image and released maintenance before retry. If new app boots but fails health, use retained v10 application with verified OTA. Boot-broken/no network requires slot-aware USB diagnosis; never overwrite filesystem or partition table.",
+  "intended_checks": [
+    "fresh disarmed preflight",
+    "validated saved-log backup",
+    "exact installed image and slot",
+    "six powered motors disabled and error-free",
+    "fresh IMU",
+    "maintenance released",
+    "saved CSV/wire unchanged",
+    "AP/channel/RSSI recorded"
+  ]
+}

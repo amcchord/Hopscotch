@@ -1,0 +1,3 @@
+# Retain raw robot runs locally; commit the validated hashes and outcome.
+/attempt-*/*.csv
+/attempt-*/*.wire

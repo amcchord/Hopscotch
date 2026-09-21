@@ -1,9 +1,11 @@
 # Strongest AP selection and OTA throughput
 
-Candidate on `codex/ota-throughput`, based on verified v10 record `d5f18fa`
-(installed source `7917543`). No robot requests, upload, reconnect or radio
-configuration changes were made for this investigation. The lowering task
-retains device and release ownership.
+Installed source `45c1a94` on `codex/ota-throughput`, based on verified v10
+record `d5f18fa` (motion source `7917543`). The initial investigation was offline;
+Austin subsequently authorized deployment. [Deployment evidence](../evidence/ota-throughput-deployment/README.md)
+records exact identity, the host-timeout fix, successful retry and stronger AP
+selected during a safe reconnect. Device ownership returns to the lowering task
+after this deployment handoff.
 
 ## Findings
 
@@ -92,10 +94,21 @@ considering another attempt. A later explicit retry can use `--upload-profile
 paced`; the helper does not automatically resend bytes. No extra reflash or
 in-flight stress monitoring is needed just to collect diagnostics.
 
-The fast host profile works with the existing receiver, but hardware acceptance
-is pending. Strongest-AP selection and receiver timing headers take effect only
-after firmware containing this candidate boots. Compare AP/channel/RSSI,
+The fast host profile completed a 305.815-second transfer after correcting the
+host response timeout. That transfer still ran on the old receiver; it is not
+evidence of a new-AP throughput improvement. Strongest-AP selection and receiver
+timing headers take effect only after the new firmware boots. Compare AP/channel/RSSI,
 transmitter state, transfer duration, host sleeps/socket stalls and receiver
 write/verification timing on subsequent normal uploads. Record the actual
 speedup, if any, rather than assuming the removed pacing time translates
 directly into the same wall-clock reduction.
+
+## Observed deployment outcome
+
+The successful transfer averaged 3.880 KiB/s with RC linked and no host sleeps.
+The first post-boot association was approximately -70 dBm on channel 6. A fresh
+disarmed reconnect selected a different BSSID on channel 1 and improved -69 to
+-55 dBm. A scan can miss an AP or encounter changing conditions, so strongest
+signal is a connection preference, not a guarantee of permanent best coverage.
+The next normal update can measure this connection and collect receiver timings.
+The physical percentage display was confirmed by Austin; no motion was initiated.

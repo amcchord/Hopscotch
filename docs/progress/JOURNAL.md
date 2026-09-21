@@ -661,3 +661,54 @@ for the next authorized combined release and opt-in fast-profile comparison.
 Candidate source/test/evidence commit `45c1a94` was sent to the lowering/integration
 owner with exact checks, opt-in fast command, limitations and no-robot-action
 status. Shared operating/current/journal records follow in a separate commit.
+
+## 2026-09-20 — Deploy strongest-AP / OTA throughput update
+
+Austin authorized pushing the prepared firmware while the robot was powered.
+The lowering/integration owner confirmed installed v10 source `7917543` and
+transferred exclusive device/release ownership for this release. All work stayed
+in `worktrees/ota-throughput` / `codex/ota-throughput`; root and other checkouts
+were not edited. Reused the exact validated configured candidate at source
+`45c1a94`, with 12 native / 42 Python, pinned build, TCP, radio and dashboard
+checks. Verified existing private configuration in the binary without exposing
+values. Application 1,214,928 bytes, whole SHA
+`b3f12485e2b61dcc1f4dd11c120beffbac46a41e18bfe8847bdb77221d948109`, ESP digest
+`a9ad12aedebfcd1f1aa1b39d3969f567196f357d60e7cbe249d4aa268510af61`.
+Private frozen package is `artifacts/ota-throughput/release/`; immediate v10
+rollback verified in place in the lowering worktree without copying it.
+
+Fresh preflight verified healthy powered disabled motors, disarmed IDLE, fresh
+IMU and RC link up. Each attempt archived the identical 1,462-row saved run.
+The first fast-profile transfer queued the image locally but the 120-second
+HTTP response wait timed out; the old helper retried the response wait then
+closed. Postflight timed out while the old app was still receiving. Read-only
+recovery observed 1,071,102 bytes and active motor/RC suppression; Austin
+confirmed the physical display percentage was increasing. The device later
+aborted with inactivity_timeout at 1,082,590 bytes. V10/app1, released maintenance,
+RC return and all six healthy disabled motors were verified before retry.
+
+Host-only fix `243bff2` allows 900 seconds for the receiver's final response,
+retains 120-second connect/send timeouts, and avoids reusing a timed-out HTTP
+reader. All 16 focused helper regressions passed, including actual delayed
+localhost acknowledgment, early HTTP rejection and one-close failure handling.
+Firmware was neither changed nor rebuilt. A deliberate retry of identical bytes
+received HTTP 200 after 305.815 seconds, 3.880 KiB/s; send blocking 275.442 s,
+max send 15.213 s, response wait 30.363 s, zero pacing sleep. This is not a
+controlled comparison and still used the old firmware/AP connection.
+
+Exact target digest verified in app0 at 2026-09-21T00:57:10.360018+00:00. All six
+powered motors healthy and disabled, fresh IMU, disarmed groups, released
+maintenance and RC link restored. Saved CSV/wire byte-identical before/after.
+The new image reports all-channel strongest-signal selection and metrics v1.
+Its initial association was about -70 dBm/channel 6; one maintenance-only
+reconnect after fresh safety checks selected a different BSSID on channel 1,
+improving -69 to -55 dBm. Image/health/RC reverified at
+2026-09-21T00:57:59.334995+00:00. No repeated scans or motion were initiated.
+
+[Deployment evidence](../../evidence/ota-throughput-deployment/README.md)
+retains both attempts, safe recovery, AP comparison, screen observation and
+source preservation. No settings/filesystem writes or GitHub push requested.
+Motion/RC/display production source remains v10-identical. Next: hand exact
+identity, helper fix and records back to the lowering/device owner for source
+integration before any later firmware build. Observe speed/receiver timings
+on the next normal authorized OTA rather than adding a benchmark reflash.

@@ -2,7 +2,7 @@
 
 Firmware for a remote-controlled 4-wheel robot with two arms and an experimental self-balancing mode. Runs on an ESP32-S3, controls six brushless motors over CAN bus, and is driven with a RadioMaster GX12 transmitter over ELRS.
 
-**Current firmware:** Installed source `7917543` adds [CH6-selected fast laydown](docs/BALANCE_LOWER_V10_2026-09.md). CH6 HIGH selects fast; LOW/center retain the [successful v9 laydown](evidence/balance-lower/trial-v9-success-20260920/README.md). Speed is selected independently at each CH11 maneuver request. Fast standing is unchanged. [Installed evidence](evidence/lowering-v10-integration/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md). Fast laydown needs a manual trial.
+**Current firmware:** Installed source `45c1a94` adds strongest-AP selection and OTA timing diagnostics while preserving v10 [CH6-selected fast laydown](docs/BALANCE_LOWER_V10_2026-09.md). CH6 HIGH selects fast; LOW/center retain the [successful v9 laydown](evidence/balance-lower/trial-v9-success-20260920/README.md). Speed is selected independently at each CH11 maneuver request. Fast standing is unchanged. [Installed evidence](evidence/ota-throughput-deployment/README.md), [current state](docs/progress/CURRENT.md), [OTA procedure](docs/WIFI_OTA.md). Fast laydown needs a manual trial.
 
 Earlier [successful stand-ups](docs/BALANCE_STARTUP_RECOVERY_2026-09.md) and [driving trials](docs/BALANCE_DRIVE_TRIALS_2026-09-19.md) remain historical evidence. Their frozen packages and USB flash instructions are not the current update workflow.
 
